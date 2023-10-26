@@ -45,7 +45,7 @@ func TestDigisparkAdaptorI2cGetI2cConnection(t *testing.T) {
 	c, err = a.GetI2cConnection(availableI2cAddress, a.DefaultI2cBus())
 
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, c)
 }
 
@@ -87,7 +87,7 @@ func TestDigisparkAdaptorI2cWrite(t *testing.T) {
 	count, err := c.Write(data)
 
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.True(t, a.littleWire.(*i2cMock).writeStartWasSend)
 	assert.False(t, a.littleWire.(*i2cMock).readStartWasSend)
 	assert.Equal(t, uint8(0), a.littleWire.(*i2cMock).direction)
@@ -107,7 +107,7 @@ func TestDigisparkAdaptorI2cWriteByte(t *testing.T) {
 	err := c.WriteByte(data)
 
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.True(t, a.littleWire.(*i2cMock).writeStartWasSend)
 	assert.False(t, a.littleWire.(*i2cMock).readStartWasSend)
 	assert.Equal(t, uint8(0), a.littleWire.(*i2cMock).direction)
@@ -127,7 +127,7 @@ func TestDigisparkAdaptorI2cWriteByteData(t *testing.T) {
 	err := c.WriteByteData(reg, data)
 
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.True(t, a.littleWire.(*i2cMock).writeStartWasSend)
 	assert.False(t, a.littleWire.(*i2cMock).readStartWasSend)
 	assert.Equal(t, uint8(0), a.littleWire.(*i2cMock).direction)
@@ -147,7 +147,7 @@ func TestDigisparkAdaptorI2cWriteWordData(t *testing.T) {
 	err := c.WriteWordData(reg, data)
 
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.True(t, a.littleWire.(*i2cMock).writeStartWasSend)
 	assert.False(t, a.littleWire.(*i2cMock).readStartWasSend)
 	assert.Equal(t, uint8(0), a.littleWire.(*i2cMock).direction)
@@ -167,7 +167,7 @@ func TestDigisparkAdaptorI2cWriteBlockData(t *testing.T) {
 	err := c.WriteBlockData(reg, data)
 
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.True(t, a.littleWire.(*i2cMock).writeStartWasSend)
 	assert.False(t, a.littleWire.(*i2cMock).readStartWasSend)
 	assert.Equal(t, uint8(0), a.littleWire.(*i2cMock).direction)
@@ -188,7 +188,7 @@ func TestDigisparkAdaptorI2cRead(t *testing.T) {
 
 	// assert
 	assert.Equal(t, dataLen, count)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.False(t, a.littleWire.(*i2cMock).writeStartWasSend)
 	assert.True(t, a.littleWire.(*i2cMock).readStartWasSend)
 	assert.Equal(t, uint8(1), a.littleWire.(*i2cMock).direction)
@@ -206,7 +206,7 @@ func TestDigisparkAdaptorI2cReadByte(t *testing.T) {
 	data, err := c.ReadByte()
 
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.False(t, a.littleWire.(*i2cMock).writeStartWasSend)
 	assert.True(t, a.littleWire.(*i2cMock).readStartWasSend)
 	assert.Equal(t, uint8(1), a.littleWire.(*i2cMock).direction)
@@ -225,7 +225,7 @@ func TestDigisparkAdaptorI2cReadByteData(t *testing.T) {
 	data, err := c.ReadByteData(reg)
 
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.True(t, a.littleWire.(*i2cMock).writeStartWasSend)
 	assert.True(t, a.littleWire.(*i2cMock).readStartWasSend)
 	assert.Equal(t, uint8(1), a.littleWire.(*i2cMock).direction)
@@ -247,7 +247,7 @@ func TestDigisparkAdaptorI2cReadWordData(t *testing.T) {
 	data, err := c.ReadWordData(reg)
 
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.True(t, a.littleWire.(*i2cMock).writeStartWasSend)
 	assert.True(t, a.littleWire.(*i2cMock).readStartWasSend)
 	assert.Equal(t, uint8(1), a.littleWire.(*i2cMock).direction)
@@ -269,7 +269,7 @@ func TestDigisparkAdaptorI2cReadBlockData(t *testing.T) {
 	err := c.ReadBlockData(reg, data)
 
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.True(t, a.littleWire.(*i2cMock).writeStartWasSend)
 	assert.True(t, a.littleWire.(*i2cMock).readStartWasSend)
 	assert.Equal(t, uint8(1), a.littleWire.(*i2cMock).direction)
@@ -288,7 +288,7 @@ func TestDigisparkAdaptorI2cUpdateDelay(t *testing.T) {
 	err := c.(*digisparkI2cConnection).UpdateDelay(uint(100))
 
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, uint(100), a.littleWire.(*i2cMock).duration)
 }
 

@@ -83,7 +83,7 @@ func TestNewI2cDevice(t *testing.T) {
 				assert.Equal(t, (*i2cDevice)(nil), d)
 			} else {
 				var _ gobot.I2cSystemDevicer = d
-				assert.Nil(t, err)
+				assert.NoError(t, err)
 			}
 		})
 	}
@@ -93,7 +93,7 @@ func TestClose(t *testing.T) {
 	// arrange
 	d, _ := initTestI2cDeviceWithMockedSys()
 	// act & assert
-	assert.Nil(t, d.Close())
+	assert.NoError(t, d.Close())
 }
 
 func TestWriteRead(t *testing.T) {
@@ -105,8 +105,8 @@ func TestWriteRead(t *testing.T) {
 	wn, werr := d.Write(1, wbuf)
 	rn, rerr := d.Read(1, rbuf)
 	// assert
-	assert.Nil(t, werr)
-	assert.Nil(t, rerr)
+	assert.NoError(t, werr)
+	assert.NoError(t, rerr)
 	assert.Equal(t, len(wbuf), wn)
 	assert.Equal(t, len(wbuf), rn) // will read only the written values
 	assert.Equal(t, rbuf[:len(wbuf)], wbuf)
@@ -144,7 +144,7 @@ func TestReadByte(t *testing.T) {
 			if tc.wantErr != "" {
 				assert.ErrorContains(t, err, tc.wantErr)
 			} else {
-				assert.Nil(t, err)
+				assert.NoError(t, err)
 				assert.Equal(t, want, got)
 				assert.Equal(t, d.file, msc.lastFile)
 				assert.Equal(t, uintptr(I2C_SMBUS), msc.lastSignal)
@@ -191,7 +191,7 @@ func TestReadByteData(t *testing.T) {
 			if tc.wantErr != "" {
 				assert.ErrorContains(t, err, tc.wantErr)
 			} else {
-				assert.Nil(t, err)
+				assert.NoError(t, err)
 				assert.Equal(t, want, got)
 				assert.Equal(t, d.file, msc.lastFile)
 				assert.Equal(t, uintptr(I2C_SMBUS), msc.lastSignal)
@@ -241,7 +241,7 @@ func TestReadWordData(t *testing.T) {
 			if tc.wantErr != "" {
 				assert.ErrorContains(t, err, tc.wantErr)
 			} else {
-				assert.Nil(t, err)
+				assert.NoError(t, err)
 				assert.Equal(t, want, got)
 				assert.Equal(t, d.file, msc.lastFile)
 				assert.Equal(t, uintptr(I2C_SMBUS), msc.lastSignal)
@@ -299,7 +299,7 @@ func TestReadBlockData(t *testing.T) {
 			if tc.wantErr != "" {
 				assert.ErrorContains(t, err, tc.wantErr)
 			} else {
-				assert.Nil(t, err)
+				assert.NoError(t, err)
 				assert.Equal(t, msc.dataSlice, buf)
 				assert.Equal(t, d.file, msc.lastFile)
 				assert.Equal(t, uintptr(I2C_SMBUS), msc.lastSignal)
@@ -343,7 +343,7 @@ func TestWriteByte(t *testing.T) {
 			if tc.wantErr != "" {
 				assert.ErrorContains(t, err, tc.wantErr)
 			} else {
-				assert.Nil(t, err)
+				assert.NoError(t, err)
 				assert.Equal(t, d.file, msc.lastFile)
 				assert.Equal(t, uintptr(I2C_SMBUS), msc.lastSignal)
 				assert.Equal(t, byte(I2C_SMBUS_WRITE), msc.smbus.readWrite)
@@ -388,7 +388,7 @@ func TestWriteByteData(t *testing.T) {
 			if tc.wantErr != "" {
 				assert.ErrorContains(t, err, tc.wantErr)
 			} else {
-				assert.Nil(t, err)
+				assert.NoError(t, err)
 				assert.Equal(t, d.file, msc.lastFile)
 				assert.Equal(t, uintptr(I2C_SMBUS), msc.lastSignal)
 				assert.Equal(t, byte(I2C_SMBUS_WRITE), msc.smbus.readWrite)
@@ -437,7 +437,7 @@ func TestWriteWordData(t *testing.T) {
 			if tc.wantErr != "" {
 				assert.ErrorContains(t, err, tc.wantErr)
 			} else {
-				assert.Nil(t, err)
+				assert.NoError(t, err)
 				assert.Equal(t, d.file, msc.lastFile)
 				assert.Equal(t, uintptr(I2C_SMBUS), msc.lastSignal)
 				assert.Equal(t, byte(I2C_SMBUS_WRITE), msc.smbus.readWrite)
@@ -494,7 +494,7 @@ func TestWriteBlockData(t *testing.T) {
 			if tc.wantErr != "" {
 				assert.ErrorContains(t, err, tc.wantErr)
 			} else {
-				assert.Nil(t, err)
+				assert.NoError(t, err)
 				assert.Equal(t, d.file, msc.lastFile)
 				assert.Equal(t, uintptr(I2C_SMBUS), msc.lastSignal)
 				assert.Equal(t, uint8(len(data)+1), msc.sliceSize) // including size element
@@ -523,7 +523,7 @@ func Test_setAddress(t *testing.T) {
 	// act
 	err := d.setAddress(0xff)
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, uintptr(0xff), msc.devAddress)
 }
 
@@ -567,7 +567,7 @@ func Test_queryFunctionality(t *testing.T) {
 			if tc.wantErr != "" {
 				assert.ErrorContains(t, err, tc.wantErr)
 			} else {
-				assert.Nil(t, err)
+				assert.NoError(t, err)
 			}
 			if tc.wantFile {
 				assert.NotNil(t, d.file)

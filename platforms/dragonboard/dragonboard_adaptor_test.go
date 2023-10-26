@@ -55,7 +55,7 @@ func TestDigitalIO(t *testing.T) {
 	assert.Equal(t, 1, i)
 
 	assert.ErrorContains(t, a.DigitalWrite("GPIO_M", 1), "'GPIO_M' is not a valid id for a digital pin")
-	assert.Nil(t, a.Finalize())
+	assert.NoError(t, a.Finalize())
 }
 
 func TestFinalizeErrorAfterGPIO(t *testing.T) {
@@ -70,8 +70,8 @@ func TestFinalizeErrorAfterGPIO(t *testing.T) {
 	}
 	fs := a.sys.UseMockFilesystem(mockPaths)
 
-	assert.Nil(t, a.Connect())
-	assert.Nil(t, a.DigitalWrite("GPIO_B", 1))
+	assert.NoError(t, a.Connect())
+	assert.NoError(t, a.DigitalWrite("GPIO_B", 1))
 
 	fs.WithWriteError = true
 
@@ -89,11 +89,11 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	a := NewAdaptor()
 	a.sys.UseMockSyscall()
 	fs := a.sys.UseMockFilesystem([]string{"/dev/i2c-1"})
-	assert.Nil(t, a.Connect())
+	assert.NoError(t, a.Connect())
 	con, err := a.GetI2cConnection(0xff, 1)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	_, err = con.Write([]byte{0xbf})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	fs.WithCloseError = true
 	// act
 	err = a.Finalize()

@@ -120,17 +120,17 @@ func TestPins(t *testing.T) {
 
 func TestProtocolVersionQuery(t *testing.T) {
 	b, _ := initTestFirmataWithReadWriteCloser(t.Name())
-	assert.Nil(t, b.ProtocolVersionQuery())
+	assert.NoError(t, b.ProtocolVersionQuery())
 }
 
 func TestFirmwareQuery(t *testing.T) {
 	b, _ := initTestFirmataWithReadWriteCloser(t.Name())
-	assert.Nil(t, b.FirmwareQuery())
+	assert.NoError(t, b.FirmwareQuery())
 }
 
 func TestPinStateQuery(t *testing.T) {
 	b, _ := initTestFirmataWithReadWriteCloser(t.Name())
-	assert.Nil(t, b.PinStateQuery(1))
+	assert.NoError(t, b.PinStateQuery(1))
 }
 
 func TestProcessProtocolVersion(t *testing.T) {
@@ -232,23 +232,23 @@ func TestProcessDigitalRead4(t *testing.T) {
 
 func TestDigitalWrite(t *testing.T) {
 	b, _ := initTestFirmataWithReadWriteCloser(t.Name(), testDataCapabilitiesResponse)
-	assert.Nil(t, b.DigitalWrite(13, 0))
+	assert.NoError(t, b.DigitalWrite(13, 0))
 }
 
 func TestSetPinMode(t *testing.T) {
 	b, _ := initTestFirmataWithReadWriteCloser(t.Name(), testDataCapabilitiesResponse)
-	assert.Nil(t, b.SetPinMode(13, Output))
+	assert.NoError(t, b.SetPinMode(13, Output))
 }
 
 func TestAnalogWrite(t *testing.T) {
 	b, _ := initTestFirmataWithReadWriteCloser(t.Name(), testDataCapabilitiesResponse)
-	assert.Nil(t, b.AnalogWrite(0, 128))
+	assert.NoError(t, b.AnalogWrite(0, 128))
 }
 
 func TestReportAnalog(t *testing.T) {
 	b, _ := initTestFirmataWithReadWriteCloser(t.Name())
-	assert.Nil(t, b.ReportAnalog(0, 1))
-	assert.Nil(t, b.ReportAnalog(0, 0))
+	assert.NoError(t, b.ReportAnalog(0, 1))
+	assert.NoError(t, b.ReportAnalog(0, 0))
 }
 
 func TestProcessPinState13(t *testing.T) {
@@ -272,22 +272,22 @@ func TestProcessPinState13(t *testing.T) {
 
 func TestI2cConfig(t *testing.T) {
 	b, _ := initTestFirmataWithReadWriteCloser(t.Name())
-	assert.Nil(t, b.I2cConfig(100))
+	assert.NoError(t, b.I2cConfig(100))
 }
 
 func TestI2cWrite(t *testing.T) {
 	b, _ := initTestFirmataWithReadWriteCloser(t.Name())
-	assert.Nil(t, b.I2cWrite(0x00, []byte{0x01, 0x02}))
+	assert.NoError(t, b.I2cWrite(0x00, []byte{0x01, 0x02}))
 }
 
 func TestI2cRead(t *testing.T) {
 	b, _ := initTestFirmataWithReadWriteCloser(t.Name())
-	assert.Nil(t, b.I2cRead(0x00, 10))
+	assert.NoError(t, b.I2cRead(0x00, 10))
 }
 
 func TestWriteSysex(t *testing.T) {
 	b, _ := initTestFirmataWithReadWriteCloser(t.Name())
-	assert.Nil(t, b.WriteSysex([]byte{0x01, 0x02}))
+	assert.NoError(t, b.WriteSysex([]byte{0x01, 0x02}))
 }
 
 func TestProcessI2cReply(t *testing.T) {
@@ -373,9 +373,9 @@ func TestConnect(t *testing.T) {
 		rwc.addTestReadData(testDataProtocolResponse)
 	})
 
-	assert.Nil(t, b.Connect(rwc))
+	assert.NoError(t, b.Connect(rwc))
 	time.Sleep(150 * time.Millisecond)
-	assert.Nil(t, b.Disconnect())
+	assert.NoError(t, b.Disconnect())
 }
 
 func TestServoConfig(t *testing.T) {

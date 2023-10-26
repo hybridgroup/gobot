@@ -130,7 +130,7 @@ func TestL3GD20HFullScaleRange(t *testing.T) {
 	// act
 	got, err := d.FullScaleRange()
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 1, len(a.written))
 	assert.Equal(t, uint8(0x23), a.written[0])
 	assert.Equal(t, readValue, got)
@@ -196,7 +196,7 @@ func TestL3GD20HMeasurement(t *testing.T) {
 			// act
 			x, y, z, err := d.XYZ()
 			// assert
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, 1, len(a.written))
 			assert.Equal(t, uint8(0xA8), a.written[0])
 			assert.Equal(t, tc.wantX, x)

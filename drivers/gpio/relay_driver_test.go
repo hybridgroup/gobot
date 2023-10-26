@@ -38,12 +38,12 @@ func TestRelayDriverSetName(t *testing.T) {
 
 func TestRelayDriverStart(t *testing.T) {
 	d, _ := initTestRelayDriver()
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestRelayDriverHalt(t *testing.T) {
 	d, _ := initTestRelayDriver()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 func TestRelayDriverToggle(t *testing.T) {

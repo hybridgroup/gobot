@@ -35,12 +35,12 @@ func TestNewPCF8591Driver(t *testing.T) {
 
 func TestPCF8591Start(t *testing.T) {
 	d := NewPCF8591Driver(newI2cTestAdaptor())
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestPCF8591Halt(t *testing.T) {
 	d := NewPCF8591Driver(newI2cTestAdaptor())
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 func TestPCF8591WithPCF8591With400kbitStabilization(t *testing.T) {
@@ -78,7 +78,7 @@ func TestPCF8591AnalogReadSingle(t *testing.T) {
 	// act
 	got, err := d.AnalogRead(description)
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 1, len(a.written))
 	assert.Equal(t, ctrlByteOn, a.written[0])
 	assert.Equal(t, 2, numCallsRead)
@@ -120,7 +120,7 @@ func TestPCF8591AnalogReadDiff(t *testing.T) {
 	// act
 	got, err := d.AnalogRead(description)
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 1, len(a.written))
 	assert.Equal(t, ctrlByteOn, a.written[0])
 	assert.Equal(t, 2, numCallsRead)
@@ -146,7 +146,7 @@ func TestPCF8591AnalogWrite(t *testing.T) {
 	// act
 	err := d.AnalogWrite("", int(want))
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 2, len(a.written))
 	assert.Equal(t, ctrlByteOn, a.written[0])
 	assert.Equal(t, want, a.written[1])
@@ -171,7 +171,7 @@ func TestPCF8591AnalogOutputState(t *testing.T) {
 		// act
 		err := d.AnalogOutputState(bitState == 1)
 		// assert
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, 1, len(a.written))
 		assert.Equal(t, wantCtrlByteVal, a.written[0])
 	}

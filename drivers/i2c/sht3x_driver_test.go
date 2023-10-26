@@ -42,12 +42,12 @@ func TestSHT3xOptions(t *testing.T) {
 
 func TestSHT3xStart(t *testing.T) {
 	d := NewSHT3xDriver(newI2cTestAdaptor())
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestSHT3xHalt(t *testing.T) {
 	d, _ := initTestSHT3xDriverWithStubbedAdaptor()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 func TestSHT3xSampleNormal(t *testing.T) {
@@ -155,7 +155,7 @@ func TestSHT3xHeater(t *testing.T) {
 	}
 
 	status, err := d.Heater()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.True(t, status)
 
 	// heater disabled
@@ -165,7 +165,7 @@ func TestSHT3xHeater(t *testing.T) {
 	}
 
 	status, err = d.Heater()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.False(t, status)
 
 	// heater crc failed
@@ -199,11 +199,11 @@ func TestSHT3xSetAccuracy(t *testing.T) {
 	assert.Equal(t, byte(SHT3xAccuracyHigh), d.Accuracy())
 
 	err := d.SetAccuracy(SHT3xAccuracyMedium)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, byte(SHT3xAccuracyMedium), d.Accuracy())
 
 	err = d.SetAccuracy(SHT3xAccuracyLow)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, byte(SHT3xAccuracyLow), d.Accuracy())
 
 	err = d.SetAccuracy(0xff)
@@ -219,6 +219,6 @@ func TestSHT3xSerialNumber(t *testing.T) {
 
 	sn, err := d.SerialNumber()
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, uint32(0x2000beef), sn)
 }

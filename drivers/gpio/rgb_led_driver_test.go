@@ -56,12 +56,12 @@ func TestRgbLedDriver(t *testing.T) {
 
 func TestRgbLedDriverStart(t *testing.T) {
 	d := initTestRgbLedDriver()
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestRgbLedDriverHalt(t *testing.T) {
 	d := initTestRgbLedDriver()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 func TestRgbLedDriverToggle(t *testing.T) {
@@ -76,7 +76,7 @@ func TestRgbLedDriverToggle(t *testing.T) {
 func TestRgbLedDriverSetLevel(t *testing.T) {
 	a := newGpioTestAdaptor()
 	d := NewRgbLedDriver(a, "1", "2", "3")
-	assert.Nil(t, d.SetLevel("1", 150))
+	assert.NoError(t, d.SetLevel("1", 150))
 
 	d = NewRgbLedDriver(a, "1", "2", "3")
 	a.testAdaptorPwmWrite = func(string, byte) (err error) {

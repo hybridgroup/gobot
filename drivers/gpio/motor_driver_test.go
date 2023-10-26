@@ -21,12 +21,12 @@ func TestMotorDriver(t *testing.T) {
 
 func TestMotorDriverStart(t *testing.T) {
 	d := initTestMotorDriver()
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestMotorDriverHalt(t *testing.T) {
 	d := initTestMotorDriver()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 func TestMotorDriverIsOn(t *testing.T) {

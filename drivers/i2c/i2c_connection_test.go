@@ -75,7 +75,7 @@ func TestI2CAddress(t *testing.T) {
 
 func TestI2CClose(t *testing.T) {
 	c := NewConnection(initI2CDevice(), 0x06)
-	assert.Nil(t, c.Close())
+	assert.NoError(t, c.Close())
 }
 
 func TestI2CRead(t *testing.T) {
@@ -141,7 +141,7 @@ func TestI2CReadWordDataAddressError(t *testing.T) {
 func TestI2CWriteByte(t *testing.T) {
 	c := NewConnection(initI2CDevice(), 0x06)
 	err := c.WriteByte(0x01)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestI2CWriteByteAddressError(t *testing.T) {
@@ -153,7 +153,7 @@ func TestI2CWriteByteAddressError(t *testing.T) {
 func TestI2CWriteByteData(t *testing.T) {
 	c := NewConnection(initI2CDevice(), 0x06)
 	err := c.WriteByteData(0x01, 0x01)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestI2CWriteByteDataAddressError(t *testing.T) {
@@ -165,7 +165,7 @@ func TestI2CWriteByteDataAddressError(t *testing.T) {
 func TestI2CWriteWordData(t *testing.T) {
 	c := NewConnection(initI2CDevice(), 0x06)
 	err := c.WriteWordData(0x01, 0x01)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestI2CWriteWordDataAddressError(t *testing.T) {
@@ -177,7 +177,7 @@ func TestI2CWriteWordDataAddressError(t *testing.T) {
 func TestI2CWriteBlockData(t *testing.T) {
 	c := NewConnection(initI2CDevice(), 0x06)
 	err := c.WriteBlockData(0x01, []byte{0x01, 0x02})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestI2CWriteBlockDataAddressError(t *testing.T) {

@@ -259,7 +259,7 @@ func TestWrite(t *testing.T) {
 					assert.Contains(t, err.Error(), want)
 				}
 			} else {
-				assert.Nil(t, err)
+				assert.NoError(t, err)
 			}
 			assert.Equal(t, tc.want, lm.lastVal)
 		})
@@ -294,7 +294,7 @@ func TestRead(t *testing.T) {
 					assert.Contains(t, err.Error(), want)
 				}
 			} else {
-				assert.Nil(t, err)
+				assert.NoError(t, err)
 			}
 			assert.Equal(t, got, tc.simVal)
 		})

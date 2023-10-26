@@ -90,7 +90,7 @@ func TestDriverPublishesError(t *testing.T) {
 		}
 		testAdaptor.TestAdaptorAnalogRead(returnErr)
 
-		assert.Nil(t, driver.Start())
+		assert.NoError(t, driver.Start())
 
 		// expect error
 		_ = driver.Once(driver.Event(Error), func(data interface{}) {

@@ -73,35 +73,35 @@ func TestADS1115AnalogRead(t *testing.T) {
 
 	val, err := d.AnalogRead("0")
 	assert.Equal(t, 32767, val)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	val, err = d.AnalogRead("1")
 	assert.Equal(t, 32767, val)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	val, err = d.AnalogRead("2")
 	assert.Equal(t, 32767, val)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	val, err = d.AnalogRead("3")
 	assert.Equal(t, 32767, val)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	val, err = d.AnalogRead("0-1")
 	assert.Equal(t, 32767, val)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	val, err = d.AnalogRead("0-3")
 	assert.Equal(t, 32767, val)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	val, err = d.AnalogRead("1-3")
 	assert.Equal(t, 32767, val)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	val, err = d.AnalogRead("2-3")
 	assert.Equal(t, 32767, val)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	_, err = d.AnalogRead("3-2")
 	assert.NotNil(t, err.Error())
@@ -269,7 +269,7 @@ func TestADS1115_rawRead(t *testing.T) {
 			// act
 			got, err := d.rawRead(channel, channelOffset, tt.gain, tt.dataRate)
 			// assert
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, tt.want, got)
 			assert.Equal(t, 3, numCallsRead)
 			assert.Equal(t, 6, len(a.written))

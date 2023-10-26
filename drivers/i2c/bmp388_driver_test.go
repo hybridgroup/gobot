@@ -84,13 +84,13 @@ func TestBMP388Measurements(t *testing.T) {
 	}
 	_ = d.Start()
 	temp, err := d.Temperature(2)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, float32(22.906143), temp)
 	pressure, err := d.Pressure(2)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, float32(98874.85), pressure)
 	alt, err := d.Altitude(2)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, float32(205.89395), alt)
 }
 
@@ -176,7 +176,7 @@ func TestBMP388_initialization(t *testing.T) {
 	// act, assert - initialization() must be called on Start()
 	err := d.Start()
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 2, numCallsRead)
 	assert.Equal(t, 6, len(a.written))
 	assert.Equal(t, wantChipIDReg, a.written[0])

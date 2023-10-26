@@ -23,7 +23,7 @@ func TestButtonDriverHalt(t *testing.T) {
 	go func() {
 		<-d.halt
 	}()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 func TestButtonDriver(t *testing.T) {
@@ -49,7 +49,7 @@ func TestButtonDriverStart(t *testing.T) {
 		return
 	})
 
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 
 	select {
 	case <-sem:
@@ -122,7 +122,7 @@ func TestButtonDriverDefaultState(t *testing.T) {
 		return
 	})
 
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 
 	select {
 	case <-sem:

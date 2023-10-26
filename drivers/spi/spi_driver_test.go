@@ -30,12 +30,12 @@ func TestNewDriver(t *testing.T) {
 
 func TestStart(t *testing.T) {
 	d := NewDriver(newSpiTestAdaptor(), "SPI_BASIC")
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestHalt(t *testing.T) {
 	d, _ := initTestDriverWithStubbedAdaptor()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 func TestSetName(t *testing.T) {

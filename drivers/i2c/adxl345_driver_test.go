@@ -85,7 +85,7 @@ func TestADXL345UseLowPower(t *testing.T) {
 	// act
 	err := d.UseLowPower(setVal)
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, setVal, d.bwRate.lowPower)
 	assert.Equal(t, 2, len(a.written))
 	assert.Equal(t, wantReg, a.written[0])
@@ -107,7 +107,7 @@ func TestADXL345SetRate(t *testing.T) {
 	// act
 	err := d.SetRate(setVal)
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, setVal, d.bwRate.rate)
 	assert.Equal(t, 2, len(a.written))
 	assert.Equal(t, wantReg, a.written[0])
@@ -129,7 +129,7 @@ func TestADXL345SetRange(t *testing.T) {
 	// act
 	err := d.SetRange(setVal)
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, setVal, d.dataFormat.fullScaleRange)
 	assert.Equal(t, 2, len(a.written))
 	assert.Equal(t, wantReg, a.written[0])
@@ -184,7 +184,7 @@ func TestADXL345RawXYZ(t *testing.T) {
 			// act
 			gotX, gotY, gotZ, err := d.RawXYZ()
 			// assert
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, tc.wantX, gotX)
 			assert.Equal(t, tc.wantY, gotY)
 			assert.Equal(t, tc.wantZ, gotZ)
@@ -292,7 +292,7 @@ func TestADXL345_initialize(t *testing.T) {
 	// act, assert - initialize() must be called on Start()
 	err := d.Start()
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 6, len(a.written))
 	assert.Equal(t, wantRateReg, a.written[0])
 	assert.Equal(t, wantRateRegVal, a.written[1])
@@ -316,7 +316,7 @@ func TestADXL345_shutdown(t *testing.T) {
 	// act, assert - shutdown() must be called on Halt()
 	err := d.Halt()
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 2, len(a.written))
 	assert.Equal(t, wantReg, a.written[0])
 	assert.Equal(t, wantVal, a.written[1])

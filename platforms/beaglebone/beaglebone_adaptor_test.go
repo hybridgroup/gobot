@@ -83,7 +83,7 @@ func TestPWM(t *testing.T) {
 		fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/duty_cycle"].Contents,
 	)
 
-	assert.Nil(t, a.Finalize())
+	assert.NoError(t, a.Finalize())
 }
 
 func TestAnalog(t *testing.T) {
@@ -96,7 +96,7 @@ func TestAnalog(t *testing.T) {
 	fs.Files["/sys/bus/iio/devices/iio:device0/in_voltage1_raw"].Contents = "567\n"
 	i, err := a.AnalogRead("P9_40")
 	assert.Equal(t, 567, i)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	_, err = a.AnalogRead("P9_99")
 	assert.ErrorContains(t, err, "Not a valid analog pin")
@@ -106,7 +106,7 @@ func TestAnalog(t *testing.T) {
 	assert.ErrorContains(t, err, "read error")
 	fs.WithReadError = false
 
-	assert.Nil(t, a.Finalize())
+	assert.NoError(t, a.Finalize())
 }
 
 func TestDigitalIO(t *testing.T) {
@@ -151,9 +151,9 @@ func TestDigitalIO(t *testing.T) {
 	fs.Files["/sys/class/gpio/gpio66/value"].Contents = "1"
 	i, err := a.DigitalRead("P8_07")
 	assert.Equal(t, 1, i)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
-	assert.Nil(t, a.Finalize())
+	assert.NoError(t, a.Finalize())
 }
 
 func TestName(t *testing.T) {
@@ -202,7 +202,7 @@ func TestDigitalPinFinalizeFileError(t *testing.T) {
 	a, _ := initTestAdaptorWithMockedFilesystem(mockPaths)
 
 	err := a.DigitalWrite("P9_12", 1)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	err = a.Finalize()
 	assert.Contains(t, err.Error(), "/sys/class/gpio/unexport: no such file")
@@ -233,11 +233,11 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	a := NewAdaptor()
 	a.sys.UseMockSyscall()
 	fs := a.sys.UseMockFilesystem([]string{"/dev/i2c-2"})
-	assert.Nil(t, a.Connect())
+	assert.NoError(t, a.Connect())
 	con, err := a.GetI2cConnection(0xff, 2)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	_, err = con.Write([]byte{0xbf})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	fs.WithCloseError = true
 	// act
 	err = a.Finalize()

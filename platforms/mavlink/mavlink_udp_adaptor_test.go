@@ -65,8 +65,8 @@ func TestMavlinkUDPAdaptorName(t *testing.T) {
 
 func TestMavlinkUDPAdaptorConnectAndFinalize(t *testing.T) {
 	a := initTestMavlinkUDPAdaptor()
-	assert.Nil(t, a.Connect())
-	assert.Nil(t, a.Finalize())
+	assert.NoError(t, a.Connect())
+	assert.NoError(t, a.Finalize())
 }
 
 func TestMavlinkUDPAdaptorWrite(t *testing.T) {
@@ -82,7 +82,7 @@ func TestMavlinkUDPAdaptorWrite(t *testing.T) {
 
 	i, err := a.Write([]byte{0x01, 0x02, 0x03})
 	assert.Equal(t, 3, i)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestMavlinkReadMAVLinkReadDefaultPacket(t *testing.T) {

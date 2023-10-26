@@ -69,7 +69,7 @@ func TestLeapMotionDriverName(t *testing.T) {
 
 func TestLeapMotionDriverStart(t *testing.T) {
 	d, _ := initTestLeapMotionDriver()
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 
 	d2, rwc := initTestLeapMotionDriver()
 	e := errors.New("write error")
@@ -79,7 +79,7 @@ func TestLeapMotionDriverStart(t *testing.T) {
 
 func TestLeapMotionDriverHalt(t *testing.T) {
 	d, _ := initTestLeapMotionDriver()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 func TestLeapMotionDriverParser(t *testing.T) {

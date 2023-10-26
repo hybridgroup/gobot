@@ -32,7 +32,7 @@ func TestLeapMotionAdaptorName(t *testing.T) {
 
 func TestLeapMotionAdaptorConnect(t *testing.T) {
 	a := initTestLeapMotionAdaptor()
-	assert.Nil(t, a.Connect())
+	assert.NoError(t, a.Connect())
 
 	a.connect = func(port string) (io.ReadWriteCloser, error) {
 		return nil, errors.New("connection error")
@@ -42,5 +42,5 @@ func TestLeapMotionAdaptorConnect(t *testing.T) {
 
 func TestLeapMotionAdaptorFinalize(t *testing.T) {
 	a := initTestLeapMotionAdaptor()
-	assert.Nil(t, a.Finalize())
+	assert.NoError(t, a.Finalize())
 }

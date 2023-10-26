@@ -78,8 +78,8 @@ func TestMPL115A2ReadData(t *testing.T) {
 	press, errP := d.Pressure()
 	temp, errT := d.Temperature()
 	// assert
-	assert.Nil(t, errP)
-	assert.Nil(t, errT)
+	assert.NoError(t, errP)
+	assert.NoError(t, errT)
 	assert.Equal(t, 2, readCallCounter)
 	assert.Equal(t, 6, len(a.written))
 	assert.Equal(t, uint8(0x12), a.written[0])
@@ -124,7 +124,7 @@ func TestMPL115A2_initialization(t *testing.T) {
 	// act, assert - initialization() must be called on Start()
 	err := d.Start()
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 1, readCallCounter)
 	assert.Equal(t, 1, len(a.written))
 	assert.Equal(t, uint8(0x04), a.written[0])

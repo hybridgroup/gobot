@@ -24,8 +24,8 @@ func TestBatteryDriver(t *testing.T) {
 
 func TestBatteryDriverStartAndHalt(t *testing.T) {
 	d := initTestBatteryDriver()
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.Halt())
 }
 
 func TestBatteryDriverRead(t *testing.T) {

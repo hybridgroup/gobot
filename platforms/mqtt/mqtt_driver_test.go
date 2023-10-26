@@ -16,8 +16,8 @@ func TestMqttDriver(t *testing.T) {
 	assert.True(t, strings.HasPrefix(d.Name(), "MQTT"))
 	assert.True(t, strings.HasPrefix(d.Connection().Name(), "MQTT"))
 
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.Halt())
 }
 
 func TestMqttDriverName(t *testing.T) {

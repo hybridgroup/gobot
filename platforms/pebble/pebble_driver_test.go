@@ -16,12 +16,12 @@ func initTestDriver() *Driver {
 
 func TestDriverStart(t *testing.T) {
 	d := initTestDriver()
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestDriverHalt(t *testing.T) {
 	d := initTestDriver()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 func TestDriver(t *testing.T) {

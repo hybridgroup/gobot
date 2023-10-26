@@ -72,10 +72,10 @@ func TestBMP180Measurements(t *testing.T) {
 	}
 	_ = bmp180.Start()
 	temp, err := bmp180.Temperature()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, float32(15.0), temp)
 	pressure, err := bmp180.Pressure()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, float32(69964), pressure)
 }
 
@@ -183,7 +183,7 @@ func TestBMP180_initialization(t *testing.T) {
 	// act, assert - initialization() must be called on Start()
 	err := d.Start()
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 1, numCallsRead)
 	assert.Equal(t, 1, len(a.written))
 	assert.Equal(t, uint8(0xAA), a.written[0])

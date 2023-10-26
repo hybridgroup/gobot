@@ -121,7 +121,7 @@ func TestHMC5883LRead(t *testing.T) {
 			// act
 			gotX, gotY, gotZ, err := d.Read()
 			// assert
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, tc.wantX, gotX)
 			assert.Equal(t, tc.wantY, gotY)
 			assert.Equal(t, tc.wantZ, gotZ)
@@ -177,7 +177,7 @@ func TestHMC5883L_readRawData(t *testing.T) {
 			// act
 			gotX, gotY, gotZ, err := d.readRawData()
 			// assert
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, tc.wantX, gotX)
 			assert.Equal(t, tc.wantY, gotY)
 			assert.Equal(t, tc.wantZ, gotZ)
@@ -203,7 +203,7 @@ func TestHMC5883L_initialize(t *testing.T) {
 	// act, assert - initialize() must be called on Start()
 	err := d.Start()
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 6, len(a.written))
 	assert.Equal(t, uint8(hmc5883lRegA), a.written[0])
 	assert.Equal(t, wantRegA, a.written[1])

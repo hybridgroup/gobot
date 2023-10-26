@@ -48,7 +48,7 @@ func TestTemperatureSensorDriverNtcScaling(t *testing.T) {
 			// act
 			got, err := d.Read()
 			// assert
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, tt.want, got)
 		})
 	}
@@ -83,7 +83,7 @@ func TestTemperatureSensorDriverLinearScaling(t *testing.T) {
 			// act
 			got, err := d.Read()
 			// assert
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, tt.want, got)
 		})
 	}
@@ -104,7 +104,7 @@ func TestTempSensorPublishesTemperatureInCelsius(t *testing.T) {
 		assert.Equal(t, "31.62", fmt.Sprintf("%.2f", data.(float64)))
 		sem <- true
 	})
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 
 	select {
 	case <-sem:
@@ -126,7 +126,7 @@ func TestTempSensorPublishesError(t *testing.T) {
 		return
 	})
 
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 
 	// expect error
 	_ = d.Once(d.Event(Error), func(data interface{}) {
@@ -148,7 +148,7 @@ func TestTempSensorHalt(t *testing.T) {
 		<-d.halt
 		close(done)
 	}()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 	select {
 	case <-done:
 	case <-time.After(100 * time.Millisecond):

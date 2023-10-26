@@ -74,7 +74,7 @@ func TestNatsAdapterSetsRootCAs(t *testing.T) {
 	_ = a.Connect()
 	o := a.client.Opts
 	casPool, err := o.RootCAsCB()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, casPool)
 	assert.True(t, o.Secure)
 }
@@ -84,7 +84,7 @@ func TestNatsAdapterSetsClientCerts(t *testing.T) {
 	assert.Equal(t, "tls://localhost:4242", a.Host)
 	_ = a.Connect()
 	cert, err := a.client.Opts.TLSCertCB()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, cert)
 	assert.NotNil(t, cert.Leaf)
 	assert.True(t, a.client.Opts.Secure)
@@ -95,7 +95,7 @@ func TestNatsAdapterSetsClientCertsWithUserInfo(t *testing.T) {
 	assert.Equal(t, "tls://localhost:4242", a.Host)
 	_ = a.Connect()
 	cert, err := a.client.Opts.TLSCertCB()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, cert)
 	assert.NotNil(t, cert.Leaf)
 	assert.True(t, a.client.Opts.Secure)
@@ -153,7 +153,7 @@ func TestNatsAdaptorFailedConnect(t *testing.T) {
 
 func TestNatsAdaptorFinalize(t *testing.T) {
 	a := NewAdaptor("localhost:9999", 79999)
-	assert.Nil(t, a.Finalize())
+	assert.NoError(t, a.Finalize())
 }
 
 func TestNatsAdaptorCannotPublishUnlessConnected(t *testing.T) {

@@ -48,7 +48,7 @@ func TestAnalogSensorDriver(t *testing.T) {
 	})
 	assert.Equal(t, 0.0, d.Value())
 	val, err := d.Read()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 150.0, val)
 	assert.Equal(t, 150.0, d.Value())
 	assert.Equal(t, 150, d.RawValue())
@@ -84,7 +84,7 @@ func TestAnalogSensorDriverWithLinearScaler(t *testing.T) {
 			// act
 			got, err := d.Read()
 			// assert
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, tt.want, got)
 		})
 	}
@@ -113,7 +113,7 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 		return
 	})
 
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 
 	select {
 	case <-sem:
@@ -169,7 +169,7 @@ func TestAnalogSensorDriverHalt(t *testing.T) {
 		<-d.halt
 		close(done)
 	}()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 	select {
 	case <-done:
 	case <-time.After(100 * time.Millisecond):

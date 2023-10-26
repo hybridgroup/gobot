@@ -26,8 +26,8 @@ func TestOllieDriver(t *testing.T) {
 
 func TestOllieDriverStartAndHalt(t *testing.T) {
 	d := initTestOllieDriver()
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.Halt())
 }
 
 func TestLocatorData(t *testing.T) {

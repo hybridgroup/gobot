@@ -160,7 +160,7 @@ func TestPCA9501WriteGPIO(t *testing.T) {
 			// act
 			err := d.WriteGPIO(tc.pin, tc.setVal)
 			// assert
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, 2, numCallsRead)
 			assert.Equal(t, 2, len(a.written))
 			assert.Equal(t, tc.wantPin, a.written[0])
@@ -254,7 +254,7 @@ func TestPCA9501ReadGPIO(t *testing.T) {
 			// act
 			got, err := d.ReadGPIO(pin)
 			// assert
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, tc.want, got)
 			assert.Equal(t, 2, numCallsRead)
 			assert.Equal(t, 1, len(a.written))
@@ -334,7 +334,7 @@ func TestPCA9501WriteEEPROM(t *testing.T) {
 	// act
 	err := d.WriteEEPROM(addressEEPROM, want)
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 1, numCallsWrite)
 	assert.Equal(t, addressEEPROM, a.written[0])
 	assert.Equal(t, want, a.written[1])
@@ -363,7 +363,7 @@ func TestPCA9501ReadEEPROM(t *testing.T) {
 	// act
 	val, err := d.ReadEEPROM(addressEEPROM)
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, want, val)
 	assert.Equal(t, 1, numCallsWrite)
 	assert.Equal(t, addressEEPROM, a.written[0])
@@ -419,6 +419,6 @@ func TestPCA9501_initialize(t *testing.T) {
 	// act
 	err := d.initialize()
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, want, a.address)
 }

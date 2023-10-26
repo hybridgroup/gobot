@@ -32,12 +32,12 @@ func TestMAX7219Driver(t *testing.T) {
 
 func TestMAX7219DriverStart(t *testing.T) {
 	d := initTestMAX7219Driver()
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestMAX7219DriverHalt(t *testing.T) {
 	d := initTestMAX7219Driver()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 func TestMAX7219DriverDefaultName(t *testing.T) {

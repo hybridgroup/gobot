@@ -54,7 +54,7 @@ func TestPCA9685Start(t *testing.T) {
 		copy(b, []byte{0x01})
 		return 1, nil
 	}
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestPCA9685Halt(t *testing.T) {
@@ -63,8 +63,8 @@ func TestPCA9685Halt(t *testing.T) {
 		copy(b, []byte{0x01})
 		return 1, nil
 	}
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.Halt())
 }
 
 func TestPCA9685SetPWM(t *testing.T) {
@@ -73,8 +73,8 @@ func TestPCA9685SetPWM(t *testing.T) {
 		copy(b, []byte{0x01})
 		return 1, nil
 	}
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.SetPWM(0, 0, 256))
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.SetPWM(0, 0, 256))
 }
 
 func TestPCA9685SetPWMError(t *testing.T) {
@@ -83,7 +83,7 @@ func TestPCA9685SetPWMError(t *testing.T) {
 		copy(b, []byte{0x01})
 		return 1, nil
 	}
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}
@@ -96,13 +96,13 @@ func TestPCA9685SetPWMFreq(t *testing.T) {
 		copy(b, []byte{0x01})
 		return 1, nil
 	}
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		copy(b, []byte{0x01})
 		return 1, nil
 	}
-	assert.Nil(t, d.SetPWMFreq(60))
+	assert.NoError(t, d.SetPWMFreq(60))
 }
 
 func TestPCA9685SetPWMFreqReadError(t *testing.T) {
@@ -111,7 +111,7 @@ func TestPCA9685SetPWMFreqReadError(t *testing.T) {
 		copy(b, []byte{0x01})
 		return 1, nil
 	}
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		return 0, errors.New("read error")
@@ -125,7 +125,7 @@ func TestPCA9685SetPWMFreqWriteError(t *testing.T) {
 		copy(b, []byte{0x01})
 		return 1, nil
 	}
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 
 	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")

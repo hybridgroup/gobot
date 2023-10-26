@@ -48,12 +48,12 @@ func TestLIDARLiteDriverOptions(t *testing.T) {
 
 func TestLIDARLiteDriverStart(t *testing.T) {
 	d := NewLIDARLiteDriver(newI2cTestAdaptor())
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestLIDARLiteDriverHalt(t *testing.T) {
 	d := initTestLIDARLiteDriver()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 func TestLIDARLiteDriverDistance(t *testing.T) {
@@ -72,7 +72,7 @@ func TestLIDARLiteDriverDistance(t *testing.T) {
 
 	distance, err := d.Distance()
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, int(25345), distance)
 
 	// when insufficient bytes have been read

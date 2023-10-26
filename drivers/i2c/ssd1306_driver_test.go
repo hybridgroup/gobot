@@ -47,7 +47,7 @@ func TestSSD1306StartDefault(t *testing.T) {
 	)
 	d := NewSSD1306Driver(newI2cTestAdaptor(),
 		WithSSD1306DisplayWidth(width), WithSSD1306DisplayHeight(height), WithSSD1306ExternalVCC(externalVCC))
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestSSD1306Start128x32(t *testing.T) {
@@ -58,7 +58,7 @@ func TestSSD1306Start128x32(t *testing.T) {
 	)
 	d := NewSSD1306Driver(newI2cTestAdaptor(),
 		WithSSD1306DisplayWidth(width), WithSSD1306DisplayHeight(height), WithSSD1306ExternalVCC(externalVCC))
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestSSD1306Start96x16(t *testing.T) {
@@ -69,7 +69,7 @@ func TestSSD1306Start96x16(t *testing.T) {
 	)
 	d := NewSSD1306Driver(newI2cTestAdaptor(),
 		WithSSD1306DisplayWidth(width), WithSSD1306DisplayHeight(height), WithSSD1306ExternalVCC(externalVCC))
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestSSD1306StartExternalVCC(t *testing.T) {
@@ -80,7 +80,7 @@ func TestSSD1306StartExternalVCC(t *testing.T) {
 	)
 	d := NewSSD1306Driver(newI2cTestAdaptor(),
 		WithSSD1306DisplayWidth(width), WithSSD1306DisplayHeight(height), WithSSD1306ExternalVCC(externalVCC))
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestSSD1306StartSizeError(t *testing.T) {
@@ -96,7 +96,7 @@ func TestSSD1306StartSizeError(t *testing.T) {
 
 func TestSSD1306Halt(t *testing.T) {
 	s, _ := initTestSSD1306DriverWithStubbedAdaptor(128, 64, false)
-	assert.Nil(t, s.Halt())
+	assert.NoError(t, s.Halt())
 }
 
 func TestSSD1306Options(t *testing.T) {
@@ -109,7 +109,7 @@ func TestSSD1306Options(t *testing.T) {
 func TestSSD1306Display(t *testing.T) {
 	s, _ := initTestSSD1306DriverWithStubbedAdaptor(96, 16, false)
 	_ = s.Start()
-	assert.Nil(t, s.Display())
+	assert.NoError(t, s.Display())
 }
 
 func TestSSD1306ShowImage(t *testing.T) {
@@ -119,7 +119,7 @@ func TestSSD1306ShowImage(t *testing.T) {
 	assert.ErrorContains(t, s.ShowImage(img), "image must match display width and height: 128x64")
 
 	img = image.NewRGBA(image.Rect(0, 0, 128, 64))
-	assert.Nil(t, s.ShowImage(img))
+	assert.NoError(t, s.ShowImage(img))
 }
 
 func TestSSD1306Command(t *testing.T) {
@@ -135,7 +135,7 @@ func TestSSD1306Command(t *testing.T) {
 		return 0, nil
 	}
 	err := s.command(0xFF)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestSSD1306Commands(t *testing.T) {
@@ -151,7 +151,7 @@ func TestSSD1306Commands(t *testing.T) {
 		return 0, nil
 	}
 	err := s.commands([]byte{0x00, 0xFF})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestSSD1306On(t *testing.T) {
@@ -167,7 +167,7 @@ func TestSSD1306On(t *testing.T) {
 		return 0, nil
 	}
 	err := s.On()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestSSD1306Off(t *testing.T) {
@@ -183,7 +183,7 @@ func TestSSD1306Off(t *testing.T) {
 		return 0, nil
 	}
 	err := s.Off()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestSSD1306Reset(t *testing.T) {
@@ -200,7 +200,7 @@ func TestSSD1306Reset(t *testing.T) {
 		return 0, nil
 	}
 	err := s.Reset()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 // COMMANDS

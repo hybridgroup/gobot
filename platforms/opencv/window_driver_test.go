@@ -33,12 +33,12 @@ func TestWindowDriverName(t *testing.T) {
 
 func TestWindowDriverStart(t *testing.T) {
 	d := initTestWindowDriver()
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestWindowDriverHalt(t *testing.T) {
 	d := initTestWindowDriver()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 func TestWindowDriverShowImage(t *testing.T) {

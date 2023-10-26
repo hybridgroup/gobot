@@ -25,8 +25,8 @@ func TestAccelerometerDriver(t *testing.T) {
 
 func TestAccelerometerDriverStartAndHalt(t *testing.T) {
 	d := initTestAccelerometerDriver()
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.Halt())
 }
 
 func TestAccelerometerDriverReadData(t *testing.T) {

@@ -17,8 +17,8 @@ func TestNatsDriver(t *testing.T) {
 	assert.True(t, strings.HasPrefix(d.Connection().Name(), "NATS"))
 	assert.NotNil(t, d.adaptor())
 
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.Halt())
 }
 
 func TestNatsDriverName(t *testing.T) {

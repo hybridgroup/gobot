@@ -210,7 +210,7 @@ func TestPCF8583WriteTime(t *testing.T) {
 	// act
 	err := d.WriteTime(initDate)
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, initDate.Year(), d.yearOffset)
 	assert.Equal(t, 1, numCallsRead)
 	assert.Equal(t, 11, len(a.written))
@@ -292,7 +292,7 @@ func TestPCF8583ReadTime(t *testing.T) {
 	// act
 	got, err := d.ReadTime()
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 1, len(a.written))
 	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[0])
 	assert.Equal(t, 2, numCallsRead)
@@ -357,7 +357,7 @@ func TestPCF8583WriteCounter(t *testing.T) {
 	// act
 	err := d.WriteCounter(initCount)
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 1, numCallsRead)
 	assert.Equal(t, 8, len(a.written))
 	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[0])
@@ -430,7 +430,7 @@ func TestPCF8583ReadCounter(t *testing.T) {
 	// act
 	got, err := d.ReadCounter()
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 1, len(a.written))
 	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[0])
 	assert.Equal(t, 2, numCallsRead)
@@ -480,7 +480,7 @@ func TestPCF8583WriteRam(t *testing.T) {
 	// act
 	err := d.WriteRAM(wantRAMAddress-pcf8583RamOffset, wantRAMValue)
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 2, len(a.written))
 	assert.Equal(t, wantRAMAddress, a.written[0])
 	assert.Equal(t, wantRAMValue, a.written[1])
@@ -521,7 +521,7 @@ func TestPCF8583ReadRam(t *testing.T) {
 	// act
 	got, err := d.ReadRAM(wantRAMAddress - pcf8583RamOffset)
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, want, got)
 	assert.Equal(t, 1, len(a.written))
 	assert.Equal(t, wantRAMAddress, a.written[0])
@@ -572,7 +572,7 @@ func TestPCF8583_initializeNoModeSwitch(t *testing.T) {
 	// act, assert - initialize() must be called on Start()
 	err := d.Start()
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 1, numCallsRead)
 	assert.Equal(t, 1, len(a.written))
 	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[0])
@@ -604,7 +604,7 @@ func TestPCF8583_initializeWithModeSwitch(t *testing.T) {
 	// act, assert - initialize() must be called on Start()
 	err := d.Start()
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 1, numCallsRead)
 	assert.Equal(t, 3, len(a.written))
 	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[0])

@@ -78,7 +78,7 @@ func TestDigitalIO(t *testing.T) {
 	)
 
 	assert.ErrorContains(t, a.DigitalWrite("99", 1), "'99' is not a valid id for a digital pin")
-	assert.Nil(t, a.Finalize())
+	assert.NoError(t, a.Finalize())
 }
 
 func TestPWM(t *testing.T) {
@@ -87,7 +87,7 @@ func TestPWM(t *testing.T) {
 	fs.Files["/sys/class/pwm/pwmchip0/pwm0/period"].Contents = "0"
 
 	err := a.PwmWrite("32", 100)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	assert.Equal(t, "0", fs.Files["/sys/class/pwm/pwmchip0/export"].Contents)
 	assert.Equal(t, "1", fs.Files["/sys/class/pwm/pwmchip0/pwm0/enable"].Contents)
@@ -96,24 +96,24 @@ func TestPWM(t *testing.T) {
 	assert.Equal(t, "normal", fs.Files["/sys/class/pwm/pwmchip0/pwm0/polarity"].Contents)
 
 	err = a.ServoWrite("32", 0)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	assert.Equal(t, "500000", fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents)
 	assert.Equal(t, "10000000", fs.Files["/sys/class/pwm/pwmchip0/pwm0/period"].Contents)
 
 	err = a.ServoWrite("32", 180)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	assert.Equal(t, "2000000", fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents)
 	assert.Equal(t, "10000000", fs.Files["/sys/class/pwm/pwmchip0/pwm0/period"].Contents)
 
-	assert.Nil(t, a.Finalize())
+	assert.NoError(t, a.Finalize())
 }
 
 func TestFinalizeErrorAfterGPIO(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem(gpioMockPaths)
 
-	assert.Nil(t, a.DigitalWrite("7", 1))
+	assert.NoError(t, a.DigitalWrite("7", 1))
 
 	fs.WithWriteError = true
 
@@ -126,7 +126,7 @@ func TestFinalizeErrorAfterPWM(t *testing.T) {
 	fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents = "0"
 	fs.Files["/sys/class/pwm/pwmchip0/pwm0/period"].Contents = "0"
 
-	assert.Nil(t, a.PwmWrite("32", 1))
+	assert.NoError(t, a.PwmWrite("32", 1))
 
 	fs.WithWriteError = true
 
@@ -184,11 +184,11 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	a := NewAdaptor()
 	a.sys.UseMockSyscall()
 	fs := a.sys.UseMockFilesystem([]string{"/dev/i2c-5"})
-	assert.Nil(t, a.Connect())
+	assert.NoError(t, a.Connect())
 	con, err := a.GetI2cConnection(0xff, 5)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	_, err = con.Write([]byte{0xbf})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	fs.WithCloseError = true
 	// act
 	err = a.Finalize()

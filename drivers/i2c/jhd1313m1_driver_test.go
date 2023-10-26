@@ -54,7 +54,7 @@ func TestJHD1313MDriverOptions(t *testing.T) {
 
 func TestJHD1313MDriverStart(t *testing.T) {
 	d := initTestJHD1313M1Driver()
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestJHD1313MStartConnectError(t *testing.T) {
@@ -74,13 +74,13 @@ func TestJHD1313MDriverStartWriteError(t *testing.T) {
 func TestJHD1313MDriverHalt(t *testing.T) {
 	d := initTestJHD1313M1Driver()
 	_ = d.Start()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 func TestJHD1313MDriverSetRgb(t *testing.T) {
 	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
 	_ = d.Start()
-	assert.Nil(t, d.SetRGB(0x00, 0x00, 0x00))
+	assert.NoError(t, d.SetRGB(0x00, 0x00, 0x00))
 }
 
 func TestJHD1313MDriverSetRgbError(t *testing.T) {
@@ -96,7 +96,7 @@ func TestJHD1313MDriverSetRgbError(t *testing.T) {
 func TestJHD1313MDriverClear(t *testing.T) {
 	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
 	_ = d.Start()
-	assert.Nil(t, d.Clear())
+	assert.NoError(t, d.Clear())
 }
 
 func TestJHD1313MDriverClearError(t *testing.T) {
@@ -112,13 +112,13 @@ func TestJHD1313MDriverClearError(t *testing.T) {
 func TestJHD1313MDriverHome(t *testing.T) {
 	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
 	_ = d.Start()
-	assert.Nil(t, d.Home())
+	assert.NoError(t, d.Home())
 }
 
 func TestJHD1313MDriverWrite(t *testing.T) {
 	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
 	_ = d.Start()
-	assert.Nil(t, d.Write("Hello"))
+	assert.NoError(t, d.Write("Hello"))
 }
 
 func TestJHD1313MDriverWriteError(t *testing.T) {
@@ -134,7 +134,7 @@ func TestJHD1313MDriverWriteError(t *testing.T) {
 func TestJHD1313MDriverWriteTwoLines(t *testing.T) {
 	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
 	_ = d.Start()
-	assert.Nil(t, d.Write("Hello\nthere"))
+	assert.NoError(t, d.Write("Hello\nthere"))
 }
 
 func TestJHD1313MDriverWriteTwoLinesError(t *testing.T) {
@@ -150,13 +150,13 @@ func TestJHD1313MDriverWriteTwoLinesError(t *testing.T) {
 func TestJHD1313MDriverSetPosition(t *testing.T) {
 	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
 	_ = d.Start()
-	assert.Nil(t, d.SetPosition(2))
+	assert.NoError(t, d.SetPosition(2))
 }
 
 func TestJHD1313MDriverSetSecondLinePosition(t *testing.T) {
 	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
 	_ = d.Start()
-	assert.Nil(t, d.SetPosition(18))
+	assert.NoError(t, d.SetPosition(18))
 }
 
 func TestJHD1313MDriverSetPositionInvalid(t *testing.T) {
@@ -169,20 +169,20 @@ func TestJHD1313MDriverSetPositionInvalid(t *testing.T) {
 func TestJHD1313MDriverScroll(t *testing.T) {
 	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
 	_ = d.Start()
-	assert.Nil(t, d.Scroll(true))
+	assert.NoError(t, d.Scroll(true))
 }
 
 func TestJHD1313MDriverReverseScroll(t *testing.T) {
 	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
 	_ = d.Start()
-	assert.Nil(t, d.Scroll(false))
+	assert.NoError(t, d.Scroll(false))
 }
 
 func TestJHD1313MDriverSetCustomChar(t *testing.T) {
 	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
 	data := [8]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
 	_ = d.Start()
-	assert.Nil(t, d.SetCustomChar(0, data))
+	assert.NoError(t, d.SetCustomChar(0, data))
 }
 
 func TestJHD1313MDriverSetCustomCharError(t *testing.T) {

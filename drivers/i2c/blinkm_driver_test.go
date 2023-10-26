@@ -42,12 +42,12 @@ func TestBlinkMOptions(t *testing.T) {
 
 func TestBlinkMStart(t *testing.T) {
 	d := NewBlinkMDriver(newI2cTestAdaptor())
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestBlinkMHalt(t *testing.T) {
 	d, _ := initTestBlinkMDriverWithStubbedAdaptor()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 // Commands

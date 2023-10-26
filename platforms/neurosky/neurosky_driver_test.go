@@ -52,7 +52,7 @@ func TestNeuroskyDriverStart(t *testing.T) {
 		sem <- true
 	})
 
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 
 	time.Sleep(50 * time.Millisecond)
 	rwc.ReadError(e)
@@ -69,7 +69,7 @@ func TestNeuroskyDriverStart(t *testing.T) {
 
 func TestNeuroskyDriverHalt(t *testing.T) {
 	d := initTestNeuroskyDriver()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 func TestNeuroskyDriverParse(t *testing.T) {

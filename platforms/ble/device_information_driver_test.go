@@ -24,8 +24,8 @@ func TestDeviceInformationDriver(t *testing.T) {
 
 func TestDeviceInformationDriverStartAndHalt(t *testing.T) {
 	d := initTestDeviceInformationDriver()
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.Halt())
 }
 
 func TestDeviceInformationDriverGetModelNumber(t *testing.T) {

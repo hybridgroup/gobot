@@ -20,10 +20,10 @@ func TestAdaptor(t *testing.T) {
 
 func TestAdaptorConnect(t *testing.T) {
 	a := initTestAdaptor()
-	assert.Nil(t, a.Connect())
+	assert.NoError(t, a.Connect())
 }
 
 func TestAdaptorFinalize(t *testing.T) {
 	a := initTestAdaptor()
-	assert.Nil(t, a.Finalize())
+	assert.NoError(t, a.Finalize())
 }

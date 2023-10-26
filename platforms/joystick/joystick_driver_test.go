@@ -36,7 +36,7 @@ func TestJoystickDriverName(t *testing.T) {
 func TestDriverStart(t *testing.T) {
 	d, _ := initTestDriver("./configs/dualshock3.json")
 	d.interval = 1 * time.Millisecond
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 	time.Sleep(2 * time.Millisecond)
 }
 
@@ -45,7 +45,7 @@ func TestDriverHalt(t *testing.T) {
 	go func() {
 		<-d.halt
 	}()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 func TestDriverHandleEventDS3(t *testing.T) {

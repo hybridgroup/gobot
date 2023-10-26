@@ -25,8 +25,8 @@ func TestButtonDriver(t *testing.T) {
 
 func TestButtonDriverStartAndHalt(t *testing.T) {
 	d := initTestButtonDriver()
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.Halt())
 }
 
 func TestButtonDriverReadData(t *testing.T) {

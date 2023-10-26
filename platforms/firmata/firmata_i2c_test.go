@@ -72,7 +72,7 @@ func initTestTestAdaptorWithI2cConnection() (i2c.Connection, *i2cMockFirmataBoar
 
 func TestClose(t *testing.T) {
 	i2c, _ := initTestTestAdaptorWithI2cConnection()
-	assert.Nil(t, i2c.Close())
+	assert.NoError(t, i2c.Close())
 }
 
 func TestRead(t *testing.T) {
@@ -82,7 +82,7 @@ func TestRead(t *testing.T) {
 	buf := []byte{0}
 	// act
 	countRead, err := con.Read(buf)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 1, countRead)
 	assert.Equal(t, 1, brd.numBytesToRead)
 	assert.Equal(t, brd.i2cDataForRead, buf)
@@ -96,7 +96,7 @@ func TestReadByte(t *testing.T) {
 	// act
 	val, err := con.ReadByte()
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 1, brd.numBytesToRead)
 	assert.Equal(t, brd.i2cDataForRead[0], val)
 	assert.Equal(t, 0, len(brd.i2cWritten))
@@ -110,7 +110,7 @@ func TestReadByteData(t *testing.T) {
 	// act
 	val, err := con.ReadByteData(reg)
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 1, brd.numBytesToRead)
 	assert.Equal(t, brd.i2cDataForRead[0], val)
 	assert.Equal(t, 1, len(brd.i2cWritten))
@@ -127,7 +127,7 @@ func TestReadWordData(t *testing.T) {
 	// act
 	val, err := con.ReadWordData(reg)
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 2, brd.numBytesToRead)
 	assert.Equal(t, uint16(lsb)|uint16(msb)<<8, val)
 	assert.Equal(t, 1, len(brd.i2cWritten))
@@ -143,7 +143,7 @@ func TestReadBlockData(t *testing.T) {
 	// act
 	err := con.ReadBlockData(reg, buf)
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 5, brd.numBytesToRead)
 	assert.Equal(t, brd.i2cDataForRead, buf)
 	assert.Equal(t, 1, len(brd.i2cWritten))
@@ -158,7 +158,7 @@ func TestWrite(t *testing.T) {
 	// act
 	written, err := con.Write(want)
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, wantLen, written)
 	assert.Equal(t, want, brd.i2cWritten)
 }
@@ -171,7 +171,7 @@ func TestWrite20bytes(t *testing.T) {
 	// act
 	written, err := con.Write(want)
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, wantLen, written)
 	assert.Equal(t, want, brd.i2cWritten)
 }
@@ -183,7 +183,7 @@ func TestWriteByte(t *testing.T) {
 	// act
 	err := con.WriteByte(want)
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 1, len(brd.i2cWritten))
 	assert.Equal(t, want, brd.i2cWritten[0])
 }
@@ -196,7 +196,7 @@ func TestWriteByteData(t *testing.T) {
 	// act
 	err := con.WriteByteData(reg, val)
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 2, len(brd.i2cWritten))
 	assert.Equal(t, reg, brd.i2cWritten[0])
 	assert.Equal(t, val, brd.i2cWritten[1])
@@ -210,7 +210,7 @@ func TestWriteWordData(t *testing.T) {
 	// act
 	err := con.WriteWordData(reg, val)
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 3, len(brd.i2cWritten))
 	assert.Equal(t, reg, brd.i2cWritten[0])
 	assert.Equal(t, uint8(val&0x00FF), brd.i2cWritten[1])
@@ -229,7 +229,7 @@ func TestWriteBlockData(t *testing.T) {
 	// act
 	err := con.WriteBlockData(reg, val)
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 33, len(brd.i2cWritten))
 	assert.Equal(t, reg, brd.i2cWritten[0])
 	assert.Equal(t, val[0:32], brd.i2cWritten[1:])

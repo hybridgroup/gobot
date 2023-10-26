@@ -54,12 +54,12 @@ func TestDirectPinDriver(t *testing.T) {
 
 func TestDirectPinDriverStart(t *testing.T) {
 	d := initTestDirectPinDriver()
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestDirectPinDriverHalt(t *testing.T) {
 	d := initTestDirectPinDriver()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 func TestDirectPinDriverOff(t *testing.T) {
@@ -68,7 +68,7 @@ func TestDirectPinDriverOff(t *testing.T) {
 
 	a := newGpioTestAdaptor()
 	d = NewDirectPinDriver(a, "1")
-	assert.Nil(t, d.Off())
+	assert.NoError(t, d.Off())
 }
 
 func TestDirectPinDriverOffNotSupported(t *testing.T) {
@@ -80,7 +80,7 @@ func TestDirectPinDriverOffNotSupported(t *testing.T) {
 func TestDirectPinDriverOn(t *testing.T) {
 	a := newGpioTestAdaptor()
 	d := NewDirectPinDriver(a, "1")
-	assert.Nil(t, d.On())
+	assert.NoError(t, d.On())
 }
 
 func TestDirectPinDriverOnError(t *testing.T) {
@@ -97,7 +97,7 @@ func TestDirectPinDriverOnNotSupported(t *testing.T) {
 func TestDirectPinDriverDigitalWrite(t *testing.T) {
 	adaptor := newGpioTestAdaptor()
 	d := NewDirectPinDriver(adaptor, "1")
-	assert.Nil(t, d.DigitalWrite(1))
+	assert.NoError(t, d.DigitalWrite(1))
 }
 
 func TestDirectPinDriverDigitalWriteNotSupported(t *testing.T) {
@@ -115,7 +115,7 @@ func TestDirectPinDriverDigitalRead(t *testing.T) {
 	d := initTestDirectPinDriver()
 	ret, err := d.DigitalRead()
 	assert.Equal(t, 1, ret)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestDirectPinDriverDigitalReadNotSupported(t *testing.T) {
@@ -128,7 +128,7 @@ func TestDirectPinDriverDigitalReadNotSupported(t *testing.T) {
 func TestDirectPinDriverPwmWrite(t *testing.T) {
 	a := newGpioTestAdaptor()
 	d := NewDirectPinDriver(a, "1")
-	assert.Nil(t, d.PwmWrite(1))
+	assert.NoError(t, d.PwmWrite(1))
 }
 
 func TestDirectPinDriverPwmWriteNotSupported(t *testing.T) {
@@ -145,7 +145,7 @@ func TestDirectPinDriverPwmWriteError(t *testing.T) {
 func TestDirectPinDriverServoWrite(t *testing.T) {
 	a := newGpioTestAdaptor()
 	d := NewDirectPinDriver(a, "1")
-	assert.Nil(t, d.ServoWrite(1))
+	assert.NoError(t, d.ServoWrite(1))
 }
 
 func TestDirectPinDriverServoWriteNotSupported(t *testing.T) {

@@ -16,8 +16,8 @@ var _ gobot.Adaptor = (*Adaptor)(nil)
 func TestAudioAdaptor(t *testing.T) {
 	a := NewAdaptor()
 
-	assert.Nil(t, a.Connect())
-	assert.Nil(t, a.Finalize())
+	assert.NoError(t, a.Connect())
+	assert.NoError(t, a.Finalize())
 }
 
 func TestAudioAdaptorName(t *testing.T) {

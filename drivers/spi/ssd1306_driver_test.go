@@ -19,19 +19,19 @@ func initTestSSDDriver() *SSD1306Driver {
 
 func TestDriverSSDStart(t *testing.T) {
 	d := initTestSSDDriver()
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestDriverSSDHalt(t *testing.T) {
 	d := initTestSSDDriver()
 	_ = d.Start()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 func TestDriverSSDDisplay(t *testing.T) {
 	d := initTestSSDDriver()
 	_ = d.Start()
-	assert.Nil(t, d.Display())
+	assert.NoError(t, d.Display())
 }
 
 func TestSSD1306DriverShowImage(t *testing.T) {
@@ -41,7 +41,7 @@ func TestSSD1306DriverShowImage(t *testing.T) {
 	assert.ErrorContains(t, d.ShowImage(img), "Image must match the display width and height")
 
 	img = image.NewRGBA(image.Rect(0, 0, 128, 64))
-	assert.Nil(t, d.ShowImage(img))
+	assert.NoError(t, d.ShowImage(img))
 }
 
 type gpioTestAdaptor struct {

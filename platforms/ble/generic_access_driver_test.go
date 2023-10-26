@@ -24,8 +24,8 @@ func TestGenericAccessDriver(t *testing.T) {
 
 func TestGenericAccessDriverStartAndHalt(t *testing.T) {
 	d := initTestGenericAccessDriver()
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.Halt())
 }
 
 func TestGenericAccessDriverGetDeviceName(t *testing.T) {

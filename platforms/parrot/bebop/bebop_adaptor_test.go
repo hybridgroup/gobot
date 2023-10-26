@@ -29,7 +29,7 @@ func TestBebopAdaptorName(t *testing.T) {
 
 func TestBebopAdaptorConnect(t *testing.T) {
 	a := initTestBebopAdaptor()
-	assert.Nil(t, a.Connect())
+	assert.NoError(t, a.Connect())
 
 	a.connect = func(a *Adaptor) error {
 		return errors.New("connection error")
@@ -40,5 +40,5 @@ func TestBebopAdaptorConnect(t *testing.T) {
 func TestBebopAdaptorFinalize(t *testing.T) {
 	a := initTestBebopAdaptor()
 	_ = a.Connect()
-	assert.Nil(t, a.Finalize())
+	assert.NoError(t, a.Finalize())
 }

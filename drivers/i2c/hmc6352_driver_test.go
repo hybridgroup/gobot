@@ -42,12 +42,12 @@ func TestHMC6352Options(t *testing.T) {
 
 func TestHMC6352Start(t *testing.T) {
 	d := NewHMC6352Driver(newI2cTestAdaptor())
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestHMC6352Halt(t *testing.T) {
 	d, _ := initTestHMC6352DriverWithStubbedAdaptor()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 func TestHMC6352Heading(t *testing.T) {

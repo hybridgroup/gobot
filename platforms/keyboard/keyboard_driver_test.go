@@ -35,10 +35,10 @@ func TestKeyboardDriverName(t *testing.T) {
 
 func TestKeyboardDriverStart(t *testing.T) {
 	d := initTestKeyboardDriver()
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestKeyboardDriverHalt(t *testing.T) {
 	d := initTestKeyboardDriver()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }

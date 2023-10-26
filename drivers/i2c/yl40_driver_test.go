@@ -107,12 +107,12 @@ func TestYL40DriverReadBrightness(t *testing.T) {
 	got, err := yl.ReadBrightness()
 	got2, err2 := yl.Brightness()
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 1, len(adaptor.written))
 	assert.Equal(t, ctrlByteOn, adaptor.written[0])
 	assert.Equal(t, 2, numCallsRead)
 	assert.Equal(t, want, got)
-	assert.Nil(t, err2)
+	assert.NoError(t, err2)
 	assert.Equal(t, want, got2)
 }
 
@@ -143,12 +143,12 @@ func TestYL40DriverReadTemperature(t *testing.T) {
 	got, err := yl.ReadTemperature()
 	got2, err2 := yl.Temperature()
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 1, len(adaptor.written))
 	assert.Equal(t, ctrlByteOn, adaptor.written[0])
 	assert.Equal(t, 2, numCallsRead)
 	assert.Equal(t, want, got)
-	assert.Nil(t, err2)
+	assert.NoError(t, err2)
 	assert.Equal(t, want, got2)
 }
 
@@ -178,12 +178,12 @@ func TestYL40DriverReadAIN2(t *testing.T) {
 	got, err := yl.ReadAIN2()
 	got2, err2 := yl.AIN2()
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 1, len(adaptor.written))
 	assert.Equal(t, ctrlByteOn, adaptor.written[0])
 	assert.Equal(t, 2, numCallsRead)
 	assert.Equal(t, want, got)
-	assert.Nil(t, err2)
+	assert.NoError(t, err2)
 	assert.Equal(t, want, got2)
 }
 
@@ -213,12 +213,12 @@ func TestYL40DriverReadPotentiometer(t *testing.T) {
 	got, err := yl.ReadPotentiometer()
 	got2, err2 := yl.Potentiometer()
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 1, len(adaptor.written))
 	assert.Equal(t, ctrlByteOn, adaptor.written[0])
 	assert.Equal(t, 2, numCallsRead)
 	assert.Equal(t, want, got)
-	assert.Nil(t, err2)
+	assert.NoError(t, err2)
 	assert.Equal(t, want, got2)
 }
 
@@ -238,7 +238,7 @@ func TestYL40DriverAnalogWrite(t *testing.T) {
 	// act
 	err := pcf.Write(write)
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 2, len(adaptor.written))
 	assert.Equal(t, ctrlByteOn, adaptor.written[0])
 	assert.Equal(t, want, adaptor.written[1])
@@ -246,12 +246,12 @@ func TestYL40DriverAnalogWrite(t *testing.T) {
 
 func TestYL40DriverStart(t *testing.T) {
 	yl := NewYL40Driver(newI2cTestAdaptor())
-	assert.Nil(t, yl.Start())
+	assert.NoError(t, yl.Start())
 }
 
 func TestYL40DriverHalt(t *testing.T) {
 	yl := NewYL40Driver(newI2cTestAdaptor())
-	assert.Nil(t, yl.Halt())
+	assert.NoError(t, yl.Halt())
 }
 
 func fEqual(want interface{}, got interface{}) bool {

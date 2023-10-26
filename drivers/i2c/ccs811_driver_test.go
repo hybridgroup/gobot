@@ -255,7 +255,7 @@ func TestCCS811_initialize(t *testing.T) {
 	// arrange, act - initialize() must be called on Start()
 	err := d.Start()
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 1, numCallsRead)
 	assert.Equal(t, 9, len(a.written))
 	assert.Equal(t, wantChipIDReg, a.written[0])

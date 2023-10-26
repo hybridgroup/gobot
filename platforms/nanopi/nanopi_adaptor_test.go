@@ -93,7 +93,7 @@ func TestDigitalIO(t *testing.T) {
 	assert.Equal(t, 1, i)
 
 	assert.ErrorContains(t, a.DigitalWrite("99", 1), "'99' is not a valid id for a digital pin")
-	assert.Nil(t, a.Finalize())
+	assert.NoError(t, a.Finalize())
 }
 
 func TestInvalidPWMPin(t *testing.T) {
@@ -118,7 +118,7 @@ func TestPwmWrite(t *testing.T) {
 	preparePwmFs(fs)
 
 	err := a.PwmWrite("PWM", 100)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	assert.Equal(t, "0", fs.Files[pwmExportPath].Contents)
 	assert.Equal(t, "1", fs.Files[pwmEnablePath].Contents)
@@ -127,15 +127,15 @@ func TestPwmWrite(t *testing.T) {
 	assert.Equal(t, "normal", fs.Files[pwmPolarityPath].Contents)
 
 	err = a.ServoWrite("PWM", 0)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	assert.Equal(t, "500000", fs.Files[pwmDutyCyclePath].Contents)
 
 	err = a.ServoWrite("PWM", 180)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	assert.Equal(t, "2000000", fs.Files[pwmDutyCyclePath].Contents)
-	assert.Nil(t, a.Finalize())
+	assert.NoError(t, a.Finalize())
 }
 
 func TestSetPeriod(t *testing.T) {
@@ -147,7 +147,7 @@ func TestSetPeriod(t *testing.T) {
 	// act
 	err := a.SetPeriod("PWM", newPeriod)
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, "0", fs.Files[pwmExportPath].Contents)
 	assert.Equal(t, "1", fs.Files[pwmEnablePath].Contents)
 	assert.Equal(t, fmt.Sprintf("%d", newPeriod), fs.Files[pwmPeriodPath].Contents)
@@ -156,7 +156,7 @@ func TestSetPeriod(t *testing.T) {
 
 	// arrange test for automatic adjustment of duty cycle to lower value
 	err = a.PwmWrite("PWM", 127) // 127 is a little bit smaller than 50% of period
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, fmt.Sprintf("%d", 1270000), fs.Files[pwmDutyCyclePath].Contents)
 	newPeriod = newPeriod / 10
 
@@ -164,7 +164,7 @@ func TestSetPeriod(t *testing.T) {
 	err = a.SetPeriod("PWM", newPeriod)
 
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, fmt.Sprintf("%d", 127000), fs.Files[pwmDutyCyclePath].Contents)
 
 	// arrange test for automatic adjustment of duty cycle to higher value
@@ -174,14 +174,14 @@ func TestSetPeriod(t *testing.T) {
 	err = a.SetPeriod("PWM", newPeriod)
 
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, fmt.Sprintf("%d", 2540000), fs.Files[pwmDutyCyclePath].Contents)
 }
 
 func TestFinalizeErrorAfterGPIO(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem(gpioMockPaths)
 
-	assert.Nil(t, a.DigitalWrite("7", 1))
+	assert.NoError(t, a.DigitalWrite("7", 1))
 
 	fs.WithWriteError = true
 
@@ -193,7 +193,7 @@ func TestFinalizeErrorAfterPWM(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem(pwmMockPaths)
 	preparePwmFs(fs)
 
-	assert.Nil(t, a.PwmWrite("PWM", 1))
+	assert.NoError(t, a.PwmWrite("PWM", 1))
 
 	fs.WithWriteError = true
 
@@ -221,11 +221,11 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	a := NewNeoAdaptor()
 	a.sys.UseMockSyscall()
 	fs := a.sys.UseMockFilesystem([]string{"/dev/i2c-1"})
-	assert.Nil(t, a.Connect())
+	assert.NoError(t, a.Connect())
 	con, err := a.GetI2cConnection(0xff, 1)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	_, err = con.Write([]byte{0xbf})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	fs.WithCloseError = true
 	// act
 	err = a.Finalize()

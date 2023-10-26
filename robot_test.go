@@ -39,8 +39,8 @@ func TestRobotDevicesToJSON(t *testing.T) {
 
 func TestRobotStart(t *testing.T) {
 	r := newTestRobot("Robot99")
-	assert.Nil(t, r.Start())
-	assert.Nil(t, r.Stop())
+	assert.NoError(t, r.Start())
+	assert.NoError(t, r.Stop())
 	assert.False(t, r.Running())
 }
 
@@ -55,13 +55,13 @@ func TestRobotStartAutoRun(t *testing.T) {
 	)
 
 	go func() {
-		assert.Nil(t, r.Start())
+		assert.NoError(t, r.Start())
 	}()
 
 	time.Sleep(10 * time.Millisecond)
 	assert.True(t, r.Running())
 
 	// stop it
-	assert.Nil(t, r.Stop())
+	assert.NoError(t, r.Stop())
 	assert.False(t, r.Running())
 }

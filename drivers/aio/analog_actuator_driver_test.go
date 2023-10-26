@@ -15,12 +15,12 @@ func TestAnalogActuatorDriver(t *testing.T) {
 	assert.Equal(t, "47", d.Pin())
 
 	err := d.RawWrite(100)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 1, len(a.written))
 	assert.Equal(t, 100, a.written[0])
 
 	err = d.Write(247.0)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 2, len(a.written))
 	assert.Equal(t, 247, a.written[1])
 	assert.Equal(t, 247, d.RawValue())
@@ -76,7 +76,7 @@ func TestAnalogActuatorDriverLinearScaler(t *testing.T) {
 			// act
 			err := d.Write(tt.input)
 			// assert
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, 1, len(a.written))
 			assert.Equal(t, tt.want, a.written[0])
 		})
@@ -85,12 +85,12 @@ func TestAnalogActuatorDriverLinearScaler(t *testing.T) {
 
 func TestAnalogActuatorDriverStart(t *testing.T) {
 	d := NewAnalogActuatorDriver(newAioTestAdaptor(), "1")
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestAnalogActuatorDriverHalt(t *testing.T) {
 	d := NewAnalogActuatorDriver(newAioTestAdaptor(), "1")
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 func TestAnalogActuatorDriverDefaultName(t *testing.T) {
