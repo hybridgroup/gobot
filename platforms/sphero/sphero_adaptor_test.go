@@ -82,7 +82,7 @@ func TestSpheroAdaptorReconnect(t *testing.T) {
 func TestSpheroAdaptorFinalize(t *testing.T) {
 	a, rwc := initTestSpheroAdaptor()
 	_ = a.Connect()
-	assert.Nil(t, a.Finalize())
+	assert.NoError(t, a.Finalize())
 
 	rwc.testAdaptorClose = func() error {
 		return errors.New("close error")
@@ -94,7 +94,7 @@ func TestSpheroAdaptorFinalize(t *testing.T) {
 
 func TestSpheroAdaptorConnect(t *testing.T) {
 	a, _ := initTestSpheroAdaptor()
-	assert.Nil(t, a.Connect())
+	assert.NoError(t, a.Connect())
 
 	a.connect = func(string) (io.ReadWriteCloser, error) {
 		return nil, errors.New("connect error")

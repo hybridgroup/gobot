@@ -24,6 +24,6 @@ func TestSPRKPlusDriver(t *testing.T) {
 
 func TestSPRKPlusDriverStartAndHalt(t *testing.T) {
 	d := initTestSPRKPlusDriver()
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.Halt())
 }

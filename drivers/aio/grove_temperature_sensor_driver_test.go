@@ -47,7 +47,7 @@ func TestGroveTemperatureSensorDriverScaling(t *testing.T) {
 			// act
 			got, err := d.Read()
 			// assert
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, tt.want, got)
 		})
 	}
@@ -66,7 +66,7 @@ func TestGroveTempSensorPublishesTemperatureInCelsius(t *testing.T) {
 		assert.Equal(t, "31.62", fmt.Sprintf("%.2f", data.(float64)))
 		sem <- true
 	})
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 
 	select {
 	case <-sem:

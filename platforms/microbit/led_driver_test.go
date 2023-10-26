@@ -24,32 +24,32 @@ func TestLEDDriver(t *testing.T) {
 
 func TestLEDDriverStartAndHalt(t *testing.T) {
 	d := initTestLEDDriver()
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.Halt())
 }
 
 func TestLEDDriverWriteMatrix(t *testing.T) {
 	d := initTestLEDDriver()
 	_ = d.Start()
-	assert.Nil(t, d.WriteMatrix([]byte{0x01, 0x02}))
+	assert.NoError(t, d.WriteMatrix([]byte{0x01, 0x02}))
 }
 
 func TestLEDDriverWriteText(t *testing.T) {
 	d := initTestLEDDriver()
 	_ = d.Start()
-	assert.Nil(t, d.WriteText("Hello"))
+	assert.NoError(t, d.WriteText("Hello"))
 }
 
 func TestLEDDriverCommands(t *testing.T) {
 	d := initTestLEDDriver()
 	_ = d.Start()
-	assert.Nil(t, d.Blank())
-	assert.Nil(t, d.Solid())
-	assert.Nil(t, d.UpRightArrow())
-	assert.Nil(t, d.UpLeftArrow())
-	assert.Nil(t, d.DownRightArrow())
-	assert.Nil(t, d.DownLeftArrow())
-	assert.Nil(t, d.Dimond())
-	assert.Nil(t, d.Smile())
-	assert.Nil(t, d.Wink())
+	assert.NoError(t, d.Blank())
+	assert.NoError(t, d.Solid())
+	assert.NoError(t, d.UpRightArrow())
+	assert.NoError(t, d.UpLeftArrow())
+	assert.NoError(t, d.DownRightArrow())
+	assert.NoError(t, d.DownLeftArrow())
+	assert.NoError(t, d.Dimond())
+	assert.NoError(t, d.Smile())
+	assert.NoError(t, d.Wink())
 }

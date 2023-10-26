@@ -88,13 +88,13 @@ func TestBMP280Measurements(t *testing.T) {
 	}
 	_ = d.Start()
 	temp, err := d.Temperature()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, float32(25.014637), temp)
 	pressure, err := d.Pressure()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, float32(99545.414), pressure)
 	alt, err := d.Altitude()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, float32(149.22713), alt)
 }
 
@@ -188,7 +188,7 @@ func TestBMP280_initialization(t *testing.T) {
 	// act, assert - initialization() must be called on Start()
 	err := d.Start()
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 1, numCallsRead)
 	assert.Equal(t, 5, len(a.written))
 	assert.Equal(t, wantCalibReg, a.written[0])

@@ -32,12 +32,12 @@ func TestTM1638Driver(t *testing.T) {
 
 func TestTM1638DriverStart(t *testing.T) {
 	d := initTestTM1638Driver()
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestTM1638DriverHalt(t *testing.T) {
 	d := initTestTM1638Driver()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 func TestTM1638DriverDefaultName(t *testing.T) {

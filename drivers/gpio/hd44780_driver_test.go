@@ -61,7 +61,7 @@ func TestHD44780Driver(t *testing.T) {
 
 func TestHD44780DriverHalt(t *testing.T) {
 	d := initTestHD44780Driver()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 func TestHD44780DriverDefaultName(t *testing.T) {
@@ -77,7 +77,7 @@ func TestHD44780DriverSetName(t *testing.T) {
 
 func TestHD44780DriverStart(t *testing.T) {
 	d, _ := initTestHD44780Driver4BitModeWithStubbedAdaptor()
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestHD44780DriverStartError(t *testing.T) {
@@ -114,11 +114,11 @@ func TestHD44780DriverWrite(t *testing.T) {
 
 	d, _ = initTestHD44780Driver4BitModeWithStubbedAdaptor()
 	_ = d.Start()
-	assert.Nil(t, d.Write("hello gobot"))
+	assert.NoError(t, d.Write("hello gobot"))
 
 	d, _ = initTestHD44780Driver8BitModeWithStubbedAdaptor()
 	_ = d.Start()
-	assert.Nil(t, d.Write("hello gobot"))
+	assert.NoError(t, d.Write("hello gobot"))
 }
 
 func TestHD44780DriverWriteError(t *testing.T) {
@@ -142,17 +142,17 @@ func TestHD44780DriverWriteError(t *testing.T) {
 
 func TestHD44780DriverClear(t *testing.T) {
 	d := initTestHD44780Driver()
-	assert.Nil(t, d.Clear())
+	assert.NoError(t, d.Clear())
 }
 
 func TestHD44780DriverHome(t *testing.T) {
 	d := initTestHD44780Driver()
-	assert.Nil(t, d.Home())
+	assert.NoError(t, d.Home())
 }
 
 func TestHD44780DriverSetCursor(t *testing.T) {
 	d := initTestHD44780Driver()
-	assert.Nil(t, d.SetCursor(0, 3))
+	assert.NoError(t, d.SetCursor(0, 3))
 }
 
 func TestHD44780DriverSetCursorInvalid(t *testing.T) {
@@ -166,68 +166,68 @@ func TestHD44780DriverSetCursorInvalid(t *testing.T) {
 
 func TestHD44780DriverDisplayOn(t *testing.T) {
 	d := initTestHD44780Driver()
-	assert.Nil(t, d.Display(true))
+	assert.NoError(t, d.Display(true))
 }
 
 func TestHD44780DriverDisplayOff(t *testing.T) {
 	d := initTestHD44780Driver()
-	assert.Nil(t, d.Display(false))
+	assert.NoError(t, d.Display(false))
 }
 
 func TestHD44780DriverCursorOn(t *testing.T) {
 	d := initTestHD44780Driver()
-	assert.Nil(t, d.Cursor(true))
+	assert.NoError(t, d.Cursor(true))
 }
 
 func TestHD44780DriverCursorOff(t *testing.T) {
 	d := initTestHD44780Driver()
-	assert.Nil(t, d.Cursor(false))
+	assert.NoError(t, d.Cursor(false))
 }
 
 func TestHD44780DriverBlinkOn(t *testing.T) {
 	d := initTestHD44780Driver()
-	assert.Nil(t, d.Blink(true))
+	assert.NoError(t, d.Blink(true))
 }
 
 func TestHD44780DriverBlinkOff(t *testing.T) {
 	d := initTestHD44780Driver()
-	assert.Nil(t, d.Blink(false))
+	assert.NoError(t, d.Blink(false))
 }
 
 func TestHD44780DriverScrollLeft(t *testing.T) {
 	d := initTestHD44780Driver()
-	assert.Nil(t, d.ScrollLeft())
+	assert.NoError(t, d.ScrollLeft())
 }
 
 func TestHD44780DriverScrollRight(t *testing.T) {
 	d := initTestHD44780Driver()
-	assert.Nil(t, d.ScrollRight())
+	assert.NoError(t, d.ScrollRight())
 }
 
 func TestHD44780DriverLeftToRight(t *testing.T) {
 	d := initTestHD44780Driver()
-	assert.Nil(t, d.LeftToRight())
+	assert.NoError(t, d.LeftToRight())
 }
 
 func TestHD44780DriverRightToLeft(t *testing.T) {
 	d := initTestHD44780Driver()
-	assert.Nil(t, d.RightToLeft())
+	assert.NoError(t, d.RightToLeft())
 }
 
 func TestHD44780DriverSendCommand(t *testing.T) {
 	d := initTestHD44780Driver()
-	assert.Nil(t, d.SendCommand(0x33))
+	assert.NoError(t, d.SendCommand(0x33))
 }
 
 func TestHD44780DriverWriteChar(t *testing.T) {
 	d := initTestHD44780Driver()
-	assert.Nil(t, d.WriteChar(0x41))
+	assert.NoError(t, d.WriteChar(0x41))
 }
 
 func TestHD44780DriverCreateChar(t *testing.T) {
 	d := initTestHD44780Driver()
 	charMap := [8]byte{1, 2, 3, 4, 5, 6, 7, 8}
-	assert.Nil(t, d.CreateChar(0, charMap))
+	assert.NoError(t, d.CreateChar(0, charMap))
 }
 
 func TestHD44780DriverCreateCharError(t *testing.T) {

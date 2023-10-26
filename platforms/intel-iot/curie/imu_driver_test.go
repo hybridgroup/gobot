@@ -91,12 +91,12 @@ func initTestIMUDriver() *IMUDriver {
 
 func TestIMUDriverStart(t *testing.T) {
 	d := initTestIMUDriver()
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestIMUDriverHalt(t *testing.T) {
 	d := initTestIMUDriver()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 func TestIMUDriverDefaultName(t *testing.T) {
@@ -118,7 +118,7 @@ func TestIMUDriverConnection(t *testing.T) {
 func TestIMUDriverReadAccelerometer(t *testing.T) {
 	d := initTestIMUDriver()
 	_ = d.Start()
-	assert.Nil(t, d.ReadAccelerometer())
+	assert.NoError(t, d.ReadAccelerometer())
 }
 
 func TestIMUDriverReadAccelerometerData(t *testing.T) {
@@ -126,14 +126,14 @@ func TestIMUDriverReadAccelerometerData(t *testing.T) {
 	assert.ErrorContains(t, err, "Invalid data")
 
 	result, err := parseAccelerometerData([]byte{0xF0, 0x11, 0x00, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x0f, 0xf7})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, &AccelerometerData{X: 1920, Y: 1920, Z: 1920}, result)
 }
 
 func TestIMUDriverReadGyroscope(t *testing.T) {
 	d := initTestIMUDriver()
 	_ = d.Start()
-	assert.Nil(t, d.ReadGyroscope())
+	assert.NoError(t, d.ReadGyroscope())
 }
 
 func TestIMUDriverReadGyroscopeData(t *testing.T) {
@@ -141,14 +141,14 @@ func TestIMUDriverReadGyroscopeData(t *testing.T) {
 	assert.ErrorContains(t, err, "Invalid data")
 
 	result, err := parseGyroscopeData([]byte{0xF0, 0x11, 0x01, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x0f, 0xf7})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, &GyroscopeData{X: 1920, Y: 1920, Z: 1920}, result)
 }
 
 func TestIMUDriverReadTemperature(t *testing.T) {
 	d := initTestIMUDriver()
 	_ = d.Start()
-	assert.Nil(t, d.ReadTemperature())
+	assert.NoError(t, d.ReadTemperature())
 }
 
 func TestIMUDriverReadTemperatureData(t *testing.T) {
@@ -156,14 +156,14 @@ func TestIMUDriverReadTemperatureData(t *testing.T) {
 	assert.ErrorContains(t, err, "Invalid data")
 
 	result, err := parseTemperatureData([]byte{0xF0, 0x11, 0x02, 0x00, 0x02, 0x03, 0x04, 0xf7})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, float32(31.546875), result)
 }
 
 func TestIMUDriverEnableShockDetection(t *testing.T) {
 	d := initTestIMUDriver()
 	_ = d.Start()
-	assert.Nil(t, d.EnableShockDetection(true))
+	assert.NoError(t, d.EnableShockDetection(true))
 }
 
 func TestIMUDriverShockDetectData(t *testing.T) {
@@ -171,14 +171,14 @@ func TestIMUDriverShockDetectData(t *testing.T) {
 	assert.ErrorContains(t, err, "Invalid data")
 
 	result, err := parseShockData([]byte{0xF0, 0x11, 0x03, 0x00, 0x02, 0xf7})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, &ShockData{Axis: 0, Direction: 2}, result)
 }
 
 func TestIMUDriverEnableStepCounter(t *testing.T) {
 	d := initTestIMUDriver()
 	_ = d.Start()
-	assert.Nil(t, d.EnableStepCounter(true))
+	assert.NoError(t, d.EnableStepCounter(true))
 }
 
 func TestIMUDriverStepCountData(t *testing.T) {
@@ -186,14 +186,14 @@ func TestIMUDriverStepCountData(t *testing.T) {
 	assert.ErrorContains(t, err, "Invalid data")
 
 	result, err := parseStepData([]byte{0xF0, 0x11, 0x04, 0x00, 0x02, 0xf7})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, int16(256), result)
 }
 
 func TestIMUDriverEnableTapDetection(t *testing.T) {
 	d := initTestIMUDriver()
 	_ = d.Start()
-	assert.Nil(t, d.EnableTapDetection(true))
+	assert.NoError(t, d.EnableTapDetection(true))
 }
 
 func TestIMUDriverTapDetectData(t *testing.T) {
@@ -201,14 +201,14 @@ func TestIMUDriverTapDetectData(t *testing.T) {
 	assert.ErrorContains(t, err, "Invalid data")
 
 	result, err := parseTapData([]byte{0xF0, 0x11, 0x05, 0x00, 0x02, 0xf7})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, &TapData{Axis: 0, Direction: 2}, result)
 }
 
 func TestIMUDriverEnableReadMotion(t *testing.T) {
 	d := initTestIMUDriver()
 	_ = d.Start()
-	assert.Nil(t, d.ReadMotion())
+	assert.NoError(t, d.ReadMotion())
 }
 
 func TestIMUDriverReadMotionData(t *testing.T) {
@@ -216,7 +216,7 @@ func TestIMUDriverReadMotionData(t *testing.T) {
 	assert.ErrorContains(t, err, "Invalid data")
 
 	result, err := parseMotionData([]byte{0xF0, 0x11, 0x06, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x0f, 0xf7})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, &MotionData{AX: 1920, AY: 1920, AZ: 1920, GX: 1920, GY: 1920, GZ: 1920}, result)
 }
 
@@ -224,11 +224,11 @@ func TestIMUDriverHandleEvents(t *testing.T) {
 	d := initTestIMUDriver()
 	_ = d.Start()
 
-	assert.Nil(t, d.handleEvent([]byte{0xF0, 0x11, 0x00, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x0f, 0xf7}))
-	assert.Nil(t, d.handleEvent([]byte{0xF0, 0x11, 0x01, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x0f, 0xf7}))
-	assert.Nil(t, d.handleEvent([]byte{0xF0, 0x11, 0x02, 0x00, 0x02, 0x03, 0x04, 0xf7}))
-	assert.Nil(t, d.handleEvent([]byte{0xF0, 0x11, 0x03, 0x00, 0x02, 0xf7}))
-	assert.Nil(t, d.handleEvent([]byte{0xF0, 0x11, 0x04, 0x00, 0x02, 0xf7}))
-	assert.Nil(t, d.handleEvent([]byte{0xF0, 0x11, 0x05, 0x00, 0x02, 0xf7}))
-	assert.Nil(t, d.handleEvent([]byte{0xF0, 0x11, 0x06, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x0f, 0xf7}))
+	assert.NoError(t, d.handleEvent([]byte{0xF0, 0x11, 0x00, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x0f, 0xf7}))
+	assert.NoError(t, d.handleEvent([]byte{0xF0, 0x11, 0x01, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x0f, 0xf7}))
+	assert.NoError(t, d.handleEvent([]byte{0xF0, 0x11, 0x02, 0x00, 0x02, 0x03, 0x04, 0xf7}))
+	assert.NoError(t, d.handleEvent([]byte{0xF0, 0x11, 0x03, 0x00, 0x02, 0xf7}))
+	assert.NoError(t, d.handleEvent([]byte{0xF0, 0x11, 0x04, 0x00, 0x02, 0xf7}))
+	assert.NoError(t, d.handleEvent([]byte{0xF0, 0x11, 0x05, 0x00, 0x02, 0xf7}))
+	assert.NoError(t, d.handleEvent([]byte{0xF0, 0x11, 0x06, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x0f, 0xf7}))
 }

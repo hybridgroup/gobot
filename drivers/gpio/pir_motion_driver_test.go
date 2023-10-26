@@ -23,7 +23,7 @@ func TestPIRMotionDriverHalt(t *testing.T) {
 	go func() {
 		<-d.halt
 	}()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 func TestPIRMotionDriver(t *testing.T) {
@@ -39,7 +39,7 @@ func TestPIRMotionDriverStart(t *testing.T) {
 	a := newGpioTestAdaptor()
 	d := NewPIRMotionDriver(a, "1")
 
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 
 	_ = d.Once(MotionDetected, func(data interface{}) {
 		assert.True(t, d.Active)

@@ -36,20 +36,20 @@ func TestDigitalPin(t *testing.T) {
 	assert.Nil(t, pin.valFile)
 
 	err := pin.Unexport()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, "10", fs.Files["/sys/class/gpio/unexport"].Contents)
 
 	err = pin.Export()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, "10", fs.Files["/sys/class/gpio/export"].Contents)
 	assert.NotNil(t, pin.valFile)
 
 	err = pin.Write(1)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, "1", fs.Files["/sys/class/gpio/gpio10/value"].Contents)
 
 	err = pin.ApplyOptions(WithPinDirectionInput())
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, "in", fs.Files["/sys/class/gpio/gpio10/direction"].Contents)
 
 	data, _ := pin.Read()
@@ -68,7 +68,7 @@ func TestDigitalPin(t *testing.T) {
 	}
 
 	err = pin.Unexport()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	writeFile = func(File, []byte) (int, error) {
 		return 0, &os.PathError{Err: errors.New("write error")}
@@ -87,7 +87,7 @@ func TestDigitalPin(t *testing.T) {
 		return 0, nil
 	}
 	err = pin.Export()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	// assert write error on export
 	writeFile = func(File, []byte) (int, error) {

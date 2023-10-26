@@ -49,12 +49,12 @@ func TestNewAdafruit1109Driver(t *testing.T) {
 
 func TestAdafruit1109Connect(t *testing.T) {
 	d, _ := initTestAdafruit1109WithStubbedAdaptor()
-	assert.Nil(t, d.Connect())
+	assert.NoError(t, d.Connect())
 }
 
 func TestAdafruit1109Finalize(t *testing.T) {
 	d, _ := initTestAdafruit1109WithStubbedAdaptor()
-	assert.Nil(t, d.Finalize())
+	assert.NoError(t, d.Finalize())
 }
 
 func TestAdafruit1109SetName(t *testing.T) {
@@ -65,7 +65,7 @@ func TestAdafruit1109SetName(t *testing.T) {
 
 func TestAdafruit1109Start(t *testing.T) {
 	d, _ := initTestAdafruit1109WithStubbedAdaptor()
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestAdafruit1109StartWriteErr(t *testing.T) {
@@ -87,7 +87,7 @@ func TestAdafruit1109StartReadErr(t *testing.T) {
 func TestAdafruit1109Halt(t *testing.T) {
 	d, _ := initTestAdafruit1109WithStubbedAdaptor()
 	_ = d.Start()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 func TestAdafruit1109DigitalRead(t *testing.T) {
@@ -128,7 +128,7 @@ func TestAdafruit1109DigitalRead(t *testing.T) {
 			// act
 			got, err := d.DigitalRead(name)
 			// assert
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, 1, numCallsRead)
 			assert.Equal(t, 1, len(a.written))
 			assert.Equal(t, tc.wantReg, a.written[0])
@@ -160,7 +160,7 @@ func TestAdafruit1109SelectButton(t *testing.T) {
 			// act
 			got, err := d.SelectButton()
 			// assert
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, 1, numCallsRead)
 			assert.Equal(t, tc.want, got)
 		})
@@ -190,7 +190,7 @@ func TestAdafruit1109UpButton(t *testing.T) {
 			// act
 			got, err := d.UpButton()
 			// assert
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, 1, numCallsRead)
 			assert.Equal(t, tc.want, got)
 		})
@@ -220,7 +220,7 @@ func TestAdafruit1109DownButton(t *testing.T) {
 			// act
 			got, err := d.DownButton()
 			// assert
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, 1, numCallsRead)
 			assert.Equal(t, tc.want, got)
 		})
@@ -250,7 +250,7 @@ func TestAdafruit1109LeftButton(t *testing.T) {
 			// act
 			got, err := d.LeftButton()
 			// assert
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, 1, numCallsRead)
 			assert.Equal(t, tc.want, got)
 		})
@@ -280,7 +280,7 @@ func TestAdafruit1109RightButton(t *testing.T) {
 			// act
 			got, err := d.RightButton()
 			// assert
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, 1, numCallsRead)
 			assert.Equal(t, tc.want, got)
 		})

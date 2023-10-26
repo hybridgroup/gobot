@@ -42,12 +42,12 @@ func TestSHT2xOptions(t *testing.T) {
 
 func TestSHT2xStart(t *testing.T) {
 	d := NewSHT2xDriver(newI2cTestAdaptor())
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestSHT2xHalt(t *testing.T) {
 	d, _ := initTestSHT2xDriverWithStubbedAdaptor()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 func TestSHT2xReset(t *testing.T) {
@@ -57,7 +57,7 @@ func TestSHT2xReset(t *testing.T) {
 	}
 	_ = d.Start()
 	err := d.Reset()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestSHT2xMeasurements(t *testing.T) {
@@ -75,10 +75,10 @@ func TestSHT2xMeasurements(t *testing.T) {
 	}
 	_ = d.Start()
 	temp, err := d.Temperature()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, float32(18.809052), temp)
 	hum, err := d.Humidity()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, float32(40.279907), hum)
 }
 
@@ -100,7 +100,7 @@ func TestSHT2xAccuracy(t *testing.T) {
 	_ = d.SetAccuracy(SHT2xAccuracyLow)
 	assert.Equal(t, SHT2xAccuracyLow, d.Accuracy())
 	err := d.sendAccuracy()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestSHT2xTemperatureCrcError(t *testing.T) {

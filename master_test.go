@@ -41,7 +41,7 @@ func TestNullReadWriteCloser(t *testing.T) {
 	assert.Equal(t, 3, i)
 	i, _ = n.Read(make([]byte, 10))
 	assert.Equal(t, 10, i)
-	assert.Nil(t, n.Close())
+	assert.NoError(t, n.Close())
 }
 
 func TestMasterRobot(t *testing.T) {
@@ -69,8 +69,8 @@ func TestMasterToJSON(t *testing.T) {
 
 func TestMasterStart(t *testing.T) {
 	g := initTestMaster()
-	assert.Nil(t, g.Start())
-	assert.Nil(t, g.Stop())
+	assert.NoError(t, g.Start())
+	assert.NoError(t, g.Stop())
 	assert.False(t, g.Running())
 }
 
@@ -82,7 +82,7 @@ func TestMasterStartAutoRun(t *testing.T) {
 	assert.True(t, g.Running())
 
 	// stop it
-	assert.Nil(t, g.Stop())
+	assert.NoError(t, g.Stop())
 	assert.False(t, g.Running())
 }
 
@@ -99,7 +99,7 @@ func TestMasterStartDriverErrors(t *testing.T) {
 	want = multierror.Append(want, e)
 
 	assert.Equal(t, want, g.Start())
-	assert.Nil(t, g.Stop())
+	assert.NoError(t, g.Stop())
 
 	testDriverStart = func() (err error) { return }
 }
@@ -138,7 +138,7 @@ func TestMasterStartRobotAdaptorErrors(t *testing.T) {
 	}
 
 	assert.Equal(t, want, g.Start())
-	assert.Nil(t, g.Stop())
+	assert.NoError(t, g.Stop())
 
 	testAdaptorConnect = func() (err error) { return }
 }

@@ -60,7 +60,7 @@ func TestTSL2561DriverStart(t *testing.T) {
 	d := NewTSL2561Driver(a)
 	a.i2cReadImpl = testIDReader
 
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestTSL2561DriverStartNotFound(t *testing.T) {
@@ -77,7 +77,7 @@ func TestTSL2561DriverStartNotFound(t *testing.T) {
 
 func TestTSL2561DriverHalt(t *testing.T) {
 	d, _ := initTestTSL2561Driver()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 func TestTSL2561DriverRead16(t *testing.T) {
@@ -93,7 +93,7 @@ func TestTSL2561DriverRead16(t *testing.T) {
 		return buf.Len(), nil
 	}
 	val, err := d.connection.ReadWordData(1)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, uint16(0xAEEA), val)
 }
 
@@ -180,7 +180,7 @@ func TestTSL2561DriverGetLuminocity(t *testing.T) {
 		return buf.Len(), nil
 	}
 	bb, ir, err := d.GetLuminocity()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, uint16(12365), bb)
 	assert.Equal(t, uint16(12365), ir)
 	assert.Equal(t, uint32(72), d.CalculateLux(bb, ir))
@@ -202,7 +202,7 @@ func TestTSL2561DriverGetLuminocityAutoGain(t *testing.T) {
 
 	_ = d.Start()
 	bb, ir, err := d.GetLuminocity()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, uint16(12365), bb)
 	assert.Equal(t, uint16(12365), ir)
 	assert.Equal(t, uint32(72), d.CalculateLux(bb, ir))

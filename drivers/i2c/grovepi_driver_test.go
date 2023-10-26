@@ -219,7 +219,7 @@ func TestGrovePiSomeWrite(t *testing.T) {
 				return
 			}
 			// assert
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, tc.wantWritten, a.written)
 		})
 	}

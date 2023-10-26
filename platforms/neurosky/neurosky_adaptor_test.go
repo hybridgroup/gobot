@@ -69,7 +69,7 @@ func TestNeuroskyAdaptorName(t *testing.T) {
 
 func TestNeuroskyAdaptorConnect(t *testing.T) {
 	a := initTestNeuroskyAdaptor()
-	assert.Nil(t, a.Connect())
+	assert.NoError(t, a.Connect())
 
 	a.connect = func(n *Adaptor) (io.ReadWriteCloser, error) {
 		return nil, errors.New("connection error")
@@ -84,7 +84,7 @@ func TestNeuroskyAdaptorFinalize(t *testing.T) {
 		return rwc, nil
 	}
 	_ = a.Connect()
-	assert.Nil(t, a.Finalize())
+	assert.NoError(t, a.Finalize())
 
 	rwc.CloseError(errors.New("close error"))
 	_ = a.Connect()

@@ -34,7 +34,7 @@ func TestNewAccesser_NewSpiDevice(t *testing.T) {
 	// act
 	con, err := a.NewSpiDevice(busNum, chipNum, mode, bits, maxSpeed)
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, con)
 	assert.Equal(t, busNum, spi.busNum)
 	assert.Equal(t, chipNum, spi.chipNum)

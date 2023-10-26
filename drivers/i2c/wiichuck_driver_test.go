@@ -44,7 +44,7 @@ func TestWiichuckDriverStart(t *testing.T) {
 	d.interval = 1 * time.Millisecond
 	sem := make(chan bool)
 
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 
 	go func() {
 		for {
@@ -67,7 +67,7 @@ func TestWiichuckDriverStart(t *testing.T) {
 
 func TestWiichuckDriverHalt(t *testing.T) {
 	d := initTestWiichuckDriverWithStubbedAdaptor()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 func TestWiichuckDriverCanParse(t *testing.T) {

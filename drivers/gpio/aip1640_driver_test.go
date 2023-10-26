@@ -32,12 +32,12 @@ func TestAIP1640Driver(t *testing.T) {
 
 func TestAIP1640DriverStart(t *testing.T) {
 	d := initTestAIP1640Driver()
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestAIP1640DriverHalt(t *testing.T) {
 	d := initTestAIP1640Driver()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 func TestAIP1640DriverDefaultName(t *testing.T) {

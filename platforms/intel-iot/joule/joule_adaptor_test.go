@@ -111,13 +111,13 @@ func TestFinalize(t *testing.T) {
 	_ = a.DigitalWrite("J12_1", 1)
 	_ = a.PwmWrite("J12_26", 100)
 
-	assert.Nil(t, a.Finalize())
+	assert.NoError(t, a.Finalize())
 
 	// assert finalize after finalize is working
-	assert.Nil(t, a.Finalize())
+	assert.NoError(t, a.Finalize())
 
 	// assert re-connect is working
-	assert.Nil(t, a.Connect())
+	assert.NoError(t, a.Connect())
 }
 
 func TestDigitalIO(t *testing.T) {
@@ -129,7 +129,7 @@ func TestDigitalIO(t *testing.T) {
 	_ = a.DigitalWrite("J12_1", 0)
 
 	i, err := a.DigitalRead("J12_1")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 0, i)
 
 	_, err = a.DigitalRead("P9_99")
@@ -140,7 +140,7 @@ func TestPwm(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem()
 
 	err := a.PwmWrite("J12_26", 100)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, "3921568", fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents)
 
 	err = a.PwmWrite("4", 100)
@@ -176,11 +176,11 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	a := NewAdaptor()
 	a.sys.UseMockSyscall()
 	fs := a.sys.UseMockFilesystem([]string{"/dev/i2c-2"})
-	assert.Nil(t, a.Connect())
+	assert.NoError(t, a.Connect())
 	con, err := a.GetI2cConnection(0xff, 2)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	_, err = con.Write([]byte{0xbf})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	fs.WithCloseError = true
 	// act
 	err = a.Finalize()

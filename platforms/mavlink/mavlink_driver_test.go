@@ -59,11 +59,11 @@ func TestMavlinkDriverStart(t *testing.T) {
 		err <- data.(error)
 	})
 
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 
 	select {
 	case p := <-packet:
-		assert.Nil(t, d.SendPacket(p))
+		assert.NoError(t, d.SendPacket(p))
 
 	case <-time.After(100 * time.Millisecond):
 		t.Errorf("packet was not emitted")
@@ -82,5 +82,5 @@ func TestMavlinkDriverStart(t *testing.T) {
 
 func TestMavlinkDriverHalt(t *testing.T) {
 	d := initTestMavlinkDriver()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }

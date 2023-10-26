@@ -102,7 +102,7 @@ func TestTH02FastMode(t *testing.T) {
 			// act
 			got, err := d.FastMode()
 			// assert
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, 1, len(a.written))
 			assert.Equal(t, uint8(0x03), a.written[0])
 			assert.Equal(t, tc.want, got)
@@ -130,7 +130,7 @@ func TestTH02SetHeater(t *testing.T) {
 			// act
 			err := d.SetHeater(tc.heater)
 			// assert
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, tc.heater, d.heating)
 			assert.Equal(t, 2, len(a.written))
 			assert.Equal(t, uint8(0x03), a.written[0])
@@ -162,7 +162,7 @@ func TestTH02Heater(t *testing.T) {
 			// act
 			got, err := d.Heater()
 			// assert
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, 1, len(a.written))
 			assert.Equal(t, uint8(0x03), a.written[0])
 			assert.Equal(t, tc.want, got)
@@ -186,7 +186,7 @@ func TestTH02SerialNumber(t *testing.T) {
 	// act
 	sn, err := d.SerialNumber()
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 1, len(a.written))
 	assert.Equal(t, uint8(0x11), a.written[0])
 	assert.Equal(t, want, sn)
@@ -297,7 +297,7 @@ func TestTH02Sample(t *testing.T) {
 			// act
 			temp, rh, err := d.Sample()
 			// assert
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, tc.wantRH, rh)
 			assert.Equal(t, tc.wantT, temp)
 		})

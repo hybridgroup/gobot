@@ -200,7 +200,7 @@ func TestPCA953xWritePeriod(t *testing.T) {
 			// act
 			err := d.WritePeriod(tc.idx, tc.val)
 			// assert
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, tc.wantWritten, a.written)
 		})
 	}
@@ -291,7 +291,7 @@ func TestPCA953xWriteFrequency(t *testing.T) {
 			// act
 			err := d.WriteFrequency(tc.idx, tc.val)
 			// assert
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, tc.wantWritten, a.written)
 		})
 	}
@@ -382,7 +382,7 @@ func TestPCA953xWriteDutyCyclePercent(t *testing.T) {
 			// act
 			err := d.WriteDutyCyclePercent(tc.idx, tc.val)
 			// assert
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, tc.wantWritten, a.written)
 		})
 	}
@@ -465,7 +465,7 @@ func TestPCA953x_readRegister(t *testing.T) {
 	// act
 	val, err := d.readRegister(wantRegAddress)
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 1, numCallsRead)
 	assert.Equal(t, 1, numCallsWrite)
 	assert.Equal(t, wantRegVal, val)
@@ -491,7 +491,7 @@ func TestPCA953x_writeRegister(t *testing.T) {
 	// act
 	err := d.writeRegister(wantRegAddress, wantRegVal)
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 1, numCallsWrite)
 	assert.Equal(t, 1, numCallsWrite)
 	assert.Equal(t, wantByteCount, len(a.written))

@@ -39,8 +39,8 @@ func TestIOPinDriverStartAndHalt(t *testing.T) {
 	a.TestReadCharacteristic(func(cUUID string) ([]byte, error) {
 		return []byte{0, 1, 1, 0}, nil
 	})
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.Halt())
 }
 
 func TestIOPinDriverStartError(t *testing.T) {
@@ -82,7 +82,7 @@ func TestIOPinDriverDigitalWrite(t *testing.T) {
 	d := NewIOPinDriver(a)
 
 	// TODO: a better test
-	assert.Nil(t, d.DigitalWrite("0", 1))
+	assert.NoError(t, d.DigitalWrite("0", 1))
 }
 
 func TestIOPinDriverDigitalWriteInvalidPin(t *testing.T) {
@@ -139,7 +139,7 @@ func TestIOPinDriverDigitalWriteAnalogRead(t *testing.T) {
 		return []byte{0, 0, 1, 128, 2, 1}, nil
 	})
 
-	assert.Nil(t, d.DigitalWrite("1", 0))
+	assert.NoError(t, d.DigitalWrite("1", 0))
 
 	val, _ := d.AnalogRead("1")
 	assert.Equal(t, 128, val)
@@ -155,5 +155,5 @@ func TestIOPinDriverAnalogReadDigitalWrite(t *testing.T) {
 	val, _ := d.AnalogRead("1")
 	assert.Equal(t, 128, val)
 
-	assert.Nil(t, d.DigitalWrite("1", 0))
+	assert.NoError(t, d.DigitalWrite("1", 0))
 }

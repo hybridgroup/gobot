@@ -43,12 +43,12 @@ func TestServoDriver(t *testing.T) {
 
 func TestServoDriverStart(t *testing.T) {
 	d := initTestServoDriver()
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestServoDriverHalt(t *testing.T) {
 	d := initTestServoDriver()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 func TestServoDriverMove(t *testing.T) {

@@ -35,25 +35,25 @@ func TestPwmPin(t *testing.T) {
 	assert.Equal(t, "10", pin.pin)
 
 	err := pin.Unexport()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, "10", fs.Files["/sys/class/pwm/pwmchip0/unexport"].Contents)
 
 	err = pin.Export()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, "10", fs.Files["/sys/class/pwm/pwmchip0/export"].Contents)
 
-	assert.Nil(t, pin.SetPolarity(false))
+	assert.NoError(t, pin.SetPolarity(false))
 	assert.Equal(t, inverted, fs.Files["/sys/class/pwm/pwmchip0/pwm10/polarity"].Contents)
 	pol, _ := pin.Polarity()
 	assert.False(t, pol)
-	assert.Nil(t, pin.SetPolarity(true))
+	assert.NoError(t, pin.SetPolarity(true))
 	assert.Equal(t, normal, fs.Files["/sys/class/pwm/pwmchip0/pwm10/polarity"].Contents)
 	pol, _ = pin.Polarity()
 	assert.True(t, pol)
 
 	assert.NotEqual(t, "1", fs.Files["/sys/class/pwm/pwmchip0/pwm10/enable"].Contents)
 	err = pin.SetEnabled(true)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, "1", fs.Files["/sys/class/pwm/pwmchip0/pwm10/enable"].Contents)
 	err = pin.SetPolarity(true)
 	assert.ErrorContains(t, err, "Cannot set PWM polarity when enabled")
@@ -61,13 +61,13 @@ func TestPwmPin(t *testing.T) {
 	fs.Files["/sys/class/pwm/pwmchip0/pwm10/period"].Contents = "6"
 	data, _ := pin.Period()
 	assert.Equal(t, uint32(6), data)
-	assert.Nil(t, pin.SetPeriod(100000))
+	assert.NoError(t, pin.SetPeriod(100000))
 	data, _ = pin.Period()
 	assert.Equal(t, uint32(100000), data)
 
 	assert.NotEqual(t, "1", fs.Files["/sys/class/pwm/pwmchip0/pwm10/duty_cycle"].Contents)
 	err = pin.SetDutyCycle(100)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, "100", fs.Files["/sys/class/pwm/pwmchip0/pwm10/duty_cycle"].Contents)
 	data, _ = pin.DutyCycle()
 	assert.Equal(t, uint32(100), data)
@@ -88,7 +88,7 @@ func TestPwmPinAlreadyExported(t *testing.T) {
 	}
 
 	// no error indicates that the pin was already exported
-	assert.Nil(t, pin.Export())
+	assert.NoError(t, pin.Export())
 }
 
 func TestPwmPinExportError(t *testing.T) {

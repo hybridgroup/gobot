@@ -24,6 +24,6 @@ func TestBB8Driver(t *testing.T) {
 
 func TestBB8DriverStartAndHalt(t *testing.T) {
 	d := initTestBB8Driver()
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.Halt())
 }

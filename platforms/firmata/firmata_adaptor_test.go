@@ -111,7 +111,7 @@ func TestNewAdaptor(t *testing.T) {
 
 func TestAdaptorFinalize(t *testing.T) {
 	a := initTestAdaptor()
-	assert.Nil(t, a.Finalize())
+	assert.NoError(t, a.Finalize())
 
 	a = initTestAdaptor()
 	a.Board.(*mockFirmataBoard).disconnectError = errors.New("close error")
@@ -125,7 +125,7 @@ func TestAdaptorConnect(t *testing.T) {
 	a := NewAdaptor("/dev/null")
 	a.PortOpener = openSP
 	a.Board = newMockFirmataBoard()
-	assert.Nil(t, a.Connect())
+	assert.NoError(t, a.Connect())
 
 	a = NewAdaptor("/dev/null")
 	a.Board = newMockFirmataBoard()
@@ -136,16 +136,16 @@ func TestAdaptorConnect(t *testing.T) {
 
 	a = NewAdaptor(&readWriteCloser{})
 	a.Board = newMockFirmataBoard()
-	assert.Nil(t, a.Connect())
+	assert.NoError(t, a.Connect())
 
 	a = NewAdaptor("/dev/null")
 	a.Board = nil
-	assert.Nil(t, a.Disconnect())
+	assert.NoError(t, a.Disconnect())
 }
 
 func TestAdaptorServoWrite(t *testing.T) {
 	a := initTestAdaptor()
-	assert.Nil(t, a.ServoWrite("1", 50))
+	assert.NoError(t, a.ServoWrite("1", 50))
 }
 
 func TestAdaptorServoWriteBadPin(t *testing.T) {
@@ -155,7 +155,7 @@ func TestAdaptorServoWriteBadPin(t *testing.T) {
 
 func TestAdaptorPwmWrite(t *testing.T) {
 	a := initTestAdaptor()
-	assert.Nil(t, a.PwmWrite("1", 50))
+	assert.NoError(t, a.PwmWrite("1", 50))
 }
 
 func TestAdaptorPwmWriteBadPin(t *testing.T) {
@@ -165,7 +165,7 @@ func TestAdaptorPwmWriteBadPin(t *testing.T) {
 
 func TestAdaptorDigitalWrite(t *testing.T) {
 	a := initTestAdaptor()
-	assert.Nil(t, a.DigitalWrite("1", 1))
+	assert.NoError(t, a.DigitalWrite("1", 1))
 }
 
 func TestAdaptorDigitalWriteBadPin(t *testing.T) {
@@ -176,11 +176,11 @@ func TestAdaptorDigitalWriteBadPin(t *testing.T) {
 func TestAdaptorDigitalRead(t *testing.T) {
 	a := initTestAdaptor()
 	val, err := a.DigitalRead("1")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 1, val)
 
 	val, err = a.DigitalRead("0")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 0, val)
 }
 
@@ -194,10 +194,10 @@ func TestAdaptorAnalogRead(t *testing.T) {
 	a := initTestAdaptor()
 	val, err := a.AnalogRead("1")
 	assert.Equal(t, 133, val)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	val, err = a.AnalogRead("0")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 0, val)
 }
 
@@ -210,7 +210,7 @@ func TestAdaptorAnalogReadBadPin(t *testing.T) {
 func TestServoConfig(t *testing.T) {
 	a := initTestAdaptor()
 	err := a.ServoConfig("9", 0, 0)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	// test atoi error
 	err = a.ServoConfig("a", 0, 0)

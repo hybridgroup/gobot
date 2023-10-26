@@ -37,15 +37,15 @@ func TestPwmPin(t *testing.T) {
 	require.Equal(t, "", fs.Files[periodPath].Contents)
 	require.Equal(t, "", fs.Files[dutyCyclePath].Contents)
 
-	assert.Nil(t, pin.Export())
+	assert.NoError(t, pin.Export())
 	assert.Equal(t, "3", fs.Files[exportPath].Contents)
 
-	assert.Nil(t, pin.SetEnabled(true))
+	assert.NoError(t, pin.SetEnabled(true))
 	assert.Equal(t, "1", fs.Files[enablePath].Contents)
 
 	val, _ := pin.Polarity()
 	assert.True(t, val)
-	assert.Nil(t, pin.SetPolarity(false))
+	assert.NoError(t, pin.SetPolarity(false))
 	val, _ = pin.Polarity()
 	assert.True(t, val)
 
@@ -54,7 +54,7 @@ func TestPwmPin(t *testing.T) {
 	assert.ErrorContains(t, pin.SetDutyCycle(10000), "Jetson PWM pin period not set")
 	assert.Equal(t, "", fs.Files[dutyCyclePath].Contents)
 
-	assert.Nil(t, pin.SetPeriod(20000000))
+	assert.NoError(t, pin.SetPeriod(20000000))
 	// TODO: see PR #990 assert.Equal(t, "20000000", fs.Files[periodPath].Contents)
 	period, _ := pin.Period()
 	assert.Equal(t, uint32(20000000), period)
@@ -64,7 +64,7 @@ func TestPwmPin(t *testing.T) {
 	dc, _ := pin.DutyCycle()
 	assert.Equal(t, uint32(0), dc)
 
-	assert.Nil(t, pin.SetDutyCycle(10000))
+	assert.NoError(t, pin.SetDutyCycle(10000))
 	assert.Equal(t, "10000", fs.Files[dutyCyclePath].Contents)
 	dc, _ = pin.DutyCycle()
 	assert.Equal(t, uint32(10000), dc)
@@ -74,6 +74,6 @@ func TestPwmPin(t *testing.T) {
 	assert.Equal(t, "10000", fs.Files[dutyCyclePath].Contents)
 	assert.Equal(t, uint32(10000), dc)
 
-	assert.Nil(t, pin.Unexport())
+	assert.NoError(t, pin.Unexport())
 	assert.Equal(t, "3", fs.Files[unexportPath].Contents)
 }

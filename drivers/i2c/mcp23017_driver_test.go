@@ -147,7 +147,7 @@ func TestMCP23017WriteGPIO(t *testing.T) {
 		// act
 		err := d.WriteGPIO(testPin, testPort, uint8(bitState))
 		// assert
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, 6, len(a.written))
 		assert.Equal(t, wantReg1, a.written[0])
 		assert.Equal(t, wantReg1, a.written[1])
@@ -186,7 +186,7 @@ func TestMCP23017WriteGPIONoRefresh(t *testing.T) {
 		// act
 		err := d.WriteGPIO(testPin, testPort, uint8(bitState))
 		// assert
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, 2, len(a.written))
 		assert.Equal(t, wantReg1, a.written[0])
 		assert.Equal(t, wantReg2, a.written[1])
@@ -223,7 +223,7 @@ func TestMCP23017WriteGPIONoAutoDir(t *testing.T) {
 		// act
 		err := d.WriteGPIO(testPin, testPort, uint8(bitState))
 		// assert
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, 3, len(a.written))
 		assert.Equal(t, wantReg, a.written[0])
 		assert.Equal(t, wantReg, a.written[1])
@@ -290,7 +290,7 @@ func TestMCP23017ReadGPIO(t *testing.T) {
 		// act
 		val, err := d.ReadGPIO(testPin, testPort)
 		// assert
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, 2, numCallsRead)
 		assert.Equal(t, 4, len(a.written))
 		assert.Equal(t, wantReg1, a.written[0])
@@ -328,7 +328,7 @@ func TestMCP23017ReadGPIONoRefresh(t *testing.T) {
 		// act
 		val, err := d.ReadGPIO(testPin, testPort)
 		// assert
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, 2, numCallsRead)
 		assert.Equal(t, 2, len(a.written))
 		assert.Equal(t, wantReg1, a.written[0])
@@ -363,7 +363,7 @@ func TestMCP23017ReadGPIONoAutoDir(t *testing.T) {
 		// act
 		val, err := d.ReadGPIO(testPin, testPort)
 		// assert
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, 1, numCallsRead)
 		assert.Equal(t, 1, len(a.written))
 		assert.Equal(t, wantReg2, a.written[0])
@@ -413,7 +413,7 @@ func TestMCP23017SetPinMode(t *testing.T) {
 		// act
 		err := d.SetPinMode(testPin, testPort, uint8(bitState))
 		// assert
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, 3, len(a.written))
 		assert.Equal(t, wantReg, a.written[0])
 		assert.Equal(t, wantReg, a.written[1])
@@ -463,7 +463,7 @@ func TestMCP23017SetPullUp(t *testing.T) {
 		// act
 		err := d.SetPullUp(testPin, testPort, uint8(bitState))
 		// assert
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, 3, len(a.written))
 		assert.Equal(t, wantReg, a.written[0])
 		assert.Equal(t, wantReg, a.written[1])
@@ -513,7 +513,7 @@ func TestMCP23017SetGPIOPolarity(t *testing.T) {
 		// act
 		err := d.SetGPIOPolarity(testPin, testPort, uint8(bitState))
 		// assert
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, 3, len(a.written))
 		assert.Equal(t, wantReg, a.written[0])
 		assert.Equal(t, wantReg, a.written[1])
@@ -539,13 +539,13 @@ func TestMCP23017_write(t *testing.T) {
 	d, _ := initTestMCP23017WithStubbedAdaptor(0)
 	port := d.getPort("A")
 	err := d.write(port.IODIR, uint8(7), 0)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	// set bit
 	d, _ = initTestMCP23017WithStubbedAdaptor(0)
 	port = d.getPort("B")
 	err = d.write(port.IODIR, uint8(7), 1)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	// write error
 	d, a := initTestMCP23017WithStubbedAdaptor(0)
@@ -566,7 +566,7 @@ func TestMCP23017_write(t *testing.T) {
 		return len(b), nil
 	}
 	err = d.write(port.IODIR, uint8(7), 1)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestMCP23017_read(t *testing.T) {

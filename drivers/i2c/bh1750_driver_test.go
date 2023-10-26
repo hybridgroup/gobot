@@ -43,12 +43,12 @@ func TestBH1750Options(t *testing.T) {
 
 func TestBH1750Start(t *testing.T) {
 	d := NewBH1750Driver(newI2cTestAdaptor())
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestBH1750Halt(t *testing.T) {
 	d, _ := initTestBH1750DriverWithStubbedAdaptor()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 func TestBH1750NullLux(t *testing.T) {

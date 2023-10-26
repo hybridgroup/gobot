@@ -88,13 +88,13 @@ func TestNewAdaptor(t *testing.T) {
 
 func TestAdaptorConnect(t *testing.T) {
 	a := initTestAdaptor()
-	assert.Nil(t, a.Connect())
+	assert.NoError(t, a.Connect())
 }
 
 func TestAdaptorFinalize(t *testing.T) {
 	a := initTestAdaptor()
 	_ = a.Connect()
-	assert.Nil(t, a.Finalize())
+	assert.NoError(t, a.Finalize())
 }
 
 func TestAdaptorAnalogRead(t *testing.T) {
@@ -403,5 +403,5 @@ func TestAdaptorEventStream(t *testing.T) {
 	}
 
 	_, err = a.EventStream("devices", "")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }

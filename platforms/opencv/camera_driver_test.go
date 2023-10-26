@@ -36,7 +36,7 @@ func TestCameraDriverName(t *testing.T) {
 func TestCameraDriverStart(t *testing.T) {
 	sem := make(chan bool)
 	d := initTestCameraDriver()
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 	d.On(d.Event("frame"), func(data interface{}) {
 		sem <- true
 	})
@@ -47,7 +47,7 @@ func TestCameraDriverStart(t *testing.T) {
 	}
 
 	d = NewCameraDriver("")
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 
 	d = NewCameraDriver(true)
 	assert.NotNil(t, d.Start())
@@ -55,5 +55,5 @@ func TestCameraDriverStart(t *testing.T) {
 
 func TestCameraDriverHalt(t *testing.T) {
 	d := initTestCameraDriver()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }

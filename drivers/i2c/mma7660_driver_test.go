@@ -43,12 +43,12 @@ func TestMMA7660Options(t *testing.T) {
 
 func TestMMA7660Start(t *testing.T) {
 	d := NewMMA7660Driver(newI2cTestAdaptor())
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestMMA7660Halt(t *testing.T) {
 	d, _ := initTestMMA7660DriverWithStubbedAdaptor()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 func TestMMA7660Acceleration(t *testing.T) {

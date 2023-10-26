@@ -52,12 +52,12 @@ func TestLedDriver(t *testing.T) {
 
 func TestLedDriverStart(t *testing.T) {
 	d := initTestLedDriver()
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestLedDriverHalt(t *testing.T) {
 	d := initTestLedDriver()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 func TestLedDriverToggle(t *testing.T) {

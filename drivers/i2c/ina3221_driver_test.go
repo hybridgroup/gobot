@@ -42,12 +42,12 @@ func TestINA3221Options(t *testing.T) {
 
 func TestINA3221Start(t *testing.T) {
 	d := NewINA3221Driver(newI2cTestAdaptor())
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestINA3221Halt(t *testing.T) {
 	d, _ := initTestINA3221DriverWithStubbedAdaptor()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 func TestINA3221GetBusVoltage(t *testing.T) {
@@ -60,7 +60,7 @@ func TestINA3221GetBusVoltage(t *testing.T) {
 
 	v, err := d.GetBusVoltage(INA3221Channel1)
 	assert.Equal(t, float64(13.928), v)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestINA3221GetBusVoltageReadError(t *testing.T) {
@@ -83,7 +83,7 @@ func TestINA3221GetShuntVoltage(t *testing.T) {
 
 	v, err := d.GetShuntVoltage(INA3221Channel1)
 	assert.Equal(t, float64(7.48), v)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestINA3221GetShuntVoltageReadError(t *testing.T) {
@@ -106,7 +106,7 @@ func TestINA3221GetCurrent(t *testing.T) {
 
 	v, err := d.GetCurrent(INA3221Channel1)
 	assert.Equal(t, float64(74.8), v)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestINA3221CurrentReadError(t *testing.T) {
@@ -131,7 +131,7 @@ func TestINA3221GetLoadVoltage(t *testing.T) {
 
 	v, err := d.GetLoadVoltage(INA3221Channel2)
 	assert.Equal(t, float64(13.935480), v)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestINA3221GetLoadVoltageReadError(t *testing.T) {

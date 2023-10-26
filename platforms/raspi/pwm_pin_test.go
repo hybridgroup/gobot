@@ -17,13 +17,13 @@ func TestPwmPin(t *testing.T) {
 
 	pin := NewPWMPin(a, path, "1")
 
-	assert.Nil(t, pin.Export())
-	assert.Nil(t, pin.SetEnabled(true))
+	assert.NoError(t, pin.Export())
+	assert.NoError(t, pin.SetEnabled(true))
 
 	val, _ := pin.Polarity()
 	assert.True(t, val)
 
-	assert.Nil(t, pin.SetPolarity(false))
+	assert.NoError(t, pin.SetPolarity(false))
 
 	val, _ = pin.Polarity()
 	assert.True(t, val)
@@ -32,7 +32,7 @@ func TestPwmPin(t *testing.T) {
 	assert.ErrorContains(t, err, "Raspi PWM pin period not set")
 	assert.ErrorContains(t, pin.SetDutyCycle(10000), "Raspi PWM pin period not set")
 
-	assert.Nil(t, pin.SetPeriod(20000000))
+	assert.NoError(t, pin.SetPeriod(20000000))
 	period, _ := pin.Period()
 	assert.Equal(t, uint32(20000000), period)
 	assert.ErrorContains(t, pin.SetPeriod(10000000), "Cannot set the period of individual PWM pins on Raspi")
@@ -40,7 +40,7 @@ func TestPwmPin(t *testing.T) {
 	dc, _ := pin.DutyCycle()
 	assert.Equal(t, uint32(0), dc)
 
-	assert.Nil(t, pin.SetDutyCycle(10000))
+	assert.NoError(t, pin.SetDutyCycle(10000))
 
 	dc, _ = pin.DutyCycle()
 	assert.Equal(t, uint32(10000), dc)
@@ -49,5 +49,5 @@ func TestPwmPin(t *testing.T) {
 	dc, _ = pin.DutyCycle()
 	assert.Equal(t, uint32(10000), dc)
 
-	assert.Nil(t, pin.Unexport())
+	assert.NoError(t, pin.Unexport())
 }

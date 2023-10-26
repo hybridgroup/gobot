@@ -14,10 +14,10 @@ func TestMockFilesystemOpen(t *testing.T) {
 	assert.False(t, f1.Opened)
 	f2, err := fs.openFile("foo", 0, 0o666)
 	assert.Equal(t, f2, f1)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	err = f2.Sync()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	_, err = fs.openFile("bar", 0, 0o666)
 	assert.ErrorContains(t, err, " : bar: no such file")
@@ -31,11 +31,11 @@ func TestMockFilesystemStat(t *testing.T) {
 	fs := newMockFilesystem([]string{"foo", "bar/baz"})
 
 	fileStat, err := fs.stat("foo")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.False(t, fileStat.IsDir())
 
 	dirStat, err := fs.stat("bar")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.True(t, dirStat.IsDir())
 
 	_, err = fs.stat("plonk")
@@ -61,7 +61,7 @@ func TestMockFilesystemFind(t *testing.T) {
 			// act
 			dirs, err := fs.find(tt.baseDir, tt.pattern)
 			// assert
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 			sort.Strings(dirs)
 			assert.Equal(t, tt.want, dirs)
 		})
@@ -73,7 +73,7 @@ func TestMockFilesystemWrite(t *testing.T) {
 	f1 := fs.Files["bar"]
 
 	f2, err := fs.openFile("bar", 0, 0o666)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	// Never been read or written.
 	assert.True(t, f1.Seq <= 0)
 
@@ -89,7 +89,7 @@ func TestMockFilesystemRead(t *testing.T) {
 	f1.Contents = "Yip"
 
 	f2, err := fs.openFile("bar", 0, 0o666)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	// Never been read or written.
 	assert.True(t, f1.Seq <= 0)
 

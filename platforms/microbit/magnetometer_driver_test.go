@@ -25,8 +25,8 @@ func TestMagnetometerDriver(t *testing.T) {
 
 func TestMagnetometerDriverStartAndHalt(t *testing.T) {
 	d := initTestMagnetometerDriver()
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.Halt())
 }
 
 func TestMagnetometerDriverReadData(t *testing.T) {

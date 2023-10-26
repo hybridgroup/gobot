@@ -28,12 +28,12 @@ func TestBuzzerDriverSetName(t *testing.T) {
 
 func TestBuzzerDriverStart(t *testing.T) {
 	d := initTestBuzzerDriver(newGpioTestAdaptor())
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 }
 
 func TestBuzzerDriverHalt(t *testing.T) {
 	d := initTestBuzzerDriver(newGpioTestAdaptor())
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 }
 
 func TestBuzzerDriverToggle(t *testing.T) {
@@ -47,7 +47,7 @@ func TestBuzzerDriverToggle(t *testing.T) {
 
 func TestBuzzerDriverTone(t *testing.T) {
 	d := initTestBuzzerDriver(newGpioTestAdaptor())
-	assert.Nil(t, d.Tone(100, 0.01))
+	assert.NoError(t, d.Tone(100, 0.01))
 }
 
 func TestBuzzerDriverOnError(t *testing.T) {

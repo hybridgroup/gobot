@@ -72,7 +72,7 @@ func TestBME280Measurements(t *testing.T) {
 	}
 	_ = bme280.Start()
 	hum, err := bme280.Humidity()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, float32(51.20179), hum)
 }
 
@@ -186,5 +186,5 @@ func TestBME280_initializationBME280(t *testing.T) {
 		}
 		return 0, nil
 	}
-	assert.Nil(t, bme280.Start())
+	assert.NoError(t, bme280.Start())
 }

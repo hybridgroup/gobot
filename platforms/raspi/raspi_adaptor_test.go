@@ -103,7 +103,7 @@ func TestFinalize(t *testing.T) {
 	_ = a.PwmWrite("7", 255)
 
 	_, _ = a.GetI2cConnection(0xff, 0)
-	assert.Nil(t, a.Finalize())
+	assert.NoError(t, a.Finalize())
 }
 
 func TestDigitalPWM(t *testing.T) {
@@ -111,17 +111,17 @@ func TestDigitalPWM(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem(mockedPaths)
 	a.PiBlasterPeriod = 20000000
 
-	assert.Nil(t, a.PwmWrite("7", 4))
+	assert.NoError(t, a.PwmWrite("7", 4))
 
 	pin, _ := a.PWMPin("7")
 	period, _ := pin.Period()
 	assert.Equal(t, uint32(20000000), period)
 
-	assert.Nil(t, a.PwmWrite("7", 255))
+	assert.NoError(t, a.PwmWrite("7", 255))
 
 	assert.Equal(t, "4=1", strings.Split(fs.Files["/dev/pi-blaster"].Contents, "\n")[0])
 
-	assert.Nil(t, a.ServoWrite("11", 90))
+	assert.NoError(t, a.ServoWrite("11", 90))
 
 	assert.Equal(t, "17=0.5", strings.Split(fs.Files["/dev/pi-blaster"].Contents, "\n")[0])
 
@@ -132,7 +132,7 @@ func TestDigitalPWM(t *testing.T) {
 	period, _ = pin.Period()
 	assert.Equal(t, uint32(20000000), period)
 
-	assert.Nil(t, pin.SetDutyCycle(1.5*1000*1000))
+	assert.NoError(t, pin.SetDutyCycle(1.5*1000*1000))
 
 	assert.Equal(t, "18=0.075", strings.Split(fs.Files["/dev/pi-blaster"].Contents, "\n")[0])
 }
@@ -149,19 +149,19 @@ func TestDigitalIO(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem(mockedPaths)
 
 	err := a.DigitalWrite("7", 1)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, "1", fs.Files["/sys/class/gpio/gpio4/value"].Contents)
 
 	a.revision = "2"
 	err = a.DigitalWrite("13", 1)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	i, err := a.DigitalRead("13")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 1, i)
 
 	assert.ErrorContains(t, a.DigitalWrite("notexist", 1), "Not a valid pin")
-	assert.Nil(t, a.Finalize())
+	assert.NoError(t, a.Finalize())
 }
 
 func TestDigitalPinConcurrency(t *testing.T) {
@@ -197,18 +197,18 @@ func TestPWMPin(t *testing.T) {
 
 	a.revision = "3"
 	firstSysPin, err := a.PWMPin("35")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 1, len(a.pwmPins))
 
 	secondSysPin, err := a.PWMPin("35")
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 1, len(a.pwmPins))
 	assert.Equal(t, secondSysPin, firstSysPin)
 
 	otherSysPin, err := a.PWMPin("36")
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 2, len(a.pwmPins))
 	assert.NotEqual(t, otherSysPin, firstSysPin)
 }
@@ -222,17 +222,17 @@ func TestPWMPinsReConnect(t *testing.T) {
 	}
 
 	_, err := a.PWMPin("35")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 1, len(a.pwmPins))
-	assert.Nil(t, a.Finalize())
+	assert.NoError(t, a.Finalize())
 	// act
 	err = a.Connect()
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 0, len(a.pwmPins))
 	_, _ = a.PWMPin("35")
 	_, err = a.PWMPin("36")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 2, len(a.pwmPins))
 }
 
@@ -262,11 +262,11 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	a := NewAdaptor()
 	a.sys.UseMockSyscall()
 	fs := a.sys.UseMockFilesystem([]string{"/dev/i2c-1"})
-	assert.Nil(t, a.Connect())
+	assert.NoError(t, a.Connect())
 	con, err := a.GetI2cConnection(0xff, 1)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	_, err = con.Write([]byte{0xbf})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	fs.WithCloseError = true
 	// act
 	err = a.Finalize()

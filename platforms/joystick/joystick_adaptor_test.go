@@ -29,7 +29,7 @@ func TestJoystickAdaptorName(t *testing.T) {
 
 func TestAdaptorConnect(t *testing.T) {
 	a := initTestAdaptor()
-	assert.Nil(t, a.Connect())
+	assert.NoError(t, a.Connect())
 
 	a = NewAdaptor("6")
 	err := a.Connect()
@@ -39,5 +39,5 @@ func TestAdaptorConnect(t *testing.T) {
 func TestAdaptorFinalize(t *testing.T) {
 	a := initTestAdaptor()
 	_ = a.Connect()
-	assert.Nil(t, a.Finalize())
+	assert.NoError(t, a.Finalize())
 }

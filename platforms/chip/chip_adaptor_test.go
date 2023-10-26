@@ -71,8 +71,8 @@ func TestNewProAdaptor(t *testing.T) {
 
 func TestFinalizeErrorAfterGPIO(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem()
-	assert.Nil(t, a.Connect())
-	assert.Nil(t, a.DigitalWrite("CSID7", 1))
+	assert.NoError(t, a.Connect())
+	assert.NoError(t, a.DigitalWrite("CSID7", 1))
 
 	fs.WithWriteError = true
 
@@ -85,8 +85,8 @@ func TestFinalizeErrorAfterPWM(t *testing.T) {
 	fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents = "0"
 	fs.Files["/sys/class/pwm/pwmchip0/pwm0/period"].Contents = "0"
 
-	assert.Nil(t, a.Connect())
-	assert.Nil(t, a.PwmWrite("PWM0", 100))
+	assert.NoError(t, a.Connect())
+	assert.NoError(t, a.PwmWrite("PWM0", 100))
 
 	fs.WithWriteError = true
 
@@ -106,7 +106,7 @@ func TestDigitalIO(t *testing.T) {
 	assert.Equal(t, 1, i)
 
 	assert.ErrorContains(t, a.DigitalWrite("XIO-P10", 1), "'XIO-P10' is not a valid id for a digital pin")
-	assert.Nil(t, a.Finalize())
+	assert.NoError(t, a.Finalize())
 }
 
 func TestProDigitalIO(t *testing.T) {
@@ -121,7 +121,7 @@ func TestProDigitalIO(t *testing.T) {
 	assert.Equal(t, 1, i)
 
 	assert.ErrorContains(t, a.DigitalWrite("XIO-P0", 1), "'XIO-P0' is not a valid id for a digital pin")
-	assert.Nil(t, a.Finalize())
+	assert.NoError(t, a.Finalize())
 }
 
 func TestPWM(t *testing.T) {
@@ -132,7 +132,7 @@ func TestPWM(t *testing.T) {
 	_ = a.Connect()
 
 	err := a.PwmWrite("PWM0", 100)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	assert.Equal(t, "0", fs.Files["/sys/class/pwm/pwmchip0/export"].Contents)
 	assert.Equal(t, "1", fs.Files["/sys/class/pwm/pwmchip0/pwm0/enable"].Contents)
@@ -141,18 +141,18 @@ func TestPWM(t *testing.T) {
 	assert.Equal(t, "normal", fs.Files["/sys/class/pwm/pwmchip0/pwm0/polarity"].Contents)
 
 	err = a.ServoWrite("PWM0", 0)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	assert.Equal(t, "500000", fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents)
 	assert.Equal(t, "10000000", fs.Files["/sys/class/pwm/pwmchip0/pwm0/period"].Contents)
 
 	err = a.ServoWrite("PWM0", 180)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	assert.Equal(t, "2000000", fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents)
 	assert.Equal(t, "10000000", fs.Files["/sys/class/pwm/pwmchip0/pwm0/period"].Contents) // pwmPeriodDefault
 
-	assert.Nil(t, a.Finalize())
+	assert.NoError(t, a.Finalize())
 }
 
 func TestI2cDefaultBus(t *testing.T) {
@@ -165,11 +165,11 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	a := NewAdaptor()
 	a.sys.UseMockSyscall()
 	fs := a.sys.UseMockFilesystem([]string{"/dev/i2c-2"})
-	assert.Nil(t, a.Connect())
+	assert.NoError(t, a.Connect())
 	con, err := a.GetI2cConnection(0xff, 2)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	_, err = con.Write([]byte{0xbf})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	fs.WithCloseError = true
 	// act
 	err = a.Finalize()

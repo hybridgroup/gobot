@@ -25,8 +25,8 @@ func TestTemperatureDriver(t *testing.T) {
 
 func TestTemperatureDriverStartAndHalt(t *testing.T) {
 	d := initTestTemperatureDriver()
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.Halt())
 }
 
 func TestTemperatureDriverReadData(t *testing.T) {

@@ -40,5 +40,5 @@ func TestDriverLEDs(t *testing.T) {
 	d.SetRGBA(2, color.RGBA{255, 255, 255, 15})
 	d.SetRGBA(3, color.RGBA{255, 255, 255, 15})
 
-	assert.Nil(t, d.Draw())
+	assert.NoError(t, d.Draw())
 }

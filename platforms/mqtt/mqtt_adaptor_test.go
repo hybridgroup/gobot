@@ -90,7 +90,7 @@ func TestMqttAdaptorConnectWithAuthError(t *testing.T) {
 
 func TestMqttAdaptorFinalize(t *testing.T) {
 	a := initTestMqttAdaptor()
-	assert.Nil(t, a.Finalize())
+	assert.NoError(t, a.Finalize())
 }
 
 func TestMqttAdaptorCannotPublishUnlessConnected(t *testing.T) {

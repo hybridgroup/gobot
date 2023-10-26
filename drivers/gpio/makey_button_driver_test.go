@@ -24,7 +24,7 @@ func TestMakeyButtonDriverHalt(t *testing.T) {
 		<-d.halt
 		close(done)
 	}()
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Halt())
 	select {
 	case <-done:
 	case <-time.After(makeyTestDelay * time.Millisecond):
@@ -47,7 +47,7 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 	a := newGpioTestAdaptor()
 	d := NewMakeyButtonDriver(a, "1")
 
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 
 	_ = d.Once(ButtonPush, func(data interface{}) {
 		assert.True(t, d.Active)

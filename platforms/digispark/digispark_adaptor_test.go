@@ -92,18 +92,18 @@ func TestDigisparkAdaptorName(t *testing.T) {
 
 func TestDigisparkAdaptorConnect(t *testing.T) {
 	a := initTestAdaptor()
-	assert.Nil(t, a.Connect())
+	assert.NoError(t, a.Connect())
 }
 
 func TestDigisparkAdaptorFinalize(t *testing.T) {
 	a := initTestAdaptor()
-	assert.Nil(t, a.Finalize())
+	assert.NoError(t, a.Finalize())
 }
 
 func TestDigisparkAdaptorDigitalWrite(t *testing.T) {
 	a := initTestAdaptor()
 	err := a.DigitalWrite("0", uint8(1))
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, uint8(0), a.littleWire.(*mock).pin)
 	assert.Equal(t, uint8(1), a.littleWire.(*mock).state)
 
@@ -118,7 +118,7 @@ func TestDigisparkAdaptorDigitalWrite(t *testing.T) {
 func TestDigisparkAdaptorServoWrite(t *testing.T) {
 	a := initTestAdaptor()
 	err := a.ServoWrite("2", uint8(80))
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, uint8(80), a.littleWire.(*mock).locationA)
 	assert.Equal(t, uint8(80), a.littleWire.(*mock).locationB)
 
@@ -131,7 +131,7 @@ func TestDigisparkAdaptorServoWrite(t *testing.T) {
 func TestDigisparkAdaptorPwmWrite(t *testing.T) {
 	a := initTestAdaptor()
 	err := a.PwmWrite("1", uint8(100))
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, uint8(100), a.littleWire.(*mock).pwmChannelA)
 	assert.Equal(t, uint8(100), a.littleWire.(*mock).pwmChannelB)
 

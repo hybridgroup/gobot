@@ -172,7 +172,7 @@ func TestMPU6050_initialize(t *testing.T) {
 	// act, assert - initialize() must be called on Start()
 	err := d.Start()
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 1, readCallCounter)
 	assert.Equal(t, 13, len(a.written))
 	assert.Equal(t, uint8(0x6B), a.written[0])

@@ -24,133 +24,133 @@ func TestMinidroneDriver(t *testing.T) {
 
 func TestMinidroneDriverStartAndHalt(t *testing.T) {
 	d := initTestMinidroneDriver()
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.Halt())
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.Halt())
 }
 
 func TestMinidroneTakeoff(t *testing.T) {
 	d := initTestMinidroneDriver()
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.TakeOff())
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.TakeOff())
 }
 
 func TestMinidroneEmergency(t *testing.T) {
 	d := initTestMinidroneDriver()
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.Emergency())
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.Emergency())
 }
 
 func TestMinidroneTakePicture(t *testing.T) {
 	d := initTestMinidroneDriver()
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.TakePicture())
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.TakePicture())
 }
 
 func TestMinidroneUp(t *testing.T) {
 	d := initTestMinidroneDriver()
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.Up(25))
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.Up(25))
 }
 
 func TestMinidroneUpTooFar(t *testing.T) {
 	d := initTestMinidroneDriver()
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.Up(125))
-	assert.Nil(t, d.Up(-50))
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.Up(125))
+	assert.NoError(t, d.Up(-50))
 }
 
 func TestMinidroneDown(t *testing.T) {
 	d := initTestMinidroneDriver()
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.Down(25))
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.Down(25))
 }
 
 func TestMinidroneForward(t *testing.T) {
 	d := initTestMinidroneDriver()
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.Forward(25))
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.Forward(25))
 }
 
 func TestMinidroneBackward(t *testing.T) {
 	d := initTestMinidroneDriver()
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.Backward(25))
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.Backward(25))
 }
 
 func TestMinidroneRight(t *testing.T) {
 	d := initTestMinidroneDriver()
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.Right(25))
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.Right(25))
 }
 
 func TestMinidroneLeft(t *testing.T) {
 	d := initTestMinidroneDriver()
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.Left(25))
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.Left(25))
 }
 
 func TestMinidroneClockwise(t *testing.T) {
 	d := initTestMinidroneDriver()
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.Clockwise(25))
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.Clockwise(25))
 }
 
 func TestMinidroneCounterClockwise(t *testing.T) {
 	d := initTestMinidroneDriver()
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.CounterClockwise(25))
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.CounterClockwise(25))
 }
 
 func TestMinidroneStop(t *testing.T) {
 	d := initTestMinidroneDriver()
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.Stop())
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.Stop())
 }
 
 func TestMinidroneStartStopRecording(t *testing.T) {
 	d := initTestMinidroneDriver()
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.StartRecording())
-	assert.Nil(t, d.StopRecording())
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.StartRecording())
+	assert.NoError(t, d.StopRecording())
 }
 
 func TestMinidroneHullProtectionOutdoor(t *testing.T) {
 	d := initTestMinidroneDriver()
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.HullProtection(true))
-	assert.Nil(t, d.Outdoor(true))
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.HullProtection(true))
+	assert.NoError(t, d.Outdoor(true))
 }
 
 func TestMinidroneHullFlips(t *testing.T) {
 	d := initTestMinidroneDriver()
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.FrontFlip())
-	assert.Nil(t, d.BackFlip())
-	assert.Nil(t, d.RightFlip())
-	assert.Nil(t, d.LeftFlip())
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.FrontFlip())
+	assert.NoError(t, d.BackFlip())
+	assert.NoError(t, d.RightFlip())
+	assert.NoError(t, d.LeftFlip())
 }
 
 func TestMinidroneLightControl(t *testing.T) {
 	d := initTestMinidroneDriver()
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.LightControl(0, LightBlinked, 25))
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.LightControl(0, LightBlinked, 25))
 }
 
 func TestMinidroneClawControl(t *testing.T) {
 	d := initTestMinidroneDriver()
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.ClawControl(0, ClawOpen))
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.ClawControl(0, ClawOpen))
 }
 
 func TestMinidroneGunControl(t *testing.T) {
 	d := initTestMinidroneDriver()
-	assert.Nil(t, d.Start())
-	assert.Nil(t, d.GunControl(0))
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.GunControl(0))
 }
 
 func TestMinidroneProcessFlightData(t *testing.T) {
 	d := initTestMinidroneDriver()
-	assert.Nil(t, d.Start())
+	assert.NoError(t, d.Start())
 
 	d.processFlightStatus([]byte{0x00, 0x00, 0x00})
 	d.processFlightStatus([]byte{0x00, 0x00, 0x00, 0x00, 0x00})
@@ -166,5 +166,5 @@ func TestMinidroneProcessFlightData(t *testing.T) {
 	d.processFlightStatus([]byte{0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x05})
 	d.processFlightStatus([]byte{0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x06})
 
-	assert.Nil(t, d.Stop())
+	assert.NoError(t, d.Stop())
 }
