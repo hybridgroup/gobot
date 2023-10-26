@@ -53,6 +53,8 @@ type digitalPinConfig struct {
 	debouncePeriod   time.Duration
 	edge             int
 	edgeEventHandler func(lineOffset int, timestamp time.Duration, detectedEdge string, seqno uint32, lseqno uint32)
+	pollInterval     time.Duration
+	pollQuitChan     chan struct{}
 }
 
 func newDigitalPinConfig(label string, options ...func(gobot.DigitalPinOptioner) bool) *digitalPinConfig {
@@ -140,6 +142,16 @@ func WithPinEventOnBothEdges(handler func(lineOffset int, timestamp time.Duratio
 	}
 }
 
+// WithPinPollForEdgeDetection initializes a discrete input pin polling function to use for edge detection.
+func WithPinPollForEdgeDetection(
+	pollInterval time.Duration,
+	pollQuitChan chan struct{},
+) func(gobot.DigitalPinOptioner) bool {
+	return func(d gobot.DigitalPinOptioner) bool {
+		return d.SetPollForEdgeDetection(pollInterval, pollQuitChan)
+	}
+}
+
 // SetLabel sets the label to use for next reconfigure. The function is intended to use by WithPinLabel().
 func (d *digitalPinConfig) SetLabel(label string) bool {
 	if d.label == label {
@@ -211,13 +223,34 @@ func (d *digitalPinConfig) SetDebounce(period time.Duration) bool {
 	return true
 }
 
-// SetEventHandlerForEdge sets the input pin to edge detection and to call the event handler on specified edge. The
+// SetEventHandlerForEdge sets the input pin to edge detection to call the event handler on specified edge. The
 // function is intended to use by WithPinEventOnFallingEdge(), WithPinEventOnRisingEdge() and WithPinEventOnBothEdges().
-func (d *digitalPinConfig) SetEventHandlerForEdge(handler func(int, time.Duration, string, uint32, uint32), edge int) bool {
+func (d *digitalPinConfig) SetEventHandlerForEdge(
+	handler func(int, time.Duration, string, uint32, uint32),
+	edge int,
+) bool {
 	if d.edge == edge {
 		return false
 	}
 	d.edge = edge
 	d.edgeEventHandler = handler
+	return true
+}
+
+// SetPollForEdgeDetection use a discrete input polling method to detect edges. A poll interval of zero or smaller
+// will deactivate this function. Please note: Using this feature is CPU consuming and less accurate than using cdev
+// event handler (gpiod implementation) and should be done only if the former is not implemented or not working for
+// the adaptor. E.g. sysfs driver in gobot has not implemented edge detection yet. The function is only useful
+// together with SetEventHandlerForEdge() and its corresponding With*() functions.
+// The function is intended to use by WithPinPollForEdgeDetection().
+func (d *digitalPinConfig) SetPollForEdgeDetection(
+	pollInterval time.Duration,
+	pollQuitChan chan struct{},
+) (changed bool) {
+	if d.pollInterval == pollInterval {
+		return false
+	}
+	d.pollInterval = pollInterval
+	d.pollQuitChan = pollQuitChan
 	return true
 }

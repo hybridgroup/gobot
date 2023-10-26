@@ -142,6 +142,28 @@ Connect the input header pin26 to +3.3V with an resistor (e.g. 1kOhm).
 1
 ```
 
+### Test edge detection behavior of gpio251 (sysfs Tinkerboard)
+
+investigate status:
+
+```sh
+# cat /sys/class/gpio/gpio251/edge
+none
+```
+
+The file exists only if the pin can be configured as an interrupt generating input pin. To activate edge detection,
+"rising", "falling", or "both" needs to be set.
+
+```sh
+# cat /sys/class/gpio/gpio251/value
+1
+```
+
+If edge detection is activated, a poll will return only when the interrupt was triggered. The new value is written to
+the beginning of the file.
+
+> Not tested yet, not supported by gobot yet.
+
 ### Test output behavior of gpio251 (sysfs Tinkerboard)
 
 Connect the output header pin26 to +3.3V with an resistor (e.g. 1kOhm leads to ~0.3mA, 300Ohm leads to ~10mA).

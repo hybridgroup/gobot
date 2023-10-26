@@ -413,3 +413,36 @@ func TestWithPinEventOnBothEdges(t *testing.T) {
 		})
 	}
 }
+
+func TestWithPinPollForEdgeDetection(t *testing.T) {
+	const (
+		oldVal = time.Duration(1)
+		newVal = time.Duration(3)
+	)
+	tests := map[string]struct {
+		oldPollInterval time.Duration
+		want            bool
+		wantVal         time.Duration
+	}{
+		"no_change": {
+			oldPollInterval: newVal,
+		},
+		"change": {
+			oldPollInterval: oldVal,
+			want:            true,
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			dpc := &digitalPinConfig{pollInterval: tc.oldPollInterval}
+			stopChan := make(chan struct{})
+			defer close(stopChan)
+			// act
+			got := WithPinPollForEdgeDetection(newVal, stopChan)(dpc)
+			// assert
+			assert.Equal(t, tc.want, got)
+			assert.Equal(t, newVal, dpc.pollInterval)
+		})
+	}
+}
