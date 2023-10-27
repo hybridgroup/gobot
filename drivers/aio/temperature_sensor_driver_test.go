@@ -41,10 +41,10 @@ func TestTemperatureSensorDriverNtcScaling(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			a.TestAdaptorAnalogRead(func() (val int, err error) {
+			a.analogReadFunc = func() (val int, err error) {
 				val = tt.input
 				return
-			})
+			}
 			// act
 			got, err := d.Read()
 			// assert
@@ -76,10 +76,10 @@ func TestTemperatureSensorDriverLinearScaling(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			a.TestAdaptorAnalogRead(func() (val int, err error) {
+			a.analogReadFunc = func() (val int, err error) {
 				val = tt.input
 				return
-			})
+			}
 			// act
 			got, err := d.Read()
 			// assert
@@ -96,10 +96,10 @@ func TestTempSensorPublishesTemperatureInCelsius(t *testing.T) {
 	ntc := TemperatureSensorNtcConf{TC0: 25, R0: 10000.0, B: 3975} // Ohm, R25=10k
 	d.SetNtcScaler(1023, 10000, false, ntc)                        // Ohm, reference value: 1023, series R: 10k
 
-	a.TestAdaptorAnalogRead(func() (val int, err error) {
+	a.analogReadFunc = func() (val int, err error) {
 		val = 585
 		return
-	})
+	}
 	_ = d.Once(d.Event(Value), func(data interface{}) {
 		assert.Equal(t, "31.62", fmt.Sprintf("%.2f", data.(float64)))
 		sem <- true
@@ -121,10 +121,10 @@ func TestTempSensorPublishesError(t *testing.T) {
 	d := NewTemperatureSensorDriver(a, "1")
 
 	// send error
-	a.TestAdaptorAnalogRead(func() (val int, err error) {
+	a.analogReadFunc = func() (val int, err error) {
 		err = errors.New("read error")
 		return
-	})
+	}
 
 	assert.NoError(t, d.Start())
 

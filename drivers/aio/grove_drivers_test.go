@@ -51,10 +51,10 @@ func TestAnalogDriverHalt(t *testing.T) {
 
 	for _, driver := range drivers {
 		var callCount int32
-		testAdaptor.TestAdaptorAnalogRead(func() (int, error) {
+		testAdaptor.analogReadFunc = func() (int, error) {
 			atomic.AddInt32(&callCount, 1)
 			return 42, nil
-		})
+		}
 
 		// Start the driver and allow for multiple digital reads
 		_ = driver.Start()
@@ -84,11 +84,10 @@ func TestDriverPublishesError(t *testing.T) {
 	for _, driver := range drivers {
 		sem := make(chan struct{}, 1)
 		// send error
-		returnErr := func() (val int, err error) {
+		testAdaptor.analogReadFunc = func() (val int, err error) {
 			err = errors.New("read error")
 			return
 		}
-		testAdaptor.TestAdaptorAnalogRead(returnErr)
 
 		assert.NoError(t, driver.Start())
 

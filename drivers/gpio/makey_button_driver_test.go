@@ -54,10 +54,10 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 		sem <- true
 	})
 
-	a.TestAdaptorDigitalRead(func(string) (val int, err error) {
+	a.digitalReadFunc = func(string) (val int, err error) {
 		val = 0
 		return
-	})
+	}
 
 	select {
 	case <-sem:
@@ -70,10 +70,10 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 		sem <- true
 	})
 
-	a.TestAdaptorDigitalRead(func(string) (val int, err error) {
+	a.digitalReadFunc = func(string) (val int, err error) {
 		val = 1
 		return
-	})
+	}
 
 	select {
 	case <-sem:
@@ -86,10 +86,10 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 		sem <- true
 	})
 
-	a.TestAdaptorDigitalRead(func(string) (val int, err error) {
+	a.digitalReadFunc = func(string) (val int, err error) {
 		err = errors.New("digital read error")
 		return
-	})
+	}
 
 	select {
 	case <-sem:
@@ -102,10 +102,10 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 		sem <- true
 	})
 
-	a.TestAdaptorDigitalRead(func(string) (val int, err error) {
+	a.digitalReadFunc = func(string) (val int, err error) {
 		val = 1
 		return
-	})
+	}
 
 	d.halt <- true
 

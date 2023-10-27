@@ -15,10 +15,10 @@ func (l *RelayDriver) High() bool { return l.high }
 
 func initTestRelayDriver() (*RelayDriver, *gpioTestAdaptor) {
 	a := newGpioTestAdaptor()
-	a.testAdaptorDigitalWrite = func(string, byte) (err error) {
+	a.digitalWriteFunc = func(string, byte) (err error) {
 		return nil
 	}
-	a.testAdaptorPwmWrite = func(string, byte) (err error) {
+	a.pwmWriteFunc = func(string, byte) (err error) {
 		return nil
 	}
 	return NewRelayDriver(a, "1"), a
@@ -49,10 +49,10 @@ func TestRelayDriverHalt(t *testing.T) {
 func TestRelayDriverToggle(t *testing.T) {
 	d, a := initTestRelayDriver()
 	var lastVal byte
-	a.TestAdaptorDigitalWrite(func(pin string, val byte) error {
+	a.digitalWriteFunc = func(pin string, val byte) error {
 		lastVal = val
 		return nil
-	})
+	}
 
 	_ = d.Off()
 	assert.False(t, d.State())
@@ -68,10 +68,10 @@ func TestRelayDriverToggle(t *testing.T) {
 func TestRelayDriverToggleInverted(t *testing.T) {
 	d, a := initTestRelayDriver()
 	var lastVal byte
-	a.TestAdaptorDigitalWrite(func(pin string, val byte) error {
+	a.digitalWriteFunc = func(pin string, val byte) error {
 		lastVal = val
 		return nil
-	})
+	}
 
 	d.Inverted = true
 	_ = d.Off()
@@ -88,10 +88,10 @@ func TestRelayDriverToggleInverted(t *testing.T) {
 func TestRelayDriverCommands(t *testing.T) {
 	d, a := initTestRelayDriver()
 	var lastVal byte
-	a.TestAdaptorDigitalWrite(func(pin string, val byte) error {
+	a.digitalWriteFunc = func(pin string, val byte) error {
 		lastVal = val
 		return nil
-	})
+	}
 
 	assert.Nil(t, d.Command("Off")(nil))
 	assert.False(t, d.State())
@@ -109,10 +109,10 @@ func TestRelayDriverCommands(t *testing.T) {
 func TestRelayDriverCommandsInverted(t *testing.T) {
 	d, a := initTestRelayDriver()
 	var lastVal byte
-	a.TestAdaptorDigitalWrite(func(pin string, val byte) error {
+	a.digitalWriteFunc = func(pin string, val byte) error {
 		lastVal = val
 		return nil
-	})
+	}
 	d.Inverted = true
 
 	assert.Nil(t, d.Command("Off")(nil))
