@@ -215,6 +215,7 @@ func TestDigitalWrite(t *testing.T) {
 	WithGpiosPullUp("7")(a)
 	WithGpiosOpenDrain("7")(a)
 	WithGpioEventOnFallingEdge("7", gpioEventHandler)(a)
+	WithGpioPollForEdgeDetection("7", 0, nil)(a)
 	err := a.DigitalWrite("7", 1)
 	assert.NoError(t, err)
 	assert.Equal(t, "1", fs.Files["/sys/class/gpio/gpio18/value"].Contents)

@@ -2,6 +2,9 @@ package gpio
 
 import (
 	"errors"
+	"sync"
+
+	"gobot.io/x/gobot/v2"
 )
 
 var (
@@ -60,4 +63,63 @@ type DigitalWriter interface {
 // DigitalReader interface represents an Adaptor which has DigitalRead capabilities
 type DigitalReader interface {
 	DigitalRead(string) (val int, err error)
+}
+
+// Driver implements the interface gobot.Driver.
+type Driver struct {
+	name       string
+	connection gobot.Adaptor
+	afterStart func() error
+	beforeHalt func() error
+	gobot.Commander
+	mutex *sync.Mutex // mutex often needed to ensure that write-read sequences are not interrupted
+}
+
+// NewDriver creates a new generic and basic gpio gobot driver.
+func NewDriver(a gobot.Adaptor, name string) *Driver {
+	d := &Driver{
+		name:       gobot.DefaultName(name),
+		connection: a,
+		afterStart: func() error { return nil },
+		beforeHalt: func() error { return nil },
+		Commander:  gobot.NewCommander(),
+		mutex:      &sync.Mutex{},
+	}
+
+	return d
+}
+
+// Name returns the name of the gpio device.
+func (d *Driver) Name() string {
+	return d.name
+}
+
+// SetName sets the name of the gpio device.
+func (d *Driver) SetName(name string) {
+	d.name = name
+}
+
+// Connection returns the connection of the gpio device.
+func (d *Driver) Connection() gobot.Connection {
+	return d.connection.(gobot.Connection)
+}
+
+// Start initializes the gpio device.
+func (d *Driver) Start() error {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
+	// currently there is nothing to do here for the driver
+
+	return d.afterStart()
+}
+
+// Halt halts the gpio device.
+func (d *Driver) Halt() error {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
+	// currently there is nothing to do after halt for the driver
+
+	return d.beforeHalt()
 }

@@ -270,7 +270,7 @@ Support for many devices that use General Purpose Input/Output (GPIO) have
 a shared set of drivers provided using the `gobot/drivers/gpio` package:
 
 - [GPIO](https://en.wikipedia.org/wiki/General_Purpose_Input/Output) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/gpio)
-  - AIP1640 LED
+  - AIP1640 LED Dot Matrix/7 Segment Controller
   - Button
   - Buzzer
   - Direct Pin
@@ -281,8 +281,11 @@ a shared set of drivers provided using the `gobot/drivers/gpio` package:
   - Grove Magnetic Switch
   - Grove Relay
   - Grove Touch Sensor
+  - HC-SR04 Ultrasonic Ranging Module
+  - HD44780 LCD controller
   - LED
   - Makey Button
+  - MAX7219 LED Dot Matrix
   - Motor
   - Proximity Infra Red (PIR) Motion Sensor
   - Relay

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/hashicorp/go-multierror"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/system"
 )
@@ -31,6 +32,7 @@ type digitalPinsOptioner interface {
 		detectedEdge string, seqno uint32, lseqno uint32))
 	prepareDigitalPinEventOnBothEdges(pin string, handler func(lineOffset int, timestamp time.Duration,
 		detectedEdge string, seqno uint32, lseqno uint32))
+	prepareDigitalPinPollForEdgeDetection(pin string, pollInterval time.Duration, pollQuitChan chan struct{})
 }
 
 // DigitalPinsAdaptor is a adaptor for digital pins, normally used for composition in platforms.
@@ -192,6 +194,17 @@ func WithGpioEventOnBothEdges(pin string, handler func(lineOffset int, timestamp
 		a, ok := o.(digitalPinsOptioner)
 		if ok {
 			a.prepareDigitalPinEventOnBothEdges(pin, handler)
+		}
+	}
+}
+
+// WithGpioPollForEdgeDetection prepares the given input pin to use a discrete input pin polling function together with
+// edge detection.
+func WithGpioPollForEdgeDetection(pin string, pollInterval time.Duration, pollQuitChan chan struct{}) func(Optioner) {
+	return func(o Optioner) {
+		a, ok := o.(digitalPinsOptioner)
+		if ok {
+			a.prepareDigitalPinPollForEdgeDetection(pin, pollInterval, pollQuitChan)
 		}
 	}
 }
@@ -368,6 +381,18 @@ func (a *DigitalPinsAdaptor) prepareDigitalPinEventOnBothEdges(id string, handle
 	}
 
 	a.pinOptions[id] = append(a.pinOptions[id], system.WithPinEventOnBothEdges(handler))
+}
+
+func (a *DigitalPinsAdaptor) prepareDigitalPinPollForEdgeDetection(
+	id string,
+	pollInterval time.Duration,
+	pollQuitChan chan struct{},
+) {
+	if a.pinOptions == nil {
+		a.pinOptions = make(map[string][]func(gobot.DigitalPinOptioner) bool)
+	}
+
+	a.pinOptions[id] = append(a.pinOptions[id], system.WithPinPollForEdgeDetection(pollInterval, pollQuitChan))
 }
 
 func (a *DigitalPinsAdaptor) digitalPin(id string, opts ...func(gobot.DigitalPinOptioner) bool) (gobot.DigitalPinner, error) {
