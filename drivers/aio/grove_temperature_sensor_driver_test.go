@@ -40,10 +40,10 @@ func TestGroveTemperatureSensorDriverScaling(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			a.TestAdaptorAnalogRead(func() (val int, err error) {
+			a.analogReadFunc = func() (val int, err error) {
 				val = tt.input
 				return
-			})
+			}
 			// act
 			got, err := d.Read()
 			// assert
@@ -58,10 +58,10 @@ func TestGroveTempSensorPublishesTemperatureInCelsius(t *testing.T) {
 	a := newAioTestAdaptor()
 	d := NewGroveTemperatureSensorDriver(a, "1")
 
-	a.TestAdaptorAnalogRead(func() (val int, err error) {
+	a.analogReadFunc = func() (val int, err error) {
 		val = 585
 		return
-	})
+	}
 	_ = d.Once(d.Event(Value), func(data interface{}) {
 		assert.Equal(t, "31.62", fmt.Sprintf("%.2f", data.(float64)))
 		sem <- true

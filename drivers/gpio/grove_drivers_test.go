@@ -53,7 +53,7 @@ func TestDigitalDriverHalt(t *testing.T) {
 	for _, driver := range drivers {
 
 		var callCount int32
-		testAdaptor.testAdaptorDigitalRead = func(string) (int, error) {
+		testAdaptor.digitalReadFunc = func(string) (int, error) {
 			atomic.AddInt32(&callCount, 1)
 			return 42, nil
 		}
@@ -89,7 +89,7 @@ func TestDriverPublishesError(t *testing.T) {
 			err = errors.New("read error")
 			return
 		}
-		testAdaptor.testAdaptorDigitalRead = returnErr
+		testAdaptor.digitalReadFunc = returnErr
 
 		assert.NoError(t, driver.Start())
 

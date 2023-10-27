@@ -27,10 +27,11 @@ func TestAnalogSensorDriver(t *testing.T) {
 	assert.Equal(t, "42", d.Pin())
 	assert.Equal(t, 30*time.Second, d.interval)
 
-	a.TestAdaptorAnalogRead(func() (val int, err error) {
+	a.analogReadFunc = func() (val int, err error) {
 		val = 100
 		return
-	})
+	}
+
 	ret := d.Command("ReadRaw")(nil).(map[string]interface{})
 	assert.Equal(t, 100, ret["val"].(int))
 	assert.Nil(t, ret["err"])
@@ -42,10 +43,10 @@ func TestAnalogSensorDriver(t *testing.T) {
 	// refresh value on read
 	a = newAioTestAdaptor()
 	d = NewAnalogSensorDriver(a, "3")
-	a.TestAdaptorAnalogRead(func() (val int, err error) {
+	a.analogReadFunc = func() (val int, err error) {
 		val = 150
 		return
-	})
+	}
 	assert.Equal(t, 0.0, d.Value())
 	val, err := d.Read()
 	assert.NoError(t, err)
@@ -78,9 +79,9 @@ func TestAnalogSensorDriverWithLinearScaler(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// arrange
 			d.SetScaler(AnalogSensorLinearScaler(0, 255, tt.toMin, tt.toMax))
-			a.TestAdaptorAnalogRead(func() (val int, err error) {
+			a.analogReadFunc = func() (val int, err error) {
 				return tt.input, nil
-			})
+			}
 			// act
 			got, err := d.Read()
 			// assert
@@ -108,10 +109,10 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 	})
 
 	// send data
-	a.TestAdaptorAnalogRead(func() (val int, err error) {
+	a.analogReadFunc = func() (val int, err error) {
 		val = 100
 		return
-	})
+	}
 
 	assert.NoError(t, d.Start())
 
@@ -128,10 +129,10 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 	})
 
 	// send error
-	a.TestAdaptorAnalogRead(func() (val int, err error) {
+	a.analogReadFunc = func() (val int, err error) {
 		err = errors.New("read error")
 		return
-	})
+	}
 
 	select {
 	case <-sem:
@@ -148,10 +149,10 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 		sem <- true
 	})
 
-	a.TestAdaptorAnalogRead(func() (val int, err error) {
+	a.analogReadFunc = func() (val int, err error) {
 		val = 200
 		return
-	})
+	}
 
 	d.halt <- true
 
