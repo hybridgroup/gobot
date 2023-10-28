@@ -55,11 +55,11 @@ func TestPwmPin(t *testing.T) {
 	assert.Equal(t, "", fs.Files[dutyCyclePath].Contents)
 
 	assert.NoError(t, pin.SetPeriod(20000000))
-	// TODO: see PR #990 assert.Equal(t, "20000000", fs.Files[periodPath].Contents)
+	assert.Equal(t, "20000000", fs.Files[periodPath].Contents)
 	period, _ := pin.Period()
 	assert.Equal(t, uint32(20000000), period)
 	assert.ErrorContains(t, pin.SetPeriod(10000000), "Cannot set the period of individual PWM pins on Jetson")
-	// TODO: see PR #990 assert.Equal(t, "20000000", fs.Files[periodPath].Contents)
+	assert.Equal(t, "20000000", fs.Files[periodPath].Contents)
 
 	dc, _ := pin.DutyCycle()
 	assert.Equal(t, uint32(0), dc)
