@@ -89,7 +89,7 @@ func (p *PWMPin) SetPeriod(period uint32) error {
 	if period < minimumPeriod {
 		return errors.New("Cannot set the period more then minimum")
 	}
-	if err := p.writeFile(fmt.Sprintf("pwm%s/period", p.fn), fmt.Sprintf("%v", p.period)); err != nil {
+	if err := p.writeFile(fmt.Sprintf("pwm%s/period", p.fn), fmt.Sprintf("%v", period)); err != nil {
 		return err
 	}
 	p.period = period
