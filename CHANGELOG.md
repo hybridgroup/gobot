@@ -1,6 +1,61 @@
 # CHANGELOG
 
-## [Unreleased](https://github.com/hybridgroup/gobot/compare/v2.1.1...HEAD)
+## [Unreleased](https://github.com/hybridgroup/gobot/compare/v2.2.0...HEAD)
+
+## [v2.2.0](https://github.com/hybridgroup/gobot/compare/v2.1.1...v2.2.0) (2023-10-29)
+
+### Adaptors
+
+* **PWM:** fix wrong duty cycle after kill program ([#994](https://github.com/hybridgroup/gobot/issues/994))
+
+### Beaglebone
+
+* **doc:** fix preceding typo ([#985](https://github.com/hybridgroup/gobot/issues/985))
+
+### Build
+
+* **deps:** module update ([#992](https://github.com/hybridgroup/gobot/issues/992))
+* **go, deps:** switch to Go 1.19 and update modules ([#1008](https://github.com/hybridgroup/gobot/issues/1008))
+* **style:** switch to gofumpt and add linters ([#1009](https://github.com/hybridgroup/gobot/issues/1009))
+
+### Doc
+
+* **roadmap:** remove file ROADMAP.md after creating issues ([#1005](https://github.com/hybridgroup/gobot/issues/1005))
+
+### Dragonboard
+
+* fix example and documentation ([#977](https://github.com/hybridgroup/gobot/issues/977))
+
+### Gpio
+
+* **hcsr04:** add driver for ultrasonic ranging module ([#1012](https://github.com/hybridgroup/gobot/issues/1012))
+
+### I2c
+
+* **PCA9685, adafruit, adafruit2327, adafruit2348:** clean up architecture and fix init ([#1021](https://github.com/hybridgroup/gobot/issues/1021))
+
+### Jetson
+
+* **PWM:** fix set period ([#1019](https://github.com/hybridgroup/gobot/issues/1019))
+
+### Joystick
+
+* **core:** replace sdl with 0xcafed00d/joystick  package ([#988](https://github.com/hybridgroup/gobot/issues/988))
+
+### Sphero
+
+* Add support for calibration
+
+### System
+
+* **gpio:** add edge polling function ([#1015](https://github.com/hybridgroup/gobot/issues/1015))
+
+### Test
+
+* **all:** substitude assert.Nil by assert.NoError if useful ([#1016](https://github.com/hybridgroup/gobot/issues/1016))
+* **all:** substitude assert.Error by assert.ErrorContains ([#1014](https://github.com/hybridgroup/gobot/issues/1014), [#1011](https://github.com/hybridgroup/gobot/issues/1011))
+* **all:** switch to test package stretchr testify ([#1006](https://github.com/hybridgroup/gobot/issues/1006))
+* **gpio, aio:** cleanup helper_test ([#1018](https://github.com/hybridgroup/gobot/issues/1018))
 
 ## [v2.1.1](https://github.com/hybridgroup/gobot/compare/v2.1.0...v2.1.1) (2023-07-07)
 
