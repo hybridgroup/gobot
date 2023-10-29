@@ -88,7 +88,6 @@ linters:
     - exhaustruct # useful with some exclusions for existing code (e.g. mavlink/common/common.go)
     - funlen # useful with some tweeks (reduce bugs, simplify code, better understandable code)
     - gci # useful (improve readability)
-    - gochecknoinits # useful (reduce bugs, simplify bug catching)
     - gocognit # useful with some tweeks (better understandable code)
     - goconst # useful (reduce bugs)
     - gocritic # useful with some exclusions for existing code (e.g. mavlink/common/common.go)

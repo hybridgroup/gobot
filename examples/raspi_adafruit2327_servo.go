@@ -15,7 +15,7 @@ import (
 	"gobot.io/x/gobot/v2/platforms/raspi"
 )
 
-var (
+const (
 	// Min pulse length out of 4096
 	servoMin = 150
 	// Max pulse length out of 4096
@@ -27,22 +27,35 @@ var (
 	yawDeg      = 90
 )
 
-func degree2pulse(deg int) int32 {
-	pulse := servoMin
-	pulse += ((servoMax - servoMin) / maxDegree) * deg
-	return int32(pulse)
-}
+func main() {
+	r := raspi.NewAdaptor()
 
-func adafruitServoMotorRunner(a *i2c.AdafruitMotorHatDriver) (err error) {
-	log.Printf("Servo Motor Run Loop...\n")
 	// Changing from the default 0x40 address because this configuration involves
 	// a Servo HAT stacked on top of a DC/Stepper Motor HAT on top of the Pi.
 	stackedHatAddr := 0x41
+
+	adaFruit := i2c.NewAdafruit2327Driver(r, i2c.WithAddress(stackedHatAddr))
+
+	work := func() {
+		gobot.Every(5*time.Second, func() {
+			adafruitServoMotorRunner(adaFruit)
+		})
+	}
+
+	robot := gobot.NewRobot("adaFruitBot",
+		[]gobot.Connection{r},
+		[]gobot.Device{adaFruit},
+		work,
+	)
+
+	robot.Start()
+}
+
+func adafruitServoMotorRunner(a *i2c.Adafruit2327Driver) (err error) {
+	log.Printf("Servo Motor Run Loop...\n")
+
 	var channel byte = 1
 	deg := 90
-
-	// update the I2C address state
-	a.SetServoHatAddress(stackedHatAddr)
 
 	// Do not need to set this every run loop
 	freq := 60.0
@@ -72,21 +85,8 @@ func adafruitServoMotorRunner(a *i2c.AdafruitMotorHatDriver) (err error) {
 	return
 }
 
-func main() {
-	r := raspi.NewAdaptor()
-	adaFruit := i2c.NewAdafruitMotorHatDriver(r)
-
-	work := func() {
-		gobot.Every(5*time.Second, func() {
-			adafruitServoMotorRunner(adaFruit)
-		})
-	}
-
-	robot := gobot.NewRobot("adaFruitBot",
-		[]gobot.Connection{r},
-		[]gobot.Device{adaFruit},
-		work,
-	)
-
-	robot.Start()
+func degree2pulse(deg int) int32 {
+	pulse := servoMin
+	pulse += ((servoMax - servoMin) / maxDegree) * deg
+	return int32(pulse)
 }

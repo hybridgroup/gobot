@@ -309,8 +309,9 @@ Support for devices that use Inter-Integrated Circuit (I2C) have a shared set of
 drivers provided using the `gobot/drivers/i2c` package:
 
 - [I2C](https://en.wikipedia.org/wiki/I%C2%B2C) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/i2c)
-  - Adafruit 2x16 RGB-LCD with 5 keys
-  - Adafruit Motor Hat
+  - Adafruit 1109 2x16 RGB-LCD with 5 keys
+  - Adafruit 2327 16-Channel PWM/Servo HAT Hat
+  - Adafruit 2348 DC and Stepper Motor Hat
   - ADS1015 Analog to Digital Converter
   - ADS1115 Analog to Digital Converter
   - ADXL345 Digital Accelerometer
