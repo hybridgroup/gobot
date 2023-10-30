@@ -25,12 +25,9 @@ func TestNewDriver(t *testing.T) {
 	// arrange
 	a := newGpioTestAdaptor()
 	// act
-	var di interface{} = NewDriver(a, "GPIO_BASIC")
+	d := NewDriver(a, "GPIO_BASIC")
 	// assert
-	d, ok := di.(*Driver)
-	if !ok {
-		t.Errorf("NewDriver() should have returned a *Driver")
-	}
+	assert.IsType(t, &Driver{}, d)
 	assert.Contains(t, d.name, "GPIO_BASIC")
 	assert.Equal(t, a, d.connection)
 	assert.NoError(t, d.afterStart())
