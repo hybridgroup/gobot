@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*Driver)(nil)
@@ -13,7 +13,7 @@ var _ gobot.Driver = (*Driver)(nil)
 func TestBebopDriverName(t *testing.T) {
 	a := initTestBebopAdaptor()
 	d := NewDriver(a)
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Bebop"), true)
+	assert.True(t, strings.HasPrefix(d.Name(), "Bebop"))
 	d.SetName("NewName")
-	gobottest.Assert(t, d.Name(), "NewName")
+	assert.Equal(t, "NewName", d.Name())
 }

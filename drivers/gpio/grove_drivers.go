@@ -12,6 +12,7 @@ type GroveRelayDriver struct {
 // NewGroveRelayDriver return a new GroveRelayDriver given a DigitalWriter and pin.
 //
 // Adds the following API Commands:
+//
 //	"Toggle" - See RelayDriver.Toggle
 //	"On" - See RelayDriver.On
 //	"Off" - See RelayDriver.Off
@@ -29,6 +30,7 @@ type GroveLedDriver struct {
 // NewGroveLedDriver return a new GroveLedDriver given a DigitalWriter and pin.
 //
 // Adds the following API Commands:
+//
 //	"Brightness" - See LedDriver.Brightness
 //	"Toggle" - See LedDriver.Toggle
 //	"On" - See LedDriver.On
@@ -62,7 +64,8 @@ type GroveButtonDriver struct {
 // 10 Milliseconds given a DigitalReader and pin.
 //
 // Optionally accepts:
-//  time.Duration: Interval at which the ButtonDriver is polled for new information
+//
+//	time.Duration: Interval at which the ButtonDriver is polled for new information
 func NewGroveButtonDriver(a DigitalReader, pin string, v ...time.Duration) *GroveButtonDriver {
 	return &GroveButtonDriver{
 		ButtonDriver: NewButtonDriver(a, pin, v...),
@@ -79,7 +82,8 @@ type GroveTouchDriver struct {
 // 10 Milliseconds given a DigitalReader and pin.
 //
 // Optionally accepts:
-//  time.Duration: Interval at which the ButtonDriver is polled for new information
+//
+//	time.Duration: Interval at which the ButtonDriver is polled for new information
 func NewGroveTouchDriver(a DigitalReader, pin string, v ...time.Duration) *GroveTouchDriver {
 	return &GroveTouchDriver{
 		ButtonDriver: NewButtonDriver(a, pin, v...),
@@ -96,7 +100,8 @@ type GroveMagneticSwitchDriver struct {
 // 10 Milliseconds given a DigitalReader, name and pin.
 //
 // Optionally accepts:
-//  time.Duration: Interval at which the ButtonDriver is polled for new information
+//
+//	time.Duration: Interval at which the ButtonDriver is polled for new information
 func NewGroveMagneticSwitchDriver(a DigitalReader, pin string, v ...time.Duration) *GroveMagneticSwitchDriver {
 	return &GroveMagneticSwitchDriver{
 		ButtonDriver: NewButtonDriver(a, pin, v...),

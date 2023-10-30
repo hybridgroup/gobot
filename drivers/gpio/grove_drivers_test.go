@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 type DriverAndPinner interface {
@@ -35,8 +35,8 @@ func TestDriverDefaults(t *testing.T) {
 	}
 
 	for _, driver := range drivers {
-		gobottest.Assert(t, driver.Connection(), testAdaptor)
-		gobottest.Assert(t, driver.Pin(), pin)
+		assert.Equal(t, testAdaptor, driver.Connection())
+		assert.Equal(t, pin, driver.Pin())
 	}
 }
 
@@ -53,7 +53,7 @@ func TestDigitalDriverHalt(t *testing.T) {
 	for _, driver := range drivers {
 
 		var callCount int32
-		testAdaptor.testAdaptorDigitalRead = func(string) (int, error) {
+		testAdaptor.digitalReadFunc = func(string) (int, error) {
 			atomic.AddInt32(&callCount, 1)
 			return 42, nil
 		}
@@ -89,13 +89,13 @@ func TestDriverPublishesError(t *testing.T) {
 			err = errors.New("read error")
 			return
 		}
-		testAdaptor.testAdaptorDigitalRead = returnErr
+		testAdaptor.digitalReadFunc = returnErr
 
-		gobottest.Assert(t, driver.Start(), nil)
+		assert.NoError(t, driver.Start())
 
 		// expect error
 		_ = driver.Once(driver.Event(Error), func(data interface{}) {
-			gobottest.Assert(t, data.(error).Error(), "read error")
+			assert.Equal(t, "read error", data.(error).Error())
 			close(sem)
 		})
 

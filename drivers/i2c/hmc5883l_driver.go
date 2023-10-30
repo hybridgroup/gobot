@@ -109,16 +109,17 @@ var hmc5883lGainBits = map[float64]int{
 
 // NewHMC5883LDriver creates a new driver with specified i2c interface
 // Params:
-//		c Connector - the Adaptor to use with this Driver
+//
+//	c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.WithBus(int):	bus to use with this driver
-//		i2c.WithAddress(int):	address to use with this driver
-//    i2c.WithHMC5883LSamplesAveraged(int)
-//    i2c.WithHMC5883LDataOutputRate(int)
-//    i2c.WithHMC5883LMeasurementFlow(int)
-//    i2c.WithHMC5883LGain(int)
 //
+//			i2c.WithBus(int):	bus to use with this driver
+//			i2c.WithAddress(int):	address to use with this driver
+//	   i2c.WithHMC5883LSamplesAveraged(int)
+//	   i2c.WithHMC5883LDataOutputRate(int)
+//	   i2c.WithHMC5883LMeasurementFlow(int)
+//	   i2c.WithHMC5883LGain(int)
 func NewHMC5883LDriver(c Connector, options ...func(Config)) *HMC5883LDriver {
 	h := &HMC5883LDriver{
 		Driver:          NewDriver(c, "HMC5883L", hmc5883lDefaultAddress),

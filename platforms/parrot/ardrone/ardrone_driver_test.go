@@ -3,8 +3,8 @@ package ardrone
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*Driver)(nil)
@@ -22,25 +22,26 @@ func initTestArdroneDriver() *Driver {
 
 func TestArdroneDriver(t *testing.T) {
 	d := initTestArdroneDriver()
-	gobottest.Assert(t, d.Name(), "mydrone")
+	assert.Equal(t, "mydrone", d.Name())
 }
 
 func TestArdroneDriverName(t *testing.T) {
 	d := initTestArdroneDriver()
-	gobottest.Assert(t, d.Name(), "mydrone")
+	assert.Equal(t, "mydrone", d.Name())
 	d.SetName("NewName")
-	gobottest.Assert(t, d.Name(), "NewName")
+	assert.Equal(t, "NewName", d.Name())
 }
 
 func TestArdroneDriverStart(t *testing.T) {
 	d := initTestArdroneDriver()
-	gobottest.Assert(t, d.Start(), nil)
+	assert.NoError(t, d.Start())
 }
 
 func TestArdroneDriverHalt(t *testing.T) {
 	d := initTestArdroneDriver()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.NoError(t, d.Halt())
 }
+
 func TestArdroneDriverTakeOff(t *testing.T) {
 	d := initTestArdroneDriver()
 	d.TakeOff()

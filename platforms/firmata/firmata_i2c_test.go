@@ -1,14 +1,16 @@
+//go:build !windows
+// +build !windows
+
 package firmata
 
 import (
-	"errors"
 	"io"
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/i2c"
-	"gobot.io/x/gobot/v2/gobottest"
 	"gobot.io/x/gobot/v2/platforms/firmata/client"
 )
 
@@ -32,6 +34,7 @@ func (t *i2cMockFirmataBoard) I2cRead(address int, numBytes int) error {
 	}()
 	return nil
 }
+
 func (t *i2cMockFirmataBoard) I2cWrite(address int, data []byte) error {
 	t.i2cWritten = append(t.i2cWritten, data...)
 	return nil
@@ -72,7 +75,7 @@ func initTestTestAdaptorWithI2cConnection() (i2c.Connection, *i2cMockFirmataBoar
 
 func TestClose(t *testing.T) {
 	i2c, _ := initTestTestAdaptorWithI2cConnection()
-	gobottest.Assert(t, i2c.Close(), nil)
+	assert.NoError(t, i2c.Close())
 }
 
 func TestRead(t *testing.T) {
@@ -82,11 +85,11 @@ func TestRead(t *testing.T) {
 	buf := []byte{0}
 	// act
 	countRead, err := con.Read(buf)
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, countRead, 1)
-	gobottest.Assert(t, brd.numBytesToRead, 1)
-	gobottest.Assert(t, buf, brd.i2cDataForRead)
-	gobottest.Assert(t, len(brd.i2cWritten), 0)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, countRead)
+	assert.Equal(t, 1, brd.numBytesToRead)
+	assert.Equal(t, brd.i2cDataForRead, buf)
+	assert.Equal(t, 0, len(brd.i2cWritten))
 }
 
 func TestReadByte(t *testing.T) {
@@ -96,10 +99,10 @@ func TestReadByte(t *testing.T) {
 	// act
 	val, err := con.ReadByte()
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, brd.numBytesToRead, 1)
-	gobottest.Assert(t, val, brd.i2cDataForRead[0])
-	gobottest.Assert(t, len(brd.i2cWritten), 0)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, brd.numBytesToRead)
+	assert.Equal(t, brd.i2cDataForRead[0], val)
+	assert.Equal(t, 0, len(brd.i2cWritten))
 }
 
 func TestReadByteData(t *testing.T) {
@@ -110,11 +113,11 @@ func TestReadByteData(t *testing.T) {
 	// act
 	val, err := con.ReadByteData(reg)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, brd.numBytesToRead, 1)
-	gobottest.Assert(t, val, brd.i2cDataForRead[0])
-	gobottest.Assert(t, len(brd.i2cWritten), 1)
-	gobottest.Assert(t, brd.i2cWritten[0], reg)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, brd.numBytesToRead)
+	assert.Equal(t, brd.i2cDataForRead[0], val)
+	assert.Equal(t, 1, len(brd.i2cWritten))
+	assert.Equal(t, reg, brd.i2cWritten[0])
 }
 
 func TestReadWordData(t *testing.T) {
@@ -127,11 +130,11 @@ func TestReadWordData(t *testing.T) {
 	// act
 	val, err := con.ReadWordData(reg)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, brd.numBytesToRead, 2)
-	gobottest.Assert(t, val, uint16(lsb)|uint16(msb)<<8)
-	gobottest.Assert(t, len(brd.i2cWritten), 1)
-	gobottest.Assert(t, brd.i2cWritten[0], reg)
+	assert.NoError(t, err)
+	assert.Equal(t, 2, brd.numBytesToRead)
+	assert.Equal(t, uint16(lsb)|uint16(msb)<<8, val)
+	assert.Equal(t, 1, len(brd.i2cWritten))
+	assert.Equal(t, reg, brd.i2cWritten[0])
 }
 
 func TestReadBlockData(t *testing.T) {
@@ -143,11 +146,11 @@ func TestReadBlockData(t *testing.T) {
 	// act
 	err := con.ReadBlockData(reg, buf)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, brd.numBytesToRead, 5)
-	gobottest.Assert(t, buf, brd.i2cDataForRead)
-	gobottest.Assert(t, len(brd.i2cWritten), 1)
-	gobottest.Assert(t, brd.i2cWritten[0], reg)
+	assert.NoError(t, err)
+	assert.Equal(t, 5, brd.numBytesToRead)
+	assert.Equal(t, brd.i2cDataForRead, buf)
+	assert.Equal(t, 1, len(brd.i2cWritten))
+	assert.Equal(t, reg, brd.i2cWritten[0])
 }
 
 func TestWrite(t *testing.T) {
@@ -158,9 +161,9 @@ func TestWrite(t *testing.T) {
 	// act
 	written, err := con.Write(want)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, written, wantLen)
-	gobottest.Assert(t, brd.i2cWritten, want)
+	assert.NoError(t, err)
+	assert.Equal(t, wantLen, written)
+	assert.Equal(t, want, brd.i2cWritten)
 }
 
 func TestWrite20bytes(t *testing.T) {
@@ -171,9 +174,9 @@ func TestWrite20bytes(t *testing.T) {
 	// act
 	written, err := con.Write(want)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, written, wantLen)
-	gobottest.Assert(t, brd.i2cWritten, want)
+	assert.NoError(t, err)
+	assert.Equal(t, wantLen, written)
+	assert.Equal(t, want, brd.i2cWritten)
 }
 
 func TestWriteByte(t *testing.T) {
@@ -183,9 +186,9 @@ func TestWriteByte(t *testing.T) {
 	// act
 	err := con.WriteByte(want)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, len(brd.i2cWritten), 1)
-	gobottest.Assert(t, brd.i2cWritten[0], want)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(brd.i2cWritten))
+	assert.Equal(t, want, brd.i2cWritten[0])
 }
 
 func TestWriteByteData(t *testing.T) {
@@ -196,10 +199,10 @@ func TestWriteByteData(t *testing.T) {
 	// act
 	err := con.WriteByteData(reg, val)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, len(brd.i2cWritten), 2)
-	gobottest.Assert(t, brd.i2cWritten[0], reg)
-	gobottest.Assert(t, brd.i2cWritten[1], val)
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(brd.i2cWritten))
+	assert.Equal(t, reg, brd.i2cWritten[0])
+	assert.Equal(t, val, brd.i2cWritten[1])
 }
 
 func TestWriteWordData(t *testing.T) {
@@ -210,11 +213,11 @@ func TestWriteWordData(t *testing.T) {
 	// act
 	err := con.WriteWordData(reg, val)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, len(brd.i2cWritten), 3)
-	gobottest.Assert(t, brd.i2cWritten[0], reg)
-	gobottest.Assert(t, brd.i2cWritten[1], uint8(val&0x00FF))
-	gobottest.Assert(t, brd.i2cWritten[2], uint8(val>>8))
+	assert.NoError(t, err)
+	assert.Equal(t, 3, len(brd.i2cWritten))
+	assert.Equal(t, reg, brd.i2cWritten[0])
+	assert.Equal(t, uint8(val&0x00FF), brd.i2cWritten[1])
+	assert.Equal(t, uint8(val>>8), brd.i2cWritten[2])
 }
 
 func TestWriteBlockData(t *testing.T) {
@@ -229,19 +232,19 @@ func TestWriteBlockData(t *testing.T) {
 	// act
 	err := con.WriteBlockData(reg, val)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, len(brd.i2cWritten), 33)
-	gobottest.Assert(t, brd.i2cWritten[0], reg)
-	gobottest.Assert(t, brd.i2cWritten[1:], val[0:32])
+	assert.NoError(t, err)
+	assert.Equal(t, 33, len(brd.i2cWritten))
+	assert.Equal(t, reg, brd.i2cWritten[0])
+	assert.Equal(t, val[0:32], brd.i2cWritten[1:])
 }
 
 func TestDefaultBus(t *testing.T) {
 	a := NewAdaptor()
-	gobottest.Assert(t, a.DefaultI2cBus(), 0)
+	assert.Equal(t, 0, a.DefaultI2cBus())
 }
 
 func TestGetI2cConnectionInvalidBus(t *testing.T) {
 	a := NewAdaptor()
 	_, err := a.GetI2cConnection(0x01, 99)
-	gobottest.Assert(t, err, errors.New("Invalid bus number 99, only 0 is supported"))
+	assert.ErrorContains(t, err, "Invalid bus number 99, only 0 is supported")
 }

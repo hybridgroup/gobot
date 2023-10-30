@@ -3,22 +3,18 @@ package gobot
 import (
 	"testing"
 
-	"gobot.io/x/gobot/v2/gobottest"
+	"github.com/stretchr/testify/assert"
 )
 
-func TestCommaner(t *testing.T) {
+func TestCommander(t *testing.T) {
+	// arrange
 	c := NewCommander()
 	c.AddCommand("test", func(map[string]interface{}) interface{} {
 		return "hi"
 	})
 
-	if _, ok := c.Commands()["test"]; !ok {
-		t.Errorf("Could not add command to list of Commands")
-	}
-
-	command := c.Command("test")
-	gobottest.Refute(t, command, nil)
-
-	command = c.Command("booyeah")
-	gobottest.Assert(t, command, (func(map[string]interface{}) interface{})(nil))
+	// act && assert
+	assert.Equal(t, 1, len(c.Commands()))
+	assert.NotNil(t, c.Command("test"))
+	assert.Nil(t, c.Command("booyeah"))
 }

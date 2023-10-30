@@ -9,8 +9,8 @@ import (
 	"testing"
 
 	"github.com/donovanhide/eventsource"
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // HELPERS
@@ -79,22 +79,22 @@ func TestNewAdaptor(t *testing.T) {
 		t.Errorf("NewAdaptor() should have returned a *Adaptor")
 	}
 
-	gobottest.Assert(t, core.APIServer, "https://api.particle.io")
-	gobottest.Assert(t, strings.HasPrefix(core.Name(), "Particle"), true)
+	assert.Equal(t, "https://api.particle.io", core.APIServer)
+	assert.True(t, strings.HasPrefix(core.Name(), "Particle"))
 
 	core.SetName("sparkie")
-	gobottest.Assert(t, core.Name(), "sparkie")
+	assert.Equal(t, "sparkie", core.Name())
 }
 
 func TestAdaptorConnect(t *testing.T) {
 	a := initTestAdaptor()
-	gobottest.Assert(t, a.Connect(), nil)
+	assert.NoError(t, a.Connect())
 }
 
 func TestAdaptorFinalize(t *testing.T) {
 	a := initTestAdaptor()
 	_ = a.Connect()
-	gobottest.Assert(t, a.Finalize(), nil)
+	assert.NoError(t, a.Finalize())
 }
 
 func TestAdaptorAnalogRead(t *testing.T) {
@@ -109,7 +109,7 @@ func TestAdaptorAnalogRead(t *testing.T) {
 	defer testServer.Close()
 
 	val, _ := a.AnalogRead("A1")
-	gobottest.Assert(t, val, 5)
+	assert.Equal(t, 5, val)
 }
 
 func TestAdaptorAnalogReadError(t *testing.T) {
@@ -122,7 +122,7 @@ func TestAdaptorAnalogReadError(t *testing.T) {
 	a.setAPIServer(testServer.URL)
 
 	val, _ := a.AnalogRead("A1")
-	gobottest.Assert(t, val, 0)
+	assert.Equal(t, 0, val)
 }
 
 func TestAdaptorPwmWrite(t *testing.T) {
@@ -206,7 +206,7 @@ func TestAdaptorDigitalRead(t *testing.T) {
 	a.setAPIServer(testServer.URL)
 
 	val, _ := a.DigitalRead("D7")
-	gobottest.Assert(t, val, 1)
+	assert.Equal(t, 1, val)
 	testServer.Close()
 
 	// When LOW
@@ -218,7 +218,7 @@ func TestAdaptorDigitalRead(t *testing.T) {
 	defer testServer.Close()
 
 	val, _ = a.DigitalRead("D7")
-	gobottest.Assert(t, val, 0)
+	assert.Equal(t, 0, val)
 }
 
 func TestAdaptorDigitalReadError(t *testing.T) {
@@ -232,7 +232,7 @@ func TestAdaptorDigitalReadError(t *testing.T) {
 	a.setAPIServer(testServer.URL)
 
 	val, _ := a.DigitalRead("D7")
-	gobottest.Assert(t, val, -1)
+	assert.Equal(t, -1, val)
 }
 
 func TestAdaptorFunction(t *testing.T) {
@@ -244,7 +244,7 @@ func TestAdaptorFunction(t *testing.T) {
 	a.setAPIServer(testServer.URL)
 
 	val, _ := a.Function("hello", "100,200")
-	gobottest.Assert(t, val, 1)
+	assert.Equal(t, 1, val)
 	testServer.Close()
 
 	// When not existent
@@ -254,7 +254,7 @@ func TestAdaptorFunction(t *testing.T) {
 	a.setAPIServer(testServer.URL)
 
 	_, err := a.Function("hello", "")
-	gobottest.Assert(t, err.Error(), "timeout")
+	assert.ErrorContains(t, err, "timeout")
 
 	testServer.Close()
 }
@@ -269,7 +269,7 @@ func TestAdaptorVariable(t *testing.T) {
 	a.setAPIServer(testServer.URL)
 
 	val, _ := a.Variable("variable_name")
-	gobottest.Assert(t, val, "1")
+	assert.Equal(t, "1", val)
 	testServer.Close()
 
 	// When float
@@ -279,7 +279,7 @@ func TestAdaptorVariable(t *testing.T) {
 	a.setAPIServer(testServer.URL)
 
 	val, _ = a.Variable("variable_name")
-	gobottest.Assert(t, val, "1.1")
+	assert.Equal(t, "1.1", val)
 	testServer.Close()
 
 	// When int
@@ -289,7 +289,7 @@ func TestAdaptorVariable(t *testing.T) {
 	a.setAPIServer(testServer.URL)
 
 	val, _ = a.Variable("variable_name")
-	gobottest.Assert(t, val, "1")
+	assert.Equal(t, "1", val)
 	testServer.Close()
 
 	// When bool
@@ -299,7 +299,7 @@ func TestAdaptorVariable(t *testing.T) {
 	a.setAPIServer(testServer.URL)
 
 	val, _ = a.Variable("variable_name")
-	gobottest.Assert(t, val, "true")
+	assert.Equal(t, "true", val)
 	testServer.Close()
 
 	// When not existent
@@ -309,7 +309,7 @@ func TestAdaptorVariable(t *testing.T) {
 	a.setAPIServer(testServer.URL)
 
 	_, err := a.Variable("not_existent")
-	gobottest.Assert(t, err.Error(), "Variable not found")
+	assert.ErrorContains(t, err, "Variable not found")
 
 	testServer.Close()
 }
@@ -317,10 +317,10 @@ func TestAdaptorVariable(t *testing.T) {
 func TestAdaptorSetAPIServer(t *testing.T) {
 	a := initTestAdaptor()
 	apiServer := "new_api_server"
-	gobottest.Refute(t, a.APIServer, apiServer)
+	assert.NotEqual(t, apiServer, a.APIServer)
 
 	a.setAPIServer(apiServer)
-	gobottest.Assert(t, a.APIServer, apiServer)
+	assert.Equal(t, apiServer, a.APIServer)
 }
 
 func TestAdaptorDeviceURL(t *testing.T) {
@@ -328,19 +328,19 @@ func TestAdaptorDeviceURL(t *testing.T) {
 	a := initTestAdaptor()
 	a.setAPIServer("http://server")
 	a.DeviceID = "devID"
-	gobottest.Assert(t, a.deviceURL(), "http://server/v1/devices/devID")
+	assert.Equal(t, "http://server/v1/devices/devID", a.deviceURL())
 
 	// When APIServer is not set
 	a = &Adaptor{name: "particleie", DeviceID: "myDevice", AccessToken: "token"}
-	gobottest.Assert(t, a.deviceURL(), "https://api.particle.io/v1/devices/myDevice")
+	assert.Equal(t, "https://api.particle.io/v1/devices/myDevice", a.deviceURL())
 }
 
 func TestAdaptorPinLevel(t *testing.T) {
 	a := initTestAdaptor()
 
-	gobottest.Assert(t, a.pinLevel(1), "HIGH")
-	gobottest.Assert(t, a.pinLevel(0), "LOW")
-	gobottest.Assert(t, a.pinLevel(5), "LOW")
+	assert.Equal(t, "HIGH", a.pinLevel(1))
+	assert.Equal(t, "LOW", a.pinLevel(0))
+	assert.Equal(t, "LOW", a.pinLevel(5))
 }
 
 func TestAdaptorPostToparticle(t *testing.T) {
@@ -377,23 +377,23 @@ func TestAdaptorEventStream(t *testing.T) {
 		return nil, nil, nil
 	}
 	_, _ = a.EventStream("all", "ping")
-	gobottest.Assert(t, url, "https://api.particle.io/v1/events/ping?access_token=token")
+	assert.Equal(t, "https://api.particle.io/v1/events/ping?access_token=token", url)
 
 	_, _ = a.EventStream("devices", "ping")
-	gobottest.Assert(t, url, "https://api.particle.io/v1/devices/events/ping?access_token=token")
+	assert.Equal(t, "https://api.particle.io/v1/devices/events/ping?access_token=token", url)
 
 	_, _ = a.EventStream("device", "ping")
-	gobottest.Assert(t, url, "https://api.particle.io/v1/devices/myDevice/events/ping?access_token=token")
+	assert.Equal(t, "https://api.particle.io/v1/devices/myDevice/events/ping?access_token=token", url)
 
 	_, err := a.EventStream("nothing", "ping")
-	gobottest.Assert(t, err.Error(), "source param should be: all, devices or device")
+	assert.ErrorContains(t, err, "source param should be: all, devices or device")
 
 	eventSource = func(u string) (chan eventsource.Event, chan error, error) {
 		return nil, nil, errors.New("error connecting sse")
 	}
 
 	_, err = a.EventStream("devices", "")
-	gobottest.Assert(t, err.Error(), "error connecting sse")
+	assert.ErrorContains(t, err, "error connecting sse")
 
 	eventChan := make(chan eventsource.Event)
 	errorChan := make(chan error)
@@ -403,5 +403,5 @@ func TestAdaptorEventStream(t *testing.T) {
 	}
 
 	_, err = a.EventStream("devices", "")
-	gobottest.Assert(t, err, nil)
+	assert.NoError(t, err)
 }

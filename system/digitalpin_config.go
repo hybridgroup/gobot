@@ -53,6 +53,8 @@ type digitalPinConfig struct {
 	debouncePeriod   time.Duration
 	edge             int
 	edgeEventHandler func(lineOffset int, timestamp time.Duration, detectedEdge string, seqno uint32, lseqno uint32)
+	pollInterval     time.Duration
+	pollQuitChan     chan struct{}
 }
 
 func newDigitalPinConfig(label string, options ...func(gobot.DigitalPinOptioner) bool) *digitalPinConfig {
@@ -115,7 +117,8 @@ func WithPinDebounce(period time.Duration) func(gobot.DigitalPinOptioner) bool {
 
 // WithPinEventOnFallingEdge initializes the input pin for edge detection and call the event handler on falling edges.
 func WithPinEventOnFallingEdge(handler func(lineOffset int, timestamp time.Duration, detectedEdge string, seqno uint32,
-	lseqno uint32)) func(gobot.DigitalPinOptioner) bool {
+	lseqno uint32),
+) func(gobot.DigitalPinOptioner) bool {
 	return func(d gobot.DigitalPinOptioner) bool {
 		return d.SetEventHandlerForEdge(handler, digitalPinEventOnFallingEdge)
 	}
@@ -123,7 +126,8 @@ func WithPinEventOnFallingEdge(handler func(lineOffset int, timestamp time.Durat
 
 // WithPinEventOnRisingEdge initializes the input pin for edge detection and call the event handler on rising edges.
 func WithPinEventOnRisingEdge(handler func(lineOffset int, timestamp time.Duration, detectedEdge string, seqno uint32,
-	lseqno uint32)) func(gobot.DigitalPinOptioner) bool {
+	lseqno uint32),
+) func(gobot.DigitalPinOptioner) bool {
 	return func(d gobot.DigitalPinOptioner) bool {
 		return d.SetEventHandlerForEdge(handler, digitalPinEventOnRisingEdge)
 	}
@@ -131,9 +135,20 @@ func WithPinEventOnRisingEdge(handler func(lineOffset int, timestamp time.Durati
 
 // WithPinEventOnBothEdges initializes the input pin for edge detection and call the event handler on all edges.
 func WithPinEventOnBothEdges(handler func(lineOffset int, timestamp time.Duration, detectedEdge string, seqno uint32,
-	lseqno uint32)) func(gobot.DigitalPinOptioner) bool {
+	lseqno uint32),
+) func(gobot.DigitalPinOptioner) bool {
 	return func(d gobot.DigitalPinOptioner) bool {
 		return d.SetEventHandlerForEdge(handler, digitalPinEventOnBothEdges)
+	}
+}
+
+// WithPinPollForEdgeDetection initializes a discrete input pin polling function to use for edge detection.
+func WithPinPollForEdgeDetection(
+	pollInterval time.Duration,
+	pollQuitChan chan struct{},
+) func(gobot.DigitalPinOptioner) bool {
+	return func(d gobot.DigitalPinOptioner) bool {
+		return d.SetPollForEdgeDetection(pollInterval, pollQuitChan)
 	}
 }
 
@@ -208,13 +223,34 @@ func (d *digitalPinConfig) SetDebounce(period time.Duration) bool {
 	return true
 }
 
-// SetEventHandlerForEdge sets the input pin to edge detection and to call the event handler on specified edge. The
+// SetEventHandlerForEdge sets the input pin to edge detection to call the event handler on specified edge. The
 // function is intended to use by WithPinEventOnFallingEdge(), WithPinEventOnRisingEdge() and WithPinEventOnBothEdges().
-func (d *digitalPinConfig) SetEventHandlerForEdge(handler func(int, time.Duration, string, uint32, uint32), edge int) bool {
+func (d *digitalPinConfig) SetEventHandlerForEdge(
+	handler func(int, time.Duration, string, uint32, uint32),
+	edge int,
+) bool {
 	if d.edge == edge {
 		return false
 	}
 	d.edge = edge
 	d.edgeEventHandler = handler
+	return true
+}
+
+// SetPollForEdgeDetection use a discrete input polling method to detect edges. A poll interval of zero or smaller
+// will deactivate this function. Please note: Using this feature is CPU consuming and less accurate than using cdev
+// event handler (gpiod implementation) and should be done only if the former is not implemented or not working for
+// the adaptor. E.g. sysfs driver in gobot has not implemented edge detection yet. The function is only useful
+// together with SetEventHandlerForEdge() and its corresponding With*() functions.
+// The function is intended to use by WithPinPollForEdgeDetection().
+func (d *digitalPinConfig) SetPollForEdgeDetection(
+	pollInterval time.Duration,
+	pollQuitChan chan struct{},
+) (changed bool) {
+	if d.pollInterval == pollInterval {
+		return false
+	}
+	d.pollInterval = pollInterval
+	d.pollQuitChan = pollQuitChan
 	return true
 }

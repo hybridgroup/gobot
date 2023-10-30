@@ -129,5 +129,4 @@ func initialize(pca *i2c.PCA953xDriver, led2FrequHz float32, led3FrequHz float32
 	if err != nil {
 		fmt.Println("errW:", err)
 	}
-
 }

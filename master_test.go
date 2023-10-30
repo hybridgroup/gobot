@@ -9,7 +9,7 @@ import (
 	"time"
 
 	multierror "github.com/hashicorp/go-multierror"
-	"gobot.io/x/gobot/v2/gobottest"
+	"github.com/stretchr/testify/assert"
 )
 
 func initTestMaster() *Master {
@@ -38,23 +38,23 @@ func initTestMaster1Robot() *Master {
 func TestNullReadWriteCloser(t *testing.T) {
 	n := &NullReadWriteCloser{}
 	i, _ := n.Write([]byte{1, 2, 3})
-	gobottest.Assert(t, i, 3)
+	assert.Equal(t, 3, i)
 	i, _ = n.Read(make([]byte, 10))
-	gobottest.Assert(t, i, 10)
-	gobottest.Assert(t, n.Close(), nil)
+	assert.Equal(t, 10, i)
+	assert.NoError(t, n.Close())
 }
 
 func TestMasterRobot(t *testing.T) {
 	g := initTestMaster()
-	gobottest.Assert(t, g.Robot("Robot1").Name, "Robot1")
-	gobottest.Assert(t, g.Robot("Robot4"), (*Robot)(nil))
-	gobottest.Assert(t, g.Robot("Robot4").Device("Device1"), (Device)(nil))
-	gobottest.Assert(t, g.Robot("Robot4").Connection("Connection1"), (Connection)(nil))
-	gobottest.Assert(t, g.Robot("Robot1").Device("Device4"), (Device)(nil))
-	gobottest.Assert(t, g.Robot("Robot1").Device("Device1").Name(), "Device1")
-	gobottest.Assert(t, g.Robot("Robot1").Devices().Len(), 3)
-	gobottest.Assert(t, g.Robot("Robot1").Connection("Connection4"), (Connection)(nil))
-	gobottest.Assert(t, g.Robot("Robot1").Connections().Len(), 3)
+	assert.Equal(t, "Robot1", g.Robot("Robot1").Name)
+	assert.Equal(t, (*Robot)(nil), g.Robot("Robot4"))
+	assert.Equal(t, (Device)(nil), g.Robot("Robot4").Device("Device1"))
+	assert.Equal(t, (Connection)(nil), g.Robot("Robot4").Connection("Connection1"))
+	assert.Equal(t, (Device)(nil), g.Robot("Robot1").Device("Device4"))
+	assert.Equal(t, "Device1", g.Robot("Robot1").Device("Device1").Name())
+	assert.Equal(t, 3, g.Robot("Robot1").Devices().Len())
+	assert.Equal(t, (Connection)(nil), g.Robot("Robot1").Connection("Connection4"))
+	assert.Equal(t, 3, g.Robot("Robot1").Connections().Len())
 }
 
 func TestMasterToJSON(t *testing.T) {
@@ -63,15 +63,15 @@ func TestMasterToJSON(t *testing.T) {
 		return nil
 	})
 	json := NewJSONMaster(g)
-	gobottest.Assert(t, len(json.Robots), g.Robots().Len())
-	gobottest.Assert(t, len(json.Commands), len(g.Commands()))
+	assert.Equal(t, g.Robots().Len(), len(json.Robots))
+	assert.Equal(t, len(g.Commands()), len(json.Commands))
 }
 
 func TestMasterStart(t *testing.T) {
 	g := initTestMaster()
-	gobottest.Assert(t, g.Start(), nil)
-	gobottest.Assert(t, g.Stop(), nil)
-	gobottest.Assert(t, g.Running(), false)
+	assert.NoError(t, g.Start())
+	assert.NoError(t, g.Stop())
+	assert.False(t, g.Running())
 }
 
 func TestMasterStartAutoRun(t *testing.T) {
@@ -79,11 +79,11 @@ func TestMasterStartAutoRun(t *testing.T) {
 	g.AddRobot(newTestRobot("Robot99"))
 	go func() { _ = g.Start() }()
 	time.Sleep(10 * time.Millisecond)
-	gobottest.Assert(t, g.Running(), true)
+	assert.True(t, g.Running())
 
 	// stop it
-	gobottest.Assert(t, g.Stop(), nil)
-	gobottest.Assert(t, g.Running(), false)
+	assert.NoError(t, g.Stop())
+	assert.False(t, g.Running())
 }
 
 func TestMasterStartDriverErrors(t *testing.T) {
@@ -98,8 +98,8 @@ func TestMasterStartDriverErrors(t *testing.T) {
 	want = multierror.Append(want, e)
 	want = multierror.Append(want, e)
 
-	gobottest.Assert(t, g.Start(), want)
-	gobottest.Assert(t, g.Stop(), nil)
+	assert.Equal(t, want, g.Start())
+	assert.NoError(t, g.Stop())
 
 	testDriverStart = func() (err error) { return }
 }
@@ -119,7 +119,7 @@ func TestMasterHaltFromRobotDriverErrors(t *testing.T) {
 		want = multierror.Append(want, e)
 	}
 
-	gobottest.Assert(t, g.Start(), want)
+	assert.Equal(t, want, g.Start())
 }
 
 func TestMasterStartRobotAdaptorErrors(t *testing.T) {
@@ -137,8 +137,8 @@ func TestMasterStartRobotAdaptorErrors(t *testing.T) {
 		want = multierror.Append(want, e)
 	}
 
-	gobottest.Assert(t, g.Start(), want)
-	gobottest.Assert(t, g.Stop(), nil)
+	assert.Equal(t, want, g.Start())
+	assert.NoError(t, g.Stop())
 
 	testAdaptorConnect = func() (err error) { return }
 }
@@ -158,5 +158,5 @@ func TestMasterFinalizeErrors(t *testing.T) {
 		want = multierror.Append(want, e)
 	}
 
-	gobottest.Assert(t, g.Start(), want)
+	assert.Equal(t, want, g.Start())
 }

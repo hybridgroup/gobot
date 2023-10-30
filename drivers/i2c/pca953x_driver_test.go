@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
@@ -29,9 +29,9 @@ func TestNewPCA953xDriver(t *testing.T) {
 	if !ok {
 		t.Errorf("NewPCA953xDriver() should have returned a *PCA953xDriver")
 	}
-	gobottest.Refute(t, d.Driver, nil)
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "PCA953x"), true)
-	gobottest.Assert(t, d.defaultAddress, 0x63)
+	assert.NotNil(t, d.Driver)
+	assert.True(t, strings.HasPrefix(d.Name(), "PCA953x"))
+	assert.Equal(t, 0x63, d.defaultAddress)
 }
 
 func TestPCA953xWriteGPIO(t *testing.T) {
@@ -40,7 +40,7 @@ func TestPCA953xWriteGPIO(t *testing.T) {
 	// * read current state of LED select register (write reg, read val)
 	// * modify 2 bits according to given index of GPIO
 	// * write the new state to the LED select register (write reg, write val)
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		idx         uint8
 		ls0State    uint8
 		ls1State    uint8
@@ -99,8 +99,8 @@ func TestPCA953xWriteGPIO(t *testing.T) {
 			// act
 			err := d.WriteGPIO(tc.idx, tc.val)
 			// assert
-			gobottest.Assert(t, err, tc.wantErr)
-			gobottest.Assert(t, a.written, tc.wantWritten)
+			assert.Equal(t, tc.wantErr, err)
+			assert.Equal(t, tc.wantWritten, a.written)
 		})
 	}
 }
@@ -109,7 +109,7 @@ func TestPCA953xReadGPIO(t *testing.T) {
 	// sequence to read:
 	// * read current state of INPUT register (write reg 0x00, read val)
 	// * convert bit position to output value
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		idx     uint8
 		want    uint8
 		wantErr error
@@ -158,10 +158,10 @@ func TestPCA953xReadGPIO(t *testing.T) {
 			// act
 			got, err := d.ReadGPIO(tc.idx)
 			// assert
-			gobottest.Assert(t, err, tc.wantErr)
-			gobottest.Assert(t, len(a.written), 1)
-			gobottest.Assert(t, a.written[0], wantReg)
-			gobottest.Assert(t, got, tc.want)
+			assert.Equal(t, tc.wantErr, err)
+			assert.Equal(t, 1, len(a.written))
+			assert.Equal(t, wantReg, a.written[0])
+			assert.Equal(t, tc.want, got)
 		})
 	}
 }
@@ -171,7 +171,7 @@ func TestPCA953xWritePeriod(t *testing.T) {
 	// * calculate PSC value (0..255) from given value in seconds, valid values are 0.00658 ... 1.68 [s]
 	// * choose PSC0 (0x01) or PSC1 (0x03) frequency prescaler register by the given index
 	// * write the value to the register (write reg, write val)
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		idx         uint8
 		val         float32
 		wantWritten []uint8
@@ -186,7 +186,7 @@ func TestPCA953xWritePeriod(t *testing.T) {
 			val:         0.5,
 			wantWritten: []byte{0x03, 75},
 		},
-		"write_shrinked_noerror": {
+		"write_limited_noerror": {
 			idx:         0,
 			val:         2,
 			wantWritten: []byte{0x01, 255},
@@ -200,8 +200,8 @@ func TestPCA953xWritePeriod(t *testing.T) {
 			// act
 			err := d.WritePeriod(tc.idx, tc.val)
 			// assert
-			gobottest.Assert(t, err, nil)
-			gobottest.Assert(t, a.written, tc.wantWritten)
+			assert.NoError(t, err)
+			assert.Equal(t, tc.wantWritten, a.written)
 		})
 	}
 }
@@ -211,7 +211,7 @@ func TestPCA953xReadPeriod(t *testing.T) {
 	// * choose PSC0 (0x01) or PSC1 (0x03) frequency prescaler register by the given index
 	// * read the value from the register (write reg, write val)
 	// * calculate value in seconds from PSC value
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		idx         uint8
 		val         uint8
 		want        float32
@@ -250,9 +250,9 @@ func TestPCA953xReadPeriod(t *testing.T) {
 			// act
 			got, err := d.ReadPeriod(tc.idx)
 			// assert
-			gobottest.Assert(t, err, tc.wantErr)
-			gobottest.Assert(t, got, tc.want)
-			gobottest.Assert(t, a.written, tc.wantWritten)
+			assert.Equal(t, tc.wantErr, err)
+			assert.Equal(t, tc.want, got)
+			assert.Equal(t, tc.wantWritten, a.written)
 		})
 	}
 }
@@ -262,7 +262,7 @@ func TestPCA953xWriteFrequency(t *testing.T) {
 	// * calculate PSC value (0..255) from given value in Hz, valid values are 0.6 ... 152 [Hz]
 	// * choose PSC0 (0x01) or PSC1 (0x03) frequency prescaler register by the given index
 	// * write the value to the register (write reg, write val)
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		idx         uint8
 		val         float32
 		wantWritten []uint8
@@ -277,7 +277,7 @@ func TestPCA953xWriteFrequency(t *testing.T) {
 			val:         2,
 			wantWritten: []byte{0x03, 75},
 		},
-		"write_shrinked_noerror": {
+		"write_limited_noerror": {
 			idx:         0,
 			val:         153,
 			wantWritten: []byte{0x01, 0},
@@ -291,8 +291,8 @@ func TestPCA953xWriteFrequency(t *testing.T) {
 			// act
 			err := d.WriteFrequency(tc.idx, tc.val)
 			// assert
-			gobottest.Assert(t, err, nil)
-			gobottest.Assert(t, a.written, tc.wantWritten)
+			assert.NoError(t, err)
+			assert.Equal(t, tc.wantWritten, a.written)
 		})
 	}
 }
@@ -302,7 +302,7 @@ func TestPCA953xReadFrequency(t *testing.T) {
 	// * choose PSC0 (0x01) or PSC1 (0x03) frequency prescaler register by the given index
 	// * read the value from the register (write reg, write val)
 	// * calculate value in Hz from PSC value
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		idx         uint8
 		val         uint8
 		want        float32
@@ -341,9 +341,9 @@ func TestPCA953xReadFrequency(t *testing.T) {
 			// act
 			got, err := d.ReadFrequency(tc.idx)
 			// assert
-			gobottest.Assert(t, err, tc.wantErr)
-			gobottest.Assert(t, got, tc.want)
-			gobottest.Assert(t, a.written, tc.wantWritten)
+			assert.Equal(t, tc.wantErr, err)
+			assert.Equal(t, tc.want, got)
+			assert.Equal(t, tc.wantWritten, a.written)
 		})
 	}
 }
@@ -353,7 +353,7 @@ func TestPCA953xWriteDutyCyclePercent(t *testing.T) {
 	// * calculate PWM value (0..255) from given value in percent, valid values are 0 ... 100 [%]
 	// * choose PWM0 (0x02) or PWM1 (0x04) pwm register by the given index
 	// * write the value to the register (write reg, write val)
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		idx         uint8
 		val         float32
 		wantWritten []uint8
@@ -368,7 +368,7 @@ func TestPCA953xWriteDutyCyclePercent(t *testing.T) {
 			val:         50,
 			wantWritten: []byte{0x04, 128},
 		},
-		"write_shrinked_noerror": {
+		"write_limited_noerror": {
 			idx:         1,
 			val:         101,
 			wantWritten: []byte{0x04, 255},
@@ -382,8 +382,8 @@ func TestPCA953xWriteDutyCyclePercent(t *testing.T) {
 			// act
 			err := d.WriteDutyCyclePercent(tc.idx, tc.val)
 			// assert
-			gobottest.Assert(t, err, nil)
-			gobottest.Assert(t, a.written, tc.wantWritten)
+			assert.NoError(t, err)
+			assert.Equal(t, tc.wantWritten, a.written)
 		})
 	}
 }
@@ -393,7 +393,7 @@ func TestPCA953xReadDutyCyclePercent(t *testing.T) {
 	// * choose PWM0 (0x02) or PWM1 (0x04) pwm register by the given index
 	// * read the value from the register (write reg, write val)
 	// * calculate value percent from PWM value
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		idx         uint8
 		val         uint8
 		want        float32
@@ -432,9 +432,9 @@ func TestPCA953xReadDutyCyclePercent(t *testing.T) {
 			// act
 			got, err := d.ReadDutyCyclePercent(tc.idx)
 			// assert
-			gobottest.Assert(t, err, tc.wantErr)
-			gobottest.Assert(t, got, tc.want)
-			gobottest.Assert(t, a.written, tc.wantWritten)
+			assert.Equal(t, tc.wantErr, err)
+			assert.Equal(t, tc.want, got)
+			assert.Equal(t, tc.wantWritten, a.written)
 		})
 	}
 }
@@ -465,13 +465,13 @@ func TestPCA953x_readRegister(t *testing.T) {
 	// act
 	val, err := d.readRegister(wantRegAddress)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, numCallsRead, 1)
-	gobottest.Assert(t, numCallsWrite, 1)
-	gobottest.Assert(t, val, wantRegVal)
-	gobottest.Assert(t, readByteCount, wantReadByteCount)
-	gobottest.Assert(t, len(a.written), 1)
-	gobottest.Assert(t, a.written[0], uint8(wantRegAddress))
+	assert.NoError(t, err)
+	assert.Equal(t, 1, numCallsRead)
+	assert.Equal(t, 1, numCallsWrite)
+	assert.Equal(t, wantRegVal, val)
+	assert.Equal(t, wantReadByteCount, readByteCount)
+	assert.Equal(t, 1, len(a.written))
+	assert.Equal(t, uint8(wantRegAddress), a.written[0])
 }
 
 func TestPCA953x_writeRegister(t *testing.T) {
@@ -491,12 +491,12 @@ func TestPCA953x_writeRegister(t *testing.T) {
 	// act
 	err := d.writeRegister(wantRegAddress, wantRegVal)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, numCallsWrite, 1)
-	gobottest.Assert(t, numCallsWrite, 1)
-	gobottest.Assert(t, len(a.written), wantByteCount)
-	gobottest.Assert(t, a.written[0], uint8(wantRegAddress))
-	gobottest.Assert(t, a.written[1], uint8(wantRegVal))
+	assert.NoError(t, err)
+	assert.Equal(t, 1, numCallsWrite)
+	assert.Equal(t, 1, numCallsWrite)
+	assert.Equal(t, wantByteCount, len(a.written))
+	assert.Equal(t, uint8(wantRegAddress), a.written[0])
+	assert.Equal(t, wantRegVal, a.written[1])
 }
 
 func TestPCA953x_pca953xCalcPsc(t *testing.T) {
@@ -517,8 +517,8 @@ func TestPCA953x_pca953xCalcPsc(t *testing.T) {
 			// act
 			val, err := pca953xCalcPsc(tc.period)
 			// assert
-			gobottest.Assert(t, err, tc.wantErr)
-			gobottest.Assert(t, val, tc.want)
+			assert.Equal(t, tc.wantErr, err)
+			assert.Equal(t, tc.want, val)
 		})
 	}
 }
@@ -539,7 +539,7 @@ func TestPCA953x_pca953xCalcPeriod(t *testing.T) {
 			// act
 			val := pca953xCalcPeriod(tc.psc)
 			// assert
-			gobottest.Assert(t, float32(math.Round(float64(val)*10000)/10000), tc.want)
+			assert.Equal(t, tc.want, float32(math.Round(float64(val)*10000)/10000))
 		})
 	}
 }
@@ -563,8 +563,8 @@ func TestPCA953x_pca953xCalcPwm(t *testing.T) {
 			// act
 			val, err := pca953xCalcPwm(tc.percent)
 			// assert
-			gobottest.Assert(t, err, tc.wantErr)
-			gobottest.Assert(t, val, tc.want)
+			assert.Equal(t, tc.wantErr, err)
+			assert.Equal(t, tc.want, val)
 		})
 	}
 }
@@ -585,7 +585,7 @@ func TestPCA953x_pca953xCalcDutyCyclePercent(t *testing.T) {
 			// act
 			val := pca953xCalcDutyCyclePercent(tc.pwm)
 			// assert
-			gobottest.Assert(t, float32(math.Round(float64(val)*10)/10), tc.want)
+			assert.Equal(t, tc.want, float32(math.Round(float64(val)*10)/10))
 		})
 	}
 }

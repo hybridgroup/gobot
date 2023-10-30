@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"gobot.io/x/gobot/v2/gobottest"
+	"github.com/stretchr/testify/assert"
 )
 
 func initTestADS1115DriverWithStubbedAdaptor() (*ADS1x15Driver, *i2cTestAdaptor) {
@@ -23,11 +23,11 @@ func TestNewADS1115Driver(t *testing.T) {
 	if !ok {
 		t.Errorf("NewADS1115Driver() should have returned a *ADS1x15Driver")
 	}
-	gobottest.Refute(t, d.Driver, nil)
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "ADS1115"), true)
+	assert.NotNil(t, d.Driver)
+	assert.True(t, strings.HasPrefix(d.Name(), "ADS1115"))
 	for i := 0; i <= 3; i++ {
-		gobottest.Assert(t, d.channelCfgs[i].gain, 1)
-		gobottest.Assert(t, d.channelCfgs[i].dataRate, 128)
+		assert.Equal(t, 1, d.channelCfgs[i].gain)
+		assert.Equal(t, 128, d.channelCfgs[i].dataRate)
 	}
 }
 
@@ -35,10 +35,10 @@ func TestADS1115Options(t *testing.T) {
 	// This is a general test, that options are applied in constructor by using the common WithBus() option and
 	// least one of this driver. Further tests for options can also be done by call of "WithOption(val)(d)".
 	d := NewADS1115Driver(newI2cTestAdaptor(), WithBus(2), WithADS1x15Gain(2), WithADS1x15DataRate(860))
-	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
+	assert.Equal(t, 2, d.GetBusOrDefault(1))
 	for i := 0; i <= 3; i++ {
-		gobottest.Assert(t, d.channelCfgs[i].gain, 2)
-		gobottest.Assert(t, d.channelCfgs[i].dataRate, 860)
+		assert.Equal(t, 2, d.channelCfgs[i].gain)
+		assert.Equal(t, 860, d.channelCfgs[i].dataRate)
 	}
 }
 
@@ -46,7 +46,7 @@ func TestADS1115WithADS1x15BestGainForVoltage(t *testing.T) {
 	d, _ := initTestADS1115DriverWithStubbedAdaptor()
 	WithADS1x15BestGainForVoltage(1.01)(d)
 	for i := 0; i <= 3; i++ {
-		gobottest.Assert(t, d.channelCfgs[i].gain, 3)
+		assert.Equal(t, 3, d.channelCfgs[i].gain)
 	}
 }
 
@@ -56,10 +56,10 @@ func TestADS1115WithADS1x15ChannelBestGainForVoltage(t *testing.T) {
 	WithADS1x15ChannelBestGainForVoltage(1, 2.5)(d)
 	WithADS1x15ChannelBestGainForVoltage(2, 3.3)(d)
 	WithADS1x15ChannelBestGainForVoltage(3, 5.0)(d)
-	gobottest.Assert(t, d.channelCfgs[0].gain, 3)
-	gobottest.Assert(t, d.channelCfgs[1].gain, 1)
-	gobottest.Assert(t, d.channelCfgs[2].gain, 1)
-	gobottest.Assert(t, d.channelCfgs[3].gain, 0)
+	assert.Equal(t, 3, d.channelCfgs[0].gain)
+	assert.Equal(t, 1, d.channelCfgs[1].gain)
+	assert.Equal(t, 1, d.channelCfgs[2].gain)
+	assert.Equal(t, 0, d.channelCfgs[3].gain)
 }
 
 func TestADS1115AnalogRead(t *testing.T) {
@@ -72,39 +72,39 @@ func TestADS1115AnalogRead(t *testing.T) {
 	}
 
 	val, err := d.AnalogRead("0")
-	gobottest.Assert(t, val, 32767)
-	gobottest.Assert(t, err, nil)
+	assert.Equal(t, 32767, val)
+	assert.NoError(t, err)
 
 	val, err = d.AnalogRead("1")
-	gobottest.Assert(t, val, 32767)
-	gobottest.Assert(t, err, nil)
+	assert.Equal(t, 32767, val)
+	assert.NoError(t, err)
 
 	val, err = d.AnalogRead("2")
-	gobottest.Assert(t, val, 32767)
-	gobottest.Assert(t, err, nil)
+	assert.Equal(t, 32767, val)
+	assert.NoError(t, err)
 
 	val, err = d.AnalogRead("3")
-	gobottest.Assert(t, val, 32767)
-	gobottest.Assert(t, err, nil)
+	assert.Equal(t, 32767, val)
+	assert.NoError(t, err)
 
 	val, err = d.AnalogRead("0-1")
-	gobottest.Assert(t, val, 32767)
-	gobottest.Assert(t, err, nil)
+	assert.Equal(t, 32767, val)
+	assert.NoError(t, err)
 
 	val, err = d.AnalogRead("0-3")
-	gobottest.Assert(t, val, 32767)
-	gobottest.Assert(t, err, nil)
+	assert.Equal(t, 32767, val)
+	assert.NoError(t, err)
 
 	val, err = d.AnalogRead("1-3")
-	gobottest.Assert(t, val, 32767)
-	gobottest.Assert(t, err, nil)
+	assert.Equal(t, 32767, val)
+	assert.NoError(t, err)
 
 	val, err = d.AnalogRead("2-3")
-	gobottest.Assert(t, val, 32767)
-	gobottest.Assert(t, err, nil)
+	assert.Equal(t, 32767, val)
+	assert.NoError(t, err)
 
 	_, err = d.AnalogRead("3-2")
-	gobottest.Refute(t, err.Error(), nil)
+	assert.NotNil(t, err.Error())
 }
 
 func TestADS1115AnalogReadError(t *testing.T) {
@@ -115,14 +115,14 @@ func TestADS1115AnalogReadError(t *testing.T) {
 	}
 
 	_, err := d.AnalogRead("0")
-	gobottest.Assert(t, err, errors.New("read error"))
+	assert.ErrorContains(t, err, "read error")
 }
 
 func TestADS1115AnalogReadInvalidPin(t *testing.T) {
 	d, _ := initTestADS1115DriverWithStubbedAdaptor()
 
 	_, err := d.AnalogRead("98")
-	gobottest.Assert(t, err, errors.New("Invalid channel (98), must be between 0 and 3"))
+	assert.ErrorContains(t, err, "Invalid channel (98), must be between 0 and 3")
 }
 
 func TestADS1115AnalogReadWriteError(t *testing.T) {
@@ -133,41 +133,41 @@ func TestADS1115AnalogReadWriteError(t *testing.T) {
 	}
 
 	_, err := d.AnalogRead("0")
-	gobottest.Assert(t, err, errors.New("write error"))
+	assert.ErrorContains(t, err, "write error")
 
 	_, err = d.AnalogRead("0-1")
-	gobottest.Assert(t, err, errors.New("write error"))
+	assert.ErrorContains(t, err, "write error")
 
 	_, err = d.AnalogRead("2-3")
-	gobottest.Assert(t, err, errors.New("write error"))
+	assert.ErrorContains(t, err, "write error")
 }
 
 func TestADS1115ReadInvalidChannel(t *testing.T) {
 	d, _ := initTestADS1115DriverWithStubbedAdaptor()
 
 	_, err := d.Read(7, 1, 1600)
-	gobottest.Assert(t, err, errors.New("Invalid channel (7), must be between 0 and 3"))
+	assert.ErrorContains(t, err, "Invalid channel (7), must be between 0 and 3")
 }
 
 func TestADS1115ReadInvalidGain(t *testing.T) {
 	d, _ := initTestADS1115DriverWithStubbedAdaptor()
 
 	_, err := d.Read(0, 21, 1600)
-	gobottest.Assert(t, err, errors.New("Gain (21) must be one of: [0 1 2 3 4 5 6 7]"))
+	assert.ErrorContains(t, err, "Gain (21) must be one of: [0 1 2 3 4 5 6 7]")
 }
 
 func TestADS1115ReadInvalidDataRate(t *testing.T) {
 	d, _ := initTestADS1115DriverWithStubbedAdaptor()
 
 	_, err := d.Read(0, 1, 678)
-	gobottest.Assert(t, err, errors.New("Invalid data rate (678). Accepted values: [8 16 32 64 128 250 475 860]"))
+	assert.ErrorContains(t, err, "Invalid data rate (678). Accepted values: [8 16 32 64 128 250 475 860]")
 }
 
 func TestADS1115ReadDifferenceInvalidChannel(t *testing.T) {
 	d, _ := initTestADS1115DriverWithStubbedAdaptor()
 
 	_, err := d.ReadDifference(5, 1, 1600)
-	gobottest.Assert(t, err, errors.New("Invalid channel (5), must be between 0 and 3"))
+	assert.ErrorContains(t, err, "Invalid channel (5), must be between 0 and 3")
 }
 
 func TestADS1115_rawRead(t *testing.T) {
@@ -177,7 +177,7 @@ func TestADS1115_rawRead(t *testing.T) {
 	// * read config register (16 bit, MSByte first) and wait for bit 15 is set
 	// * read conversion register (16 bit, MSByte first) for the value
 	// * apply two's complement converter, relates to one digit resolution (1/2^15), voltage multiplier
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		input      []uint8
 		gain       int
 		dataRate   int
@@ -269,16 +269,16 @@ func TestADS1115_rawRead(t *testing.T) {
 			// act
 			got, err := d.rawRead(channel, channelOffset, tt.gain, tt.dataRate)
 			// assert
-			gobottest.Assert(t, err, nil)
-			gobottest.Assert(t, got, tt.want)
-			gobottest.Assert(t, numCallsRead, 3)
-			gobottest.Assert(t, len(a.written), 6)
-			gobottest.Assert(t, a.written[0], uint8(ads1x15PointerConfig))
-			gobottest.Assert(t, a.written[1], tt.wantConfig[0])            // MSByte: OS, MUX, PGA, MODE
-			gobottest.Assert(t, a.written[2], tt.wantConfig[1])            // LSByte: DR, COMP_*
-			gobottest.Assert(t, a.written[3], uint8(ads1x15PointerConfig)) // first check for no conversion
-			gobottest.Assert(t, a.written[4], uint8(ads1x15PointerConfig)) // second check for no conversion
-			gobottest.Assert(t, a.written[5], uint8(ads1x15PointerConversion))
+			assert.NoError(t, err)
+			assert.Equal(t, tt.want, got)
+			assert.Equal(t, 3, numCallsRead)
+			assert.Equal(t, 6, len(a.written))
+			assert.Equal(t, uint8(ads1x15PointerConfig), a.written[0])
+			assert.Equal(t, tt.wantConfig[0], a.written[1])            // MSByte: OS, MUX, PGA, MODE
+			assert.Equal(t, tt.wantConfig[1], a.written[2])            // LSByte: DR, COMP_*
+			assert.Equal(t, uint8(ads1x15PointerConfig), a.written[3]) // first check for no conversion
+			assert.Equal(t, uint8(ads1x15PointerConfig), a.written[4]) // second check for no conversion
+			assert.Equal(t, uint8(ads1x15PointerConversion), a.written[5])
 		})
 	}
 }

@@ -10,26 +10,27 @@ import (
 const pca9685DefaultAddress = 0x40
 
 const (
-	PCA9685_MODE1        = 0x00
-	PCA9685_MODE2        = 0x01
-	PCA9685_PRESCALE     = 0xFE
-	PCA9685_SUBADR1      = 0x02
-	PCA9685_SUBADR2      = 0x03
-	PCA9685_SUBADR3      = 0x04
-	PCA9685_LED0_ON_L    = 0x06
-	PCA9685_LED0_ON_H    = 0x07
-	PCA9685_LED0_OFF_L   = 0x08
-	PCA9685_LED0_OFF_H   = 0x09
-	PCA9685_ALLLED_ON_L  = 0xFA
-	PCA9685_ALLLED_ON_H  = 0xFB
-	PCA9685_ALLLED_OFF_L = 0xFC
-	PCA9685_ALLLED_OFF_H = 0xFD
+	pca9685Mode1Reg      = 0x00
+	pca9685Mode2Reg      = 0x01
+	pca9685Subadr1Reg    = 0x02
+	pca9685Subadr2Reg    = 0x03
+	pca9685Subadr3Reg    = 0x04
+	pca9685Led0OnLReg    = 0x06
+	pca9685Led0OnHReg    = 0x07
+	pca9685Led0OffLReg   = 0x08
+	pca9685Led0OffHReg   = 0x09
+	pca9685AllLedOnLReg  = 0xFA
+	pca9685AllLedOnHReg  = 0xFB
+	pca9685AllLedOffLReg = 0xFC
+	pca9685AllLedOffHReg = 0xFD
+	pca9685PrescaleReg   = 0xFE
 
-	PCA9685_RESTART = 0x80
-	PCA9685_SLEEP   = 0x10
-	PCA9685_ALLCALL = 0x01
-	PCA9685_INVRT   = 0x10
-	PCA9685_OUTDRV  = 0x04
+	pca9685Mode1RegRestartBit    = 0x80 // bit 7 - 0: restart disabled (default)
+	pca9685Mode1RegSleepBit      = 0x10 // bit 4 - 0: normal, 1: low power (default)
+	pca9685Mode1RegAllCallBit    = 0x01 // bit 0 - 0: no response to all-call, 1: respond to all-call (default)
+	pca9685Mode2RegInvertBit     = 0x10 // bit 4 - 0: outputs not inverted (default), 1: outputs inverted
+	pca9685Mode2RegOutdrvBit     = 0x04 // bit 2 - 0: open-drain, 1: totem-pole (default)
+	pca9685AllLedOffHRegShutDown = 0x10 // bit 4 - 1: orderly shut down
 )
 
 // PCA9685Driver is a Gobot Driver for the PCA9685 16-channel 12-bit PWM/Servo controller.
@@ -93,19 +94,19 @@ func NewPCA9685Driver(c Connector, options ...func(Config)) *PCA9685Driver {
 //
 // Most typically you set "on" to a zero value, and then set "off" to your desired duty.
 func (p *PCA9685Driver) SetPWM(channel int, on uint16, off uint16) (err error) {
-	if _, err := p.connection.Write([]byte{byte(PCA9685_LED0_ON_L + 4*channel), byte(on) & 0xFF}); err != nil {
+	if _, err := p.connection.Write([]byte{byte(pca9685Led0OnLReg + 4*channel), byte(on) & 0xFF}); err != nil {
 		return err
 	}
 
-	if _, err := p.connection.Write([]byte{byte(PCA9685_LED0_ON_H + 4*channel), byte(on >> 8)}); err != nil {
+	if _, err := p.connection.Write([]byte{byte(pca9685Led0OnHReg + 4*channel), byte(on >> 8)}); err != nil {
 		return err
 	}
 
-	if _, err := p.connection.Write([]byte{byte(PCA9685_LED0_OFF_L + 4*channel), byte(off) & 0xFF}); err != nil {
+	if _, err := p.connection.Write([]byte{byte(pca9685Led0OffLReg + 4*channel), byte(off) & 0xFF}); err != nil {
 		return err
 	}
 
-	if _, err := p.connection.Write([]byte{byte(PCA9685_LED0_OFF_H + 4*channel), byte(off >> 8)}); err != nil {
+	if _, err := p.connection.Write([]byte{byte(pca9685Led0OffHReg + 4*channel), byte(off >> 8)}); err != nil {
 		return err
 	}
 
@@ -120,38 +121,38 @@ func (p *PCA9685Driver) SetPWM(channel int, on uint16, off uint16) (err error) {
 //
 // Most typically you set "on" to a zero value, and then set "off" to your desired duty.
 func (p *PCA9685Driver) SetAllPWM(on uint16, off uint16) (err error) {
-	if _, err := p.connection.Write([]byte{byte(PCA9685_ALLLED_ON_L), byte(on) & 0xFF}); err != nil {
+	if _, err := p.connection.Write([]byte{byte(pca9685AllLedOnLReg), byte(on) & 0xFF}); err != nil {
 		return err
 	}
 
-	if _, err := p.connection.Write([]byte{byte(PCA9685_ALLLED_ON_H), byte(on >> 8)}); err != nil {
+	if _, err := p.connection.Write([]byte{byte(pca9685AllLedOnHReg), byte(on >> 8)}); err != nil {
 		return err
 	}
 
-	if _, err := p.connection.Write([]byte{byte(PCA9685_ALLLED_OFF_L), byte(off) & 0xFF}); err != nil {
+	if _, err := p.connection.Write([]byte{byte(pca9685AllLedOffLReg), byte(off) & 0xFF}); err != nil {
 		return err
 	}
 
-	if _, err := p.connection.Write([]byte{byte(PCA9685_ALLLED_OFF_H), byte(off >> 8)}); err != nil {
+	if _, err := p.connection.Write([]byte{byte(pca9685AllLedOffHReg), byte(off >> 8)}); err != nil {
 		return err
 	}
 
 	return
 }
 
-// SetPWMFreq sets the PWM frequency in Hz
+// SetPWMFreq sets the PWM frequency in Hz between 24Hz and 1526Hz, the default is 200Hz.
 func (p *PCA9685Driver) SetPWMFreq(freq float32) error {
-	// IC oscillator frequency is 25 MHz
+	// internal IC oscillator frequency is 25 MHz
 	var prescalevel float32 = 25000000
-	// Find frequency of PWM waveform
+	// find frequency of PWM waveform
 	prescalevel /= 4096
-	// Ratio between desired frequency and maximum
+	// ratio between desired frequency and maximum
 	prescalevel /= freq
 	prescalevel--
-	// Round value to nearest whole
+	// round value to nearest whole
 	prescale := byte(prescalevel + 0.5)
 
-	if _, err := p.connection.Write([]byte{byte(PCA9685_MODE1)}); err != nil {
+	if _, err := p.connection.Write([]byte{byte(pca9685Mode1Reg)}); err != nil {
 		return err
 	}
 	oldmode, err := p.connection.ReadByte()
@@ -159,25 +160,27 @@ func (p *PCA9685Driver) SetPWMFreq(freq float32) error {
 		return err
 	}
 
-	// Put oscillator in sleep mode, clear bit 7 here to avoid overwriting
-	// previous setting
-	newmode := (oldmode & 0x7F) | 0x10
-	if _, err := p.connection.Write([]byte{byte(PCA9685_MODE1), byte(newmode)}); err != nil {
+	// put oscillator in sleep mode, clear the restart bit 7 here to prevent unneeded restart
+	sleepMode := (oldmode &^ pca9685Mode1RegRestartBit) | pca9685Mode1RegSleepBit
+	if _, err := p.connection.Write([]byte{byte(pca9685Mode1Reg), sleepMode}); err != nil {
 		return err
 	}
-	// Write prescaler value
-	if _, err := p.connection.Write([]byte{byte(PCA9685_PRESCALE), prescale}); err != nil {
+	// write prescaler value
+	if _, err := p.connection.Write([]byte{byte(pca9685PrescaleReg), prescale}); err != nil {
 		return err
 	}
-	// Put back to old settings
-	if _, err := p.connection.Write([]byte{byte(PCA9685_MODE1), byte(oldmode)}); err != nil {
+	// put back to old settings, ensure no sleep
+	noSleepMode := oldmode &^ pca9685Mode1RegSleepBit
+	if _, err := p.connection.Write([]byte{byte(pca9685Mode1Reg), noSleepMode}); err != nil {
 		return err
 	}
 
+	// wait >500us according to data sheet
 	time.Sleep(5 * time.Millisecond)
 
-	// Enable response to All Call address, enable auto-increment, clear restart
-	if _, err := p.connection.Write([]byte{byte(PCA9685_MODE1), byte(oldmode | 0x80)}); err != nil {
+	// initiate a restart
+	restartMode := oldmode | pca9685Mode1RegRestartBit
+	if _, err := p.connection.Write([]byte{byte(pca9685Mode1Reg), restartMode}); err != nil {
 		return err
 	}
 
@@ -208,31 +211,38 @@ func (p *PCA9685Driver) ServoWrite(pin string, val byte) (err error) {
 	return p.SetPWM(i, 0, uint16(v))
 }
 
+// initialize the driver according to the data sheet section "7.3.1.1 Restart mode"
+// * ensure the sleep bit is unset
+// * wait > 500us
+// * write a logic 1 to bit 7 (RESTART) of register "MODE1"
 func (p *PCA9685Driver) initialize() error {
 	if err := p.SetAllPWM(0, 0); err != nil {
 		return err
 	}
 
-	if _, err := p.connection.Write([]byte{PCA9685_MODE2, PCA9685_OUTDRV}); err != nil {
+	// set not inverted (default), outputs change on stop (default), OE reaction to 0 (default), totem-pole (default)
+	if _, err := p.connection.Write([]byte{pca9685Mode2Reg, pca9685Mode2RegOutdrvBit}); err != nil {
 		return err
 	}
-
-	if _, err := p.connection.Write([]byte{PCA9685_MODE1, PCA9685_ALLCALL}); err != nil {
+	// reset of sleep bit together with set of no restart (default), internal clock (default), no AI (default),
+	// no response to sub address 1, 2 or 3 (default), activate response to all-call (default)
+	if _, err := p.connection.Write([]byte{pca9685Mode1Reg, pca9685Mode1RegAllCallBit}); err != nil {
 		return err
 	}
 
 	time.Sleep(5 * time.Millisecond)
 
-	if _, err := p.connection.Write([]byte{byte(PCA9685_MODE1)}); err != nil {
+	// initiate the restart
+	if _, err := p.connection.Write([]byte{byte(pca9685Mode1Reg)}); err != nil {
 		return err
 	}
 	oldmode, err := p.connection.ReadByte()
 	if err != nil {
 		return err
 	}
-	oldmode = oldmode &^ byte(PCA9685_SLEEP)
+	oldmode = oldmode | byte(pca9685Mode1RegRestartBit)
 
-	if _, err := p.connection.Write([]byte{PCA9685_MODE1, oldmode}); err != nil {
+	if _, err := p.connection.Write([]byte{pca9685Mode1Reg, oldmode}); err != nil {
 		return err
 	}
 
@@ -242,6 +252,6 @@ func (p *PCA9685Driver) initialize() error {
 }
 
 func (p *PCA9685Driver) shutdown() error {
-	_, err := p.connection.Write([]byte{PCA9685_ALLLED_OFF_H, 0x10})
+	_, err := p.connection.Write([]byte{pca9685AllLedOffHReg, pca9685AllLedOffHRegShutDown})
 	return err
 }

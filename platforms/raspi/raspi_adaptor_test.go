@@ -1,33 +1,33 @@
 package raspi
 
 import (
-	"errors"
 	"fmt"
-	"strings"
-	"testing"
-
 	"runtime"
 	"strconv"
+	"strings"
 	"sync"
+	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/gpio"
 	"gobot.io/x/gobot/v2/drivers/i2c"
 	"gobot.io/x/gobot/v2/drivers/spi"
-	"gobot.io/x/gobot/v2/gobottest"
 	"gobot.io/x/gobot/v2/system"
 )
 
 // make sure that this Adaptor fulfills all the required interfaces
-var _ gobot.Adaptor = (*Adaptor)(nil)
-var _ gobot.DigitalPinnerProvider = (*Adaptor)(nil)
-var _ gobot.PWMPinnerProvider = (*Adaptor)(nil)
-var _ gpio.DigitalReader = (*Adaptor)(nil)
-var _ gpio.DigitalWriter = (*Adaptor)(nil)
-var _ gpio.PwmWriter = (*Adaptor)(nil)
-var _ gpio.ServoWriter = (*Adaptor)(nil)
-var _ i2c.Connector = (*Adaptor)(nil)
-var _ spi.Connector = (*Adaptor)(nil)
+var (
+	_ gobot.Adaptor               = (*Adaptor)(nil)
+	_ gobot.DigitalPinnerProvider = (*Adaptor)(nil)
+	_ gobot.PWMPinnerProvider     = (*Adaptor)(nil)
+	_ gpio.DigitalReader          = (*Adaptor)(nil)
+	_ gpio.DigitalWriter          = (*Adaptor)(nil)
+	_ gpio.PwmWriter              = (*Adaptor)(nil)
+	_ gpio.ServoWriter            = (*Adaptor)(nil)
+	_ i2c.Connector               = (*Adaptor)(nil)
+	_ spi.Connector               = (*Adaptor)(nil)
+)
 
 func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.MockFilesystem) {
 	a := NewAdaptor()
@@ -39,14 +39,14 @@ func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.
 func TestName(t *testing.T) {
 	a := NewAdaptor()
 
-	gobottest.Assert(t, strings.HasPrefix(a.Name(), "RaspberryPi"), true)
+	assert.True(t, strings.HasPrefix(a.Name(), "RaspberryPi"))
 	a.SetName("NewName")
-	gobottest.Assert(t, a.Name(), "NewName")
+	assert.Equal(t, "NewName", a.Name())
 }
 
 func TestGetDefaultBus(t *testing.T) {
 	const contentPattern = "Hardware        : BCM2708\n%sSerial          : 000000003bc748ea\n"
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		revisionPart string
 		wantRev      string
 		wantBus      int
@@ -77,12 +77,12 @@ func TestGetDefaultBus(t *testing.T) {
 			a := NewAdaptor()
 			fs := a.sys.UseMockFilesystem([]string{infoFile})
 			fs.Files[infoFile].Contents = fmt.Sprintf(contentPattern, tc.revisionPart)
-			gobottest.Assert(t, a.revision, "")
-			//act, will read and refresh the revision
+			assert.Equal(t, "", a.revision)
+			// act, will read and refresh the revision
 			gotBus := a.DefaultI2cBus()
-			//assert
-			gobottest.Assert(t, a.revision, tc.wantRev)
-			gobottest.Assert(t, gotBus, tc.wantBus)
+			// assert
+			assert.Equal(t, tc.wantRev, a.revision)
+			assert.Equal(t, tc.wantBus, gotBus)
 		})
 	}
 }
@@ -103,7 +103,7 @@ func TestFinalize(t *testing.T) {
 	_ = a.PwmWrite("7", 255)
 
 	_, _ = a.GetI2cConnection(0xff, 0)
-	gobottest.Assert(t, a.Finalize(), nil)
+	assert.NoError(t, a.Finalize())
 }
 
 func TestDigitalPWM(t *testing.T) {
@@ -111,30 +111,30 @@ func TestDigitalPWM(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem(mockedPaths)
 	a.PiBlasterPeriod = 20000000
 
-	gobottest.Assert(t, a.PwmWrite("7", 4), nil)
+	assert.NoError(t, a.PwmWrite("7", 4))
 
 	pin, _ := a.PWMPin("7")
 	period, _ := pin.Period()
-	gobottest.Assert(t, period, uint32(20000000))
+	assert.Equal(t, uint32(20000000), period)
 
-	gobottest.Assert(t, a.PwmWrite("7", 255), nil)
+	assert.NoError(t, a.PwmWrite("7", 255))
 
-	gobottest.Assert(t, strings.Split(fs.Files["/dev/pi-blaster"].Contents, "\n")[0], "4=1")
+	assert.Equal(t, "4=1", strings.Split(fs.Files["/dev/pi-blaster"].Contents, "\n")[0])
 
-	gobottest.Assert(t, a.ServoWrite("11", 90), nil)
+	assert.NoError(t, a.ServoWrite("11", 90))
 
-	gobottest.Assert(t, strings.Split(fs.Files["/dev/pi-blaster"].Contents, "\n")[0], "17=0.5")
+	assert.Equal(t, "17=0.5", strings.Split(fs.Files["/dev/pi-blaster"].Contents, "\n")[0])
 
-	gobottest.Assert(t, a.PwmWrite("notexist", 1), errors.New("Not a valid pin"))
-	gobottest.Assert(t, a.ServoWrite("notexist", 1), errors.New("Not a valid pin"))
+	assert.ErrorContains(t, a.PwmWrite("notexist", 1), "Not a valid pin")
+	assert.ErrorContains(t, a.ServoWrite("notexist", 1), "Not a valid pin")
 
 	pin, _ = a.PWMPin("12")
 	period, _ = pin.Period()
-	gobottest.Assert(t, period, uint32(20000000))
+	assert.Equal(t, uint32(20000000), period)
 
-	gobottest.Assert(t, pin.SetDutyCycle(1.5*1000*1000), nil)
+	assert.NoError(t, pin.SetDutyCycle(1.5*1000*1000))
 
-	gobottest.Assert(t, strings.Split(fs.Files["/dev/pi-blaster"].Contents, "\n")[0], "18=0.075")
+	assert.Equal(t, "18=0.075", strings.Split(fs.Files["/dev/pi-blaster"].Contents, "\n")[0])
 }
 
 func TestDigitalIO(t *testing.T) {
@@ -149,19 +149,19 @@ func TestDigitalIO(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem(mockedPaths)
 
 	err := a.DigitalWrite("7", 1)
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio4/value"].Contents, "1")
+	assert.NoError(t, err)
+	assert.Equal(t, "1", fs.Files["/sys/class/gpio/gpio4/value"].Contents)
 
 	a.revision = "2"
 	err = a.DigitalWrite("13", 1)
-	gobottest.Assert(t, err, nil)
+	assert.NoError(t, err)
 
 	i, err := a.DigitalRead("13")
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, i, 1)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, i)
 
-	gobottest.Assert(t, a.DigitalWrite("notexist", 1), errors.New("Not a valid pin"))
-	gobottest.Assert(t, a.Finalize(), nil)
+	assert.ErrorContains(t, a.DigitalWrite("notexist", 1), "Not a valid pin")
+	assert.NoError(t, a.Finalize())
 }
 
 func TestDigitalPinConcurrency(t *testing.T) {
@@ -193,24 +193,24 @@ func TestPWMPin(t *testing.T) {
 		panic(err)
 	}
 
-	gobottest.Assert(t, len(a.pwmPins), 0)
+	assert.Equal(t, 0, len(a.pwmPins))
 
 	a.revision = "3"
 	firstSysPin, err := a.PWMPin("35")
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, len(a.pwmPins), 1)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(a.pwmPins))
 
 	secondSysPin, err := a.PWMPin("35")
 
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, len(a.pwmPins), 1)
-	gobottest.Assert(t, firstSysPin, secondSysPin)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(a.pwmPins))
+	assert.Equal(t, secondSysPin, firstSysPin)
 
 	otherSysPin, err := a.PWMPin("36")
 
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, len(a.pwmPins), 2)
-	gobottest.Refute(t, firstSysPin, otherSysPin)
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(a.pwmPins))
+	assert.NotEqual(t, otherSysPin, firstSysPin)
 }
 
 func TestPWMPinsReConnect(t *testing.T) {
@@ -222,27 +222,27 @@ func TestPWMPinsReConnect(t *testing.T) {
 	}
 
 	_, err := a.PWMPin("35")
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, len(a.pwmPins), 1)
-	gobottest.Assert(t, a.Finalize(), nil)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(a.pwmPins))
+	assert.NoError(t, a.Finalize())
 	// act
 	err = a.Connect()
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, len(a.pwmPins), 0)
+	assert.NoError(t, err)
+	assert.Equal(t, 0, len(a.pwmPins))
 	_, _ = a.PWMPin("35")
 	_, err = a.PWMPin("36")
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, len(a.pwmPins), 2)
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(a.pwmPins))
 }
 
 func TestSpiDefaultValues(t *testing.T) {
 	a := NewAdaptor()
 
-	gobottest.Assert(t, a.SpiDefaultBusNumber(), 0)
-	gobottest.Assert(t, a.SpiDefaultChipNumber(), 0)
-	gobottest.Assert(t, a.SpiDefaultMode(), 0)
-	gobottest.Assert(t, a.SpiDefaultMaxSpeed(), int64(500000))
+	assert.Equal(t, 0, a.SpiDefaultBusNumber())
+	assert.Equal(t, 0, a.SpiDefaultChipNumber())
+	assert.Equal(t, 0, a.SpiDefaultMode())
+	assert.Equal(t, int64(500000), a.SpiDefaultMaxSpeed())
 }
 
 func TestI2cDefaultBus(t *testing.T) {
@@ -251,10 +251,10 @@ func TestI2cDefaultBus(t *testing.T) {
 	a.sys.UseMockSyscall()
 
 	a.revision = "0"
-	gobottest.Assert(t, a.DefaultI2cBus(), 0)
+	assert.Equal(t, 0, a.DefaultI2cBus())
 
 	a.revision = "2"
-	gobottest.Assert(t, a.DefaultI2cBus(), 1)
+	assert.Equal(t, 1, a.DefaultI2cBus())
 }
 
 func TestI2cFinalizeWithErrors(t *testing.T) {
@@ -262,20 +262,20 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	a := NewAdaptor()
 	a.sys.UseMockSyscall()
 	fs := a.sys.UseMockFilesystem([]string{"/dev/i2c-1"})
-	gobottest.Assert(t, a.Connect(), nil)
+	assert.NoError(t, a.Connect())
 	con, err := a.GetI2cConnection(0xff, 1)
-	gobottest.Assert(t, err, nil)
+	assert.NoError(t, err)
 	_, err = con.Write([]byte{0xbf})
-	gobottest.Assert(t, err, nil)
+	assert.NoError(t, err)
 	fs.WithCloseError = true
 	// act
 	err = a.Finalize()
 	// assert
-	gobottest.Assert(t, strings.Contains(err.Error(), "close error"), true)
+	assert.Contains(t, err.Error(), "close error")
 }
 
 func Test_validateSpiBusNumber(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		busNr   int
 		wantErr error
 	}{
@@ -301,13 +301,13 @@ func Test_validateSpiBusNumber(t *testing.T) {
 			// act
 			err := a.validateSpiBusNumber(tc.busNr)
 			// assert
-			gobottest.Assert(t, err, tc.wantErr)
+			assert.Equal(t, tc.wantErr, err)
 		})
 	}
 }
 
 func Test_validateI2cBusNumber(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		busNr   int
 		wantErr error
 	}{
@@ -333,7 +333,7 @@ func Test_validateI2cBusNumber(t *testing.T) {
 			// act
 			err := a.validateI2cBusNumber(tc.busNr)
 			// assert
-			gobottest.Assert(t, err, tc.wantErr)
+			assert.Equal(t, tc.wantErr, err)
 		})
 	}
 }

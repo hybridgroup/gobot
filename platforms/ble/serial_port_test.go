@@ -3,7 +3,7 @@ package ble
 import (
 	"testing"
 
-	"gobot.io/x/gobot/v2/gobottest"
+	"github.com/stretchr/testify/assert"
 )
 
 func initTestBLESerialPort() *SerialPort {
@@ -12,5 +12,5 @@ func initTestBLESerialPort() *SerialPort {
 
 func TestBLESerialPort(t *testing.T) {
 	d := initTestBLESerialPort()
-	gobottest.Assert(t, d.Address(), "TEST123")
+	assert.Equal(t, "TEST123", d.Address())
 }

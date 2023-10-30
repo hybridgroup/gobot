@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
@@ -23,45 +23,45 @@ func TestNewHMC5883LDriver(t *testing.T) {
 	if !ok {
 		t.Errorf("NewHMC5883LDriver() should have returned a *HMC5883LDriver")
 	}
-	gobottest.Refute(t, d.Driver, nil)
-	gobottest.Assert(t, strings.HasPrefix(d.name, "HMC5883L"), true)
-	gobottest.Assert(t, d.defaultAddress, 0x1E)
-	gobottest.Assert(t, d.samplesAvg, uint8(8))
-	gobottest.Assert(t, d.outputRate, uint32(15000))
-	gobottest.Assert(t, d.applyBias, int8(0))
-	gobottest.Assert(t, d.measurementMode, 0)
-	gobottest.Assert(t, d.gain, 390.0)
+	assert.NotNil(t, d.Driver)
+	assert.True(t, strings.HasPrefix(d.name, "HMC5883L"))
+	assert.Equal(t, 0x1E, d.defaultAddress)
+	assert.Equal(t, uint8(8), d.samplesAvg)
+	assert.Equal(t, uint32(15000), d.outputRate)
+	assert.Equal(t, int8(0), d.applyBias)
+	assert.Equal(t, 0, d.measurementMode)
+	assert.Equal(t, 390.0, d.gain)
 }
 
 func TestHMC5883LOptions(t *testing.T) {
 	// This is a general test, that options are applied in constructor by using the common WithBus() option and
 	// least one of this driver. Further tests for options can also be done by call of "WithOption(val)(d)".
 	d := NewHMC5883LDriver(newI2cTestAdaptor(), WithBus(2), WithHMC5883LSamplesAveraged(4))
-	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
-	gobottest.Assert(t, d.samplesAvg, uint8(4))
+	assert.Equal(t, 2, d.GetBusOrDefault(1))
+	assert.Equal(t, uint8(4), d.samplesAvg)
 }
 
 func TestHMC5883LWithHMC5883LDataOutputRate(t *testing.T) {
 	d := NewHMC5883LDriver(newI2cTestAdaptor())
 	WithHMC5883LDataOutputRate(7500)(d)
-	gobottest.Assert(t, d.outputRate, uint32(7500))
+	assert.Equal(t, uint32(7500), d.outputRate)
 }
 
 func TestHMC5883LWithHMC5883LApplyBias(t *testing.T) {
 	d := NewHMC5883LDriver(newI2cTestAdaptor())
 	WithHMC5883LApplyBias(-1)(d)
-	gobottest.Assert(t, d.applyBias, int8(-1))
+	assert.Equal(t, int8(-1), d.applyBias)
 }
 
 func TestHMC5883LWithHMC5883LGain(t *testing.T) {
 	d := NewHMC5883LDriver(newI2cTestAdaptor())
 	WithHMC5883LGain(230)(d)
-	gobottest.Assert(t, d.gain, 230.0)
+	assert.Equal(t, 230.0, d.gain)
 }
 
 func TestHMC5883LRead(t *testing.T) {
 	// arrange
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		inputX []uint8
 		inputY []uint8
 		inputZ []uint8
@@ -121,10 +121,10 @@ func TestHMC5883LRead(t *testing.T) {
 			// act
 			gotX, gotY, gotZ, err := d.Read()
 			// assert
-			gobottest.Assert(t, err, nil)
-			gobottest.Assert(t, gotX, tc.wantX)
-			gobottest.Assert(t, gotY, tc.wantY)
-			gobottest.Assert(t, gotZ, tc.wantZ)
+			assert.NoError(t, err)
+			assert.Equal(t, tc.wantX, gotX)
+			assert.Equal(t, tc.wantY, gotY)
+			assert.Equal(t, tc.wantZ, gotZ)
 		})
 	}
 }
@@ -136,7 +136,7 @@ func TestHMC5883L_readRawData(t *testing.T) {
 	// * apply two's complement converter
 	//
 	// arrange
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		inputX []uint8
 		inputY []uint8
 		inputZ []uint8
@@ -177,13 +177,13 @@ func TestHMC5883L_readRawData(t *testing.T) {
 			// act
 			gotX, gotY, gotZ, err := d.readRawData()
 			// assert
-			gobottest.Assert(t, err, nil)
-			gobottest.Assert(t, gotX, tc.wantX)
-			gobottest.Assert(t, gotY, tc.wantY)
-			gobottest.Assert(t, gotZ, tc.wantZ)
-			gobottest.Assert(t, numCallsRead, 1)
-			gobottest.Assert(t, len(a.written), 1)
-			gobottest.Assert(t, a.written[0], uint8(hmc5883lAxisX))
+			assert.NoError(t, err)
+			assert.Equal(t, tc.wantX, gotX)
+			assert.Equal(t, tc.wantY, gotY)
+			assert.Equal(t, tc.wantZ, gotZ)
+			assert.Equal(t, 1, numCallsRead)
+			assert.Equal(t, 1, len(a.written))
+			assert.Equal(t, uint8(hmc5883lAxisX), a.written[0])
 		})
 	}
 }
@@ -203,12 +203,12 @@ func TestHMC5883L_initialize(t *testing.T) {
 	// act, assert - initialize() must be called on Start()
 	err := d.Start()
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, len(a.written), 6)
-	gobottest.Assert(t, a.written[0], uint8(hmc5883lRegA))
-	gobottest.Assert(t, a.written[1], wantRegA)
-	gobottest.Assert(t, a.written[2], uint8(hmc5883lRegB))
-	gobottest.Assert(t, a.written[3], wantRegB)
-	gobottest.Assert(t, a.written[4], uint8(hmc5883lRegMode))
-	gobottest.Assert(t, a.written[5], wantRegM)
+	assert.NoError(t, err)
+	assert.Equal(t, 6, len(a.written))
+	assert.Equal(t, uint8(hmc5883lRegA), a.written[0])
+	assert.Equal(t, wantRegA, a.written[1])
+	assert.Equal(t, uint8(hmc5883lRegB), a.written[2])
+	assert.Equal(t, wantRegB, a.written[3])
+	assert.Equal(t, uint8(hmc5883lRegMode), a.written[4])
+	assert.Equal(t, wantRegM, a.written[5])
 }

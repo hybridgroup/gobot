@@ -270,7 +270,7 @@ Support for many devices that use General Purpose Input/Output (GPIO) have
 a shared set of drivers provided using the `gobot/drivers/gpio` package:
 
 - [GPIO](https://en.wikipedia.org/wiki/General_Purpose_Input/Output) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/gpio)
-  - AIP1640 LED
+  - AIP1640 LED Dot Matrix/7 Segment Controller
   - Button
   - Buzzer
   - Direct Pin
@@ -281,8 +281,11 @@ a shared set of drivers provided using the `gobot/drivers/gpio` package:
   - Grove Magnetic Switch
   - Grove Relay
   - Grove Touch Sensor
+  - HC-SR04 Ultrasonic Ranging Module
+  - HD44780 LCD controller
   - LED
   - Makey Button
+  - MAX7219 LED Dot Matrix
   - Motor
   - Proximity Infra Red (PIR) Motion Sensor
   - Relay
@@ -306,8 +309,9 @@ Support for devices that use Inter-Integrated Circuit (I2C) have a shared set of
 drivers provided using the `gobot/drivers/i2c` package:
 
 - [I2C](https://en.wikipedia.org/wiki/I%C2%B2C) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/i2c)
-  - Adafruit 2x16 RGB-LCD with 5 keys
-  - Adafruit Motor Hat
+  - Adafruit 1109 2x16 RGB-LCD with 5 keys
+  - Adafruit 2327 16-Channel PWM/Servo HAT Hat
+  - Adafruit 2348 DC and Stepper Motor Hat
   - ADS1015 Analog to Digital Converter
   - ADS1115 Analog to Digital Converter
   - ADXL345 Digital Accelerometer

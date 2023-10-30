@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"gobot.io/x/gobot/v2/gobottest"
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2/system"
 )
 
@@ -17,11 +17,11 @@ func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.
 
 func TestDefaultI2cBus(t *testing.T) {
 	a, _ := initTestAdaptorWithMockedFilesystem([]string{})
-	gobottest.Assert(t, a.DefaultI2cBus(), 7)
+	assert.Equal(t, 7, a.DefaultI2cBus())
 }
 
 func Test_getPinTranslatorFunction(t *testing.T) {
-	var cases = map[string]struct {
+	cases := map[string]struct {
 		pin          string
 		model        string
 		expectedLine int
@@ -63,15 +63,15 @@ func Test_getPinTranslatorFunction(t *testing.T) {
 			// act
 			chip, line, err := fn(tc.pin)
 			// assert
-			gobottest.Assert(t, chip, "")
-			gobottest.Assert(t, err, tc.expectedErr)
-			gobottest.Assert(t, line, tc.expectedLine)
+			assert.Equal(t, "", chip)
+			assert.Equal(t, tc.expectedErr, err)
+			assert.Equal(t, tc.expectedLine, line)
 		})
 	}
 }
 
 func Test_validateSpiBusNumber(t *testing.T) {
-	var cases = map[string]struct {
+	cases := map[string]struct {
 		busNr       int
 		expectedErr error
 	}{
@@ -97,13 +97,13 @@ func Test_validateSpiBusNumber(t *testing.T) {
 			// act
 			err := a.validateSpiBusNumber(tc.busNr)
 			// assert
-			gobottest.Assert(t, err, tc.expectedErr)
+			assert.Equal(t, tc.expectedErr, err)
 		})
 	}
 }
 
 func Test_validateI2cBusNumber(t *testing.T) {
-	var cases = map[string]struct {
+	cases := map[string]struct {
 		busNr   int
 		wantErr error
 	}{
@@ -132,7 +132,7 @@ func Test_validateI2cBusNumber(t *testing.T) {
 			// act
 			err := a.validateI2cBusNumber(tc.busNr)
 			// assert
-			gobottest.Assert(t, err, tc.wantErr)
+			assert.Equal(t, tc.wantErr, err)
 		})
 	}
 }

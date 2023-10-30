@@ -1,31 +1,32 @@
 package beaglebone
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/aio"
 	"gobot.io/x/gobot/v2/drivers/gpio"
 	"gobot.io/x/gobot/v2/drivers/i2c"
 	"gobot.io/x/gobot/v2/drivers/spi"
-	"gobot.io/x/gobot/v2/gobottest"
 	"gobot.io/x/gobot/v2/system"
 )
 
 // make sure that this Adaptor fulfills all the required interfaces
-var _ gobot.Adaptor = (*Adaptor)(nil)
-var _ gobot.DigitalPinnerProvider = (*Adaptor)(nil)
-var _ gobot.PWMPinnerProvider = (*Adaptor)(nil)
-var _ gpio.DigitalReader = (*Adaptor)(nil)
-var _ gpio.DigitalWriter = (*Adaptor)(nil)
-var _ aio.AnalogReader = (*Adaptor)(nil)
-var _ gpio.PwmWriter = (*Adaptor)(nil)
-var _ gpio.ServoWriter = (*Adaptor)(nil)
-var _ i2c.Connector = (*Adaptor)(nil)
-var _ spi.Connector = (*Adaptor)(nil)
+var (
+	_ gobot.Adaptor               = (*Adaptor)(nil)
+	_ gobot.DigitalPinnerProvider = (*Adaptor)(nil)
+	_ gobot.PWMPinnerProvider     = (*Adaptor)(nil)
+	_ gpio.DigitalReader          = (*Adaptor)(nil)
+	_ gpio.DigitalWriter          = (*Adaptor)(nil)
+	_ aio.AnalogReader            = (*Adaptor)(nil)
+	_ gpio.PwmWriter              = (*Adaptor)(nil)
+	_ gpio.ServoWriter            = (*Adaptor)(nil)
+	_ i2c.Connector               = (*Adaptor)(nil)
+	_ spi.Connector               = (*Adaptor)(nil)
+)
 
 func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.MockFilesystem) {
 	a := NewAdaptor()
@@ -54,33 +55,35 @@ func TestPWM(t *testing.T) {
 	}
 
 	a, fs := initTestAdaptorWithMockedFilesystem(mockPaths)
+	fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/duty_cycle"].Contents = "0"
+	fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/period"].Contents = "0"
 
-	gobottest.Assert(t, a.PwmWrite("P9_99", 175), errors.New("'P9_99' is not a valid id for a PWM pin"))
+	assert.ErrorContains(t, a.PwmWrite("P9_99", 175), "'P9_99' is not a valid id for a PWM pin")
 	_ = a.PwmWrite("P9_21", 175)
-	gobottest.Assert(
+	assert.Equal(
 		t,
-		fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/period"].Contents,
 		"500000",
+		fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/period"].Contents,
 	)
-	gobottest.Assert(
+	assert.Equal(
 		t,
-		fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/duty_cycle"].Contents,
 		"343137",
+		fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/duty_cycle"].Contents,
 	)
 
 	_ = a.ServoWrite("P9_21", 100)
-	gobottest.Assert(
+	assert.Equal(
 		t,
-		fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/period"].Contents,
 		"500000",
+		fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/period"].Contents,
 	)
-	gobottest.Assert(
+	assert.Equal(
 		t,
-		fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/duty_cycle"].Contents,
 		"66666",
+		fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/duty_cycle"].Contents,
 	)
 
-	gobottest.Assert(t, a.Finalize(), nil)
+	assert.NoError(t, a.Finalize())
 }
 
 func TestAnalog(t *testing.T) {
@@ -92,18 +95,18 @@ func TestAnalog(t *testing.T) {
 
 	fs.Files["/sys/bus/iio/devices/iio:device0/in_voltage1_raw"].Contents = "567\n"
 	i, err := a.AnalogRead("P9_40")
-	gobottest.Assert(t, i, 567)
-	gobottest.Assert(t, err, nil)
+	assert.Equal(t, 567, i)
+	assert.NoError(t, err)
 
 	_, err = a.AnalogRead("P9_99")
-	gobottest.Assert(t, err, errors.New("Not a valid analog pin"))
+	assert.ErrorContains(t, err, "Not a valid analog pin")
 
 	fs.WithReadError = true
 	_, err = a.AnalogRead("P9_40")
-	gobottest.Assert(t, err, errors.New("read error"))
+	assert.ErrorContains(t, err, "read error")
 	fs.WithReadError = false
 
-	gobottest.Assert(t, a.Finalize(), nil)
+	assert.NoError(t, a.Finalize())
 }
 
 func TestDigitalIO(t *testing.T) {
@@ -128,36 +131,36 @@ func TestDigitalIO(t *testing.T) {
 
 	// DigitalIO
 	_ = a.DigitalWrite("usr1", 1)
-	gobottest.Assert(t,
-		fs.Files["/sys/class/leds/beaglebone:green:usr1/brightness"].Contents,
+	assert.Equal(t,
 		"1",
+		fs.Files["/sys/class/leds/beaglebone:green:usr1/brightness"].Contents,
 	)
 
 	// no such LED
 	err := a.DigitalWrite("usr10101", 1)
-	gobottest.Assert(t, err.Error(), " : /sys/class/leds/beaglebone:green:usr10101/brightness: no such file")
+	assert.ErrorContains(t, err, " : /sys/class/leds/beaglebone:green:usr10101/brightness: no such file")
 
 	_ = a.DigitalWrite("P9_12", 1)
-	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio60/value"].Contents, "1")
+	assert.Equal(t, "1", fs.Files["/sys/class/gpio/gpio60/value"].Contents)
 
-	gobottest.Assert(t, a.DigitalWrite("P9_99", 1), errors.New("'P9_99' is not a valid id for a digital pin"))
+	assert.ErrorContains(t, a.DigitalWrite("P9_99", 1), "'P9_99' is not a valid id for a digital pin")
 
 	_, err = a.DigitalRead("P9_99")
-	gobottest.Assert(t, err, errors.New("'P9_99' is not a valid id for a digital pin"))
+	assert.ErrorContains(t, err, "'P9_99' is not a valid id for a digital pin")
 
 	fs.Files["/sys/class/gpio/gpio66/value"].Contents = "1"
 	i, err := a.DigitalRead("P8_07")
-	gobottest.Assert(t, i, 1)
-	gobottest.Assert(t, err, nil)
+	assert.Equal(t, 1, i)
+	assert.NoError(t, err)
 
-	gobottest.Assert(t, a.Finalize(), nil)
+	assert.NoError(t, a.Finalize())
 }
 
 func TestName(t *testing.T) {
 	a := NewAdaptor()
-	gobottest.Assert(t, strings.HasPrefix(a.Name(), "Beaglebone"), true)
+	assert.True(t, strings.HasPrefix(a.Name(), "Beaglebone"))
 	a.SetName("NewName")
-	gobottest.Assert(t, a.Name(), "NewName")
+	assert.Equal(t, "NewName", a.Name())
 }
 
 func TestAnalogReadFileError(t *testing.T) {
@@ -168,7 +171,7 @@ func TestAnalogReadFileError(t *testing.T) {
 	a, _ := initTestAdaptorWithMockedFilesystem(mockPaths)
 
 	_, err := a.AnalogRead("P9_40")
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/bus/iio/devices/iio:device0/in_voltage1_raw: no such file"), true)
+	assert.Contains(t, err.Error(), "/sys/bus/iio/devices/iio:device0/in_voltage1_raw: no such file")
 }
 
 func TestDigitalPinDirectionFileError(t *testing.T) {
@@ -181,11 +184,11 @@ func TestDigitalPinDirectionFileError(t *testing.T) {
 	a, _ := initTestAdaptorWithMockedFilesystem(mockPaths)
 
 	err := a.DigitalWrite("P9_12", 1)
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/gpio60/direction: no such file"), true)
+	assert.Contains(t, err.Error(), "/sys/class/gpio/gpio60/direction: no such file")
 
 	// no pin added after previous problem, so no pin to unexport in finalize
 	err = a.Finalize()
-	gobottest.Assert(t, nil, err)
+	assert.Equal(t, err, nil)
 }
 
 func TestDigitalPinFinalizeFileError(t *testing.T) {
@@ -199,30 +202,30 @@ func TestDigitalPinFinalizeFileError(t *testing.T) {
 	a, _ := initTestAdaptorWithMockedFilesystem(mockPaths)
 
 	err := a.DigitalWrite("P9_12", 1)
-	gobottest.Assert(t, err, nil)
+	assert.NoError(t, err)
 
 	err = a.Finalize()
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/unexport: no such file"), true)
+	assert.Contains(t, err.Error(), "/sys/class/gpio/unexport: no such file")
 }
 
 func TestPocketName(t *testing.T) {
 	a := NewPocketBeagleAdaptor()
-	gobottest.Assert(t, strings.HasPrefix(a.Name(), "PocketBeagle"), true)
+	assert.True(t, strings.HasPrefix(a.Name(), "PocketBeagle"))
 }
 
 func TestSpiDefaultValues(t *testing.T) {
 	a := NewAdaptor()
 
-	gobottest.Assert(t, a.SpiDefaultBusNumber(), 0)
-	gobottest.Assert(t, a.SpiDefaultChipNumber(), 0)
-	gobottest.Assert(t, a.SpiDefaultMode(), 0)
-	gobottest.Assert(t, a.SpiDefaultBitCount(), 8)
-	gobottest.Assert(t, a.SpiDefaultMaxSpeed(), int64(500000))
+	assert.Equal(t, 0, a.SpiDefaultBusNumber())
+	assert.Equal(t, 0, a.SpiDefaultChipNumber())
+	assert.Equal(t, 0, a.SpiDefaultMode())
+	assert.Equal(t, 8, a.SpiDefaultBitCount())
+	assert.Equal(t, int64(500000), a.SpiDefaultMaxSpeed())
 }
 
 func TestI2cDefaultBus(t *testing.T) {
 	a := NewAdaptor()
-	gobottest.Assert(t, a.DefaultI2cBus(), 2)
+	assert.Equal(t, 2, a.DefaultI2cBus())
 }
 
 func TestI2cFinalizeWithErrors(t *testing.T) {
@@ -230,20 +233,20 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	a := NewAdaptor()
 	a.sys.UseMockSyscall()
 	fs := a.sys.UseMockFilesystem([]string{"/dev/i2c-2"})
-	gobottest.Assert(t, a.Connect(), nil)
+	assert.NoError(t, a.Connect())
 	con, err := a.GetI2cConnection(0xff, 2)
-	gobottest.Assert(t, err, nil)
+	assert.NoError(t, err)
 	_, err = con.Write([]byte{0xbf})
-	gobottest.Assert(t, err, nil)
+	assert.NoError(t, err)
 	fs.WithCloseError = true
 	// act
 	err = a.Finalize()
 	// assert
-	gobottest.Assert(t, strings.Contains(err.Error(), "close error"), true)
+	assert.Contains(t, err.Error(), "close error")
 }
 
 func Test_validateSpiBusNumber(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		busNr   int
 		wantErr error
 	}{
@@ -269,13 +272,13 @@ func Test_validateSpiBusNumber(t *testing.T) {
 			// act
 			err := a.validateSpiBusNumber(tc.busNr)
 			// assert
-			gobottest.Assert(t, err, tc.wantErr)
+			assert.Equal(t, tc.wantErr, err)
 		})
 	}
 }
 
 func Test_validateI2cBusNumber(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		busNr   int
 		wantErr error
 	}{
@@ -305,7 +308,7 @@ func Test_validateI2cBusNumber(t *testing.T) {
 			// act
 			err := a.validateI2cBusNumber(tc.busNr)
 			// assert
-			gobottest.Assert(t, err, tc.wantErr)
+			assert.Equal(t, tc.wantErr, err)
 		})
 	}
 }
@@ -320,7 +323,7 @@ func Test_translateAndMuxPWMPin(t *testing.T) {
 	}
 	a, fs := initTestAdaptorWithMockedFilesystem(mockPaths)
 
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		wantDir     string
 		wantChannel int
 		wantErr     error
@@ -367,11 +370,11 @@ func Test_translateAndMuxPWMPin(t *testing.T) {
 			// act
 			path, channel, err := a.translateAndMuxPWMPin(name)
 			// assert
-			gobottest.Assert(t, err, tc.wantErr)
-			gobottest.Assert(t, path, tc.wantDir)
-			gobottest.Assert(t, channel, tc.wantChannel)
+			assert.Equal(t, tc.wantErr, err)
+			assert.Equal(t, tc.wantDir, path)
+			assert.Equal(t, tc.wantChannel, channel)
 			if tc.wantErr == nil {
-				gobottest.Assert(t, fs.Files[muxPath].Contents, "pwm")
+				assert.Equal(t, "pwm", fs.Files[muxPath].Contents)
 			}
 		})
 	}

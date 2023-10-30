@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-
 	"sync"
 
 	multierror "github.com/hashicorp/go-multierror"
@@ -209,7 +208,7 @@ func (c *Adaptor) readRevision() string {
 		}
 		for _, v := range strings.Split(string(content), "\n") {
 			if strings.Contains(v, "Revision") {
-				s := strings.Split(string(v), " ")
+				s := strings.Split(v, " ")
 				version, _ := strconv.ParseInt("0x"+s[len(s)-1], 0, 64)
 				if version <= 3 {
 					c.revision = "1"

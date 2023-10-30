@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*CameraDriver)(nil)
@@ -22,21 +22,21 @@ func initTestCameraDriver() *CameraDriver {
 
 func TestCameraDriver(t *testing.T) {
 	d := initTestCameraDriver()
-	gobottest.Assert(t, d.Name(), "Camera")
-	gobottest.Assert(t, d.Connection(), (gobot.Connection)(nil))
+	assert.Equal(t, "Camera", d.Name())
+	assert.Equal(t, (gobot.Connection)(nil), d.Connection())
 }
 
 func TestCameraDriverName(t *testing.T) {
 	d := initTestCameraDriver()
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Camera"), true)
+	assert.True(t, strings.HasPrefix(d.Name(), "Camera"))
 	d.SetName("NewName")
-	gobottest.Assert(t, d.Name(), "NewName")
+	assert.Equal(t, "NewName", d.Name())
 }
 
 func TestCameraDriverStart(t *testing.T) {
 	sem := make(chan bool)
 	d := initTestCameraDriver()
-	gobottest.Assert(t, d.Start(), nil)
+	assert.NoError(t, d.Start())
 	d.On(d.Event("frame"), func(data interface{}) {
 		sem <- true
 	})
@@ -47,13 +47,13 @@ func TestCameraDriverStart(t *testing.T) {
 	}
 
 	d = NewCameraDriver("")
-	gobottest.Assert(t, d.Start(), nil)
+	assert.NoError(t, d.Start())
 
 	d = NewCameraDriver(true)
-	gobottest.Refute(t, d.Start(), nil)
+	assert.NotNil(t, d.Start())
 }
 
 func TestCameraDriverHalt(t *testing.T) {
 	d := initTestCameraDriver()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.NoError(t, d.Halt())
 }

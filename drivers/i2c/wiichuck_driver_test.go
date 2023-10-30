@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
@@ -27,10 +27,10 @@ func TestNewWiichuckDriver(t *testing.T) {
 	if !ok {
 		t.Errorf("NewWiichuckDriver() should have returned a *WiichuckDriver")
 	}
-	gobottest.Refute(t, d.Driver, nil)
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Wiichuck"), true)
-	gobottest.Assert(t, d.defaultAddress, 0x52)
-	gobottest.Assert(t, d.interval, 10*time.Millisecond)
+	assert.NotNil(t, d.Driver)
+	assert.True(t, strings.HasPrefix(d.Name(), "Wiichuck"))
+	assert.Equal(t, 0x52, d.defaultAddress)
+	assert.Equal(t, 10*time.Millisecond, d.interval)
 }
 
 func TestWiichuckDriverStart(t *testing.T) {
@@ -44,7 +44,7 @@ func TestWiichuckDriverStart(t *testing.T) {
 	d.interval = 1 * time.Millisecond
 	sem := make(chan bool)
 
-	gobottest.Assert(t, d.Start(), nil)
+	assert.NoError(t, d.Start())
 
 	go func() {
 		for {
@@ -63,12 +63,11 @@ func TestWiichuckDriverStart(t *testing.T) {
 	case <-time.After(100 * time.Millisecond):
 		t.Errorf("origin not read correctly")
 	}
-
 }
 
 func TestWiichuckDriverHalt(t *testing.T) {
 	d := initTestWiichuckDriverWithStubbedAdaptor()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.NoError(t, d.Halt())
 }
 
 func TestWiichuckDriverCanParse(t *testing.T) {
@@ -79,10 +78,10 @@ func TestWiichuckDriverCanParse(t *testing.T) {
 	_ = d.update(decryptedValue)
 
 	// - This should be done by WiichuckDriver.parse
-	gobottest.Assert(t, d.data["sx"], float64(45))
-	gobottest.Assert(t, d.data["sy"], float64(44))
-	gobottest.Assert(t, d.data["z"], float64(0))
-	gobottest.Assert(t, d.data["c"], float64(0))
+	assert.Equal(t, float64(45), d.data["sx"])
+	assert.Equal(t, float64(44), d.data["sy"])
+	assert.Equal(t, float64(0), d.data["z"])
+	assert.Equal(t, float64(0), d.data["c"])
 }
 
 func TestWiichuckDriverCanAdjustOrigins(t *testing.T) {
@@ -93,8 +92,8 @@ func TestWiichuckDriverCanAdjustOrigins(t *testing.T) {
 	_ = d.update(decryptedValue)
 
 	// - This should be done by WiichuckDriver.adjustOrigins
-	gobottest.Assert(t, d.Joystick()["sx_origin"], float64(45))
-	gobottest.Assert(t, d.Joystick()["sy_origin"], float64(44))
+	assert.Equal(t, float64(45), d.Joystick()["sx_origin"])
+	assert.Equal(t, float64(44), d.Joystick()["sy_origin"])
 }
 
 func TestWiichuckDriverCButton(t *testing.T) {
@@ -108,7 +107,7 @@ func TestWiichuckDriverCButton(t *testing.T) {
 	done := make(chan bool)
 
 	_ = d.On(d.Event(C), func(data interface{}) {
-		gobottest.Assert(t, data, true)
+		assert.Equal(t, true, data)
 		done <- true
 	})
 
@@ -131,7 +130,7 @@ func TestWiichuckDriverZButton(t *testing.T) {
 	done := make(chan bool)
 
 	_ = d.On(d.Event(Z), func(data interface{}) {
-		gobottest.Assert(t, data, true)
+		assert.Equal(t, true, data)
 		done <- true
 	})
 
@@ -159,7 +158,7 @@ func TestWiichuckDriverUpdateJoystick(t *testing.T) {
 	done := make(chan bool)
 
 	_ = d.On(d.Event(Joystick), func(data interface{}) {
-		gobottest.Assert(t, data, expectedData)
+		assert.Equal(t, expectedData, data)
 		done <- true
 	})
 
@@ -178,104 +177,104 @@ func TestWiichuckDriverEncrypted(t *testing.T) {
 
 	_ = d.update(encryptedValue)
 
-	gobottest.Assert(t, d.data["sx"], float64(0))
-	gobottest.Assert(t, d.data["sy"], float64(0))
-	gobottest.Assert(t, d.data["z"], float64(0))
-	gobottest.Assert(t, d.data["c"], float64(0))
+	assert.Equal(t, float64(0), d.data["sx"])
+	assert.Equal(t, float64(0), d.data["sy"])
+	assert.Equal(t, float64(0), d.data["z"])
+	assert.Equal(t, float64(0), d.data["c"])
 
-	gobottest.Assert(t, d.Joystick()["sx_origin"], float64(-1))
-	gobottest.Assert(t, d.Joystick()["sy_origin"], float64(-1))
+	assert.Equal(t, float64(-1), d.Joystick()["sx_origin"])
+	assert.Equal(t, float64(-1), d.Joystick()["sy_origin"])
 }
 
 func TestWiichuckDriverSetJoystickDefaultValue(t *testing.T) {
 	d := initTestWiichuckDriverWithStubbedAdaptor()
 
-	gobottest.Assert(t, d.Joystick()["sy_origin"], float64(-1))
+	assert.Equal(t, float64(-1), d.Joystick()["sy_origin"])
 
 	d.setJoystickDefaultValue("sy_origin", float64(2))
 
-	gobottest.Assert(t, d.Joystick()["sy_origin"], float64(2))
+	assert.Equal(t, float64(2), d.Joystick()["sy_origin"])
 
 	// when current default value is not -1 it keeps the current value
 	d.setJoystickDefaultValue("sy_origin", float64(20))
 
-	gobottest.Assert(t, d.Joystick()["sy_origin"], float64(2))
+	assert.Equal(t, float64(2), d.Joystick()["sy_origin"])
 }
 
 func TestWiichuckDriverCalculateJoystickValue(t *testing.T) {
 	d := initTestWiichuckDriverWithStubbedAdaptor()
 
-	gobottest.Assert(t, d.calculateJoystickValue(float64(20), float64(5)), float64(15))
-	gobottest.Assert(t, d.calculateJoystickValue(float64(1), float64(2)), float64(-1))
-	gobottest.Assert(t, d.calculateJoystickValue(float64(10), float64(5)), float64(5))
-	gobottest.Assert(t, d.calculateJoystickValue(float64(5), float64(10)), float64(-5))
+	assert.Equal(t, float64(15), d.calculateJoystickValue(float64(20), float64(5)))
+	assert.Equal(t, float64(-1), d.calculateJoystickValue(float64(1), float64(2)))
+	assert.Equal(t, float64(5), d.calculateJoystickValue(float64(10), float64(5)))
+	assert.Equal(t, float64(-5), d.calculateJoystickValue(float64(5), float64(10)))
 }
 
 func TestWiichuckDriverIsEncrypted(t *testing.T) {
 	d := initTestWiichuckDriverWithStubbedAdaptor()
 
 	encryptedValue := []byte{1, 1, 2, 2, 3, 3}
-	gobottest.Assert(t, d.isEncrypted(encryptedValue), true)
+	assert.True(t, d.isEncrypted(encryptedValue))
 
 	encryptedValue = []byte{42, 42, 24, 24, 30, 30}
-	gobottest.Assert(t, d.isEncrypted(encryptedValue), true)
+	assert.True(t, d.isEncrypted(encryptedValue))
 
 	decryptedValue := []byte{1, 2, 3, 4, 5, 6}
-	gobottest.Assert(t, d.isEncrypted(decryptedValue), false)
+	assert.False(t, d.isEncrypted(decryptedValue))
 
 	decryptedValue = []byte{1, 1, 2, 2, 5, 6}
-	gobottest.Assert(t, d.isEncrypted(decryptedValue), false)
+	assert.False(t, d.isEncrypted(decryptedValue))
 
 	decryptedValue = []byte{1, 1, 2, 3, 3, 3}
-	gobottest.Assert(t, d.isEncrypted(decryptedValue), false)
+	assert.False(t, d.isEncrypted(decryptedValue))
 }
 
 func TestWiichuckDriverDecode(t *testing.T) {
 	d := initTestWiichuckDriverWithStubbedAdaptor()
 
-	gobottest.Assert(t, d.decode(byte(0)), float64(46))
-	gobottest.Assert(t, d.decode(byte(100)), float64(138))
-	gobottest.Assert(t, d.decode(byte(200)), float64(246))
-	gobottest.Assert(t, d.decode(byte(254)), float64(0))
+	assert.Equal(t, float64(46), d.decode(byte(0)))
+	assert.Equal(t, float64(138), d.decode(byte(100)))
+	assert.Equal(t, float64(246), d.decode(byte(200)))
+	assert.Equal(t, float64(0), d.decode(byte(254)))
 }
 
 func TestWiichuckDriverParse(t *testing.T) {
 	d := initTestWiichuckDriverWithStubbedAdaptor()
 
-	gobottest.Assert(t, d.data["sx"], float64(0))
-	gobottest.Assert(t, d.data["sy"], float64(0))
-	gobottest.Assert(t, d.data["z"], float64(0))
-	gobottest.Assert(t, d.data["c"], float64(0))
+	assert.Equal(t, float64(0), d.data["sx"])
+	assert.Equal(t, float64(0), d.data["sy"])
+	assert.Equal(t, float64(0), d.data["z"])
+	assert.Equal(t, float64(0), d.data["c"])
 
 	// First pass
 	d.parse([]byte{12, 23, 34, 45, 56, 67})
 
-	gobottest.Assert(t, d.data["sx"], float64(50))
-	gobottest.Assert(t, d.data["sy"], float64(23))
-	gobottest.Assert(t, d.data["z"], float64(1))
-	gobottest.Assert(t, d.data["c"], float64(2))
+	assert.Equal(t, float64(50), d.data["sx"])
+	assert.Equal(t, float64(23), d.data["sy"])
+	assert.Equal(t, float64(1), d.data["z"])
+	assert.Equal(t, float64(2), d.data["c"])
 
 	// Second pass
 	d.parse([]byte{70, 81, 92, 103, 204, 205})
 
-	gobottest.Assert(t, d.data["sx"], float64(104))
-	gobottest.Assert(t, d.data["sy"], float64(93))
-	gobottest.Assert(t, d.data["z"], float64(1))
-	gobottest.Assert(t, d.data["c"], float64(0))
+	assert.Equal(t, float64(104), d.data["sx"])
+	assert.Equal(t, float64(93), d.data["sy"])
+	assert.Equal(t, float64(1), d.data["z"])
+	assert.Equal(t, float64(0), d.data["c"])
 }
 
 func TestWiichuckDriverAdjustOrigins(t *testing.T) {
 	d := initTestWiichuckDriverWithStubbedAdaptor()
 
-	gobottest.Assert(t, d.Joystick()["sy_origin"], float64(-1))
-	gobottest.Assert(t, d.Joystick()["sx_origin"], float64(-1))
+	assert.Equal(t, float64(-1), d.Joystick()["sy_origin"])
+	assert.Equal(t, float64(-1), d.Joystick()["sx_origin"])
 
 	// First pass
 	d.parse([]byte{1, 2, 3, 4, 5, 6})
 	d.adjustOrigins()
 
-	gobottest.Assert(t, d.Joystick()["sy_origin"], float64(44))
-	gobottest.Assert(t, d.Joystick()["sx_origin"], float64(45))
+	assert.Equal(t, float64(44), d.Joystick()["sy_origin"])
+	assert.Equal(t, float64(45), d.Joystick()["sx_origin"])
 
 	// Second pass
 	d = initTestWiichuckDriverWithStubbedAdaptor()
@@ -283,17 +282,17 @@ func TestWiichuckDriverAdjustOrigins(t *testing.T) {
 	d.parse([]byte{61, 72, 83, 94, 105, 206})
 	d.adjustOrigins()
 
-	gobottest.Assert(t, d.Joystick()["sy_origin"], float64(118))
-	gobottest.Assert(t, d.Joystick()["sx_origin"], float64(65))
+	assert.Equal(t, float64(118), d.Joystick()["sy_origin"])
+	assert.Equal(t, float64(65), d.Joystick()["sx_origin"])
 }
 
 func TestWiichuckDriverSetName(t *testing.T) {
 	d := initTestWiichuckDriverWithStubbedAdaptor()
 	d.SetName("TESTME")
-	gobottest.Assert(t, d.Name(), "TESTME")
+	assert.Equal(t, "TESTME", d.Name())
 }
 
 func TestWiichuckDriverOptions(t *testing.T) {
 	d := NewWiichuckDriver(newI2cTestAdaptor(), WithBus(2))
-	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
+	assert.Equal(t, 2, d.GetBusOrDefault(1))
 }

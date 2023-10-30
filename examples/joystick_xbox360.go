@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	joystickAdaptor := joystick.NewAdaptor()
+	joystickAdaptor := joystick.NewAdaptor("0")
 	stick := joystick.NewDriver(joystickAdaptor, joystick.Xbox360)
 
 	work := func() {

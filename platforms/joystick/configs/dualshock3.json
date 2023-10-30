@@ -11,12 +11,20 @@
             "id": 1
         },
         {
-            "name": "right_x",
+            "name": "l2",
             "id": 2
         },
         {
-            "name": "right_y",
+            "name": "right_x",
             "id": 3
+        },
+        {
+            "name": "right_y",
+            "id": 4
+        },
+        {
+            "name": "r2",
+            "id": 5
         }
     ],
     "buttons": [

@@ -7,8 +7,8 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Adaptor = (*Adaptor)(nil)
@@ -57,24 +57,24 @@ func initTestNeuroskyAdaptor() *Adaptor {
 
 func TestNeuroskyAdaptor(t *testing.T) {
 	a := NewAdaptor("/dev/null")
-	gobottest.Assert(t, a.Port(), "/dev/null")
+	assert.Equal(t, "/dev/null", a.Port())
 }
 
 func TestNeuroskyAdaptorName(t *testing.T) {
 	a := NewAdaptor("/dev/null")
-	gobottest.Assert(t, strings.HasPrefix(a.Name(), "Neurosky"), true)
+	assert.True(t, strings.HasPrefix(a.Name(), "Neurosky"))
 	a.SetName("NewName")
-	gobottest.Assert(t, a.Name(), "NewName")
+	assert.Equal(t, "NewName", a.Name())
 }
 
 func TestNeuroskyAdaptorConnect(t *testing.T) {
 	a := initTestNeuroskyAdaptor()
-	gobottest.Assert(t, a.Connect(), nil)
+	assert.NoError(t, a.Connect())
 
 	a.connect = func(n *Adaptor) (io.ReadWriteCloser, error) {
 		return nil, errors.New("connection error")
 	}
-	gobottest.Assert(t, a.Connect(), errors.New("connection error"))
+	assert.ErrorContains(t, a.Connect(), "connection error")
 }
 
 func TestNeuroskyAdaptorFinalize(t *testing.T) {
@@ -84,9 +84,9 @@ func TestNeuroskyAdaptorFinalize(t *testing.T) {
 		return rwc, nil
 	}
 	_ = a.Connect()
-	gobottest.Assert(t, a.Finalize(), nil)
+	assert.NoError(t, a.Finalize())
 
 	rwc.CloseError(errors.New("close error"))
 	_ = a.Connect()
-	gobottest.Assert(t, a.Finalize(), errors.New("close error"))
+	assert.ErrorContains(t, a.Finalize(), "close error")
 }

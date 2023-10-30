@@ -5,142 +5,219 @@ import (
 	"testing"
 	"time"
 
-	"github.com/veandco/go-sdl2/sdl"
+	"github.com/stretchr/testify/assert"
+
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
+
+	js "github.com/0xcafed00d/joystick"
 )
 
 var _ gobot.Driver = (*Driver)(nil)
 
-func initTestDriver(config string) *Driver {
-	a := NewAdaptor()
+func initTestDriver(config string) (*Driver, *testJoystick) {
+	a := NewAdaptor("6")
+	tj := &testJoystick{}
 	a.connect = func(j *Adaptor) (err error) {
-		j.joystick = &testJoystick{}
+		j.joystick = tj
 		return nil
 	}
 	_ = a.Connect()
 	d := NewDriver(a, config)
-	d.poll = func() sdl.Event {
-		return nil
-	}
-	return d
+	return d, tj
 }
 
 func TestJoystickDriverName(t *testing.T) {
-	d := initTestDriver("./configs/xbox360_power_a_mini_proex.json")
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Joystick"), true)
+	d, _ := initTestDriver("./configs/dualshock3.json")
+	assert.True(t, strings.HasPrefix(d.Name(), "Joystick"))
 	d.SetName("NewName")
-	gobottest.Assert(t, d.Name(), "NewName")
+	assert.Equal(t, d.Name(), "NewName")
 }
 
 func TestDriverStart(t *testing.T) {
-	d := initTestDriver("./configs/xbox360_power_a_mini_proex.json")
+	d, _ := initTestDriver("./configs/dualshock3.json")
 	d.interval = 1 * time.Millisecond
-	gobottest.Assert(t, d.Start(), nil)
+	assert.NoError(t, d.Start())
 	time.Sleep(2 * time.Millisecond)
 }
 
 func TestDriverHalt(t *testing.T) {
-	d := initTestDriver("./configs/xbox360_power_a_mini_proex.json")
+	d, _ := initTestDriver("./configs/dualshock3.json")
 	go func() {
 		<-d.halt
 	}()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.NoError(t, d.Halt())
 }
 
-func TestDriverHandleEvent(t *testing.T) {
+func TestDriverHandleEventDS3(t *testing.T) {
 	sem := make(chan bool)
-	d := initTestDriver("./configs/xbox360_power_a_mini_proex.json")
-	_ = d.Start()
+	d, tj := initTestDriver("dualshock3")
+	tj.axisCount = 6
+	tj.buttonCount = 17
+
+	if err := d.initConfig(); err != nil {
+		t.Errorf("initConfig() error: %v", err)
+	}
+
+	d.initEvents()
 
 	// left x stick
 	_ = d.On(d.Event("left_x"), func(data interface{}) {
-		gobottest.Assert(t, int16(100), data.(int16))
+		assert.Equal(t, int(255), data.(int))
 		sem <- true
 	})
-	_ = d.handleEvent(&sdl.JoyAxisEvent{
-		Which: 0,
-		Axis:  0,
-		Value: 100,
+	_ = d.handleAxes(js.State{
+		AxisData: []int{255, 0, 0, 0, 0, 0},
+		Buttons:  0,
 	})
 	select {
 	case <-sem:
-	case <-time.After(10 * time.Second):
+	case <-time.After(1 * time.Second):
 		t.Errorf("Button Event \"left_x\" was not published")
 	}
 
-	// x button press
-	_ = d.On(d.Event("x_press"), func(data interface{}) {
+	// square button press
+	_ = d.On(d.Event("square_press"), func(data interface{}) {
 		sem <- true
 	})
-	_ = d.handleEvent(&sdl.JoyButtonEvent{
-		Which:  0,
-		Button: 2,
-		State:  1,
+	_ = d.handleButtons(js.State{
+		AxisData: []int{255, 0, 0, 0, 0, 0},
+		Buttons:  1 << d.findID("square", d.config.Buttons),
 	})
 	select {
 	case <-sem:
-	case <-time.After(10 * time.Second):
-		t.Errorf("Button Event \"x_press\" was not published")
+	case <-time.After(1 * time.Second):
+		t.Errorf("Button Event \"square_press\" was not published")
 	}
 
-	// x button  release
-	_ = d.On(d.Event("x_release"), func(data interface{}) {
+	// square button release
+	_ = d.On(d.Event("square_release"), func(data interface{}) {
 		sem <- true
 	})
-	_ = d.handleEvent(&sdl.JoyButtonEvent{
-		Which:  0,
-		Button: 2,
-		State:  0,
+	_ = d.handleButtons(js.State{
+		AxisData: []int{255, 0, 0, 0, 0, 0},
+		Buttons:  0,
 	})
 	select {
 	case <-sem:
-	case <-time.After(10 * time.Second):
-		t.Errorf("Button Event \"x_release\" was not published")
+	case <-time.After(1 * time.Second):
+		t.Errorf("Button Event \"square_release\" was not published")
+	}
+}
+
+func TestDriverHandleEventJSONDS3(t *testing.T) {
+	sem := make(chan bool)
+	d, tj := initTestDriver("./configs/dualshock3.json")
+	tj.axisCount = 6
+	tj.buttonCount = 17
+
+	if err := d.initConfig(); err != nil {
+		t.Errorf("initConfig() error: %v", err)
 	}
 
-	// down button press
-	_ = d.On(d.Event("down_press"), func(data interface{}) {
+	d.initEvents()
+
+	// left x stick
+	_ = d.On(d.Event("left_x"), func(data interface{}) {
+		assert.Equal(t, int(255), data.(int))
 		sem <- true
 	})
-	_ = d.handleEvent(&sdl.JoyHatEvent{
-		Which: 0,
-		Hat:   0,
-		Value: 4,
+	_ = d.handleAxes(js.State{
+		AxisData: []int{255, 0, 0, 0, 0, 0},
+		Buttons:  0,
 	})
 	select {
 	case <-sem:
-	case <-time.After(10 * time.Second):
-		t.Errorf("Hat Event \"down\" was not published")
+	case <-time.After(1 * time.Second):
+		t.Errorf("Button Event \"left_x\" was not published")
 	}
 
-	err := d.handleEvent(&sdl.JoyHatEvent{
-		Which: 0,
-		Hat:   99,
-		Value: 4,
+	// square button press
+	_ = d.On(d.Event("square_press"), func(data interface{}) {
+		sem <- true
 	})
-
-	gobottest.Assert(t, err.Error(), "Unknown Hat: 99 4")
-
-	err = d.handleEvent(&sdl.JoyAxisEvent{
-		Which: 0,
-		Axis:  99,
-		Value: 100,
+	_ = d.handleButtons(js.State{
+		AxisData: []int{255, 0, 0, 0, 0, 0},
+		Buttons:  1 << d.findID("square", d.config.Buttons),
 	})
+	select {
+	case <-sem:
+	case <-time.After(1 * time.Second):
+		t.Errorf("Button Event \"square_press\" was not published")
+	}
 
-	gobottest.Assert(t, err.Error(), "Unknown Axis: 99")
-
-	err = d.handleEvent(&sdl.JoyButtonEvent{
-		Which:  0,
-		Button: 99,
-		State:  0,
+	// square button release
+	_ = d.On(d.Event("square_release"), func(data interface{}) {
+		sem <- true
 	})
+	_ = d.handleButtons(js.State{
+		AxisData: []int{255, 0, 0, 0, 0, 0},
+		Buttons:  0,
+	})
+	select {
+	case <-sem:
+	case <-time.After(1 * time.Second):
+		t.Errorf("Button Event \"square_release\" was not published")
+	}
+}
 
-	gobottest.Assert(t, err.Error(), "Unknown Button: 99")
+func TestDriverHandleEventDS4(t *testing.T) {
+	sem := make(chan bool)
+	d, tj := initTestDriver("dualshock4")
+	tj.axisCount = 6
+	tj.buttonCount = 17
+
+	if err := d.initConfig(); err != nil {
+		t.Errorf("initConfig() error: %v", err)
+	}
+
+	d.initEvents()
+
+	// left x stick
+	_ = d.On(d.Event("left_x"), func(data interface{}) {
+		assert.Equal(t, int(255), data.(int))
+		sem <- true
+	})
+	_ = d.handleAxes(js.State{
+		AxisData: []int{255, 0, 0, 0, 0, 0},
+		Buttons:  0,
+	})
+	select {
+	case <-sem:
+	case <-time.After(1 * time.Second):
+		t.Errorf("Button Event \"left_x\" was not published")
+	}
+
+	// square button press
+	_ = d.On(d.Event("square_press"), func(data interface{}) {
+		sem <- true
+	})
+	_ = d.handleButtons(js.State{
+		AxisData: []int{255, 0, 0, 0, 0, 0},
+		Buttons:  1 << d.findID("square", d.config.Buttons),
+	})
+	select {
+	case <-sem:
+	case <-time.After(1 * time.Second):
+		t.Errorf("Button Event \"square_press\" was not published")
+	}
+
+	// square button release
+	_ = d.On(d.Event("square_release"), func(data interface{}) {
+		sem <- true
+	})
+	_ = d.handleButtons(js.State{
+		AxisData: []int{255, 0, 0, 0, 0, 0},
+		Buttons:  0,
+	})
+	select {
+	case <-sem:
+	case <-time.After(1 * time.Second):
+		t.Errorf("Button Event \"square_release\" was not published")
+	}
 }
 
 func TestDriverInvalidConfig(t *testing.T) {
-	d := initTestDriver("./configs/doesnotexist")
+	d, _ := initTestDriver("./configs/doesnotexist")
 	err := d.Start()
-	gobottest.Assert(t, strings.Contains(err.Error(), "open ./configs/doesnotexist: no such file or directory"), true)
+	assert.Contains(t, err.Error(), "loadfile error")
 }

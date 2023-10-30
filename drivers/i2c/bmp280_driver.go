@@ -13,9 +13,11 @@ const bmp280Debug = true
 // this is also true for bme280 (which using this address as well)
 const bmp280DefaultAddress = 0x77
 
-type BMP280PressureOversampling uint8
-type BMP280TemperatureOversampling uint8
-type BMP280IIRFilter uint8
+type (
+	BMP280PressureOversampling    uint8
+	BMP280TemperatureOversampling uint8
+	BMP280IIRFilter               uint8
+)
 
 const (
 	bmp280RegCalib00      = 0x88 // 12 x 16 bit calibration data (T1..T3, P1..P9)
@@ -245,7 +247,7 @@ func (d *BMP280Driver) initialization() error {
 		return err
 	}
 
-	ctrlReg := uint8(d.ctrlPwrMode) | uint8(d.ctrlPressOversamp)<<2 | uint8(d.ctrlTempOversamp)<<5
+	ctrlReg := d.ctrlPwrMode | uint8(d.ctrlPressOversamp)<<2 | uint8(d.ctrlTempOversamp)<<5
 	if err := d.connection.WriteByteData(bmp280RegCtrl, ctrlReg); err != nil {
 		return err
 	}

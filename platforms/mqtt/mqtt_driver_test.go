@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*Driver)(nil)
@@ -13,25 +13,25 @@ var _ gobot.Driver = (*Driver)(nil)
 func TestMqttDriver(t *testing.T) {
 	d := NewDriver(initTestMqttAdaptor(), "/test/topic")
 
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "MQTT"), true)
-	gobottest.Assert(t, strings.HasPrefix(d.Connection().Name(), "MQTT"), true)
+	assert.True(t, strings.HasPrefix(d.Name(), "MQTT"))
+	assert.True(t, strings.HasPrefix(d.Connection().Name(), "MQTT"))
 
-	gobottest.Assert(t, d.Start(), nil)
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.Halt())
 }
 
 func TestMqttDriverName(t *testing.T) {
 	d := NewDriver(initTestMqttAdaptor(), "/test/topic")
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "MQTT"), true)
+	assert.True(t, strings.HasPrefix(d.Name(), "MQTT"))
 	d.SetName("NewName")
-	gobottest.Assert(t, d.Name(), "NewName")
+	assert.Equal(t, "NewName", d.Name())
 }
 
 func TestMqttDriverTopic(t *testing.T) {
 	d := NewDriver(initTestMqttAdaptor(), "/test/topic")
-	gobottest.Assert(t, d.Topic(), "/test/topic")
+	assert.Equal(t, "/test/topic", d.Topic())
 	d.SetTopic("/test/newtopic")
-	gobottest.Assert(t, d.Topic(), "/test/newtopic")
+	assert.Equal(t, "/test/newtopic", d.Topic())
 }
 
 func TestMqttDriverPublish(t *testing.T) {
@@ -40,7 +40,7 @@ func TestMqttDriverPublish(t *testing.T) {
 	_ = a.Connect()
 	_ = d.Start()
 	defer func() { _ = d.Halt() }()
-	gobottest.Assert(t, d.Publish([]byte{0x01, 0x02, 0x03}), true)
+	assert.True(t, d.Publish([]byte{0x01, 0x02, 0x03}))
 }
 
 func TestMqttDriverPublishError(t *testing.T) {
@@ -48,5 +48,5 @@ func TestMqttDriverPublishError(t *testing.T) {
 	d := NewDriver(a, "/test/topic")
 	_ = d.Start()
 	defer func() { _ = d.Halt() }()
-	gobottest.Assert(t, d.Publish([]byte{0x01, 0x02, 0x03}), false)
+	assert.False(t, d.Publish([]byte{0x01, 0x02, 0x03}))
 }

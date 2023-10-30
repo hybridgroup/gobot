@@ -3,7 +3,7 @@ package system
 import (
 	"testing"
 
-	"gobot.io/x/gobot/v2/gobottest"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewAccesser(t *testing.T) {
@@ -13,10 +13,10 @@ func TestNewAccesser(t *testing.T) {
 	nativeSys := a.sys.(*nativeSyscall)
 	nativeFsSys := a.fs.(*nativeFilesystem)
 	perphioSpi := a.spiAccess.(*periphioSpiAccess)
-	gobottest.Refute(t, a, nil)
-	gobottest.Refute(t, nativeSys, nil)
-	gobottest.Refute(t, nativeFsSys, nil)
-	gobottest.Refute(t, perphioSpi, nil)
+	assert.NotNil(t, a)
+	assert.NotNil(t, nativeSys)
+	assert.NotNil(t, nativeFsSys)
+	assert.NotNil(t, perphioSpi)
 }
 
 func TestNewAccesser_NewSpiDevice(t *testing.T) {
@@ -34,17 +34,17 @@ func TestNewAccesser_NewSpiDevice(t *testing.T) {
 	// act
 	con, err := a.NewSpiDevice(busNum, chipNum, mode, bits, maxSpeed)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Refute(t, con, nil)
-	gobottest.Assert(t, spi.busNum, busNum)
-	gobottest.Assert(t, spi.chipNum, chipNum)
-	gobottest.Assert(t, spi.mode, mode)
-	gobottest.Assert(t, spi.bits, bits)
-	gobottest.Assert(t, spi.maxSpeed, maxSpeed)
+	assert.NoError(t, err)
+	assert.NotNil(t, con)
+	assert.Equal(t, busNum, spi.busNum)
+	assert.Equal(t, chipNum, spi.chipNum)
+	assert.Equal(t, mode, spi.mode)
+	assert.Equal(t, bits, spi.bits)
+	assert.Equal(t, maxSpeed, spi.maxSpeed)
 }
 
 func TestNewAccesser_IsSysfsDigitalPinAccess(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		gpiodAccesser bool
 		wantSys       bool
 	}{
@@ -75,17 +75,17 @@ func TestNewAccesser_IsSysfsDigitalPinAccess(t *testing.T) {
 			// act
 			got := a.IsSysfsDigitalPinAccess()
 			// assert
-			gobottest.Refute(t, a, nil)
+			assert.NotNil(t, a)
 			if tc.wantSys {
-				gobottest.Assert(t, got, true)
+				assert.True(t, got)
 				dpaSys := a.digitalPinAccess.(*sysfsDigitalPinAccess)
-				gobottest.Refute(t, dpaSys, nil)
-				gobottest.Assert(t, dpaSys.fs, a.fs.(*nativeFilesystem))
+				assert.NotNil(t, dpaSys)
+				assert.Equal(t, a.fs.(*nativeFilesystem), dpaSys.fs)
 			} else {
-				gobottest.Assert(t, got, false)
+				assert.False(t, got)
 				dpaGpiod := a.digitalPinAccess.(*gpiodDigitalPinAccess)
-				gobottest.Refute(t, dpaGpiod, nil)
-				gobottest.Assert(t, dpaGpiod.fs, a.fs.(*nativeFilesystem))
+				assert.NotNil(t, dpaGpiod)
+				assert.Equal(t, a.fs.(*nativeFilesystem), dpaGpiod.fs)
 			}
 		})
 	}

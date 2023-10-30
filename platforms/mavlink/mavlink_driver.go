@@ -25,8 +25,7 @@ type Driver struct {
 	gobot.Eventer
 }
 
-type MavlinkInterface interface {
-}
+type MavlinkInterface interface{}
 
 // NewDriver creates a new mavlink driver.
 //

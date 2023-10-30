@@ -34,7 +34,6 @@ var (
 // LED's: the output pins are wired to the cathode of a LED, the anode is wired with a resistor (70-130Ohm for 20mA) to VCC
 // Expected behavior: always one LED is on, the other in opposite state, if button is pressed for >2 seconds the state changes
 func main() {
-
 	board := raspi.NewAdaptor()
 
 	work := func() {

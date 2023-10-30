@@ -40,7 +40,7 @@ const (
 	th02Reg_Config  = 0x03
 	th02Reg_ID      = 0x11
 
-	//th02Status_ReadyBit = 0x01 // D0 is /RDY
+	// th02Status_ReadyBit = 0x01 // D0 is /RDY
 
 	th02Config_StartBit = 0x01 // D0 is START
 	th02Config_HeatBit  = 0x02 // D1 is HEAT
@@ -50,8 +50,8 @@ const (
 
 // Accuracy constants for the TH02 devices (deprecated, use WithFastMode() instead)
 const (
-	TH02HighAccuracy = 0 //High Accuracy (T: 14 bit, H: 12 bit), normal (35 ms)
-	TH02LowAccuracy  = 1 //Lower Accuracy (T: 13 bit, H: 11 bit), fast (18 ms)
+	TH02HighAccuracy = 0 // High Accuracy (T: 14 bit, H: 12 bit), normal (35 ms)
+	TH02LowAccuracy  = 1 // Lower Accuracy (T: 13 bit, H: 11 bit), fast (18 ms)
 )
 
 // TH02Driver is a Driver for a TH02 humidity and temperature sensor
@@ -123,7 +123,7 @@ func (s *TH02Driver) SerialNumber() (uint8, error) {
 	defer s.mutex.Unlock()
 
 	ret, err := s.connection.ReadByteData(th02Reg_ID)
-	return uint8(ret) >> 4, err
+	return ret >> 4, err
 }
 
 // FastMode returns true if the fast mode is enabled in the device
@@ -185,7 +185,6 @@ func (s *TH02Driver) Sample() (temperature float32, relhumidity float32, _ error
 	}
 
 	return temperature, relhumidity, nil
-
 }
 
 func (s *TH02Driver) createConfig(measurement bool, readTemp bool) byte {

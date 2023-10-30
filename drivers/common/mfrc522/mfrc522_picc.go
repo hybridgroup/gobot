@@ -36,16 +36,20 @@ const (
 	piccCommandMFRegTRANSFER  = 0xB0 // Writes the contents of the internal data register to a block.
 	// The commands used for MIFARE Ultralight (from http://www.nxp.com/documents/dataRegsheet/MF0ICU1.pdf, Section 8.6)
 	// The piccCommandMFRegREAD and piccCommandMFRegWRITE can also be used for MIFARE Ultralight.
-	//piccCommandULRegWRITE = 0xA2 // Writes one 4 byte page to the PICC.
+	// piccCommandULRegWRITE = 0xA2 // Writes one 4 byte page to the PICC.
 )
 
 const piccReadWriteAuthBlock = uint8(11)
 
-var piccKey = []byte{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}
-var piccUserBlockAddresses = []byte{8, 9, 10}
+var (
+	piccKey                = []byte{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}
+	piccUserBlockAddresses = []byte{8, 9, 10}
+)
 
-var piccCardFromSak = map[uint8]string{0x08: "Classic 1K, Plus 2K-SE-1K(SL1)", 0x18: "Classic 4K, Plus 4K(SL1)",
-	0x10: "Plus 2K(SL2)", 0x11: "Plus 4K(SL2)", 0x20: "Plus 2K-SE-1K(SL3), Plus 4K(SL3)"}
+var piccCardFromSak = map[uint8]string{
+	0x08: "Classic 1K, Plus 2K-SE-1K(SL1)", 0x18: "Classic 4K, Plus 4K(SL1)",
+	0x10: "Plus 2K(SL2)", 0x11: "Plus 4K(SL2)", 0x20: "Plus 2K-SE-1K(SL3), Plus 4K(SL3)",
+}
 
 // IsCardPresent is used to poll for a card in range. After an successful request, the card is halted.
 func (d *MFRC522Common) IsCardPresent() error {

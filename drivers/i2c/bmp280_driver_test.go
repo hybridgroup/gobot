@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
@@ -25,22 +25,22 @@ func TestNewBMP280Driver(t *testing.T) {
 	if !ok {
 		t.Errorf("NewBMP280Driver() should have returned a *BMP280Driver")
 	}
-	gobottest.Refute(t, d.Driver, nil)
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "BMP280"), true)
-	gobottest.Assert(t, d.defaultAddress, 0x77)
-	gobottest.Assert(t, d.ctrlPwrMode, uint8(0x03))
-	gobottest.Assert(t, d.ctrlPressOversamp, BMP280PressureOversampling(0x05))
-	gobottest.Assert(t, d.ctrlTempOversamp, BMP280TemperatureOversampling(0x01))
-	gobottest.Assert(t, d.confFilter, BMP280IIRFilter(0x00))
-	gobottest.Refute(t, d.calCoeffs, nil)
+	assert.NotNil(t, d.Driver)
+	assert.True(t, strings.HasPrefix(d.Name(), "BMP280"))
+	assert.Equal(t, 0x77, d.defaultAddress)
+	assert.Equal(t, uint8(0x03), d.ctrlPwrMode)
+	assert.Equal(t, BMP280PressureOversampling(0x05), d.ctrlPressOversamp)
+	assert.Equal(t, BMP280TemperatureOversampling(0x01), d.ctrlTempOversamp)
+	assert.Equal(t, BMP280IIRFilter(0x00), d.confFilter)
+	assert.NotNil(t, d.calCoeffs)
 }
 
 func TestBMP280Options(t *testing.T) {
 	// This is a general test, that options are applied in constructor by using the common WithBus() option and
 	// least one of this driver. Further tests for options can also be done by call of "WithOption(val)(d)".
 	d := NewBMP280Driver(newI2cTestAdaptor(), WithBus(2), WithBMP280PressureOversampling(0x04))
-	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
-	gobottest.Assert(t, d.ctrlPressOversamp, BMP280PressureOversampling(0x04))
+	assert.Equal(t, 2, d.GetBusOrDefault(1))
+	assert.Equal(t, BMP280PressureOversampling(0x04), d.ctrlPressOversamp)
 }
 
 func TestWithBMP280TemperatureOversampling(t *testing.T) {
@@ -53,8 +53,8 @@ func TestWithBMP280TemperatureOversampling(t *testing.T) {
 	// act
 	WithBMP280TemperatureOversampling(setVal)(d)
 	// assert
-	gobottest.Assert(t, d.ctrlTempOversamp, setVal)
-	gobottest.Assert(t, len(a.written), 0)
+	assert.Equal(t, setVal, d.ctrlTempOversamp)
+	assert.Equal(t, 0, len(a.written))
 }
 
 func TestWithBMP280IIRFilter(t *testing.T) {
@@ -67,8 +67,8 @@ func TestWithBMP280IIRFilter(t *testing.T) {
 	// act
 	WithBMP280IIRFilter(setVal)(d)
 	// assert
-	gobottest.Assert(t, d.confFilter, setVal)
-	gobottest.Assert(t, len(a.written), 0)
+	assert.Equal(t, setVal, d.confFilter)
+	assert.Equal(t, 0, len(a.written))
 }
 
 func TestBMP280Measurements(t *testing.T) {
@@ -88,14 +88,14 @@ func TestBMP280Measurements(t *testing.T) {
 	}
 	_ = d.Start()
 	temp, err := d.Temperature()
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, temp, float32(25.014637))
+	assert.NoError(t, err)
+	assert.Equal(t, float32(25.014637), temp)
 	pressure, err := d.Pressure()
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, pressure, float32(99545.414))
+	assert.NoError(t, err)
+	assert.Equal(t, float32(99545.414), pressure)
 	alt, err := d.Altitude()
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, alt, float32(149.22713))
+	assert.NoError(t, err)
+	assert.Equal(t, float32(149.22713), alt)
 }
 
 func TestBMP280TemperatureWriteError(t *testing.T) {
@@ -106,8 +106,8 @@ func TestBMP280TemperatureWriteError(t *testing.T) {
 		return 0, errors.New("write error")
 	}
 	temp, err := d.Temperature()
-	gobottest.Assert(t, err, errors.New("write error"))
-	gobottest.Assert(t, temp, float32(0.0))
+	assert.ErrorContains(t, err, "write error")
+	assert.Equal(t, float32(0.0), temp)
 }
 
 func TestBMP280TemperatureReadError(t *testing.T) {
@@ -118,8 +118,8 @@ func TestBMP280TemperatureReadError(t *testing.T) {
 		return 0, errors.New("read error")
 	}
 	temp, err := d.Temperature()
-	gobottest.Assert(t, err, errors.New("read error"))
-	gobottest.Assert(t, temp, float32(0.0))
+	assert.ErrorContains(t, err, "read error")
+	assert.Equal(t, float32(0.0), temp)
 }
 
 func TestBMP280PressureWriteError(t *testing.T) {
@@ -130,8 +130,8 @@ func TestBMP280PressureWriteError(t *testing.T) {
 		return 0, errors.New("write error")
 	}
 	press, err := d.Pressure()
-	gobottest.Assert(t, err, errors.New("write error"))
-	gobottest.Assert(t, press, float32(0.0))
+	assert.ErrorContains(t, err, "write error")
+	assert.Equal(t, float32(0.0), press)
 }
 
 func TestBMP280PressureReadError(t *testing.T) {
@@ -142,8 +142,8 @@ func TestBMP280PressureReadError(t *testing.T) {
 		return 0, errors.New("read error")
 	}
 	press, err := d.Pressure()
-	gobottest.Assert(t, err, errors.New("read error"))
-	gobottest.Assert(t, press, float32(0.0))
+	assert.ErrorContains(t, err, "read error")
+	assert.Equal(t, float32(0.0), press)
 }
 
 func TestBMP280_initialization(t *testing.T) {
@@ -188,24 +188,24 @@ func TestBMP280_initialization(t *testing.T) {
 	// act, assert - initialization() must be called on Start()
 	err := d.Start()
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, numCallsRead, 1)
-	gobottest.Assert(t, len(a.written), 5)
-	gobottest.Assert(t, a.written[0], wantCalibReg)
-	gobottest.Assert(t, a.written[1], wantCtrlReg)
-	gobottest.Assert(t, a.written[2], wantCtrlRegVal)
-	gobottest.Assert(t, a.written[3], wantConfReg)
-	gobottest.Assert(t, a.written[4], wantConfRegVal)
-	gobottest.Assert(t, d.calCoeffs.t1, uint16(27504))
-	gobottest.Assert(t, d.calCoeffs.t2, int16(26435))
-	gobottest.Assert(t, d.calCoeffs.t3, int16(-1000))
-	gobottest.Assert(t, d.calCoeffs.p1, uint16(36477))
-	gobottest.Assert(t, d.calCoeffs.p2, int16(-10685))
-	gobottest.Assert(t, d.calCoeffs.p3, int16(3024))
-	gobottest.Assert(t, d.calCoeffs.p4, int16(2855))
-	gobottest.Assert(t, d.calCoeffs.p5, int16(140))
-	gobottest.Assert(t, d.calCoeffs.p6, int16(-7))
-	gobottest.Assert(t, d.calCoeffs.p7, int16(15500))
-	gobottest.Assert(t, d.calCoeffs.p8, int16(-14600))
-	gobottest.Assert(t, d.calCoeffs.p9, int16(6000))
+	assert.NoError(t, err)
+	assert.Equal(t, 1, numCallsRead)
+	assert.Equal(t, 5, len(a.written))
+	assert.Equal(t, wantCalibReg, a.written[0])
+	assert.Equal(t, wantCtrlReg, a.written[1])
+	assert.Equal(t, wantCtrlRegVal, a.written[2])
+	assert.Equal(t, wantConfReg, a.written[3])
+	assert.Equal(t, wantConfRegVal, a.written[4])
+	assert.Equal(t, uint16(27504), d.calCoeffs.t1)
+	assert.Equal(t, int16(26435), d.calCoeffs.t2)
+	assert.Equal(t, int16(-1000), d.calCoeffs.t3)
+	assert.Equal(t, uint16(36477), d.calCoeffs.p1)
+	assert.Equal(t, int16(-10685), d.calCoeffs.p2)
+	assert.Equal(t, int16(3024), d.calCoeffs.p3)
+	assert.Equal(t, int16(2855), d.calCoeffs.p4)
+	assert.Equal(t, int16(140), d.calCoeffs.p5)
+	assert.Equal(t, int16(-7), d.calCoeffs.p6)
+	assert.Equal(t, int16(15500), d.calCoeffs.p7)
+	assert.Equal(t, int16(-14600), d.calCoeffs.p8)
+	assert.Equal(t, int16(6000), d.calCoeffs.p9)
 }

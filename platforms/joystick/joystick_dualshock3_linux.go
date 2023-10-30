@@ -1,8 +1,8 @@
 package joystick
 
-var dualshock4Config = joystickConfig{
-	Name: "Dualshock4 Controller",
-	GUID: "2222",
+var dualshock3Config = joystickConfig{
+	Name: "Dualshock3 Controller",
+	GUID: "1111",
 	Axis: []pair{
 		{
 			Name: "left_x",
@@ -13,16 +13,16 @@ var dualshock4Config = joystickConfig{
 			ID:   1,
 		},
 		{
+			Name: "l2",
+			ID:   2,
+		},
+		{
 			Name: "right_x",
 			ID:   3,
 		},
 		{
 			Name: "right_y",
 			ID:   4,
-		},
-		{
-			Name: "l2",
-			ID:   2,
 		},
 		{
 			Name: "r2",
@@ -47,6 +47,22 @@ var dualshock4Config = joystickConfig{
 			ID:   0,
 		},
 		{
+			Name: "up",
+			ID:   13,
+		},
+		{
+			Name: "down",
+			ID:   14,
+		},
+		{
+			Name: "left",
+			ID:   15,
+		},
+		{
+			Name: "right",
+			ID:   16,
+		},
+		{
 			Name: "l1",
 			ID:   4,
 		},
@@ -63,43 +79,16 @@ var dualshock4Config = joystickConfig{
 			ID:   7,
 		},
 		{
-			Name: "share",
-			ID:   8,
+			Name: "start",
+			ID:   9,
 		},
 		{
-			Name: "options",
-			ID:   9,
+			Name: "select",
+			ID:   8,
 		},
 		{
 			Name: "home",
 			ID:   10,
-		},
-	},
-	Hats: []hat{
-		{
-			Hat:  0,
-			Name: "down",
-			ID:   4,
-		},
-		{
-			Hat:  0,
-			Name: "up",
-			ID:   1,
-		},
-		{
-			Hat:  0,
-			Name: "left",
-			ID:   8,
-		},
-		{
-			Hat:  0,
-			Name: "right",
-			ID:   2,
-		},
-		{
-			Hat:  0,
-			Name: "released",
-			ID:   0,
 		},
 	},
 }

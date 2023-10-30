@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/aio"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on spi.Driver, which implements the gobot.Driver
@@ -32,12 +32,12 @@ func TestNewMCP3202Driver(t *testing.T) {
 	if !ok {
 		t.Errorf("NewMCP3202Driver() should have returned a *MCP3202Driver")
 	}
-	gobottest.Refute(t, d.Driver, nil)
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "MCP3202"), true)
+	assert.NotNil(t, d.Driver)
+	assert.True(t, strings.HasPrefix(d.Name(), "MCP3202"))
 }
 
 func TestMCP3202Read(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		chanNum     int
 		simRead     []byte
 		want        int
@@ -73,9 +73,9 @@ func TestMCP3202Read(t *testing.T) {
 			// act
 			got, err := d.Read(tc.chanNum)
 			// assert
-			gobottest.Assert(t, err, tc.wantErr)
-			gobottest.Assert(t, got, tc.want)
-			gobottest.Assert(t, a.spi.Written(), tc.wantWritten)
+			assert.Equal(t, tc.wantErr, err)
+			assert.Equal(t, tc.want, got)
+			assert.Equal(t, tc.wantWritten, a.spi.Written())
 		})
 	}
 }
@@ -87,6 +87,6 @@ func TestMCP3202ReadWithError(t *testing.T) {
 	// act
 	got, err := d.Read(0)
 	// assert
-	gobottest.Assert(t, err, fmt.Errorf("error while SPI read in mock"))
-	gobottest.Assert(t, got, 0)
+	assert.ErrorContains(t, err, "error while SPI read in mock")
+	assert.Equal(t, 0, got)
 }

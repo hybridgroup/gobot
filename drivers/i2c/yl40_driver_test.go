@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"gobot.io/x/gobot/v2/gobottest"
+	"github.com/stretchr/testify/assert"
 )
 
 func initTestYL40DriverWithStubbedAdaptor() (*YL40Driver, *i2cTestAdaptor) {
@@ -19,22 +19,22 @@ func initTestYL40DriverWithStubbedAdaptor() (*YL40Driver, *i2cTestAdaptor) {
 func TestYL40Driver(t *testing.T) {
 	// arrange, act
 	yl := NewYL40Driver(newI2cTestAdaptor())
-	//assert
-	gobottest.Refute(t, yl.PCF8591Driver, nil)
-	gobottest.Assert(t, yl.conf.sensors[YL40Bri].interval, time.Duration(0))
-	gobottest.Refute(t, yl.conf.sensors[YL40Bri].scaler, nil)
-	gobottest.Assert(t, yl.conf.sensors[YL40Temp].interval, time.Duration(0))
-	gobottest.Refute(t, yl.conf.sensors[YL40Temp].scaler, nil)
-	gobottest.Assert(t, yl.conf.sensors[YL40AIN2].interval, time.Duration(0))
-	gobottest.Refute(t, yl.conf.sensors[YL40AIN2].scaler, nil)
-	gobottest.Assert(t, yl.conf.sensors[YL40Poti].interval, time.Duration(0))
-	gobottest.Refute(t, yl.conf.sensors[YL40Poti].scaler, nil)
-	gobottest.Refute(t, yl.conf.aOutScaler, nil)
-	gobottest.Refute(t, yl.aBri, nil)
-	gobottest.Refute(t, yl.aTemp, nil)
-	gobottest.Refute(t, yl.aAIN2, nil)
-	gobottest.Refute(t, yl.aPoti, nil)
-	gobottest.Refute(t, yl.aOut, nil)
+	// assert
+	assert.NotNil(t, yl.PCF8591Driver)
+	assert.Equal(t, time.Duration(0), yl.conf.sensors[YL40Bri].interval)
+	assert.NotNil(t, yl.conf.sensors[YL40Bri].scaler)
+	assert.Equal(t, time.Duration(0), yl.conf.sensors[YL40Temp].interval)
+	assert.NotNil(t, yl.conf.sensors[YL40Temp].scaler)
+	assert.Equal(t, time.Duration(0), yl.conf.sensors[YL40AIN2].interval)
+	assert.NotNil(t, yl.conf.sensors[YL40AIN2].scaler)
+	assert.Equal(t, time.Duration(0), yl.conf.sensors[YL40Poti].interval)
+	assert.NotNil(t, yl.conf.sensors[YL40Poti].scaler)
+	assert.NotNil(t, yl.conf.aOutScaler)
+	assert.NotNil(t, yl.aBri)
+	assert.NotNil(t, yl.aTemp)
+	assert.NotNil(t, yl.aAIN2)
+	assert.NotNil(t, yl.aPoti)
+	assert.NotNil(t, yl.aOut)
 }
 
 func TestYL40DriverWithYL40Interval(t *testing.T) {
@@ -46,10 +46,10 @@ func TestYL40DriverWithYL40Interval(t *testing.T) {
 		WithYL40Interval(YL40Poti, 103),
 	)
 	// assert
-	gobottest.Assert(t, yl.conf.sensors[YL40Bri].interval, time.Duration(100))
-	gobottest.Assert(t, yl.conf.sensors[YL40Temp].interval, time.Duration(101))
-	gobottest.Assert(t, yl.conf.sensors[YL40AIN2].interval, time.Duration(102))
-	gobottest.Assert(t, yl.conf.sensors[YL40Poti].interval, time.Duration(103))
+	assert.Equal(t, time.Duration(100), yl.conf.sensors[YL40Bri].interval)
+	assert.Equal(t, time.Duration(101), yl.conf.sensors[YL40Temp].interval)
+	assert.Equal(t, time.Duration(102), yl.conf.sensors[YL40AIN2].interval)
+	assert.Equal(t, time.Duration(103), yl.conf.sensors[YL40Poti].interval)
 }
 
 func TestYL40DriverWithYL40InputScaler(t *testing.T) {
@@ -59,26 +59,26 @@ func TestYL40DriverWithYL40InputScaler(t *testing.T) {
 	f2 := func(input int) (value float64) { return 0.2 }
 	f3 := func(input int) (value float64) { return 0.3 }
 	f4 := func(input int) (value float64) { return 0.4 }
-	//act
+	// act
 	WithYL40InputScaler(YL40Bri, f1)(yl)
 	WithYL40InputScaler(YL40Temp, f2)(yl)
 	WithYL40InputScaler(YL40AIN2, f3)(yl)
 	WithYL40InputScaler(YL40Poti, f4)(yl)
 	// assert
-	gobottest.Assert(t, fEqual(yl.conf.sensors[YL40Bri].scaler, f1), true)
-	gobottest.Assert(t, fEqual(yl.conf.sensors[YL40Temp].scaler, f2), true)
-	gobottest.Assert(t, fEqual(yl.conf.sensors[YL40AIN2].scaler, f3), true)
-	gobottest.Assert(t, fEqual(yl.conf.sensors[YL40Poti].scaler, f4), true)
+	assert.True(t, fEqual(yl.conf.sensors[YL40Bri].scaler, f1))
+	assert.True(t, fEqual(yl.conf.sensors[YL40Temp].scaler, f2))
+	assert.True(t, fEqual(yl.conf.sensors[YL40AIN2].scaler, f3))
+	assert.True(t, fEqual(yl.conf.sensors[YL40Poti].scaler, f4))
 }
 
 func TestYL40DriverWithYL40WithYL40OutputScaler(t *testing.T) {
 	// arrange
 	yl := NewYL40Driver(newI2cTestAdaptor())
 	fo := func(input float64) (value int) { return 123 }
-	//act
+	// act
 	WithYL40OutputScaler(fo)(yl)
 	// assert
-	gobottest.Assert(t, fEqual(yl.conf.aOutScaler, fo), true)
+	assert.True(t, fEqual(yl.conf.aOutScaler, fo))
 }
 
 func TestYL40DriverReadBrightness(t *testing.T) {
@@ -107,13 +107,13 @@ func TestYL40DriverReadBrightness(t *testing.T) {
 	got, err := yl.ReadBrightness()
 	got2, err2 := yl.Brightness()
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, len(adaptor.written), 1)
-	gobottest.Assert(t, adaptor.written[0], ctrlByteOn)
-	gobottest.Assert(t, numCallsRead, 2)
-	gobottest.Assert(t, got, want)
-	gobottest.Assert(t, err2, nil)
-	gobottest.Assert(t, got2, want)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(adaptor.written))
+	assert.Equal(t, ctrlByteOn, adaptor.written[0])
+	assert.Equal(t, 2, numCallsRead)
+	assert.Equal(t, want, got)
+	assert.NoError(t, err2)
+	assert.Equal(t, want, got2)
 }
 
 func TestYL40DriverReadTemperature(t *testing.T) {
@@ -143,13 +143,13 @@ func TestYL40DriverReadTemperature(t *testing.T) {
 	got, err := yl.ReadTemperature()
 	got2, err2 := yl.Temperature()
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, len(adaptor.written), 1)
-	gobottest.Assert(t, adaptor.written[0], ctrlByteOn)
-	gobottest.Assert(t, numCallsRead, 2)
-	gobottest.Assert(t, got, want)
-	gobottest.Assert(t, err2, nil)
-	gobottest.Assert(t, got2, want)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(adaptor.written))
+	assert.Equal(t, ctrlByteOn, adaptor.written[0])
+	assert.Equal(t, 2, numCallsRead)
+	assert.Equal(t, want, got)
+	assert.NoError(t, err2)
+	assert.Equal(t, want, got2)
 }
 
 func TestYL40DriverReadAIN2(t *testing.T) {
@@ -178,13 +178,13 @@ func TestYL40DriverReadAIN2(t *testing.T) {
 	got, err := yl.ReadAIN2()
 	got2, err2 := yl.AIN2()
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, len(adaptor.written), 1)
-	gobottest.Assert(t, adaptor.written[0], ctrlByteOn)
-	gobottest.Assert(t, numCallsRead, 2)
-	gobottest.Assert(t, got, want)
-	gobottest.Assert(t, err2, nil)
-	gobottest.Assert(t, got2, want)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(adaptor.written))
+	assert.Equal(t, ctrlByteOn, adaptor.written[0])
+	assert.Equal(t, 2, numCallsRead)
+	assert.Equal(t, want, got)
+	assert.NoError(t, err2)
+	assert.Equal(t, want, got2)
 }
 
 func TestYL40DriverReadPotentiometer(t *testing.T) {
@@ -213,13 +213,13 @@ func TestYL40DriverReadPotentiometer(t *testing.T) {
 	got, err := yl.ReadPotentiometer()
 	got2, err2 := yl.Potentiometer()
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, len(adaptor.written), 1)
-	gobottest.Assert(t, adaptor.written[0], ctrlByteOn)
-	gobottest.Assert(t, numCallsRead, 2)
-	gobottest.Assert(t, got, want)
-	gobottest.Assert(t, err2, nil)
-	gobottest.Assert(t, got2, want)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(adaptor.written))
+	assert.Equal(t, ctrlByteOn, adaptor.written[0])
+	assert.Equal(t, 2, numCallsRead)
+	assert.Equal(t, want, got)
+	assert.NoError(t, err2)
+	assert.Equal(t, want, got2)
 }
 
 func TestYL40DriverAnalogWrite(t *testing.T) {
@@ -238,20 +238,20 @@ func TestYL40DriverAnalogWrite(t *testing.T) {
 	// act
 	err := pcf.Write(write)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, len(adaptor.written), 2)
-	gobottest.Assert(t, adaptor.written[0], ctrlByteOn)
-	gobottest.Assert(t, adaptor.written[1], want)
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(adaptor.written))
+	assert.Equal(t, ctrlByteOn, adaptor.written[0])
+	assert.Equal(t, want, adaptor.written[1])
 }
 
 func TestYL40DriverStart(t *testing.T) {
 	yl := NewYL40Driver(newI2cTestAdaptor())
-	gobottest.Assert(t, yl.Start(), nil)
+	assert.NoError(t, yl.Start())
 }
 
 func TestYL40DriverHalt(t *testing.T) {
 	yl := NewYL40Driver(newI2cTestAdaptor())
-	gobottest.Assert(t, yl.Halt(), nil)
+	assert.NoError(t, yl.Halt())
 }
 
 func fEqual(want interface{}, got interface{}) bool {

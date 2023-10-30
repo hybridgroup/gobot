@@ -3,7 +3,7 @@ package i2c
 import (
 	"testing"
 
-	"gobot.io/x/gobot/v2/gobottest"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewConfig(t *testing.T) {
@@ -14,8 +14,8 @@ func TestNewConfig(t *testing.T) {
 	if !ok {
 		t.Errorf("NewConfig() should have returned a *i2cConfig")
 	}
-	gobottest.Assert(t, c.bus, BusNotInitialized)
-	gobottest.Assert(t, c.address, AddressNotInitialized)
+	assert.Equal(t, BusNotInitialized, c.bus)
+	assert.Equal(t, AddressNotInitialized, c.address)
 }
 
 func TestWithBus(t *testing.T) {
@@ -24,7 +24,7 @@ func TestWithBus(t *testing.T) {
 	// act
 	c.SetBus(0x23)
 	// assert
-	gobottest.Assert(t, c.(*i2cConfig).bus, 0x23)
+	assert.Equal(t, 0x23, c.(*i2cConfig).bus)
 }
 
 func TestWithAddress(t *testing.T) {
@@ -33,11 +33,11 @@ func TestWithAddress(t *testing.T) {
 	// act
 	c.SetAddress(0x24)
 	// assert
-	gobottest.Assert(t, c.(*i2cConfig).address, 0x24)
+	assert.Equal(t, 0x24, c.(*i2cConfig).address)
 }
 
 func TestGetBusOrDefaultWithBusOption(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		init int
 		bus  int
 		want int
@@ -53,13 +53,13 @@ func TestGetBusOrDefaultWithBusOption(t *testing.T) {
 			WithBus(tc.init)(c)
 			got := c.GetBusOrDefault(tc.bus)
 			// assert
-			gobottest.Assert(t, got, tc.want)
+			assert.Equal(t, tc.want, got)
 		})
 	}
 }
 
 func TestGetAddressOrDefaultWithAddressOption(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		init    int
 		address int
 		want    int
@@ -75,7 +75,7 @@ func TestGetAddressOrDefaultWithAddressOption(t *testing.T) {
 			WithAddress(tc.init)(c)
 			got := c.GetAddressOrDefault(tc.address)
 			// assert
-			gobottest.Assert(t, got, tc.want)
+			assert.Equal(t, tc.want, got)
 		})
 	}
 }

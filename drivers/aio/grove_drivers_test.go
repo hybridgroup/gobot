@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 type DriverAndPinner interface {
@@ -33,8 +33,8 @@ func TestDriverDefaults(t *testing.T) {
 	}
 
 	for _, driver := range drivers {
-		gobottest.Assert(t, driver.Connection(), testAdaptor)
-		gobottest.Assert(t, driver.Pin(), pin)
+		assert.Equal(t, testAdaptor, driver.Connection())
+		assert.Equal(t, pin, driver.Pin())
 	}
 }
 
@@ -51,10 +51,10 @@ func TestAnalogDriverHalt(t *testing.T) {
 
 	for _, driver := range drivers {
 		var callCount int32
-		testAdaptor.TestAdaptorAnalogRead(func() (int, error) {
+		testAdaptor.analogReadFunc = func() (int, error) {
 			atomic.AddInt32(&callCount, 1)
 			return 42, nil
-		})
+		}
 
 		// Start the driver and allow for multiple digital reads
 		_ = driver.Start()
@@ -84,17 +84,16 @@ func TestDriverPublishesError(t *testing.T) {
 	for _, driver := range drivers {
 		sem := make(chan struct{}, 1)
 		// send error
-		returnErr := func() (val int, err error) {
+		testAdaptor.analogReadFunc = func() (val int, err error) {
 			err = errors.New("read error")
 			return
 		}
-		testAdaptor.TestAdaptorAnalogRead(returnErr)
 
-		gobottest.Assert(t, driver.Start(), nil)
+		assert.NoError(t, driver.Start())
 
 		// expect error
 		_ = driver.Once(driver.Event(Error), func(data interface{}) {
-			gobottest.Assert(t, data.(error).Error(), "read error")
+			assert.Equal(t, "read error", data.(error).Error())
 			close(sem)
 		})
 

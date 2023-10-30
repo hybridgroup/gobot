@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Adaptor = (*Adaptor)(nil)
@@ -54,30 +54,30 @@ func initTestMavlinkAdaptor() *Adaptor {
 
 func TestMavlinkAdaptor(t *testing.T) {
 	a := initTestMavlinkAdaptor()
-	gobottest.Assert(t, a.Port(), "/dev/null")
+	assert.Equal(t, "/dev/null", a.Port())
 }
 
 func TestMavlinkAdaptorName(t *testing.T) {
 	a := initTestMavlinkAdaptor()
-	gobottest.Assert(t, strings.HasPrefix(a.Name(), "Mavlink"), true)
+	assert.True(t, strings.HasPrefix(a.Name(), "Mavlink"))
 	a.SetName("NewName")
-	gobottest.Assert(t, a.Name(), "NewName")
+	assert.Equal(t, "NewName", a.Name())
 }
 
 func TestMavlinkAdaptorConnect(t *testing.T) {
 	a := initTestMavlinkAdaptor()
-	gobottest.Assert(t, a.Connect(), nil)
+	assert.NoError(t, a.Connect())
 
 	a.connect = func(port string) (io.ReadWriteCloser, error) { return nil, errors.New("connect error") }
-	gobottest.Assert(t, a.Connect(), errors.New("connect error"))
+	assert.ErrorContains(t, a.Connect(), "connect error")
 }
 
 func TestMavlinkAdaptorFinalize(t *testing.T) {
 	a := initTestMavlinkAdaptor()
-	gobottest.Assert(t, a.Finalize(), nil)
+	assert.NoError(t, a.Finalize())
 
 	testAdaptorClose = func() error {
 		return errors.New("close error")
 	}
-	gobottest.Assert(t, a.Finalize(), errors.New("close error"))
+	assert.ErrorContains(t, a.Finalize(), "close error")
 }

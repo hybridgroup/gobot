@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*BatteryDriver)(nil)
@@ -17,15 +17,15 @@ func initTestBatteryDriver() *BatteryDriver {
 
 func TestBatteryDriver(t *testing.T) {
 	d := initTestBatteryDriver()
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Battery"), true)
+	assert.True(t, strings.HasPrefix(d.Name(), "Battery"))
 	d.SetName("NewName")
-	gobottest.Assert(t, d.Name(), "NewName")
+	assert.Equal(t, "NewName", d.Name())
 }
 
 func TestBatteryDriverStartAndHalt(t *testing.T) {
 	d := initTestBatteryDriver()
-	gobottest.Assert(t, d.Start(), nil)
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.Halt())
 }
 
 func TestBatteryDriverRead(t *testing.T) {
@@ -35,5 +35,5 @@ func TestBatteryDriverRead(t *testing.T) {
 		return []byte{20}, nil
 	})
 
-	gobottest.Assert(t, d.GetBatteryLevel(), uint8(20))
+	assert.Equal(t, uint8(20), d.GetBatteryLevel())
 }

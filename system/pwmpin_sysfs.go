@@ -12,8 +12,8 @@ import (
 const pwmDebug = false
 
 const (
-	pwmPinErrorPattern    = "%s() failed for id %s with %v"
-	pwmPinSetErrorPattern = "%s(%v) failed for id %s with %v"
+	pwmPinErrorPattern    = "%s() failed for id %s with %v"   //nolint:gosec // false positive
+	pwmPinSetErrorPattern = "%s(%v) failed for id %s with %v" //nolint:gosec // false positive
 )
 
 // pwmPinSysFs represents a PWM pin
@@ -221,7 +221,7 @@ func (p *pwmPinSysFs) pwmPolarityPath() string {
 }
 
 func writePwmFile(fs filesystem, path string, data []byte) (int, error) {
-	file, err := fs.openFile(path, os.O_WRONLY, 0644)
+	file, err := fs.openFile(path, os.O_WRONLY, 0o644)
 	defer file.Close() //nolint:staticcheck // for historical reasons
 	if err != nil {
 		return 0, err
@@ -231,7 +231,7 @@ func writePwmFile(fs filesystem, path string, data []byte) (int, error) {
 }
 
 func readPwmFile(fs filesystem, path string) ([]byte, error) {
-	file, err := fs.openFile(path, os.O_RDONLY, 0644)
+	file, err := fs.openFile(path, os.O_RDONLY, 0o644)
 	defer file.Close() //nolint:staticcheck // for historical reasons
 	if err != nil {
 		return make([]byte, 0), err

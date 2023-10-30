@@ -1,3 +1,6 @@
+//go:build !windows
+// +build !windows
+
 package firmata
 
 import (
@@ -8,21 +11,23 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/aio"
 	"gobot.io/x/gobot/v2/drivers/gpio"
-	"gobot.io/x/gobot/v2/gobottest"
 	"gobot.io/x/gobot/v2/platforms/firmata/client"
 )
 
 // make sure that this Adaptor fulfills all required analog and digital interfaces
-var _ gobot.Adaptor = (*Adaptor)(nil)
-var _ gpio.DigitalReader = (*Adaptor)(nil)
-var _ gpio.DigitalWriter = (*Adaptor)(nil)
-var _ aio.AnalogReader = (*Adaptor)(nil)
-var _ gpio.PwmWriter = (*Adaptor)(nil)
-var _ gpio.ServoWriter = (*Adaptor)(nil)
-var _ FirmataAdaptor = (*Adaptor)(nil)
+var (
+	_ gobot.Adaptor      = (*Adaptor)(nil)
+	_ gpio.DigitalReader = (*Adaptor)(nil)
+	_ gpio.DigitalWriter = (*Adaptor)(nil)
+	_ aio.AnalogReader   = (*Adaptor)(nil)
+	_ gpio.PwmWriter     = (*Adaptor)(nil)
+	_ gpio.ServoWriter   = (*Adaptor)(nil)
+	_ FirmataAdaptor     = (*Adaptor)(nil)
+)
 
 type readWriteCloser struct{}
 
@@ -30,15 +35,17 @@ func (readWriteCloser) Write(p []byte) (int, error) {
 	return testWriteData.Write(p)
 }
 
-var testReadData = []byte{}
-var testWriteData = bytes.Buffer{}
+var (
+	testReadData  = []byte{}
+	testWriteData = bytes.Buffer{}
+)
 
 func (readWriteCloser) Read(b []byte) (int, error) {
 	size := len(b)
 	if len(testReadData) < size {
 		size = len(testReadData)
 	}
-	copy(b, []byte(testReadData)[:size])
+	copy(b, testReadData[:size])
 	testReadData = testReadData[size:]
 
 	return size, nil
@@ -69,9 +76,11 @@ func newMockFirmataBoard() *mockFirmataBoard {
 
 // setup mock for GPIO, PWM and servo tests
 func (mockFirmataBoard) Connect(io.ReadWriteCloser) error { return nil }
+
 func (m mockFirmataBoard) Disconnect() error {
 	return m.disconnectError
 }
+
 func (m mockFirmataBoard) Pins() []client.Pin {
 	return m.pins
 }
@@ -100,113 +109,113 @@ func initTestAdaptor() *Adaptor {
 
 func TestNewAdaptor(t *testing.T) {
 	a := NewAdaptor("/dev/null")
-	gobottest.Assert(t, a.Port(), "/dev/null")
+	assert.Equal(t, "/dev/null", a.Port())
 }
 
 func TestAdaptorFinalize(t *testing.T) {
 	a := initTestAdaptor()
-	gobottest.Assert(t, a.Finalize(), nil)
+	assert.NoError(t, a.Finalize())
 
 	a = initTestAdaptor()
 	a.Board.(*mockFirmataBoard).disconnectError = errors.New("close error")
-	gobottest.Assert(t, a.Finalize(), errors.New("close error"))
+	assert.ErrorContains(t, a.Finalize(), "close error")
 }
 
 func TestAdaptorConnect(t *testing.T) {
-	var openSP = func(port string) (io.ReadWriteCloser, error) {
+	openSP := func(port string) (io.ReadWriteCloser, error) {
 		return &readWriteCloser{}, nil
 	}
 	a := NewAdaptor("/dev/null")
 	a.PortOpener = openSP
 	a.Board = newMockFirmataBoard()
-	gobottest.Assert(t, a.Connect(), nil)
+	assert.NoError(t, a.Connect())
 
 	a = NewAdaptor("/dev/null")
 	a.Board = newMockFirmataBoard()
 	a.PortOpener = func(port string) (io.ReadWriteCloser, error) {
 		return nil, errors.New("connect error")
 	}
-	gobottest.Assert(t, a.Connect(), errors.New("connect error"))
+	assert.ErrorContains(t, a.Connect(), "connect error")
 
 	a = NewAdaptor(&readWriteCloser{})
 	a.Board = newMockFirmataBoard()
-	gobottest.Assert(t, a.Connect(), nil)
+	assert.NoError(t, a.Connect())
 
 	a = NewAdaptor("/dev/null")
 	a.Board = nil
-	gobottest.Assert(t, a.Disconnect(), nil)
+	assert.NoError(t, a.Disconnect())
 }
 
 func TestAdaptorServoWrite(t *testing.T) {
 	a := initTestAdaptor()
-	gobottest.Assert(t, a.ServoWrite("1", 50), nil)
+	assert.NoError(t, a.ServoWrite("1", 50))
 }
 
 func TestAdaptorServoWriteBadPin(t *testing.T) {
 	a := initTestAdaptor()
-	gobottest.Refute(t, a.ServoWrite("xyz", 50), nil)
+	assert.NotNil(t, a.ServoWrite("xyz", 50))
 }
 
 func TestAdaptorPwmWrite(t *testing.T) {
 	a := initTestAdaptor()
-	gobottest.Assert(t, a.PwmWrite("1", 50), nil)
+	assert.NoError(t, a.PwmWrite("1", 50))
 }
 
 func TestAdaptorPwmWriteBadPin(t *testing.T) {
 	a := initTestAdaptor()
-	gobottest.Refute(t, a.PwmWrite("xyz", 50), nil)
+	assert.NotNil(t, a.PwmWrite("xyz", 50))
 }
 
 func TestAdaptorDigitalWrite(t *testing.T) {
 	a := initTestAdaptor()
-	gobottest.Assert(t, a.DigitalWrite("1", 1), nil)
+	assert.NoError(t, a.DigitalWrite("1", 1))
 }
 
 func TestAdaptorDigitalWriteBadPin(t *testing.T) {
 	a := initTestAdaptor()
-	gobottest.Refute(t, a.DigitalWrite("xyz", 50), nil)
+	assert.NotNil(t, a.DigitalWrite("xyz", 50))
 }
 
 func TestAdaptorDigitalRead(t *testing.T) {
 	a := initTestAdaptor()
 	val, err := a.DigitalRead("1")
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, val, 1)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, val)
 
 	val, err = a.DigitalRead("0")
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, val, 0)
+	assert.NoError(t, err)
+	assert.Equal(t, 0, val)
 }
 
 func TestAdaptorDigitalReadBadPin(t *testing.T) {
 	a := initTestAdaptor()
 	_, err := a.DigitalRead("xyz")
-	gobottest.Refute(t, err, nil)
+	assert.NotNil(t, err)
 }
 
 func TestAdaptorAnalogRead(t *testing.T) {
 	a := initTestAdaptor()
 	val, err := a.AnalogRead("1")
-	gobottest.Assert(t, val, 133)
-	gobottest.Assert(t, err, nil)
+	assert.Equal(t, 133, val)
+	assert.NoError(t, err)
 
 	val, err = a.AnalogRead("0")
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, val, 0)
+	assert.NoError(t, err)
+	assert.Equal(t, 0, val)
 }
 
 func TestAdaptorAnalogReadBadPin(t *testing.T) {
 	a := initTestAdaptor()
 	_, err := a.AnalogRead("xyz")
-	gobottest.Refute(t, err, nil)
+	assert.NotNil(t, err)
 }
 
 func TestServoConfig(t *testing.T) {
 	a := initTestAdaptor()
 	err := a.ServoConfig("9", 0, 0)
-	gobottest.Assert(t, err, nil)
+	assert.NoError(t, err)
 
 	// test atoi error
 	err = a.ServoConfig("a", 0, 0)
-	gobottest.Assert(t, true, strings.Contains(fmt.Sprintf("%v", err), "invalid syntax"))
+	assert.Equal(t, strings.Contains(fmt.Sprintf("%v", err), "invalid syntax"), true)
 }

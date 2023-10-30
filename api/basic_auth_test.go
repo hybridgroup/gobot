@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"gobot.io/x/gobot/v2/gobottest"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestBasicAuth(t *testing.T) {
@@ -17,11 +17,11 @@ func TestBasicAuth(t *testing.T) {
 	request.SetBasicAuth("admin", "password")
 	response := httptest.NewRecorder()
 	a.ServeHTTP(response, request)
-	gobottest.Assert(t, response.Code, 200)
+	assert.Equal(t, 200, response.Code)
 
 	request, _ = http.NewRequest("GET", "/api/", nil)
 	request.SetBasicAuth("admin", "wrongPassword")
 	response = httptest.NewRecorder()
 	a.ServeHTTP(response, request)
-	gobottest.Assert(t, response.Code, 401)
+	assert.Equal(t, 401, response.Code)
 }

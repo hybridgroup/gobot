@@ -36,10 +36,12 @@ const (
 	PCA953xModePwm1 PCA953xGPIOMode = 0x03
 )
 
-var errToSmallPeriod = fmt.Errorf("Given Period to small, must be at least 1/152s (~6.58ms) or 152Hz")
-var errToBigPeriod = fmt.Errorf("Given Period to high, must be max. 256/152s (~1.68s) or 152/256Hz (~0.6Hz)")
-var errToSmallDutyCycle = fmt.Errorf("Given Duty Cycle to small, must be at least 0%%")
-var errToBigDutyCycle = fmt.Errorf("Given Duty Cycle to high, must be max. 100%%")
+var (
+	errToSmallPeriod    = fmt.Errorf("Given Period to small, must be at least 1/152s (~6.58ms) or 152Hz")
+	errToBigPeriod      = fmt.Errorf("Given Period to high, must be max. 256/152s (~1.68s) or 152/256Hz (~0.6Hz)")
+	errToSmallDutyCycle = fmt.Errorf("Given Duty Cycle to small, must be at least 0%%")
+	errToBigDutyCycle   = fmt.Errorf("Given Duty Cycle to high, must be max. 100%%")
+)
 
 // PCA953xDriver is a Gobot Driver for LED Dimmer PCA9530 (2-bit), PCA9533 (4-bit), PCA9531 (8-bit), PCA9532 (16-bit)
 // Although this is designed for LED's it can be used as a GPIO (read, write, pwm).
@@ -118,7 +120,7 @@ func (d *PCA953xDriver) ReadGPIO(idx uint8) (uint8, error) {
 	if err != nil {
 		return val, err
 	}
-	val = 1 << uint8(idx) & val
+	val = 1 << idx & val
 	if val > 1 {
 		val = 1
 	}
@@ -133,7 +135,7 @@ func (d *PCA953xDriver) WritePeriod(idx uint8, valSec float32) error {
 	// period is valid in range ~6.58ms..1.68s
 	val, err := pca953xCalcPsc(valSec)
 	if err != nil && pca953xDebug {
-		fmt.Println(err, "value shrinked!")
+		fmt.Println(err, "value limited!")
 	}
 	var regPsc pca953xRegister = pca953xRegPsc0
 	if idx > 0 {
@@ -166,7 +168,7 @@ func (d *PCA953xDriver) WriteFrequency(idx uint8, valHz float32) error {
 	// frequency is valid in range ~0.6..152Hz
 	val, err := pca953xCalcPsc(1 / valHz)
 	if err != nil && pca953xDebug {
-		fmt.Println(err, "value shrinked!")
+		fmt.Println(err, "value limited!")
 	}
 	regPsc := pca953xRegPsc0
 	if idx > 0 {
@@ -199,7 +201,7 @@ func (d *PCA953xDriver) WriteDutyCyclePercent(idx uint8, valPercent float32) err
 
 	val, err := pca953xCalcPwm(valPercent)
 	if err != nil && pca953xDebug {
-		fmt.Println(err, "value shrinked!")
+		fmt.Println(err, "value limited!")
 	}
 	regPwm := pca953xRegPwm0
 	if idx > 0 {

@@ -14,8 +14,10 @@ const bmp388Debug = false
 const bmp388DefaultAddress = 0x77
 
 // BMP388Accuracy accuracy type
-type BMP388Accuracy uint8
-type BMP388IIRFilter uint8
+type (
+	BMP388Accuracy  uint8
+	BMP388IIRFilter uint8
+)
 
 const (
 	bmp388ChipID = 0x50
@@ -136,7 +138,7 @@ func (d *BMP388Driver) Temperature(accuracy BMP388Accuracy) (temp float32, err e
 
 	var rawT int32
 
-	mode := uint8(d.ctrlPwrMode)<<4 | bmp388PWRCTRLPressEnableBit | bmp388PWRCTRLTempEnableBit
+	mode := d.ctrlPwrMode<<4 | bmp388PWRCTRLPressEnableBit | bmp388PWRCTRLTempEnableBit
 	if err = d.connection.WriteByteData(bmp388RegPWRCTRL, mode); err != nil {
 		return 0, err
 	}
@@ -160,7 +162,7 @@ func (d *BMP388Driver) Pressure(accuracy BMP388Accuracy) (press float32, err err
 
 	var rawT, rawP int32
 
-	mode := uint8(d.ctrlPwrMode)<<4 | bmp388PWRCTRLPressEnableBit | bmp388PWRCTRLTempEnableBit
+	mode := d.ctrlPwrMode<<4 | bmp388PWRCTRLPressEnableBit | bmp388PWRCTRLTempEnableBit
 	if err = d.connection.WriteByteData(bmp388RegPWRCTRL, mode); err != nil {
 		return 0, err
 	}
@@ -194,7 +196,6 @@ func (d *BMP388Driver) Altitude(accuracy BMP388Accuracy) (alt float32, err error
 
 // initialization reads the calibration coefficients.
 func (d *BMP388Driver) initialization() error {
-
 	chipID, err := d.connection.ReadByteData(bmp388RegChipID)
 	if err != nil {
 		return err

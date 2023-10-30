@@ -2,7 +2,6 @@ package gpio
 
 import (
 	"math"
-
 	"strings"
 
 	"gobot.io/x/gobot/v2"
@@ -62,7 +61,6 @@ func NewTM1638Driver(a gobot.Connection, clockPin string, dataPin string, strobe
 
 // Start initializes the tm1638, it uses a SPI-like communication protocol
 func (t *TM1638Driver) Start() error {
-
 	if err := t.pinStrobe.On(); err != nil {
 		return err
 	}

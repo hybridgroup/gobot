@@ -2,20 +2,21 @@ package adaptors
 
 import (
 	"fmt"
+	"log"
 	"runtime"
 	"strconv"
 	"strings"
 	"sync"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/gpio"
-	"gobot.io/x/gobot/v2/gobottest"
 	"gobot.io/x/gobot/v2/system"
 )
 
 const (
-	pwmDir           = "/sys/devices/platform/ff680020.pwm/pwm/pwmchip3/"
+	pwmDir           = "/sys/devices/platform/ff680020.pwm/pwm/pwmchip3/" //nolint:gosec // false positive
 	pwmPwm0Dir       = pwmDir + "pwm44/"
 	pwmExportPath    = pwmDir + "export"
 	pwmUnexportPath  = pwmDir + "unexport"
@@ -35,9 +36,11 @@ var pwmMockPaths = []string{
 }
 
 // make sure that this PWMPinsAdaptor fulfills all the required interfaces
-var _ gobot.PWMPinnerProvider = (*PWMPinsAdaptor)(nil)
-var _ gpio.PwmWriter = (*PWMPinsAdaptor)(nil)
-var _ gpio.ServoWriter = (*PWMPinsAdaptor)(nil)
+var (
+	_ gobot.PWMPinnerProvider = (*PWMPinsAdaptor)(nil)
+	_ gpio.PwmWriter          = (*PWMPinsAdaptor)(nil)
+	_ gpio.ServoWriter        = (*PWMPinsAdaptor)(nil)
+)
 
 func initTestPWMPinsAdaptorWithMockedFilesystem(mockPaths []string) (*PWMPinsAdaptor, *system.MockFilesystem) {
 	sys := system.NewAccesser()
@@ -68,10 +71,10 @@ func TestNewPWMPinsAdaptor(t *testing.T) {
 	// act
 	a := NewPWMPinsAdaptor(system.NewAccesser(), translate)
 	// assert
-	gobottest.Assert(t, a.periodDefault, uint32(pwmPeriodDefault))
-	gobottest.Assert(t, a.polarityNormalIdentifier, "normal")
-	gobottest.Assert(t, a.polarityInvertedIdentifier, "inverted")
-	gobottest.Assert(t, a.adjustDutyOnSetPeriod, true)
+	assert.Equal(t, uint32(pwmPeriodDefault), a.periodDefault)
+	assert.Equal(t, "normal", a.polarityNormalIdentifier)
+	assert.Equal(t, "inverted", a.polarityInvertedIdentifier)
+	assert.True(t, a.adjustDutyOnSetPeriod)
 }
 
 func TestWithPWMPinInitializer(t *testing.T) {
@@ -85,7 +88,7 @@ func TestWithPWMPinInitializer(t *testing.T) {
 		WithPWMPinInitializer(newInitializer))
 	// assert
 	err := a.initialize(nil)
-	gobottest.Assert(t, err, wantErr)
+	assert.Equal(t, wantErr, err)
 }
 
 func TestWithPWMPinDefaultPeriod(t *testing.T) {
@@ -95,7 +98,7 @@ func TestWithPWMPinDefaultPeriod(t *testing.T) {
 	// act
 	WithPWMPinDefaultPeriod(newPeriod)(a)
 	// assert
-	gobottest.Assert(t, a.periodDefault, newPeriod)
+	assert.Equal(t, newPeriod, a.periodDefault)
 }
 
 func TestWithPolarityInvertedIdentifier(t *testing.T) {
@@ -105,21 +108,21 @@ func TestWithPolarityInvertedIdentifier(t *testing.T) {
 	// act
 	WithPolarityInvertedIdentifier(newPolarityIdent)(a)
 	// assert
-	gobottest.Assert(t, a.polarityInvertedIdentifier, newPolarityIdent)
+	assert.Equal(t, newPolarityIdent, a.polarityInvertedIdentifier)
 }
 
 func TestPWMPinsConnect(t *testing.T) {
 	translate := func(pin string) (chip string, line int, err error) { return }
 	a := NewPWMPinsAdaptor(system.NewAccesser(), translate)
-	gobottest.Assert(t, a.pins, (map[string]gobot.PWMPinner)(nil))
+	assert.Equal(t, (map[string]gobot.PWMPinner)(nil), a.pins)
 
 	err := a.PwmWrite("33", 1)
-	gobottest.Assert(t, err.Error(), "not connected")
+	assert.ErrorContains(t, err, "not connected")
 
 	err = a.Connect()
-	gobottest.Assert(t, err, nil)
-	gobottest.Refute(t, a.pins, (map[string]gobot.PWMPinner)(nil))
-	gobottest.Assert(t, len(a.pins), 0)
+	assert.NoError(t, err)
+	assert.NotEqual(t, (map[string]gobot.PWMPinner)(nil), a.pins)
+	assert.Equal(t, 0, len(a.pins))
 }
 
 func TestPWMPinsFinalize(t *testing.T) {
@@ -127,98 +130,100 @@ func TestPWMPinsFinalize(t *testing.T) {
 	sys := system.NewAccesser()
 	fs := sys.UseMockFilesystem(pwmMockPaths)
 	a := NewPWMPinsAdaptor(sys, testPWMPinTranslator)
+	fs.Files[pwmPeriodPath].Contents = "0"
+	fs.Files[pwmDutyCyclePath].Contents = "0"
 	// assert that finalize before connect is working
-	gobottest.Assert(t, a.Finalize(), nil)
+	assert.NoError(t, a.Finalize())
 	// arrange
-	gobottest.Assert(t, a.Connect(), nil)
-	gobottest.Assert(t, a.PwmWrite("33", 1), nil)
-	gobottest.Assert(t, len(a.pins), 1)
+	assert.NoError(t, a.Connect())
+	assert.NoError(t, a.PwmWrite("33", 1))
+	assert.Equal(t, 1, len(a.pins))
 	// act
 	err := a.Finalize()
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, len(a.pins), 0)
+	assert.NoError(t, err)
+	assert.Equal(t, 0, len(a.pins))
 	// assert that finalize after finalize is working
-	gobottest.Assert(t, a.Finalize(), nil)
+	assert.NoError(t, a.Finalize())
 	// arrange missing sysfs file
-	gobottest.Assert(t, a.Connect(), nil)
-	gobottest.Assert(t, a.PwmWrite("33", 2), nil)
+	assert.NoError(t, a.Connect())
+	assert.NoError(t, a.PwmWrite("33", 2))
 	delete(fs.Files, pwmUnexportPath)
 	err = a.Finalize()
-	gobottest.Assert(t, strings.Contains(err.Error(), pwmUnexportPath+": no such file"), true)
+	assert.Contains(t, err.Error(), pwmUnexportPath+": no such file")
 	// arrange write error
-	gobottest.Assert(t, a.Connect(), nil)
-	gobottest.Assert(t, a.PwmWrite("33", 2), nil)
+	assert.NoError(t, a.Connect())
+	assert.NoError(t, a.PwmWrite("33", 2))
 	fs.WithWriteError = true
 	err = a.Finalize()
-	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
+	assert.Contains(t, err.Error(), "write error")
 }
 
 func TestPWMPinsReConnect(t *testing.T) {
 	// arrange
 	a, _ := initTestPWMPinsAdaptorWithMockedFilesystem(pwmMockPaths)
-	gobottest.Assert(t, a.PwmWrite("33", 1), nil)
-	gobottest.Assert(t, len(a.pins), 1)
-	gobottest.Assert(t, a.Finalize(), nil)
+	assert.NoError(t, a.PwmWrite("33", 1))
+	assert.Equal(t, 1, len(a.pins))
+	assert.NoError(t, a.Finalize())
 	// act
 	err := a.Connect()
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Refute(t, a.pins, nil)
-	gobottest.Assert(t, len(a.pins), 0)
+	assert.NoError(t, err)
+	assert.NotNil(t, a.pins)
+	assert.Equal(t, 0, len(a.pins))
 }
 
 func TestPwmWrite(t *testing.T) {
 	a, fs := initTestPWMPinsAdaptorWithMockedFilesystem(pwmMockPaths)
 
 	err := a.PwmWrite("33", 100)
-	gobottest.Assert(t, err, nil)
+	assert.NoError(t, err)
 
-	gobottest.Assert(t, fs.Files[pwmExportPath].Contents, "44")
-	gobottest.Assert(t, fs.Files[pwmEnablePath].Contents, "1")
-	gobottest.Assert(t, fs.Files[pwmPeriodPath].Contents, fmt.Sprintf("%d", a.periodDefault))
-	gobottest.Assert(t, fs.Files[pwmDutyCyclePath].Contents, "3921568")
-	gobottest.Assert(t, fs.Files[pwmPolarityPath].Contents, "normal")
+	assert.Equal(t, "44", fs.Files[pwmExportPath].Contents)
+	assert.Equal(t, "1", fs.Files[pwmEnablePath].Contents)
+	assert.Equal(t, fmt.Sprintf("%d", a.periodDefault), fs.Files[pwmPeriodPath].Contents)
+	assert.Equal(t, "3921568", fs.Files[pwmDutyCyclePath].Contents)
+	assert.Equal(t, "normal", fs.Files[pwmPolarityPath].Contents)
 
 	err = a.PwmWrite("notexist", 42)
-	gobottest.Assert(t, err.Error(), "'notexist' is not a valid id of a PWM pin")
+	assert.ErrorContains(t, err, "'notexist' is not a valid id of a PWM pin")
 
 	fs.WithWriteError = true
 	err = a.PwmWrite("33", 100)
-	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
+	assert.Contains(t, err.Error(), "write error")
 	fs.WithWriteError = false
 
 	fs.WithReadError = true
 	err = a.PwmWrite("33", 100)
-	gobottest.Assert(t, strings.Contains(err.Error(), "read error"), true)
+	assert.Contains(t, err.Error(), "read error")
 }
 
 func TestServoWrite(t *testing.T) {
 	a, fs := initTestPWMPinsAdaptorWithMockedFilesystem(pwmMockPaths)
 
 	err := a.ServoWrite("33", 0)
-	gobottest.Assert(t, fs.Files[pwmExportPath].Contents, "44")
-	gobottest.Assert(t, fs.Files[pwmEnablePath].Contents, "1")
-	gobottest.Assert(t, fs.Files[pwmPeriodPath].Contents, fmt.Sprintf("%d", a.periodDefault))
-	gobottest.Assert(t, fs.Files[pwmDutyCyclePath].Contents, "500000")
-	gobottest.Assert(t, fs.Files[pwmPolarityPath].Contents, "normal")
-	gobottest.Assert(t, err, nil)
+	assert.Equal(t, "44", fs.Files[pwmExportPath].Contents)
+	assert.Equal(t, "1", fs.Files[pwmEnablePath].Contents)
+	assert.Equal(t, fmt.Sprintf("%d", a.periodDefault), fs.Files[pwmPeriodPath].Contents)
+	assert.Equal(t, "500000", fs.Files[pwmDutyCyclePath].Contents)
+	assert.Equal(t, "normal", fs.Files[pwmPolarityPath].Contents)
+	assert.NoError(t, err)
 
 	err = a.ServoWrite("33", 180)
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, fs.Files[pwmDutyCyclePath].Contents, "2000000")
+	assert.NoError(t, err)
+	assert.Equal(t, "2000000", fs.Files[pwmDutyCyclePath].Contents)
 
 	err = a.ServoWrite("notexist", 42)
-	gobottest.Assert(t, err.Error(), "'notexist' is not a valid id of a PWM pin")
+	assert.ErrorContains(t, err, "'notexist' is not a valid id of a PWM pin")
 
 	fs.WithWriteError = true
 	err = a.ServoWrite("33", 100)
-	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
+	assert.Contains(t, err.Error(), "write error")
 	fs.WithWriteError = false
 
 	fs.WithReadError = true
 	err = a.ServoWrite("33", 100)
-	gobottest.Assert(t, strings.Contains(err.Error(), "read error"), true)
+	assert.Contains(t, err.Error(), "read error")
 }
 
 func TestSetPeriod(t *testing.T) {
@@ -228,25 +233,25 @@ func TestSetPeriod(t *testing.T) {
 	// act
 	err := a.SetPeriod("33", newPeriod)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, fs.Files[pwmExportPath].Contents, "44")
-	gobottest.Assert(t, fs.Files[pwmEnablePath].Contents, "1")
-	gobottest.Assert(t, fs.Files[pwmPeriodPath].Contents, fmt.Sprintf("%d", newPeriod))
-	gobottest.Assert(t, fs.Files[pwmDutyCyclePath].Contents, "0")
-	gobottest.Assert(t, fs.Files[pwmPolarityPath].Contents, "normal")
+	assert.NoError(t, err)
+	assert.Equal(t, "44", fs.Files[pwmExportPath].Contents)
+	assert.Equal(t, "1", fs.Files[pwmEnablePath].Contents)
+	assert.Equal(t, fmt.Sprintf("%d", newPeriod), fs.Files[pwmPeriodPath].Contents)
+	assert.Equal(t, "0", fs.Files[pwmDutyCyclePath].Contents)
+	assert.Equal(t, "normal", fs.Files[pwmPolarityPath].Contents)
 
 	// arrange test for automatic adjustment of duty cycle to lower value
 	err = a.PwmWrite("33", 127) // 127 is a little bit smaller than 50% of period
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, fs.Files[pwmDutyCyclePath].Contents, fmt.Sprintf("%d", 1270000))
+	assert.NoError(t, err)
+	assert.Equal(t, fmt.Sprintf("%d", 1270000), fs.Files[pwmDutyCyclePath].Contents)
 	newPeriod = newPeriod / 10
 
 	// act
 	err = a.SetPeriod("33", newPeriod)
 
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, fs.Files[pwmDutyCyclePath].Contents, fmt.Sprintf("%d", 127000))
+	assert.NoError(t, err)
+	assert.Equal(t, fmt.Sprintf("%d", 127000), fs.Files[pwmDutyCyclePath].Contents)
 
 	// arrange test for automatic adjustment of duty cycle to higher value
 	newPeriod = newPeriod * 20
@@ -255,27 +260,30 @@ func TestSetPeriod(t *testing.T) {
 	err = a.SetPeriod("33", newPeriod)
 
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, fs.Files[pwmDutyCyclePath].Contents, fmt.Sprintf("%d", 2540000))
+	assert.NoError(t, err)
+	assert.Equal(t, fmt.Sprintf("%d", 2540000), fs.Files[pwmDutyCyclePath].Contents)
 
 	// act
 	err = a.SetPeriod("not_exist", newPeriod)
 	// assert
-	gobottest.Assert(t, err.Error(), "'not_exist' is not a valid id of a PWM pin")
+	assert.ErrorContains(t, err, "'not_exist' is not a valid id of a PWM pin")
 }
 
 func Test_PWMPin(t *testing.T) {
 	translateErr := "translator_error"
 	translator := func(string) (string, int, error) { return pwmDir, 44, nil }
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		mockPaths []string
 		period    string
+		dutyCycle string
 		translate func(string) (string, int, error)
 		pin       string
 		wantErr   string
 	}{
 		"pin_ok": {
 			mockPaths: []string{pwmExportPath, pwmEnablePath, pwmPeriodPath, pwmDutyCyclePath, pwmPolarityPath},
+			period:    "0",
+			dutyCycle: "0",
 			translate: translator,
 			pin:       "33",
 		},
@@ -293,18 +301,23 @@ func Test_PWMPin(t *testing.T) {
 			wantErr:   "SetEnabled(false) failed for id 44 with  : /sys/devices/platform/ff680020.pwm/pwm/pwmchip3/pwm44/enable: no such file",
 		},
 		"init_setperiod_dutycycle_no_error": {
-			mockPaths: []string{pwmExportPath, pwmEnablePath, pwmPeriodPath, pwmPolarityPath},
+			mockPaths: []string{pwmExportPath, pwmEnablePath, pwmPeriodPath, pwmDutyCyclePath, pwmPolarityPath},
+			period:    "0",
+			dutyCycle: "0",
 			translate: translator,
 			pin:       "33",
 		},
 		"init_setperiod_error": {
-			mockPaths: []string{pwmExportPath, pwmEnablePath},
+			mockPaths: []string{pwmExportPath, pwmEnablePath, pwmDutyCyclePath},
+			dutyCycle: "0",
 			translate: translator,
 			pin:       "33",
 			wantErr:   "SetPeriod(10000000) failed for id 44 with  : /sys/devices/platform/ff680020.pwm/pwm/pwmchip3/pwm44/period: no such file",
 		},
 		"init_setpolarity_error": {
 			mockPaths: []string{pwmExportPath, pwmEnablePath, pwmPeriodPath, pwmDutyCyclePath},
+			period:    "0",
+			dutyCycle: "0",
 			translate: translator,
 			pin:       "33",
 			wantErr:   "SetPolarity(normal) failed for id 44 with  : /sys/devices/platform/ff680020.pwm/pwm/pwmchip3/pwm44/polarity: no such file",
@@ -322,6 +335,9 @@ func Test_PWMPin(t *testing.T) {
 			if tc.period != "" {
 				fs.Files[pwmPeriodPath].Contents = tc.period
 			}
+			if tc.dutyCycle != "" {
+				fs.Files[pwmDutyCyclePath].Contents = tc.dutyCycle
+			}
 			a := NewPWMPinsAdaptor(sys, tc.translate)
 			if err := a.Connect(); err != nil {
 				panic(err)
@@ -330,13 +346,15 @@ func Test_PWMPin(t *testing.T) {
 			got, err := a.PWMPin(tc.pin)
 			// assert
 			if tc.wantErr == "" {
-				gobottest.Assert(t, err, nil)
-				gobottest.Refute(t, got, nil)
+				assert.NoError(t, err)
+				assert.NotNil(t, got)
 			} else {
-				gobottest.Assert(t, strings.Contains(err.Error(), tc.wantErr), true)
-				gobottest.Assert(t, got, nil)
+				if !strings.Contains(err.Error(), tc.wantErr) {
+					log.Println(err.Error())
+				}
+				assert.Contains(t, err.Error(), tc.wantErr)
+				assert.Nil(t, got)
 			}
-
 		})
 	}
 }

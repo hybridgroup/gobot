@@ -31,9 +31,10 @@ run:
 linters:
   # currently active linters:
   #
-  #INFO [lintersdb] Active 35 linters: [asasalint asciicheck bidichk contextcheck decorder depguard durationcheck errcheck exportloopref
-  # gocheckcompilerdirectives gomoddirectives gomodguard goprintffuncname gosimple govet grouper ineffassign makezero mirror musttag
-  # nilerr nilnil nolintlint nosprintfhostport prealloc reassign revive staticcheck tagalign tenv testableexamples tparallel typecheck unused wastedassign]
+  #INFO [lintersdb] Active 42 linters: [asasalint asciicheck bidichk contextcheck decorder depguard dupword durationcheck errcheck exportloopref
+  # gocheckcompilerdirectives gofmt gofumpt goimports gomoddirectives gomodguard goprintffuncname gosec gosimple govet grouper ineffassign makezero mirror
+  # misspell musttag nilerr nilnil nolintlint nosprintfhostport prealloc reassign revive staticcheck tagalign tenv testableexamples tparallel unconvert unparam
+  # unused wastedassign]
 
   enable-all: true
 
@@ -60,7 +61,6 @@ linters:
     - godot # not used (seems to be counting peas)
     - godox # not used (we have many TODOs, so not useful)
     - goerr113 # not used (we allow error creation at return statement)
-    - gofumpt # not used (we use "go fmt" or "gofmt" not gofumpt"
     - gosmopolitan # not needed (report i18n/l10n anti-patterns)
     - importas # not needed (there is no alias rule at the moment)
     - ireturn # not used (we allow return interfaces)
@@ -73,38 +73,30 @@ linters:
     - wrapcheck # not needed (we allow errors from interface methods)
     - zerologlint # not needed (related to zerolog package)
     # important to have
-    - gofmt # important to prevent "format tsunami" ("gofmt -s -w" missed), disabled due to "https://github.com/golangci/golangci-lint-action/issues/535"
+    - errorlint # useful (reduce bugs), but suppress the "Use `%w` to format errors" check
+    - forcetypeassert # useful (reduce bugs)
     - nakedret # very useful together with "nonamedreturns" (reduce bugs)
     - nonamedreturns # very useful (reduce bugs)
-    - unconvert # very useful (reduce bugs, simplify code)
-    - unparam # very useful (reduce bugs, simplify code)
     # useful for the future
     - bodyclose # maybe useful (reduce bugs), exclusions for tests needed
     - containedctx # useful (structs are not for context wrapping)
     - cyclop # useful with some tweeks (better understandable code), see also gocyclo
     - dogsled # useful with some tweeks (e.g. exclude tests)
     - dupl # useful with some tweeks (reduce bugs and lines of code)
-    - dupword # useful with some tweeks, but not important
     - errchkjson # useful (reduce bugs)
     - errname # useful for common style
-    - errorlint # useful (reduce bugs), but suppress the "Use `%w` to format errors" check
     - exhaustruct # useful with some exclusions for existing code (e.g. mavlink/common/common.go)
-    - forcetypeassert # useful (reduce bugs)
     - funlen # useful with some tweeks (reduce bugs, simplify code, better understandable code)
     - gci # useful (improve readability)
-    - gochecknoinits # useful (reduce bugs, simplify bug catching)
     - gocognit # useful with some tweeks (better understandable code)
     - goconst # useful (reduce bugs)
     - gocritic # useful with some exclusions for existing code (e.g. mavlink/common/common.go)
     - gocyclo # useful with some tweeks (better understandable code)
     - goheader # useful, if we introduce a common header (e.g. for copyright)
-    - goimports # useful (common style), but not important
     - gomnd # useful with some exclusions for existing code (e.g. mavlink.go)
-    - gosec # useful (security)
     - interfacebloat # useful with some exclusions at usage of external packages
     - lll # useful with some exclusions for existing code (e.g. mavlink/common/common.go)
     - maintidx # useful with some tweeks (better understandable code), maybe use instead "gocyclo", "gocognit" , "cyclop"
-    - misspell # useful (better understandable code), but not important
     - nestif # useful (reduce bugs, simplify code, better understandable code)
     - nlreturn # more common style, but could become annoying
     - noctx # maybe good (show used context explicit)
@@ -140,6 +132,15 @@ linters-settings:
         deny:
           - pkg: "github.com/pkg/errors"
             desc: Should be replaced by standard lib errors package
+
+  dupword:
+    # Keywords for detecting duplicate words.
+    # If this list is not empty, only the words defined in this list will be detected.
+    # Default: []
+    keywords:
+      - "the"
+      - "and"
+      - "a"
 
   nolintlint:
     # Enable to require an explanation of nonzero length after each nolint directive.

@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
@@ -25,21 +25,21 @@ func TestNewADXL345Driver(t *testing.T) {
 	if !ok {
 		t.Errorf("NewADXL345Driver() should have returned a *ADXL345Driver")
 	}
-	gobottest.Refute(t, d.Driver, nil)
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "ADXL345"), true)
-	gobottest.Assert(t, d.defaultAddress, 0x53)
-	gobottest.Assert(t, d.powerCtl.measure, uint8(1))
-	gobottest.Assert(t, d.dataFormat.fullScaleRange, ADXL345FsRangeConfig(0x00))
-	gobottest.Assert(t, d.bwRate.rate, ADXL345RateConfig(0x0A))
-	gobottest.Assert(t, d.bwRate.lowPower, true)
+	assert.NotNil(t, d.Driver)
+	assert.True(t, strings.HasPrefix(d.Name(), "ADXL345"))
+	assert.Equal(t, 0x53, d.defaultAddress)
+	assert.Equal(t, uint8(1), d.powerCtl.measure)
+	assert.Equal(t, ADXL345FsRangeConfig(0x00), d.dataFormat.fullScaleRange)
+	assert.Equal(t, ADXL345RateConfig(0x0A), d.bwRate.rate)
+	assert.True(t, d.bwRate.lowPower)
 }
 
 func TestADXL345Options(t *testing.T) {
 	// This is a general test, that options are applied in constructor by using the common WithBus() option and
 	// least one of this driver. Further tests for options can also be done by call of "WithOption(val)(d)".
 	d := NewADXL345Driver(newI2cTestAdaptor(), WithBus(2), WithADXL345LowPowerMode(false))
-	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
-	gobottest.Assert(t, d.bwRate.lowPower, false)
+	assert.Equal(t, 2, d.GetBusOrDefault(1))
+	assert.False(t, d.bwRate.lowPower)
 }
 
 func TestADXL345WithADXL345DataOutputRate(t *testing.T) {
@@ -52,8 +52,8 @@ func TestADXL345WithADXL345DataOutputRate(t *testing.T) {
 	// act
 	WithADXL345DataOutputRate(setVal)(d)
 	// assert
-	gobottest.Assert(t, d.bwRate.rate, setVal)
-	gobottest.Assert(t, len(a.written), 0)
+	assert.Equal(t, setVal, d.bwRate.rate)
+	assert.Equal(t, 0, len(a.written))
 }
 
 func TestADXL345WithADXL345FullScaleRange(t *testing.T) {
@@ -66,8 +66,8 @@ func TestADXL345WithADXL345FullScaleRange(t *testing.T) {
 	// act
 	WithADXL345FullScaleRange(setVal)(d)
 	// assert
-	gobottest.Assert(t, d.dataFormat.fullScaleRange, setVal)
-	gobottest.Assert(t, len(a.written), 0)
+	assert.Equal(t, setVal, d.dataFormat.fullScaleRange)
+	assert.Equal(t, 0, len(a.written))
 }
 
 func TestADXL345UseLowPower(t *testing.T) {
@@ -85,11 +85,11 @@ func TestADXL345UseLowPower(t *testing.T) {
 	// act
 	err := d.UseLowPower(setVal)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, d.bwRate.lowPower, setVal)
-	gobottest.Assert(t, len(a.written), 2)
-	gobottest.Assert(t, a.written[0], wantReg)
-	gobottest.Assert(t, a.written[1], wantVal)
+	assert.NoError(t, err)
+	assert.Equal(t, setVal, d.bwRate.lowPower)
+	assert.Equal(t, 2, len(a.written))
+	assert.Equal(t, wantReg, a.written[0])
+	assert.Equal(t, wantVal, a.written[1])
 }
 
 func TestADXL345SetRate(t *testing.T) {
@@ -107,11 +107,11 @@ func TestADXL345SetRate(t *testing.T) {
 	// act
 	err := d.SetRate(setVal)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, d.bwRate.rate, setVal)
-	gobottest.Assert(t, len(a.written), 2)
-	gobottest.Assert(t, a.written[0], wantReg)
-	gobottest.Assert(t, a.written[1], wantVal)
+	assert.NoError(t, err)
+	assert.Equal(t, setVal, d.bwRate.rate)
+	assert.Equal(t, 2, len(a.written))
+	assert.Equal(t, wantReg, a.written[0])
+	assert.Equal(t, wantVal, a.written[1])
 }
 
 func TestADXL345SetRange(t *testing.T) {
@@ -129,11 +129,11 @@ func TestADXL345SetRange(t *testing.T) {
 	// act
 	err := d.SetRange(setVal)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, d.dataFormat.fullScaleRange, setVal)
-	gobottest.Assert(t, len(a.written), 2)
-	gobottest.Assert(t, a.written[0], wantReg)
-	gobottest.Assert(t, a.written[1], wantVal)
+	assert.NoError(t, err)
+	assert.Equal(t, setVal, d.dataFormat.fullScaleRange)
+	assert.Equal(t, 2, len(a.written))
+	assert.Equal(t, wantReg, a.written[0])
+	assert.Equal(t, wantVal, a.written[1])
 }
 
 func TestADXL345RawXYZ(t *testing.T) {
@@ -143,7 +143,7 @@ func TestADXL345RawXYZ(t *testing.T) {
 	// * apply two's complement converter
 	//
 	// arrange
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		inputX []uint8
 		inputY []uint8
 		inputZ []uint8
@@ -184,13 +184,13 @@ func TestADXL345RawXYZ(t *testing.T) {
 			// act
 			gotX, gotY, gotZ, err := d.RawXYZ()
 			// assert
-			gobottest.Assert(t, err, nil)
-			gobottest.Assert(t, gotX, tc.wantX)
-			gobottest.Assert(t, gotY, tc.wantY)
-			gobottest.Assert(t, gotZ, tc.wantZ)
-			gobottest.Assert(t, numCallsRead, 1)
-			gobottest.Assert(t, len(a.written), 1)
-			gobottest.Assert(t, a.written[0], uint8(0x32))
+			assert.NoError(t, err)
+			assert.Equal(t, tc.wantX, gotX)
+			assert.Equal(t, tc.wantY, gotY)
+			assert.Equal(t, tc.wantZ, gotZ)
+			assert.Equal(t, 1, numCallsRead)
+			assert.Equal(t, 1, len(a.written))
+			assert.Equal(t, uint8(0x32), a.written[0])
 		})
 	}
 }
@@ -205,12 +205,12 @@ func TestADXL345RawXYZError(t *testing.T) {
 	// act
 	_, _, _, err := d.RawXYZ()
 	// assert
-	gobottest.Assert(t, err, errors.New("read error"))
+	assert.ErrorContains(t, err, "read error")
 }
 
 func TestADXL345XYZ(t *testing.T) {
 	// arrange
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		inputX []uint8
 		inputY []uint8
 		inputZ []uint8
@@ -252,9 +252,9 @@ func TestADXL345XYZ(t *testing.T) {
 			// act
 			x, y, z, _ := d.XYZ()
 			// assert
-			gobottest.Assert(t, x, tc.wantX)
-			gobottest.Assert(t, y, tc.wantY)
-			gobottest.Assert(t, z, tc.wantZ)
+			assert.Equal(t, tc.wantX, x)
+			assert.Equal(t, tc.wantY, y)
+			assert.Equal(t, tc.wantZ, z)
 		})
 	}
 }
@@ -269,7 +269,7 @@ func TestADXL345XYZError(t *testing.T) {
 	// act
 	_, _, _, err := d.XYZ()
 	// assert
-	gobottest.Assert(t, err, errors.New("read error"))
+	assert.ErrorContains(t, err, "read error")
 }
 
 func TestADXL345_initialize(t *testing.T) {
@@ -292,14 +292,14 @@ func TestADXL345_initialize(t *testing.T) {
 	// act, assert - initialize() must be called on Start()
 	err := d.Start()
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, len(a.written), 6)
-	gobottest.Assert(t, a.written[0], wantRateReg)
-	gobottest.Assert(t, a.written[1], wantRateRegVal)
-	gobottest.Assert(t, a.written[2], wantPwrReg)
-	gobottest.Assert(t, a.written[3], wantPwrRegVal)
-	gobottest.Assert(t, a.written[4], wantFormatReg)
-	gobottest.Assert(t, a.written[5], wantFormatRegVal)
+	assert.NoError(t, err)
+	assert.Equal(t, 6, len(a.written))
+	assert.Equal(t, wantRateReg, a.written[0])
+	assert.Equal(t, wantRateRegVal, a.written[1])
+	assert.Equal(t, wantPwrReg, a.written[2])
+	assert.Equal(t, wantPwrRegVal, a.written[3])
+	assert.Equal(t, wantFormatReg, a.written[4])
+	assert.Equal(t, wantFormatRegVal, a.written[5])
 }
 
 func TestADXL345_shutdown(t *testing.T) {
@@ -316,8 +316,8 @@ func TestADXL345_shutdown(t *testing.T) {
 	// act, assert - shutdown() must be called on Halt()
 	err := d.Halt()
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, len(a.written), 2)
-	gobottest.Assert(t, a.written[0], wantReg)
-	gobottest.Assert(t, a.written[1], wantVal)
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(a.written))
+	assert.Equal(t, wantReg, a.written[0])
+	assert.Equal(t, wantVal, a.written[1])
 }

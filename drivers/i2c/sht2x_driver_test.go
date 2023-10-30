@@ -2,12 +2,11 @@ package i2c
 
 import (
 	"bytes"
-	"errors"
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
@@ -29,26 +28,26 @@ func TestNewSHT2xDriver(t *testing.T) {
 	if !ok {
 		t.Errorf("NewSHT2xDriver() should have returned a *SHT2xDriver")
 	}
-	gobottest.Refute(t, d.Driver, nil)
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "SHT2x"), true)
-	gobottest.Assert(t, d.defaultAddress, 0x40)
+	assert.NotNil(t, d.Driver)
+	assert.True(t, strings.HasPrefix(d.Name(), "SHT2x"))
+	assert.Equal(t, 0x40, d.defaultAddress)
 }
 
 func TestSHT2xOptions(t *testing.T) {
 	// This is a general test, that options are applied in constructor by using the common WithBus() option and
 	// least one of this driver. Further tests for options can also be done by call of "WithOption(val)(d)".
 	b := NewSHT2xDriver(newI2cTestAdaptor(), WithBus(2))
-	gobottest.Assert(t, b.GetBusOrDefault(1), 2)
+	assert.Equal(t, 2, b.GetBusOrDefault(1))
 }
 
 func TestSHT2xStart(t *testing.T) {
 	d := NewSHT2xDriver(newI2cTestAdaptor())
-	gobottest.Assert(t, d.Start(), nil)
+	assert.NoError(t, d.Start())
 }
 
 func TestSHT2xHalt(t *testing.T) {
 	d, _ := initTestSHT2xDriverWithStubbedAdaptor()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.NoError(t, d.Halt())
 }
 
 func TestSHT2xReset(t *testing.T) {
@@ -58,7 +57,7 @@ func TestSHT2xReset(t *testing.T) {
 	}
 	_ = d.Start()
 	err := d.Reset()
-	gobottest.Assert(t, err, nil)
+	assert.NoError(t, err)
 }
 
 func TestSHT2xMeasurements(t *testing.T) {
@@ -76,11 +75,11 @@ func TestSHT2xMeasurements(t *testing.T) {
 	}
 	_ = d.Start()
 	temp, err := d.Temperature()
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, temp, float32(18.809052))
+	assert.NoError(t, err)
+	assert.Equal(t, float32(18.809052), temp)
 	hum, err := d.Humidity()
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, hum, float32(40.279907))
+	assert.NoError(t, err)
+	assert.Equal(t, float32(40.279907), hum)
 }
 
 func TestSHT2xAccuracy(t *testing.T) {
@@ -99,9 +98,9 @@ func TestSHT2xAccuracy(t *testing.T) {
 	}
 	_ = d.Start()
 	_ = d.SetAccuracy(SHT2xAccuracyLow)
-	gobottest.Assert(t, d.Accuracy(), SHT2xAccuracyLow)
+	assert.Equal(t, SHT2xAccuracyLow, d.Accuracy())
 	err := d.sendAccuracy()
-	gobottest.Assert(t, err, nil)
+	assert.NoError(t, err)
 }
 
 func TestSHT2xTemperatureCrcError(t *testing.T) {
@@ -117,8 +116,8 @@ func TestSHT2xTemperatureCrcError(t *testing.T) {
 		return buf.Len(), nil
 	}
 	temp, err := d.Temperature()
-	gobottest.Assert(t, err, errors.New("Invalid crc"))
-	gobottest.Assert(t, temp, float32(0.0))
+	assert.ErrorContains(t, err, "Invalid crc")
+	assert.Equal(t, float32(0.0), temp)
 }
 
 func TestSHT2xHumidityCrcError(t *testing.T) {
@@ -134,8 +133,8 @@ func TestSHT2xHumidityCrcError(t *testing.T) {
 		return buf.Len(), nil
 	}
 	hum, err := d.Humidity()
-	gobottest.Assert(t, err, errors.New("Invalid crc"))
-	gobottest.Assert(t, hum, float32(0.0))
+	assert.ErrorContains(t, err, "Invalid crc")
+	assert.Equal(t, float32(0.0), hum)
 }
 
 func TestSHT2xTemperatureLengthError(t *testing.T) {
@@ -151,8 +150,8 @@ func TestSHT2xTemperatureLengthError(t *testing.T) {
 		return buf.Len(), nil
 	}
 	temp, err := d.Temperature()
-	gobottest.Assert(t, err, ErrNotEnoughBytes)
-	gobottest.Assert(t, temp, float32(0.0))
+	assert.Equal(t, ErrNotEnoughBytes, err)
+	assert.Equal(t, float32(0.0), temp)
 }
 
 func TestSHT2xHumidityLengthError(t *testing.T) {
@@ -168,6 +167,6 @@ func TestSHT2xHumidityLengthError(t *testing.T) {
 		return buf.Len(), nil
 	}
 	hum, err := d.Humidity()
-	gobottest.Assert(t, err, ErrNotEnoughBytes)
-	gobottest.Assert(t, hum, float32(0.0))
+	assert.Equal(t, ErrNotEnoughBytes, err)
+	assert.Equal(t, float32(0.0), hum)
 }

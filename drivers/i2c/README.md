@@ -12,8 +12,9 @@ Please refer to the main [README.md](https://github.com/hybridgroup/gobot/blob/r
 
 Gobot has a extensible system for connecting to hardware devices. The following i2c devices are currently supported:
 
-- Adafruit 2x16 RGB-LCD with 5 keys
-- Adafruit Motor Hat
+- Adafruit 1109 2x16 RGB-LCD with 5 keys
+- Adafruit 2327 16-Channel PWM/Servo HAT Hat
+- Adafruit 2348 DC and Stepper Motor Hat
 - ADS1015 Analog to Digital Converter
 - ADS1115 Analog to Digital Converter
 - ADXL345 Digital Accelerometer

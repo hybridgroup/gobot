@@ -113,7 +113,8 @@ func (a *Accesser) UseMockSpi() *MockSpiAccess {
 
 // NewDigitalPin returns a new system digital pin, according to the given pin number.
 func (a *Accesser) NewDigitalPin(chip string, pin int,
-	o ...func(gobot.DigitalPinOptioner) bool) gobot.DigitalPinner {
+	o ...func(gobot.DigitalPinOptioner) bool,
+) gobot.DigitalPinner {
 	return a.digitalPinAccess.createPin(chip, pin, o...)
 }
 

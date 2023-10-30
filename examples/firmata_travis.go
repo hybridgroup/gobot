@@ -55,7 +55,7 @@ func checkTravis(robot *gobot.Robot) {
 	resetLeds(robot)
 	user := "hybridgroup"
 	name := "gobot"
-	//name := "broken-arrow"
+	// name := "broken-arrow"
 	fmt.Printf("Checking repo %s/%s\n", user, name)
 	turnOn(robot, "blue")
 	resp, err := http.Get(fmt.Sprintf("https://api.travis-ci.org/repos/%s/%s.json", user, name))

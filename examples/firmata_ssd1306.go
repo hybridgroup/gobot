@@ -26,7 +26,6 @@ func main() {
 	stage := false
 
 	work := func() {
-
 		gobot.Every(1*time.Second, func() {
 			fmt.Println("displaying")
 			oled.Clear()

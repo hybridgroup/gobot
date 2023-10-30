@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
@@ -39,20 +39,20 @@ func TestNewTSL2561Driver(t *testing.T) {
 	if !ok {
 		t.Errorf("NewTSL2561Driver() should have returned a *TSL2561Driver")
 	}
-	gobottest.Refute(t, d.Driver, nil)
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "TSL2561"), true)
-	gobottest.Assert(t, d.defaultAddress, 0x39)
-	gobottest.Assert(t, d.autoGain, false)
-	gobottest.Assert(t, d.gain, TSL2561Gain(0))
-	gobottest.Assert(t, d.integrationTime, TSL2561IntegrationTime(2))
+	assert.NotNil(t, d.Driver)
+	assert.True(t, strings.HasPrefix(d.Name(), "TSL2561"))
+	assert.Equal(t, 0x39, d.defaultAddress)
+	assert.False(t, d.autoGain)
+	assert.Equal(t, TSL2561Gain(0), d.gain)
+	assert.Equal(t, TSL2561IntegrationTime(2), d.integrationTime)
 }
 
 func TestTSL2561DriverOptions(t *testing.T) {
 	// This is a general test, that options are applied in constructor by using the common WithBus() option and
 	// least one of this driver. Further tests for options can also be done by call of "WithOption(val)(d)".
 	d := NewTSL2561Driver(newI2cTestAdaptor(), WithBus(2), WithTSL2561AutoGain)
-	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
-	gobottest.Assert(t, d.autoGain, true)
+	assert.Equal(t, 2, d.GetBusOrDefault(1))
+	assert.True(t, d.autoGain)
 }
 
 func TestTSL2561DriverStart(t *testing.T) {
@@ -60,7 +60,7 @@ func TestTSL2561DriverStart(t *testing.T) {
 	d := NewTSL2561Driver(a)
 	a.i2cReadImpl = testIDReader
 
-	gobottest.Assert(t, d.Start(), nil)
+	assert.NoError(t, d.Start())
 }
 
 func TestTSL2561DriverStartNotFound(t *testing.T) {
@@ -72,12 +72,12 @@ func TestTSL2561DriverStartNotFound(t *testing.T) {
 		copy(b, buf.Bytes())
 		return buf.Len(), nil
 	}
-	gobottest.Assert(t, d.Start(), errors.New("TSL2561 device not found (0x1)"))
+	assert.ErrorContains(t, d.Start(), "TSL2561 device not found (0x1)")
 }
 
 func TestTSL2561DriverHalt(t *testing.T) {
 	d, _ := initTestTSL2561Driver()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.NoError(t, d.Halt())
 }
 
 func TestTSL2561DriverRead16(t *testing.T) {
@@ -93,8 +93,8 @@ func TestTSL2561DriverRead16(t *testing.T) {
 		return buf.Len(), nil
 	}
 	val, err := d.connection.ReadWordData(1)
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, val, uint16(0xAEEA))
+	assert.NoError(t, err)
+	assert.Equal(t, uint16(0xAEEA), val)
 }
 
 func TestTSL2561DriverValidOptions(t *testing.T) {
@@ -105,9 +105,9 @@ func TestTSL2561DriverValidOptions(t *testing.T) {
 		WithAddress(TSL2561AddressLow),
 		WithTSL2561AutoGain)
 
-	gobottest.Refute(t, d, nil)
-	gobottest.Assert(t, d.autoGain, true)
-	gobottest.Assert(t, d.integrationTime, TSL2561IntegrationTime101MS)
+	assert.NotNil(t, d)
+	assert.True(t, d.autoGain)
+	assert.Equal(t, TSL2561IntegrationTime101MS, d.integrationTime)
 }
 
 func TestTSL2561DriverMoreOptions(t *testing.T) {
@@ -118,9 +118,9 @@ func TestTSL2561DriverMoreOptions(t *testing.T) {
 		WithAddress(TSL2561AddressLow),
 		WithTSL2561Gain16X)
 
-	gobottest.Refute(t, d, nil)
-	gobottest.Assert(t, d.autoGain, false)
-	gobottest.Assert(t, d.gain, TSL2561Gain(TSL2561Gain16X))
+	assert.NotNil(t, d)
+	assert.False(t, d.autoGain)
+	assert.Equal(t, TSL2561Gain(TSL2561Gain16X), d.gain)
 }
 
 func TestTSL2561DriverEvenMoreOptions(t *testing.T) {
@@ -131,10 +131,10 @@ func TestTSL2561DriverEvenMoreOptions(t *testing.T) {
 		WithAddress(TSL2561AddressLow),
 		WithTSL2561Gain1X)
 
-	gobottest.Refute(t, d, nil)
-	gobottest.Assert(t, d.autoGain, false)
-	gobottest.Assert(t, d.gain, TSL2561Gain(TSL2561Gain1X))
-	gobottest.Assert(t, d.integrationTime, TSL2561IntegrationTime13MS)
+	assert.NotNil(t, d)
+	assert.False(t, d.autoGain)
+	assert.Equal(t, TSL2561Gain1X, d.gain)
+	assert.Equal(t, TSL2561IntegrationTime13MS, d.integrationTime)
 }
 
 func TestTSL2561DriverYetEvenMoreOptions(t *testing.T) {
@@ -145,9 +145,9 @@ func TestTSL2561DriverYetEvenMoreOptions(t *testing.T) {
 		WithAddress(TSL2561AddressLow),
 		WithTSL2561AutoGain)
 
-	gobottest.Refute(t, d, nil)
-	gobottest.Assert(t, d.autoGain, true)
-	gobottest.Assert(t, d.integrationTime, TSL2561IntegrationTime402MS)
+	assert.NotNil(t, d)
+	assert.True(t, d.autoGain)
+	assert.Equal(t, TSL2561IntegrationTime402MS, d.integrationTime)
 }
 
 func TestTSL2561DriverGetDataWriteError(t *testing.T) {
@@ -157,7 +157,7 @@ func TestTSL2561DriverGetDataWriteError(t *testing.T) {
 	}
 
 	_, _, err := d.getData()
-	gobottest.Assert(t, err, errors.New("write error"))
+	assert.ErrorContains(t, err, "write error")
 }
 
 func TestTSL2561DriverGetDataReadError(t *testing.T) {
@@ -167,7 +167,7 @@ func TestTSL2561DriverGetDataReadError(t *testing.T) {
 	}
 
 	_, _, err := d.getData()
-	gobottest.Assert(t, err, errors.New("read error"))
+	assert.ErrorContains(t, err, "read error")
 }
 
 func TestTSL2561DriverGetLuminocity(t *testing.T) {
@@ -180,10 +180,10 @@ func TestTSL2561DriverGetLuminocity(t *testing.T) {
 		return buf.Len(), nil
 	}
 	bb, ir, err := d.GetLuminocity()
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, bb, uint16(12365))
-	gobottest.Assert(t, ir, uint16(12365))
-	gobottest.Assert(t, d.CalculateLux(bb, ir), uint32(72))
+	assert.NoError(t, err)
+	assert.Equal(t, uint16(12365), bb)
+	assert.Equal(t, uint16(12365), ir)
+	assert.Equal(t, uint32(72), d.CalculateLux(bb, ir))
 }
 
 func TestTSL2561DriverGetLuminocityAutoGain(t *testing.T) {
@@ -202,10 +202,10 @@ func TestTSL2561DriverGetLuminocityAutoGain(t *testing.T) {
 
 	_ = d.Start()
 	bb, ir, err := d.GetLuminocity()
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, bb, uint16(12365))
-	gobottest.Assert(t, ir, uint16(12365))
-	gobottest.Assert(t, d.CalculateLux(bb, ir), uint32(72))
+	assert.NoError(t, err)
+	assert.Equal(t, uint16(12365), bb)
+	assert.Equal(t, uint16(12365), ir)
+	assert.Equal(t, uint32(72), d.CalculateLux(bb, ir))
 }
 
 func TestTSL2561SetIntegrationTimeError(t *testing.T) {
@@ -213,7 +213,7 @@ func TestTSL2561SetIntegrationTimeError(t *testing.T) {
 	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}
-	gobottest.Assert(t, d.SetIntegrationTime(TSL2561IntegrationTime101MS), errors.New("write error"))
+	assert.ErrorContains(t, d.SetIntegrationTime(TSL2561IntegrationTime101MS), "write error")
 }
 
 func TestTSL2561SetGainError(t *testing.T) {
@@ -221,7 +221,7 @@ func TestTSL2561SetGainError(t *testing.T) {
 	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}
-	gobottest.Assert(t, d.SetGain(TSL2561Gain16X), errors.New("write error"))
+	assert.ErrorContains(t, d.SetGain(TSL2561Gain16X), "write error")
 }
 
 func TestTSL2561getHiLo13MS(t *testing.T) {
@@ -231,8 +231,8 @@ func TestTSL2561getHiLo13MS(t *testing.T) {
 		WithTSL2561AutoGain)
 
 	hi, lo := d.getHiLo()
-	gobottest.Assert(t, hi, uint16(tsl2561AgcTHi13MS))
-	gobottest.Assert(t, lo, uint16(tsl2561AgcTLo13MS))
+	assert.Equal(t, uint16(tsl2561AgcTHi13MS), hi)
+	assert.Equal(t, uint16(tsl2561AgcTLo13MS), lo)
 }
 
 func TestTSL2561getHiLo101MS(t *testing.T) {
@@ -242,8 +242,8 @@ func TestTSL2561getHiLo101MS(t *testing.T) {
 		WithTSL2561AutoGain)
 
 	hi, lo := d.getHiLo()
-	gobottest.Assert(t, hi, uint16(tsl2561AgcTHi101MS))
-	gobottest.Assert(t, lo, uint16(tsl2561AgcTLo101MS))
+	assert.Equal(t, uint16(tsl2561AgcTHi101MS), hi)
+	assert.Equal(t, uint16(tsl2561AgcTLo101MS), lo)
 }
 
 func TestTSL2561getHiLo402MS(t *testing.T) {
@@ -253,8 +253,8 @@ func TestTSL2561getHiLo402MS(t *testing.T) {
 		WithTSL2561AutoGain)
 
 	hi, lo := d.getHiLo()
-	gobottest.Assert(t, hi, uint16(tsl2561AgcTHi402MS))
-	gobottest.Assert(t, lo, uint16(tsl2561AgcTLo402MS))
+	assert.Equal(t, uint16(tsl2561AgcTHi402MS), hi)
+	assert.Equal(t, uint16(tsl2561AgcTLo402MS), lo)
 }
 
 func TestTSL2561getClipScaling13MS(t *testing.T) {
@@ -265,8 +265,8 @@ func TestTSL2561getClipScaling13MS(t *testing.T) {
 
 	c, s := d.getClipScaling()
 	d.waitForADC()
-	gobottest.Assert(t, c, uint16(tsl2561Clipping13MS))
-	gobottest.Assert(t, s, uint32(tsl2561LuxCHScaleTInt0))
+	assert.Equal(t, uint16(tsl2561Clipping13MS), c)
+	assert.Equal(t, uint32(tsl2561LuxCHScaleTInt0), s)
 }
 
 func TestTSL2561getClipScaling101MS(t *testing.T) {
@@ -277,8 +277,8 @@ func TestTSL2561getClipScaling101MS(t *testing.T) {
 
 	c, s := d.getClipScaling()
 	d.waitForADC()
-	gobottest.Assert(t, c, uint16(tsl2561Clipping101MS))
-	gobottest.Assert(t, s, uint32(tsl2561LuxChScaleTInt1))
+	assert.Equal(t, uint16(tsl2561Clipping101MS), c)
+	assert.Equal(t, uint32(tsl2561LuxChScaleTInt1), s)
 }
 
 func TestTSL2561getClipScaling402MS(t *testing.T) {
@@ -289,8 +289,8 @@ func TestTSL2561getClipScaling402MS(t *testing.T) {
 
 	c, s := d.getClipScaling()
 	d.waitForADC()
-	gobottest.Assert(t, c, uint16(tsl2561Clipping402MS))
-	gobottest.Assert(t, s, uint32(1<<tsl2561LuxChScale))
+	assert.Equal(t, uint16(tsl2561Clipping402MS), c)
+	assert.Equal(t, uint32(1<<tsl2561LuxChScale), s)
 }
 
 func TestTSL2561getBM(t *testing.T) {
@@ -300,34 +300,34 @@ func TestTSL2561getBM(t *testing.T) {
 		WithTSL2561AutoGain)
 
 	b, m := d.getBM(tsl2561LuxK1T)
-	gobottest.Assert(t, b, uint32(tsl2561LuxB1T))
-	gobottest.Assert(t, m, uint32(tsl2561LuxM1T))
+	assert.Equal(t, uint32(tsl2561LuxB1T), b)
+	assert.Equal(t, uint32(tsl2561LuxM1T), m)
 
 	b, m = d.getBM(tsl2561LuxK2T)
-	gobottest.Assert(t, b, uint32(tsl2561LuxB2T))
-	gobottest.Assert(t, m, uint32(tsl2561LuxM2T))
+	assert.Equal(t, uint32(tsl2561LuxB2T), b)
+	assert.Equal(t, uint32(tsl2561LuxM2T), m)
 
 	b, m = d.getBM(tsl2561LuxK3T)
-	gobottest.Assert(t, b, uint32(tsl2561LuxB3T))
-	gobottest.Assert(t, m, uint32(tsl2561LuxM3T))
+	assert.Equal(t, uint32(tsl2561LuxB3T), b)
+	assert.Equal(t, uint32(tsl2561LuxM3T), m)
 
 	b, m = d.getBM(tsl2561LuxK4T)
-	gobottest.Assert(t, b, uint32(tsl2561LuxB4T))
-	gobottest.Assert(t, m, uint32(tsl2561LuxM4T))
+	assert.Equal(t, uint32(tsl2561LuxB4T), b)
+	assert.Equal(t, uint32(tsl2561LuxM4T), m)
 
 	b, m = d.getBM(tsl2561LuxK5T)
-	gobottest.Assert(t, b, uint32(tsl2561LuxB5T))
-	gobottest.Assert(t, m, uint32(tsl2561LuxM5T))
+	assert.Equal(t, uint32(tsl2561LuxB5T), b)
+	assert.Equal(t, uint32(tsl2561LuxM5T), m)
 
 	b, m = d.getBM(tsl2561LuxK6T)
-	gobottest.Assert(t, b, uint32(tsl2561LuxB6T))
-	gobottest.Assert(t, m, uint32(tsl2561LuxM6T))
+	assert.Equal(t, uint32(tsl2561LuxB6T), b)
+	assert.Equal(t, uint32(tsl2561LuxM6T), m)
 
 	b, m = d.getBM(tsl2561LuxK7T)
-	gobottest.Assert(t, b, uint32(tsl2561LuxB7T))
-	gobottest.Assert(t, m, uint32(tsl2561LuxM7T))
+	assert.Equal(t, uint32(tsl2561LuxB7T), b)
+	assert.Equal(t, uint32(tsl2561LuxM7T), m)
 
 	b, m = d.getBM(tsl2561LuxK8T + 1)
-	gobottest.Assert(t, b, uint32(tsl2561LuxB8T))
-	gobottest.Assert(t, m, uint32(tsl2561LuxM8T))
+	assert.Equal(t, uint32(tsl2561LuxB8T), b)
+	assert.Equal(t, uint32(tsl2561LuxM8T), m)
 }

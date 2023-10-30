@@ -189,7 +189,7 @@ func (d *i2cDevice) WriteByteData(address int, reg uint8, val uint8) error {
 		return err
 	}
 
-	var data = val
+	data := val
 	return d.smbusAccess(address, I2C_SMBUS_WRITE, reg, I2C_SMBUS_BYTE_DATA, unsafe.Pointer(&data))
 }
 
@@ -202,7 +202,7 @@ func (d *i2cDevice) WriteWordData(address int, reg uint8, val uint16) error {
 		return err
 	}
 
-	var data = val
+	data := val
 	return d.smbusAccess(address, I2C_SMBUS_WRITE, reg, I2C_SMBUS_WORD_DATA, unsafe.Pointer(&data))
 }
 
@@ -381,7 +381,7 @@ func (d *i2cDevice) syscallIoctl(signal uintptr, payload unsafe.Pointer, sender 
 	return nil
 }
 
-func (d *i2cDevice) openFileLazy(sender string) (err error) {
+func (d *i2cDevice) openFileLazy(sender string) (err error) { //nolint:unparam // useful for debugging
 	// lazy initialization
 	// note: "os.ModeExclusive" is undefined without create the file. This means for the existing character device,
 	// a second open will not return an error e.g. due to a busy resource, so most likely "os.ModeExclusive" is not really

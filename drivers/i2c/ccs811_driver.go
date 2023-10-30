@@ -20,33 +20,33 @@ const (
 
 const (
 
-	//the default I2C address for the ccs811 applies for ADDR to GND, for ADDR to VDD it will be 0x5B
+	// the default I2C address for the ccs811 applies for ADDR to GND, for ADDR to VDD it will be 0x5B
 	ccs811DefaultAddress = 0x5A
 
-	//Registers, all definitions have been taken from the datasheet
-	//Single byte read only register which indicates if a device is active, if new data is available or if an error occurred.
+	// Registers, all definitions have been taken from the datasheet
+	// Single byte read only register which indicates if a device is active, if new data is available or if an error occurred.
 	ccs811RegStatus = 0x00
-	//This is Single byte register, which is used to enable sensor drive mode and interrupts.
+	// This is Single byte register, which is used to enable sensor drive mode and interrupts.
 	ccs811RegMeasMode = 0x01
-	//This multi-byte read only register contains the calculated eCO2 (ppm) and eTVOC (ppb) values followed by the STATUS register, ERROR_ID register and the RAW_DATA register.
+	// This multi-byte read only register contains the calculated eCO2 (ppm) and eTVOC (ppb) values followed by the STATUS register, ERROR_ID register and the RAW_DATA register.
 	ccs811RegAlgResultData = 0x02
-	//Two byte read only register which contains the latest readings from the sensor.
-	//ccs811RegRawData = 0x03
-	//A multi-byte register that can be written with the current Humidity and Temperature values if known.
-	//ccs811RegEnvData = 0x05
-	//Register that holds the NTC value used for temperature calcualtions
+	// Two byte read only register which contains the latest readings from the sensor.
+	// ccs811RegRawData = 0x03
+	// A multi-byte register that can be written with the current Humidity and Temperature values if known.
+	// ccs811RegEnvData = 0x05
+	// Register that holds the NTC value used for temperature calculations
 	ccs811RegNtc = 0x06
-	//Asserting the SW_RESET will restart the CCS811 in Boot mode to enable new application firmware to be downloaded.
+	// Asserting the SW_RESET will restart the CCS811 in Boot mode to enable new application firmware to be downloaded.
 	ccs811RegSwReset = 0xFF
-	//Single byte read only register which holds the HW ID which is 0x81 for this family of CCS81x devices.
+	// Single byte read only register which holds the HW ID which is 0x81 for this family of CCS81x devices.
 	ccs811RegHwID = 0x20
-	//Single byte read only register that contains the hardware version. The value is 0x1X
+	// Single byte read only register that contains the hardware version. The value is 0x1X
 	ccs811RegHwVersion = 0x21
-	//Two byte read only register which contain the version of the firmware bootloader stored in the CCS811 in the format Major.Minor.Trivial
+	// Two byte read only register which contain the version of the firmware bootloader stored in the CCS811 in the format Major.Minor.Trivial
 	ccs811RegFwBootVersion = 0x23
-	//Two byte read only register which contain the version of the firmware application stored in the CCS811 in the format Major.Minor.Trivial
+	// Two byte read only register which contain the version of the firmware application stored in the CCS811 in the format Major.Minor.Trivial
 	ccs811RegFwAppVersion = 0x24
-	//To change the mode of the CCS811 from Boot mode to running the application, a single byte write of 0xF4 is required.
+	// To change the mode of the CCS811 from Boot mode to running the application, a single byte write of 0xF4 is required.
 	ccs811RegAppStart = 0xF4
 
 	// Constants
@@ -54,21 +54,19 @@ const (
 	ccs811HwIDCode = 0x81
 )
 
-var (
-	// The sequence of bytes needed to do a software reset
-	ccs811SwResetSequence = []byte{0x11, 0xE5, 0x72, 0x8A}
-)
+// The sequence of bytes needed to do a software reset
+var ccs811SwResetSequence = []byte{0x11, 0xE5, 0x72, 0x8A}
 
 // CCS811Status represents the current status of the device defined by the ccs811RegStatus.
 // The following definitions were taken from https://ams.com/documents/20143/36005/CCS811_DS000459_6-00.pdf/c7091525-c7e5-37ac-eedb-b6c6828b0dcf#page=15
 type CCS811Status struct {
-	//There is some sort of error on the i2c bus or there is an error with the internal sensor
+	// There is some sort of error on the i2c bus or there is an error with the internal sensor
 	HasError byte
-	//A new data sample is ready in ccs811RegAlgResultData
+	// A new data sample is ready in ccs811RegAlgResultData
 	DataReady byte
-	//Valid application firmware loaded
+	// Valid application firmware loaded
 	AppValid byte
-	//Firmware is in application mode. CCS811 is ready to take sensor measurements
+	// Firmware is in application mode. CCS811 is ready to take sensor measurements
 	FwMode byte
 }
 
@@ -86,12 +84,12 @@ func NewCCS811Status(data uint8) *CCS811Status {
 // The following definitions were taken from the bit fields of the ccs811RegMeasMode defined in
 // https://ams.com/documents/20143/36005/CCS811_DS000459_6-00.pdf/c7091525-c7e5-37ac-eedb-b6c6828b0dcf#page=16
 type CCS811MeasMode struct {
-	//If intThresh is 1 a data measurement will only be taken when the sensor value meets the threshold constraint.
-	//The threshold value is set in the threshold register (0x10)
+	// If intThresh is 1 a data measurement will only be taken when the sensor value meets the threshold constraint.
+	// The threshold value is set in the threshold register (0x10)
 	intThresh uint8
-	//If intDataRdy is 1, the nINT signal (pin 3 of the device) will be driven low when new data is available.
+	// If intDataRdy is 1, the nINT signal (pin 3 of the device) will be driven low when new data is available.
 	intDataRdy uint8
-	//driveMode represents the sampling rate of the sensor. If the value is 0, the measurement process is idle.
+	// driveMode represents the sampling rate of the sensor. If the value is 0, the measurement process is idle.
 	driveMode CCS811DriveMode
 }
 
@@ -123,7 +121,7 @@ func NewCCS811Driver(c Connector, options ...func(Config)) *CCS811Driver {
 	d := &CCS811Driver{
 		Driver:   NewDriver(c, "CCS811", ccs811DefaultAddress),
 		measMode: NewCCS811MeasMode(),
-		//Recommended resistance value is 100,000
+		// Recommended resistance value is 100,000
 		ntcResistanceValue: 100000,
 	}
 	d.afterStart = d.initialize
@@ -205,7 +203,7 @@ func (d *CCS811Driver) GetStatus() (*CCS811Status, error) {
 	return cs, nil
 }
 
-// GetTemperature returns the device temperature in celcius.
+// GetTemperature returns the device temperature in celsius.
 // If you do not have an NTC resistor installed, this function should not be called
 func (d *CCS811Driver) GetTemperature() (float32, error) {
 	d.mutex.Lock()
@@ -319,7 +317,7 @@ func (d *CCS811Driver) resetDevice() error {
 // startApp starts the app code in the device. This operation has to be done after a
 // software reset to start taking sensor measurements.
 func (d *CCS811Driver) startApp() error {
-	//Write without data is needed to start the app code
+	// Write without data is needed to start the app code
 	_, err := d.connection.Write([]byte{ccs811RegAppStart})
 	return err
 }

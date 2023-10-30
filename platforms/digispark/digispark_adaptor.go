@@ -54,7 +54,6 @@ func (d *Adaptor) Finalize() (err error) { return }
 // DigitalWrite writes a value to the pin. Acceptable values are 1 or 0.
 func (d *Adaptor) DigitalWrite(pin string, level byte) (err error) {
 	p, err := strconv.Atoi(pin)
-
 	if err != nil {
 		return
 	}

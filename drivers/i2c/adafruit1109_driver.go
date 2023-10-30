@@ -79,7 +79,7 @@ func NewAdafruit1109Driver(a Connector, options ...func(Config)) *Adafruit1109Dr
 		D7: d.dataPinD7.String(),
 	}
 
-	//rwPin := "B_6" not mapped in HD44780 driver
+	// rwPin := "B_6" not mapped in HD44780 driver
 	// at test initialization, there seems rows and columns be switched
 	// but inside the driver the row is used as row and col as column
 	rows := 2

@@ -5,18 +5,18 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*RgbLedDriver)(nil)
 
 func initTestRgbLedDriver() *RgbLedDriver {
 	a := newGpioTestAdaptor()
-	a.testAdaptorDigitalWrite = func(string, byte) (err error) {
+	a.digitalWriteFunc = func(string, byte) (err error) {
 		return nil
 	}
-	a.testAdaptorPwmWrite = func(string, byte) (err error) {
+	a.pwmWriteFunc = func(string, byte) (err error) {
 		return nil
 	}
 	return NewRgbLedDriver(a, "1", "2", "3")
@@ -28,73 +28,73 @@ func TestRgbLedDriver(t *testing.T) {
 	a := newGpioTestAdaptor()
 	d := NewRgbLedDriver(a, "1", "2", "3")
 
-	gobottest.Assert(t, d.Pin(), "r=1, g=2, b=3")
-	gobottest.Assert(t, d.RedPin(), "1")
-	gobottest.Assert(t, d.GreenPin(), "2")
-	gobottest.Assert(t, d.BluePin(), "3")
-	gobottest.Refute(t, d.Connection(), nil)
+	assert.Equal(t, "r=1, g=2, b=3", d.Pin())
+	assert.Equal(t, "1", d.RedPin())
+	assert.Equal(t, "2", d.GreenPin())
+	assert.Equal(t, "3", d.BluePin())
+	assert.NotNil(t, d.Connection())
 
-	a.testAdaptorDigitalWrite = func(string, byte) (err error) {
+	a.digitalWriteFunc = func(string, byte) (err error) {
 		return errors.New("write error")
 	}
-	a.testAdaptorPwmWrite = func(string, byte) (err error) {
+	a.pwmWriteFunc = func(string, byte) (err error) {
 		return errors.New("pwm error")
 	}
 
 	err = d.Command("Toggle")(nil)
-	gobottest.Assert(t, err.(error), errors.New("pwm error"))
+	assert.ErrorContains(t, err.(error), "pwm error")
 
 	err = d.Command("On")(nil)
-	gobottest.Assert(t, err.(error), errors.New("pwm error"))
+	assert.ErrorContains(t, err.(error), "pwm error")
 
 	err = d.Command("Off")(nil)
-	gobottest.Assert(t, err.(error), errors.New("pwm error"))
+	assert.ErrorContains(t, err.(error), "pwm error")
 
 	err = d.Command("SetRGB")(map[string]interface{}{"r": 0xff, "g": 0xff, "b": 0xff})
-	gobottest.Assert(t, err.(error), errors.New("pwm error"))
+	assert.ErrorContains(t, err.(error), "pwm error")
 }
 
 func TestRgbLedDriverStart(t *testing.T) {
 	d := initTestRgbLedDriver()
-	gobottest.Assert(t, d.Start(), nil)
+	assert.NoError(t, d.Start())
 }
 
 func TestRgbLedDriverHalt(t *testing.T) {
 	d := initTestRgbLedDriver()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.NoError(t, d.Halt())
 }
 
 func TestRgbLedDriverToggle(t *testing.T) {
 	d := initTestRgbLedDriver()
 	_ = d.Off()
 	_ = d.Toggle()
-	gobottest.Assert(t, d.State(), true)
+	assert.True(t, d.State())
 	_ = d.Toggle()
-	gobottest.Assert(t, d.State(), false)
+	assert.False(t, d.State())
 }
 
 func TestRgbLedDriverSetLevel(t *testing.T) {
 	a := newGpioTestAdaptor()
 	d := NewRgbLedDriver(a, "1", "2", "3")
-	gobottest.Assert(t, d.SetLevel("1", 150), nil)
+	assert.NoError(t, d.SetLevel("1", 150))
 
 	d = NewRgbLedDriver(a, "1", "2", "3")
-	a.testAdaptorPwmWrite = func(string, byte) (err error) {
+	a.pwmWriteFunc = func(string, byte) (err error) {
 		err = errors.New("pwm error")
 		return
 	}
-	gobottest.Assert(t, d.SetLevel("1", 150), errors.New("pwm error"))
+	assert.ErrorContains(t, d.SetLevel("1", 150), "pwm error")
 }
 
 func TestRgbLedDriverDefaultName(t *testing.T) {
 	a := newGpioTestAdaptor()
 	d := NewRgbLedDriver(a, "1", "2", "3")
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "RGB"), true)
+	assert.True(t, strings.HasPrefix(d.Name(), "RGB"))
 }
 
 func TestRgbLedDriverSetName(t *testing.T) {
 	a := newGpioTestAdaptor()
 	d := NewRgbLedDriver(a, "1", "2", "3")
 	d.SetName("mybot")
-	gobottest.Assert(t, d.Name(), "mybot")
+	assert.Equal(t, "mybot", d.Name())
 }

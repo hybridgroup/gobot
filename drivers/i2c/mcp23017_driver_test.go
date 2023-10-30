@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
@@ -31,7 +31,7 @@ func initTestMCP23017(b uint8) (driver *MCP23017Driver) {
 	return d
 }
 
-func initTestMCP23017WithStubbedAdaptor(b uint8) (*MCP23017Driver, *i2cTestAdaptor) {
+func initTestMCP23017WithStubbedAdaptor(b uint8) (*MCP23017Driver, *i2cTestAdaptor) { //nolint:unparam // keep for tests
 	// create the driver, ready to use for tests
 	a := newI2cTestAdaptor()
 	d := NewMCP23017Driver(a, WithMCP23017Bank(b))
@@ -45,56 +45,56 @@ func TestNewMCP23017Driver(t *testing.T) {
 	if !ok {
 		t.Errorf("NewMCP23017Driver() should have returned a *MCP23017Driver")
 	}
-	gobottest.Refute(t, d.Driver, nil)
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "MCP23017"), true)
-	gobottest.Assert(t, d.defaultAddress, 0x20)
-	gobottest.Refute(t, d.mcpConf, nil)
-	gobottest.Refute(t, d.mcpBehav, nil)
+	assert.NotNil(t, d.Driver)
+	assert.True(t, strings.HasPrefix(d.Name(), "MCP23017"))
+	assert.Equal(t, 0x20, d.defaultAddress)
+	assert.NotNil(t, d.mcpConf)
+	assert.NotNil(t, d.mcpBehav)
 }
 
 func TestWithMCP23017Bank(t *testing.T) {
 	b := NewMCP23017Driver(newI2cTestAdaptor(), WithMCP23017Bank(1))
-	gobottest.Assert(t, b.mcpConf.bank, uint8(1))
+	assert.Equal(t, uint8(1), b.mcpConf.bank)
 }
 
 func TestWithMCP23017Mirror(t *testing.T) {
 	b := NewMCP23017Driver(newI2cTestAdaptor(), WithMCP23017Mirror(1))
-	gobottest.Assert(t, b.mcpConf.mirror, uint8(1))
+	assert.Equal(t, uint8(1), b.mcpConf.mirror)
 }
 
 func TestWithMCP23017Seqop(t *testing.T) {
 	b := NewMCP23017Driver(newI2cTestAdaptor(), WithMCP23017Seqop(1))
-	gobottest.Assert(t, b.mcpConf.seqop, uint8(1))
+	assert.Equal(t, uint8(1), b.mcpConf.seqop)
 }
 
 func TestWithMCP23017Disslw(t *testing.T) {
 	b := NewMCP23017Driver(newI2cTestAdaptor(), WithMCP23017Disslw(1))
-	gobottest.Assert(t, b.mcpConf.disslw, uint8(1))
+	assert.Equal(t, uint8(1), b.mcpConf.disslw)
 }
 
 func TestWithMCP23017Haen(t *testing.T) {
 	b := NewMCP23017Driver(newI2cTestAdaptor(), WithMCP23017Haen(1))
-	gobottest.Assert(t, b.mcpConf.haen, uint8(1))
+	assert.Equal(t, uint8(1), b.mcpConf.haen)
 }
 
 func TestWithMCP23017Odr(t *testing.T) {
 	b := NewMCP23017Driver(newI2cTestAdaptor(), WithMCP23017Odr(1))
-	gobottest.Assert(t, b.mcpConf.odr, uint8(1))
+	assert.Equal(t, uint8(1), b.mcpConf.odr)
 }
 
 func TestWithMCP23017Intpol(t *testing.T) {
 	b := NewMCP23017Driver(newI2cTestAdaptor(), WithMCP23017Intpol(1))
-	gobottest.Assert(t, b.mcpConf.intpol, uint8(1))
+	assert.Equal(t, uint8(1), b.mcpConf.intpol)
 }
 
 func TestWithMCP23017ForceRefresh(t *testing.T) {
 	b := NewMCP23017Driver(newI2cTestAdaptor(), WithMCP23017ForceRefresh(1))
-	gobottest.Assert(t, b.mcpBehav.forceRefresh, true)
+	assert.True(t, b.mcpBehav.forceRefresh)
 }
 
 func TestWithMCP23017AutoIODirOff(t *testing.T) {
 	b := NewMCP23017Driver(newI2cTestAdaptor(), WithMCP23017AutoIODirOff(1))
-	gobottest.Assert(t, b.mcpBehav.autoIODirOff, true)
+	assert.True(t, b.mcpBehav.autoIODirOff)
 }
 
 func TestMCP23017CommandsWriteGPIO(t *testing.T) {
@@ -103,7 +103,7 @@ func TestMCP23017CommandsWriteGPIO(t *testing.T) {
 	// act
 	result := d.Command("WriteGPIO")(pinValPort)
 	// assert
-	gobottest.Assert(t, result.(map[string]interface{})["err"], nil)
+	assert.Nil(t, result.(map[string]interface{})["err"])
 }
 
 func TestMCP23017CommandsReadGPIO(t *testing.T) {
@@ -112,7 +112,7 @@ func TestMCP23017CommandsReadGPIO(t *testing.T) {
 	// act
 	result := d.Command("ReadGPIO")(pinPort)
 	// assert
-	gobottest.Assert(t, result.(map[string]interface{})["err"], nil)
+	assert.Nil(t, result.(map[string]interface{})["err"])
 }
 
 func TestMCP23017WriteGPIO(t *testing.T) {
@@ -147,15 +147,15 @@ func TestMCP23017WriteGPIO(t *testing.T) {
 		// act
 		err := d.WriteGPIO(testPin, testPort, uint8(bitState))
 		// assert
-		gobottest.Assert(t, err, nil)
-		gobottest.Assert(t, len(a.written), 6)
-		gobottest.Assert(t, a.written[0], wantReg1)
-		gobottest.Assert(t, a.written[1], wantReg1)
-		gobottest.Assert(t, a.written[2], wantReg1Val)
-		gobottest.Assert(t, a.written[3], wantReg2)
-		gobottest.Assert(t, a.written[4], wantReg2)
-		gobottest.Assert(t, a.written[5], wantReg2Val)
-		gobottest.Assert(t, numCallsRead, 2)
+		assert.NoError(t, err)
+		assert.Equal(t, 6, len(a.written))
+		assert.Equal(t, wantReg1, a.written[0])
+		assert.Equal(t, wantReg1, a.written[1])
+		assert.Equal(t, wantReg1Val, a.written[2])
+		assert.Equal(t, wantReg2, a.written[3])
+		assert.Equal(t, wantReg2, a.written[4])
+		assert.Equal(t, wantReg2Val, a.written[5])
+		assert.Equal(t, 2, numCallsRead)
 	}
 }
 
@@ -186,11 +186,11 @@ func TestMCP23017WriteGPIONoRefresh(t *testing.T) {
 		// act
 		err := d.WriteGPIO(testPin, testPort, uint8(bitState))
 		// assert
-		gobottest.Assert(t, err, nil)
-		gobottest.Assert(t, len(a.written), 2)
-		gobottest.Assert(t, a.written[0], wantReg1)
-		gobottest.Assert(t, a.written[1], wantReg2)
-		gobottest.Assert(t, numCallsRead, 2)
+		assert.NoError(t, err)
+		assert.Equal(t, 2, len(a.written))
+		assert.Equal(t, wantReg1, a.written[0])
+		assert.Equal(t, wantReg2, a.written[1])
+		assert.Equal(t, 2, numCallsRead)
 	}
 }
 
@@ -223,12 +223,12 @@ func TestMCP23017WriteGPIONoAutoDir(t *testing.T) {
 		// act
 		err := d.WriteGPIO(testPin, testPort, uint8(bitState))
 		// assert
-		gobottest.Assert(t, err, nil)
-		gobottest.Assert(t, len(a.written), 3)
-		gobottest.Assert(t, a.written[0], wantReg)
-		gobottest.Assert(t, a.written[1], wantReg)
-		gobottest.Assert(t, a.written[2], wantRegVal)
-		gobottest.Assert(t, numCallsRead, 1)
+		assert.NoError(t, err)
+		assert.Equal(t, 3, len(a.written))
+		assert.Equal(t, wantReg, a.written[0])
+		assert.Equal(t, wantReg, a.written[1])
+		assert.Equal(t, wantRegVal, a.written[2])
+		assert.Equal(t, 1, numCallsRead)
 	}
 }
 
@@ -241,7 +241,7 @@ func TestMCP23017CommandsWriteGPIOErrIODIR(t *testing.T) {
 	// act
 	err := d.WriteGPIO(7, "A", 0)
 	// assert
-	gobottest.Assert(t, err, errors.New("MCP write-read: MCP write-ReadByteData(reg=0): write error"))
+	assert.ErrorContains(t, err, "MCP write-read: MCP write-ReadByteData(reg=0): write error")
 }
 
 func TestMCP23017CommandsWriteGPIOErrOLAT(t *testing.T) {
@@ -258,7 +258,7 @@ func TestMCP23017CommandsWriteGPIOErrOLAT(t *testing.T) {
 	// act
 	err := d.WriteGPIO(7, "A", 0)
 	// assert
-	gobottest.Assert(t, err, errors.New("MCP write-read: MCP write-ReadByteData(reg=20): write error"))
+	assert.ErrorContains(t, err, "MCP write-read: MCP write-ReadByteData(reg=20): write error")
 }
 
 func TestMCP23017ReadGPIO(t *testing.T) {
@@ -290,14 +290,14 @@ func TestMCP23017ReadGPIO(t *testing.T) {
 		// act
 		val, err := d.ReadGPIO(testPin, testPort)
 		// assert
-		gobottest.Assert(t, err, nil)
-		gobottest.Assert(t, numCallsRead, 2)
-		gobottest.Assert(t, len(a.written), 4)
-		gobottest.Assert(t, a.written[0], wantReg1)
-		gobottest.Assert(t, a.written[1], wantReg1)
-		gobottest.Assert(t, a.written[2], wantReg1Val)
-		gobottest.Assert(t, a.written[3], wantReg2)
-		gobottest.Assert(t, val, uint8(bitState))
+		assert.NoError(t, err)
+		assert.Equal(t, 2, numCallsRead)
+		assert.Equal(t, 4, len(a.written))
+		assert.Equal(t, wantReg1, a.written[0])
+		assert.Equal(t, wantReg1, a.written[1])
+		assert.Equal(t, wantReg1Val, a.written[2])
+		assert.Equal(t, wantReg2, a.written[3])
+		assert.Equal(t, uint8(bitState), val)
 	}
 }
 
@@ -328,12 +328,12 @@ func TestMCP23017ReadGPIONoRefresh(t *testing.T) {
 		// act
 		val, err := d.ReadGPIO(testPin, testPort)
 		// assert
-		gobottest.Assert(t, err, nil)
-		gobottest.Assert(t, numCallsRead, 2)
-		gobottest.Assert(t, len(a.written), 2)
-		gobottest.Assert(t, a.written[0], wantReg1)
-		gobottest.Assert(t, a.written[1], wantReg2)
-		gobottest.Assert(t, val, uint8(bitState))
+		assert.NoError(t, err)
+		assert.Equal(t, 2, numCallsRead)
+		assert.Equal(t, 2, len(a.written))
+		assert.Equal(t, wantReg1, a.written[0])
+		assert.Equal(t, wantReg2, a.written[1])
+		assert.Equal(t, uint8(bitState), val)
 	}
 }
 
@@ -363,11 +363,11 @@ func TestMCP23017ReadGPIONoAutoDir(t *testing.T) {
 		// act
 		val, err := d.ReadGPIO(testPin, testPort)
 		// assert
-		gobottest.Assert(t, err, nil)
-		gobottest.Assert(t, numCallsRead, 1)
-		gobottest.Assert(t, len(a.written), 1)
-		gobottest.Assert(t, a.written[0], wantReg2)
-		gobottest.Assert(t, val, uint8(bitState))
+		assert.NoError(t, err)
+		assert.Equal(t, 1, numCallsRead)
+		assert.Equal(t, 1, len(a.written))
+		assert.Equal(t, wantReg2, a.written[0])
+		assert.Equal(t, uint8(bitState), val)
 	}
 }
 
@@ -381,7 +381,7 @@ func TestMCP23017ReadGPIOErr(t *testing.T) {
 	// act
 	_, err := d.ReadGPIO(7, "A")
 	// assert
-	gobottest.Assert(t, err, errors.New("MCP write-read: MCP write-ReadByteData(reg=0): read error"))
+	assert.ErrorContains(t, err, "MCP write-read: MCP write-ReadByteData(reg=0): read error")
 }
 
 func TestMCP23017SetPinMode(t *testing.T) {
@@ -413,12 +413,12 @@ func TestMCP23017SetPinMode(t *testing.T) {
 		// act
 		err := d.SetPinMode(testPin, testPort, uint8(bitState))
 		// assert
-		gobottest.Assert(t, err, nil)
-		gobottest.Assert(t, len(a.written), 3)
-		gobottest.Assert(t, a.written[0], wantReg)
-		gobottest.Assert(t, a.written[1], wantReg)
-		gobottest.Assert(t, a.written[2], wantRegVal)
-		gobottest.Assert(t, numCallsRead, 1)
+		assert.NoError(t, err)
+		assert.Equal(t, 3, len(a.written))
+		assert.Equal(t, wantReg, a.written[0])
+		assert.Equal(t, wantReg, a.written[1])
+		assert.Equal(t, wantRegVal, a.written[2])
+		assert.Equal(t, 1, numCallsRead)
 	}
 }
 
@@ -431,7 +431,7 @@ func TestMCP23017SetPinModeErr(t *testing.T) {
 	// act
 	err := d.SetPinMode(7, "A", 0)
 	// assert
-	gobottest.Assert(t, err, errors.New("MCP write-read: MCP write-ReadByteData(reg=0): write error"))
+	assert.ErrorContains(t, err, "MCP write-read: MCP write-ReadByteData(reg=0): write error")
 }
 
 func TestMCP23017SetPullUp(t *testing.T) {
@@ -463,12 +463,12 @@ func TestMCP23017SetPullUp(t *testing.T) {
 		// act
 		err := d.SetPullUp(testPin, testPort, uint8(bitState))
 		// assert
-		gobottest.Assert(t, err, nil)
-		gobottest.Assert(t, len(a.written), 3)
-		gobottest.Assert(t, a.written[0], wantReg)
-		gobottest.Assert(t, a.written[1], wantReg)
-		gobottest.Assert(t, a.written[2], wantSetVal)
-		gobottest.Assert(t, numCallsRead, 1)
+		assert.NoError(t, err)
+		assert.Equal(t, 3, len(a.written))
+		assert.Equal(t, wantReg, a.written[0])
+		assert.Equal(t, wantReg, a.written[1])
+		assert.Equal(t, wantSetVal, a.written[2])
+		assert.Equal(t, 1, numCallsRead)
 	}
 }
 
@@ -481,7 +481,7 @@ func TestMCP23017SetPullUpErr(t *testing.T) {
 	// act
 	err := d.SetPullUp(7, "A", 0)
 	// assert
-	gobottest.Assert(t, err, errors.New("MCP write-read: MCP write-ReadByteData(reg=12): write error"))
+	assert.ErrorContains(t, err, "MCP write-read: MCP write-ReadByteData(reg=12): write error")
 }
 
 func TestMCP23017SetGPIOPolarity(t *testing.T) {
@@ -513,12 +513,12 @@ func TestMCP23017SetGPIOPolarity(t *testing.T) {
 		// act
 		err := d.SetGPIOPolarity(testPin, testPort, uint8(bitState))
 		// assert
-		gobottest.Assert(t, err, nil)
-		gobottest.Assert(t, len(a.written), 3)
-		gobottest.Assert(t, a.written[0], wantReg)
-		gobottest.Assert(t, a.written[1], wantReg)
-		gobottest.Assert(t, a.written[2], wantSetVal)
-		gobottest.Assert(t, numCallsRead, 1)
+		assert.NoError(t, err)
+		assert.Equal(t, 3, len(a.written))
+		assert.Equal(t, wantReg, a.written[0])
+		assert.Equal(t, wantReg, a.written[1])
+		assert.Equal(t, wantSetVal, a.written[2])
+		assert.Equal(t, 1, numCallsRead)
 	}
 }
 
@@ -531,7 +531,7 @@ func TestMCP23017SetGPIOPolarityErr(t *testing.T) {
 	// act
 	err := d.SetGPIOPolarity(7, "A", 0)
 	// assert
-	gobottest.Assert(t, err, errors.New("MCP write-read: MCP write-ReadByteData(reg=2): write error"))
+	assert.ErrorContains(t, err, "MCP write-read: MCP write-ReadByteData(reg=2): write error")
 }
 
 func TestMCP23017_write(t *testing.T) {
@@ -539,13 +539,13 @@ func TestMCP23017_write(t *testing.T) {
 	d, _ := initTestMCP23017WithStubbedAdaptor(0)
 	port := d.getPort("A")
 	err := d.write(port.IODIR, uint8(7), 0)
-	gobottest.Assert(t, err, nil)
+	assert.NoError(t, err)
 
 	// set bit
 	d, _ = initTestMCP23017WithStubbedAdaptor(0)
 	port = d.getPort("B")
 	err = d.write(port.IODIR, uint8(7), 1)
-	gobottest.Assert(t, err, nil)
+	assert.NoError(t, err)
 
 	// write error
 	d, a := initTestMCP23017WithStubbedAdaptor(0)
@@ -553,7 +553,7 @@ func TestMCP23017_write(t *testing.T) {
 		return 0, errors.New("write error")
 	}
 	err = d.write(port.IODIR, uint8(7), 0)
-	gobottest.Assert(t, err, errors.New("MCP write-read: MCP write-ReadByteData(reg=1): write error"))
+	assert.ErrorContains(t, err, "MCP write-read: MCP write-ReadByteData(reg=1): write error")
 
 	// read error
 	d, a = initTestMCP23017WithStubbedAdaptor(0)
@@ -561,12 +561,12 @@ func TestMCP23017_write(t *testing.T) {
 		return len(b), errors.New("read error")
 	}
 	err = d.write(port.IODIR, uint8(7), 0)
-	gobottest.Assert(t, err, errors.New("MCP write-read: MCP write-ReadByteData(reg=1): read error"))
+	assert.ErrorContains(t, err, "MCP write-read: MCP write-ReadByteData(reg=1): read error")
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		return len(b), nil
 	}
 	err = d.write(port.IODIR, uint8(7), 1)
-	gobottest.Assert(t, err, nil)
+	assert.NoError(t, err)
 }
 
 func TestMCP23017_read(t *testing.T) {
@@ -578,7 +578,7 @@ func TestMCP23017_read(t *testing.T) {
 		return 1, nil
 	}
 	val, _ := d.read(port.IODIR)
-	gobottest.Assert(t, val, uint8(255))
+	assert.Equal(t, uint8(255), val)
 
 	// read error
 	d, a = initTestMCP23017WithStubbedAdaptor(0)
@@ -587,8 +587,8 @@ func TestMCP23017_read(t *testing.T) {
 	}
 
 	val, err := d.read(port.IODIR)
-	gobottest.Assert(t, val, uint8(0))
-	gobottest.Assert(t, err, errors.New("MCP write-ReadByteData(reg=0): read error"))
+	assert.Equal(t, uint8(0), val)
+	assert.ErrorContains(t, err, "MCP write-ReadByteData(reg=0): read error")
 
 	// read
 	d, a = initTestMCP23017WithStubbedAdaptor(0)
@@ -598,7 +598,7 @@ func TestMCP23017_read(t *testing.T) {
 		return 1, nil
 	}
 	val, _ = d.read(port.IODIR)
-	gobottest.Assert(t, val, uint8(255))
+	assert.Equal(t, uint8(255), val)
 }
 
 func TestMCP23017_getPort(t *testing.T) {
@@ -606,23 +606,23 @@ func TestMCP23017_getPort(t *testing.T) {
 	d := initTestMCP23017(0)
 	expectedPort := mcp23017GetBank(0).portA
 	actualPort := d.getPort("A")
-	gobottest.Assert(t, expectedPort, actualPort)
+	assert.Equal(t, actualPort, expectedPort)
 
 	// port B
 	d = initTestMCP23017(0)
 	expectedPort = mcp23017GetBank(0).portB
 	actualPort = d.getPort("B")
-	gobottest.Assert(t, expectedPort, actualPort)
+	assert.Equal(t, actualPort, expectedPort)
 
 	// default
 	d = initTestMCP23017(0)
 	expectedPort = mcp23017GetBank(0).portA
 	actualPort = d.getPort("")
-	gobottest.Assert(t, expectedPort, actualPort)
+	assert.Equal(t, actualPort, expectedPort)
 
 	// port A bank 1
 	d = initTestMCP23017(1)
 	expectedPort = mcp23017GetBank(1).portA
 	actualPort = d.getPort("")
-	gobottest.Assert(t, expectedPort, actualPort)
+	assert.Equal(t, actualPort, expectedPort)
 }

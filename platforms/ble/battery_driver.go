@@ -57,6 +57,6 @@ func (b *BatteryDriver) GetBatteryLevel() (level uint8) {
 	}
 	buf := bytes.NewBuffer(c)
 	val, _ := buf.ReadByte()
-	l = uint8(val)
+	l = val
 	return l
 }

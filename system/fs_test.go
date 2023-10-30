@@ -4,19 +4,19 @@ import (
 	"os"
 	"testing"
 
-	"gobot.io/x/gobot/v2/gobottest"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFilesystemOpen(t *testing.T) {
 	fs := &nativeFilesystem{}
-	file, err := fs.openFile(os.DevNull, os.O_RDONLY, 0666)
-	gobottest.Assert(t, err, nil)
+	file, err := fs.openFile(os.DevNull, os.O_RDONLY, 0o666)
+	assert.NoError(t, err)
 	var _ File = file
 }
 
 func TestFilesystemStat(t *testing.T) {
 	fs := &nativeFilesystem{}
 	fileInfo, err := fs.stat(os.DevNull)
-	gobottest.Assert(t, err, nil)
-	gobottest.Refute(t, fileInfo, nil)
+	assert.NoError(t, err)
+	assert.NotNil(t, fileInfo)
 }

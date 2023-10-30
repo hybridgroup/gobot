@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*SpheroDriver)(nil)
@@ -20,9 +20,9 @@ func initTestSpheroDriver() *SpheroDriver {
 
 func TestSpheroDriverName(t *testing.T) {
 	d := initTestSpheroDriver()
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Sphero"), true)
+	assert.True(t, strings.HasPrefix(d.Name(), "Sphero"))
 	d.SetName("NewName")
-	gobottest.Assert(t, d.Name(), "NewName")
+	assert.Equal(t, "NewName", d.Name())
 }
 
 func TestSpheroDriver(t *testing.T) {
@@ -32,65 +32,65 @@ func TestSpheroDriver(t *testing.T) {
 	ret = d.Command("SetRGB")(
 		map[string]interface{}{"r": 100.0, "g": 100.0, "b": 100.0},
 	)
-	gobottest.Assert(t, ret, nil)
+	assert.Nil(t, ret)
 
 	ret = d.Command("Roll")(
 		map[string]interface{}{"speed": 100.0, "heading": 100.0},
 	)
-	gobottest.Assert(t, ret, nil)
+	assert.Nil(t, ret)
 
 	ret = d.Command("SetBackLED")(
 		map[string]interface{}{"level": 100.0},
 	)
-	gobottest.Assert(t, ret, nil)
+	assert.Nil(t, ret)
 
 	ret = d.Command("ConfigureLocator")(
 		map[string]interface{}{"Flags": 1.0, "X": 100.0, "Y": 100.0, "YawTare": 100.0},
 	)
-	gobottest.Assert(t, ret, nil)
+	assert.Nil(t, ret)
 
 	ret = d.Command("SetHeading")(
 		map[string]interface{}{"heading": 100.0},
 	)
-	gobottest.Assert(t, ret, nil)
+	assert.Nil(t, ret)
 
 	ret = d.Command("SetRotationRate")(
 		map[string]interface{}{"level": 100.0},
 	)
-	gobottest.Assert(t, ret, nil)
+	assert.Nil(t, ret)
 
 	ret = d.Command("SetStabilization")(
 		map[string]interface{}{"enable": true},
 	)
-	gobottest.Assert(t, ret, nil)
+	assert.Nil(t, ret)
 
 	ret = d.Command("SetStabilization")(
 		map[string]interface{}{"enable": false},
 	)
-	gobottest.Assert(t, ret, nil)
+	assert.Nil(t, ret)
 
 	ret = d.Command("Stop")(nil)
-	gobottest.Assert(t, ret, nil)
+	assert.Nil(t, ret)
 
 	ret = d.Command("GetRGB")(nil)
-	gobottest.Assert(t, ret.([]byte), []byte{})
+	assert.Equal(t, []byte{}, ret.([]byte))
 
 	ret = d.Command("ReadLocator")(nil)
-	gobottest.Assert(t, ret, []int16{})
+	assert.Equal(t, []int16{}, ret)
 
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Sphero"), true)
-	gobottest.Assert(t, strings.HasPrefix(d.Connection().Name(), "Sphero"), true)
+	assert.True(t, strings.HasPrefix(d.Name(), "Sphero"))
+	assert.True(t, strings.HasPrefix(d.Connection().Name(), "Sphero"))
 }
 
 func TestSpheroDriverStart(t *testing.T) {
 	d := initTestSpheroDriver()
-	gobottest.Assert(t, d.Start(), nil)
+	assert.NoError(t, d.Start())
 }
 
 func TestSpheroDriverHalt(t *testing.T) {
 	d := initTestSpheroDriver()
 	d.adaptor().connected = true
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.NoError(t, d.Halt())
 }
 
 func TestSpheroDriverSetDataStreaming(t *testing.T) {
@@ -102,7 +102,7 @@ func TestSpheroDriverSetDataStreaming(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_ = binary.Write(buf, binary.BigEndian, DefaultDataStreamingConfig())
 
-	gobottest.Assert(t, data.body, buf.Bytes())
+	assert.Equal(t, buf.Bytes(), data.body)
 
 	ret := d.Command("SetDataStreaming")(
 		map[string]interface{}{
@@ -113,14 +113,14 @@ func TestSpheroDriverSetDataStreaming(t *testing.T) {
 			"Mask2": 400.0,
 		},
 	)
-	gobottest.Assert(t, ret, nil)
+	assert.Nil(t, ret)
 	data = <-d.packetChannel
 
 	dconfig := DataStreamingConfig{N: 100, M: 200, Mask: 300, Pcnt: 255, Mask2: 400}
 	buf = new(bytes.Buffer)
 	_ = binary.Write(buf, binary.BigEndian, dconfig)
 
-	gobottest.Assert(t, data.body, buf.Bytes())
+	assert.Equal(t, buf.Bytes(), data.body)
 }
 
 func TestConfigureLocator(t *testing.T) {
@@ -131,7 +131,7 @@ func TestConfigureLocator(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_ = binary.Write(buf, binary.BigEndian, DefaultLocatorConfig())
 
-	gobottest.Assert(t, data.body, buf.Bytes())
+	assert.Equal(t, buf.Bytes(), data.body)
 
 	ret := d.Command("ConfigureLocator")(
 		map[string]interface{}{
@@ -141,14 +141,14 @@ func TestConfigureLocator(t *testing.T) {
 			"YawTare": 0.0,
 		},
 	)
-	gobottest.Assert(t, ret, nil)
+	assert.Nil(t, ret)
 	data = <-d.packetChannel
 
 	lconfig := LocatorConfig{Flags: 1, X: 100, Y: 100, YawTare: 0}
 	buf = new(bytes.Buffer)
 	_ = binary.Write(buf, binary.BigEndian, lconfig)
 
-	gobottest.Assert(t, data.body, buf.Bytes())
+	assert.Equal(t, buf.Bytes(), data.body)
 }
 
 func TestCalculateChecksum(t *testing.T) {

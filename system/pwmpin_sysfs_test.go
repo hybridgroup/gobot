@@ -4,8 +4,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.PWMPinner = (*pwmPinSysFs)(nil)
@@ -32,45 +32,45 @@ func TestPwmPin(t *testing.T) {
 	}
 	pin, fs := initTestPWMPinSysFsWithMockedFilesystem(mockedPaths)
 
-	gobottest.Assert(t, pin.pin, "10")
+	assert.Equal(t, "10", pin.pin)
 
 	err := pin.Unexport()
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/unexport"].Contents, "10")
+	assert.NoError(t, err)
+	assert.Equal(t, "10", fs.Files["/sys/class/pwm/pwmchip0/unexport"].Contents)
 
 	err = pin.Export()
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/export"].Contents, "10")
+	assert.NoError(t, err)
+	assert.Equal(t, "10", fs.Files["/sys/class/pwm/pwmchip0/export"].Contents)
 
-	gobottest.Assert(t, pin.SetPolarity(false), nil)
-	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm10/polarity"].Contents, inverted)
+	assert.NoError(t, pin.SetPolarity(false))
+	assert.Equal(t, inverted, fs.Files["/sys/class/pwm/pwmchip0/pwm10/polarity"].Contents)
 	pol, _ := pin.Polarity()
-	gobottest.Assert(t, pol, false)
-	gobottest.Assert(t, pin.SetPolarity(true), nil)
-	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm10/polarity"].Contents, normal)
+	assert.False(t, pol)
+	assert.NoError(t, pin.SetPolarity(true))
+	assert.Equal(t, normal, fs.Files["/sys/class/pwm/pwmchip0/pwm10/polarity"].Contents)
 	pol, _ = pin.Polarity()
-	gobottest.Assert(t, pol, true)
+	assert.True(t, pol)
 
-	gobottest.Refute(t, fs.Files["/sys/class/pwm/pwmchip0/pwm10/enable"].Contents, "1")
+	assert.NotEqual(t, "1", fs.Files["/sys/class/pwm/pwmchip0/pwm10/enable"].Contents)
 	err = pin.SetEnabled(true)
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm10/enable"].Contents, "1")
+	assert.NoError(t, err)
+	assert.Equal(t, "1", fs.Files["/sys/class/pwm/pwmchip0/pwm10/enable"].Contents)
 	err = pin.SetPolarity(true)
-	gobottest.Assert(t, err.Error(), "Cannot set PWM polarity when enabled")
+	assert.ErrorContains(t, err, "Cannot set PWM polarity when enabled")
 
 	fs.Files["/sys/class/pwm/pwmchip0/pwm10/period"].Contents = "6"
 	data, _ := pin.Period()
-	gobottest.Assert(t, data, uint32(6))
-	gobottest.Assert(t, pin.SetPeriod(100000), nil)
+	assert.Equal(t, uint32(6), data)
+	assert.NoError(t, pin.SetPeriod(100000))
 	data, _ = pin.Period()
-	gobottest.Assert(t, data, uint32(100000))
+	assert.Equal(t, uint32(100000), data)
 
-	gobottest.Refute(t, fs.Files["/sys/class/pwm/pwmchip0/pwm10/duty_cycle"].Contents, "1")
+	assert.NotEqual(t, "1", fs.Files["/sys/class/pwm/pwmchip0/pwm10/duty_cycle"].Contents)
 	err = pin.SetDutyCycle(100)
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm10/duty_cycle"].Contents, "100")
+	assert.NoError(t, err)
+	assert.Equal(t, "100", fs.Files["/sys/class/pwm/pwmchip0/pwm10/duty_cycle"].Contents)
 	data, _ = pin.DutyCycle()
-	gobottest.Assert(t, data, uint32(100))
+	assert.Equal(t, uint32(100), data)
 }
 
 func TestPwmPinAlreadyExported(t *testing.T) {
@@ -88,7 +88,7 @@ func TestPwmPinAlreadyExported(t *testing.T) {
 	}
 
 	// no error indicates that the pin was already exported
-	gobottest.Assert(t, pin.Export(), nil)
+	assert.NoError(t, pin.Export())
 }
 
 func TestPwmPinExportError(t *testing.T) {
@@ -107,7 +107,7 @@ func TestPwmPinExportError(t *testing.T) {
 
 	// no error indicates that the pin was already exported
 	err := pin.Export()
-	gobottest.Assert(t, err.Error(), "Export() failed for id 10 with  : bad address")
+	assert.ErrorContains(t, err, "Export() failed for id 10 with  : bad address")
 }
 
 func TestPwmPinUnxportError(t *testing.T) {
@@ -125,7 +125,7 @@ func TestPwmPinUnxportError(t *testing.T) {
 	}
 
 	err := pin.Unexport()
-	gobottest.Assert(t, err.Error(), "Unexport() failed for id 10 with  : device or resource busy")
+	assert.ErrorContains(t, err, "Unexport() failed for id 10 with  : device or resource busy")
 }
 
 func TestPwmPinPeriodError(t *testing.T) {
@@ -143,7 +143,7 @@ func TestPwmPinPeriodError(t *testing.T) {
 	}
 
 	_, err := pin.Period()
-	gobottest.Assert(t, err.Error(), "Period() failed for id 10 with  : device or resource busy")
+	assert.ErrorContains(t, err, "Period() failed for id 10 with  : device or resource busy")
 }
 
 func TestPwmPinPolarityError(t *testing.T) {
@@ -161,7 +161,7 @@ func TestPwmPinPolarityError(t *testing.T) {
 	}
 
 	_, err := pin.Polarity()
-	gobottest.Assert(t, err.Error(), "Polarity() failed for id 10 with  : device or resource busy")
+	assert.ErrorContains(t, err, "Polarity() failed for id 10 with  : device or resource busy")
 }
 
 func TestPwmPinDutyCycleError(t *testing.T) {
@@ -179,5 +179,5 @@ func TestPwmPinDutyCycleError(t *testing.T) {
 	}
 
 	_, err := pin.DutyCycle()
-	gobottest.Assert(t, err.Error(), "DutyCycle() failed for id 10 with  : device or resource busy")
+	assert.ErrorContains(t, err, "DutyCycle() failed for id 10 with  : device or resource busy")
 }

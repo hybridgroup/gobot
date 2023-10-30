@@ -4,13 +4,15 @@ import (
 	"encoding/hex"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/spi"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
-var _ gobot.Driver = (*Driver)(nil)
-var negativeEncoder = false
+var (
+	_               gobot.Driver = (*Driver)(nil)
+	negativeEncoder              = false
+)
 
 func initTestDriver() *Driver {
 	d := NewDriver(&TestConnector{})
@@ -20,12 +22,12 @@ func initTestDriver() *Driver {
 
 func TestDriverStart(t *testing.T) {
 	d := initTestDriver()
-	gobottest.Assert(t, d.Start(), nil)
+	assert.NoError(t, d.Start())
 }
 
 func TestDriverHalt(t *testing.T) {
 	d := initTestDriver()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.NoError(t, d.Halt())
 }
 
 func TestDriverManufacturerName(t *testing.T) {
@@ -272,8 +274,7 @@ func (ctr *TestConnector) SpiDefaultMaxSpeed() int64 {
 	return 0
 }
 
-type TestSpiDevice struct {
-}
+type TestSpiDevice struct{}
 
 func (c TestSpiDevice) Close() error {
 	return nil

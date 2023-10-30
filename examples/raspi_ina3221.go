@@ -16,12 +16,10 @@ import (
 )
 
 func main() {
-
 	r := raspi.NewAdaptor()
 	ina := i2c.NewINA3221Driver(r)
 
 	work := func() {
-
 		gobot.Every(5*time.Second, func() {
 			for _, ch := range []i2c.INA3221Channel{i2c.INA3221Channel1, i2c.INA3221Channel2, i2c.INA3221Channel3} {
 				val, err := ina.GetBusVoltage(ch)

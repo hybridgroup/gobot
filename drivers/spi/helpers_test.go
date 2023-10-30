@@ -8,12 +8,14 @@ import (
 )
 
 // make sure that this SpiBusAdaptor fulfills all the required interfaces
-var _ Connector = (*spiTestAdaptor)(nil)
-var _ gobot.Connection = (*spiTestAdaptor)(nil)
+var (
+	_ Connector        = (*spiTestAdaptor)(nil)
+	_ gobot.Connection = (*spiTestAdaptor)(nil)
+)
 
 type spiTestAdaptor struct {
 	sys *system.Accesser
-	//busNum        int
+	// busNum        int
 	spiConnectErr bool
 	spi           *system.MockSpiAccess
 	connection    Connection
@@ -34,7 +36,7 @@ func (a *spiTestAdaptor) GetSpiConnection(busNum, chipNum, mode, bits int, maxSp
 	if a.spiConnectErr {
 		return nil, fmt.Errorf("Invalid SPI connection in helper")
 	}
-	//a.busNum = busNum
+	// a.busNum = busNum
 	sysdev, err := a.sys.NewSpiDevice(busNum, chipNum, mode, bits, maxSpeed)
 	a.connection = NewConnection(sysdev)
 	return a.connection, err

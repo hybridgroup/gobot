@@ -5,19 +5,21 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/aio"
 	"gobot.io/x/gobot/v2/drivers/gpio"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // the IOPinDriver is a Driver
 var _ gobot.Driver = (*IOPinDriver)(nil)
 
 // that supports the DigitalReader, DigitalWriter, & AnalogReader interfaces
-var _ gpio.DigitalReader = (*IOPinDriver)(nil)
-var _ gpio.DigitalWriter = (*IOPinDriver)(nil)
-var _ aio.AnalogReader = (*IOPinDriver)(nil)
+var (
+	_ gpio.DigitalReader = (*IOPinDriver)(nil)
+	_ gpio.DigitalWriter = (*IOPinDriver)(nil)
+	_ aio.AnalogReader   = (*IOPinDriver)(nil)
+)
 
 func initTestIOPinDriver() *IOPinDriver {
 	d := NewIOPinDriver(NewBleTestAdaptor())
@@ -26,9 +28,9 @@ func initTestIOPinDriver() *IOPinDriver {
 
 func TestIOPinDriver(t *testing.T) {
 	d := initTestIOPinDriver()
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Microbit IO Pin"), true)
+	assert.True(t, strings.HasPrefix(d.Name(), "Microbit IO Pin"))
 	d.SetName("NewName")
-	gobottest.Assert(t, d.Name(), "NewName")
+	assert.Equal(t, "NewName", d.Name())
 }
 
 func TestIOPinDriverStartAndHalt(t *testing.T) {
@@ -37,8 +39,8 @@ func TestIOPinDriverStartAndHalt(t *testing.T) {
 	a.TestReadCharacteristic(func(cUUID string) ([]byte, error) {
 		return []byte{0, 1, 1, 0}, nil
 	})
-	gobottest.Assert(t, d.Start(), nil)
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.Halt())
 }
 
 func TestIOPinDriverStartError(t *testing.T) {
@@ -47,7 +49,7 @@ func TestIOPinDriverStartError(t *testing.T) {
 	a.TestReadCharacteristic(func(cUUID string) ([]byte, error) {
 		return nil, errors.New("read error")
 	})
-	gobottest.Assert(t, d.Start(), errors.New("read error"))
+	assert.ErrorContains(t, d.Start(), "read error")
 }
 
 func TestIOPinDriverDigitalRead(t *testing.T) {
@@ -58,10 +60,10 @@ func TestIOPinDriverDigitalRead(t *testing.T) {
 	})
 
 	val, _ := d.DigitalRead("0")
-	gobottest.Assert(t, val, 1)
+	assert.Equal(t, 1, val)
 
 	val, _ = d.DigitalRead("1")
-	gobottest.Assert(t, val, 0)
+	assert.Equal(t, 0, val)
 }
 
 func TestIOPinDriverDigitalReadInvalidPin(t *testing.T) {
@@ -69,10 +71,10 @@ func TestIOPinDriverDigitalReadInvalidPin(t *testing.T) {
 	d := NewIOPinDriver(a)
 
 	_, err := d.DigitalRead("A3")
-	gobottest.Refute(t, err, nil)
+	assert.NotNil(t, err)
 
 	_, err = d.DigitalRead("6")
-	gobottest.Assert(t, err, errors.New("Invalid pin."))
+	assert.ErrorContains(t, err, "Invalid pin.")
 }
 
 func TestIOPinDriverDigitalWrite(t *testing.T) {
@@ -80,15 +82,15 @@ func TestIOPinDriverDigitalWrite(t *testing.T) {
 	d := NewIOPinDriver(a)
 
 	// TODO: a better test
-	gobottest.Assert(t, d.DigitalWrite("0", 1), nil)
+	assert.NoError(t, d.DigitalWrite("0", 1))
 }
 
 func TestIOPinDriverDigitalWriteInvalidPin(t *testing.T) {
 	a := NewBleTestAdaptor()
 	d := NewIOPinDriver(a)
 
-	gobottest.Refute(t, d.DigitalWrite("A3", 1), nil)
-	gobottest.Assert(t, d.DigitalWrite("6", 1), errors.New("Invalid pin."))
+	assert.NotNil(t, d.DigitalWrite("A3", 1))
+	assert.ErrorContains(t, d.DigitalWrite("6", 1), "Invalid pin.")
 }
 
 func TestIOPinDriverAnalogRead(t *testing.T) {
@@ -99,10 +101,10 @@ func TestIOPinDriverAnalogRead(t *testing.T) {
 	})
 
 	val, _ := d.AnalogRead("0")
-	gobottest.Assert(t, val, 0)
+	assert.Equal(t, 0, val)
 
 	val, _ = d.AnalogRead("1")
-	gobottest.Assert(t, val, 128)
+	assert.Equal(t, 128, val)
 }
 
 func TestIOPinDriverAnalogReadInvalidPin(t *testing.T) {
@@ -110,10 +112,10 @@ func TestIOPinDriverAnalogReadInvalidPin(t *testing.T) {
 	d := NewIOPinDriver(a)
 
 	_, err := d.AnalogRead("A3")
-	gobottest.Refute(t, err, nil)
+	assert.NotNil(t, err)
 
 	_, err = d.AnalogRead("6")
-	gobottest.Assert(t, err, errors.New("Invalid pin."))
+	assert.ErrorContains(t, err, "Invalid pin.")
 }
 
 func TestIOPinDriverDigitalAnalogRead(t *testing.T) {
@@ -124,10 +126,10 @@ func TestIOPinDriverDigitalAnalogRead(t *testing.T) {
 	})
 
 	val, _ := d.DigitalRead("0")
-	gobottest.Assert(t, val, 0)
+	assert.Equal(t, 0, val)
 
 	val, _ = d.AnalogRead("0")
-	gobottest.Assert(t, val, 0)
+	assert.Equal(t, 0, val)
 }
 
 func TestIOPinDriverDigitalWriteAnalogRead(t *testing.T) {
@@ -137,10 +139,10 @@ func TestIOPinDriverDigitalWriteAnalogRead(t *testing.T) {
 		return []byte{0, 0, 1, 128, 2, 1}, nil
 	})
 
-	gobottest.Assert(t, d.DigitalWrite("1", 0), nil)
+	assert.NoError(t, d.DigitalWrite("1", 0))
 
 	val, _ := d.AnalogRead("1")
-	gobottest.Assert(t, val, 128)
+	assert.Equal(t, 128, val)
 }
 
 func TestIOPinDriverAnalogReadDigitalWrite(t *testing.T) {
@@ -151,7 +153,7 @@ func TestIOPinDriverAnalogReadDigitalWrite(t *testing.T) {
 	})
 
 	val, _ := d.AnalogRead("1")
-	gobottest.Assert(t, val, 128)
+	assert.Equal(t, 128, val)
 
-	gobottest.Assert(t, d.DigitalWrite("1", 0), nil)
+	assert.NoError(t, d.DigitalWrite("1", 0))
 }

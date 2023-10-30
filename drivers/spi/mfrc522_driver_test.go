@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on spi.Driver, which implements the gobot.Driver
@@ -29,8 +29,8 @@ func TestNewMFRC522Driver(t *testing.T) {
 	if !ok {
 		t.Errorf("NewMFRC522Driver() should have returned a *MFRC522Driver")
 	}
-	gobottest.Refute(t, d.Driver, nil)
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "MFRC522"), true)
+	assert.NotNil(t, d.Driver)
+	assert.True(t, strings.HasPrefix(d.Name(), "MFRC522"))
 }
 
 func TestMFRC522WriteByteData(t *testing.T) {
@@ -39,6 +39,6 @@ func TestMFRC522WriteByteData(t *testing.T) {
 	// act
 	err := d.connection.WriteByteData(0x00, 0x00)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, a.spi.Written(), []byte{0x00, 0x00})
+	assert.NoError(t, err)
+	assert.Equal(t, []byte{0x00, 0x00}, a.spi.Written())
 }

@@ -7,19 +7,19 @@ import (
 	"testing"
 	"time"
 
-	"gobot.io/x/gobot/v2/gobottest"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestTemperatureSensorDriver(t *testing.T) {
 	testAdaptor := newAioTestAdaptor()
 	d := NewTemperatureSensorDriver(testAdaptor, "123")
-	gobottest.Assert(t, d.Connection(), testAdaptor)
-	gobottest.Assert(t, d.Pin(), "123")
-	gobottest.Assert(t, d.interval, 10*time.Millisecond)
+	assert.Equal(t, testAdaptor, d.Connection())
+	assert.Equal(t, "123", d.Pin())
+	assert.Equal(t, 10*time.Millisecond, d.interval)
 }
 
 func TestTemperatureSensorDriverNtcScaling(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		input int
 		want  float64
 	}{
@@ -36,26 +36,26 @@ func TestTemperatureSensorDriverNtcScaling(t *testing.T) {
 	}
 	a := newAioTestAdaptor()
 	d := NewTemperatureSensorDriver(a, "4")
-	ntc1 := TemperatureSensorNtcConf{TC0: 25, R0: 10000.0, B: 3950} //Ohm, R25=10k, B=3950
-	d.SetNtcScaler(255, 1000, true, ntc1)                           //Ohm, reference value: 3300, series R: 1k
+	ntc1 := TemperatureSensorNtcConf{TC0: 25, R0: 10000.0, B: 3950} // Ohm, R25=10k, B=3950
+	d.SetNtcScaler(255, 1000, true, ntc1)                           // Ohm, reference value: 3300, series R: 1k
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			a.TestAdaptorAnalogRead(func() (val int, err error) {
+			a.analogReadFunc = func() (val int, err error) {
 				val = tt.input
 				return
-			})
+			}
 			// act
 			got, err := d.Read()
 			// assert
-			gobottest.Assert(t, err, nil)
-			gobottest.Assert(t, got, tt.want)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
 
 func TestTemperatureSensorDriverLinearScaling(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		input int
 		want  float64
 	}{
@@ -76,15 +76,15 @@ func TestTemperatureSensorDriverLinearScaling(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			a.TestAdaptorAnalogRead(func() (val int, err error) {
+			a.analogReadFunc = func() (val int, err error) {
 				val = tt.input
 				return
-			})
+			}
 			// act
 			got, err := d.Read()
 			// assert
-			gobottest.Assert(t, err, nil)
-			gobottest.Assert(t, got, tt.want)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -93,18 +93,18 @@ func TestTempSensorPublishesTemperatureInCelsius(t *testing.T) {
 	sem := make(chan bool, 1)
 	a := newAioTestAdaptor()
 	d := NewTemperatureSensorDriver(a, "1")
-	ntc := TemperatureSensorNtcConf{TC0: 25, R0: 10000.0, B: 3975} //Ohm, R25=10k
-	d.SetNtcScaler(1023, 10000, false, ntc)                        //Ohm, reference value: 1023, series R: 10k
+	ntc := TemperatureSensorNtcConf{TC0: 25, R0: 10000.0, B: 3975} // Ohm, R25=10k
+	d.SetNtcScaler(1023, 10000, false, ntc)                        // Ohm, reference value: 1023, series R: 10k
 
-	a.TestAdaptorAnalogRead(func() (val int, err error) {
+	a.analogReadFunc = func() (val int, err error) {
 		val = 585
 		return
-	})
+	}
 	_ = d.Once(d.Event(Value), func(data interface{}) {
-		gobottest.Assert(t, fmt.Sprintf("%.2f", data.(float64)), "31.62")
+		assert.Equal(t, "31.62", fmt.Sprintf("%.2f", data.(float64)))
 		sem <- true
 	})
-	gobottest.Assert(t, d.Start(), nil)
+	assert.NoError(t, d.Start())
 
 	select {
 	case <-sem:
@@ -112,7 +112,7 @@ func TestTempSensorPublishesTemperatureInCelsius(t *testing.T) {
 		t.Errorf(" Temperature Sensor Event \"Data\" was not published")
 	}
 
-	gobottest.Assert(t, d.Value(), 31.61532462352477)
+	assert.Equal(t, 31.61532462352477, d.Value())
 }
 
 func TestTempSensorPublishesError(t *testing.T) {
@@ -121,16 +121,16 @@ func TestTempSensorPublishesError(t *testing.T) {
 	d := NewTemperatureSensorDriver(a, "1")
 
 	// send error
-	a.TestAdaptorAnalogRead(func() (val int, err error) {
+	a.analogReadFunc = func() (val int, err error) {
 		err = errors.New("read error")
 		return
-	})
+	}
 
-	gobottest.Assert(t, d.Start(), nil)
+	assert.NoError(t, d.Start())
 
 	// expect error
 	_ = d.Once(d.Event(Error), func(data interface{}) {
-		gobottest.Assert(t, data.(error).Error(), "read error")
+		assert.Equal(t, "read error", data.(error).Error())
 		sem <- true
 	})
 
@@ -148,7 +148,7 @@ func TestTempSensorHalt(t *testing.T) {
 		<-d.halt
 		close(done)
 	}()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.NoError(t, d.Halt())
 	select {
 	case <-done:
 	case <-time.After(100 * time.Millisecond):
@@ -158,17 +158,17 @@ func TestTempSensorHalt(t *testing.T) {
 
 func TestTempDriverDefaultName(t *testing.T) {
 	d := NewTemperatureSensorDriver(newAioTestAdaptor(), "1")
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "TemperatureSensor"), true)
+	assert.True(t, strings.HasPrefix(d.Name(), "TemperatureSensor"))
 }
 
 func TestTempDriverSetName(t *testing.T) {
 	d := NewTemperatureSensorDriver(newAioTestAdaptor(), "1")
 	d.SetName("mybot")
-	gobottest.Assert(t, d.Name(), "mybot")
+	assert.Equal(t, "mybot", d.Name())
 }
 
 func TestTempDriver_initialize(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		input TemperatureSensorNtcConf
 		want  TemperatureSensorNtcConf
 	}{
@@ -208,7 +208,7 @@ func TestTempDriver_initialize(t *testing.T) {
 			// act
 			ntc.initialize()
 			// assert
-			gobottest.Assert(t, ntc, tt.want)
+			assert.Equal(t, tt.want, ntc)
 		})
 	}
 }

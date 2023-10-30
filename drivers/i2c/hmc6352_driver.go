@@ -9,12 +9,13 @@ type HMC6352Driver struct {
 
 // NewHMC6352Driver creates a new driver with specified i2c interface
 // Params:
-//		c Connector - the Adaptor to use with this Driver
+//
+//	c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.WithBus(int):	bus to use with this driver
-//		i2c.WithAddress(int):	address to use with this driver
 //
+//	i2c.WithBus(int):	bus to use with this driver
+//	i2c.WithAddress(int):	address to use with this driver
 func NewHMC6352Driver(c Connector, options ...func(Config)) *HMC6352Driver {
 	h := &HMC6352Driver{
 		Driver: NewDriver(c, "HMC6352", hmc6352DefaultAddress),

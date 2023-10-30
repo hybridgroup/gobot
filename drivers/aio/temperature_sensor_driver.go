@@ -126,7 +126,7 @@ func (n *TemperatureSensorNtcConf) getTemp(rntc float64) float64 {
 func (n *TemperatureSensorNtcConf) initialize() {
 	n.t0 = float64(n.TC0) + kelvinOffset
 	if n.B <= 0 {
-		//B=[ln(R0)-ln(R1)]/(1/T0-1/T1)
+		// B=[ln(R0)-ln(R1)]/(1/T0-1/T1)
 		T1 := float64(n.TC1) + kelvinOffset
 		n.B = (1/n.t0 - 1/T1)
 		n.B = (math.Log(n.R0) - math.Log(n.R1)) / n.B // 2000K...5000K

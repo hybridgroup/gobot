@@ -29,7 +29,7 @@ type AccelerometerData struct {
 
 const (
 	// BLE services
-	//accelerometerService = "e95d0753251d470aa062fa1922dfa9a8"
+	// accelerometerService = "e95d0753251d470aa062fa1922dfa9a8"
 
 	// BLE characteristics
 	accelerometerCharacteristic = "e95dca4b251d470aa062fa1922dfa9a8"
@@ -85,7 +85,8 @@ func (b *AccelerometerDriver) Start() error {
 		result := &AccelerometerData{
 			X: float32(a.X) / 1000.0,
 			Y: float32(a.Y) / 1000.0,
-			Z: float32(a.Z) / 1000.0}
+			Z: float32(a.Z) / 1000.0,
+		}
 
 		b.Publish(b.Event(Accelerometer), result)
 	})

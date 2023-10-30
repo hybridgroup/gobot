@@ -3,7 +3,7 @@ package system
 import (
 	"testing"
 
-	"gobot.io/x/gobot/v2/gobottest"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGpioSpi_isSupported(t *testing.T) {
@@ -12,11 +12,11 @@ func TestGpioSpi_isSupported(t *testing.T) {
 	// act
 	got := gsa.isSupported()
 	// assert
-	gobottest.Assert(t, got, true)
+	assert.True(t, got)
 }
 
 func TestPeriphioSpi_isSupported(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		mockPaths []string
 		want      bool
 	}{
@@ -37,7 +37,7 @@ func TestPeriphioSpi_isSupported(t *testing.T) {
 			// act
 			got := psa.isSupported()
 			// assert
-			gobottest.Assert(t, got, tc.want)
+			assert.Equal(t, tc.want, got)
 		})
 	}
 }

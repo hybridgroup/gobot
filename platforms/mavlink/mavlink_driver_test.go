@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 	common "gobot.io/x/gobot/v2/platforms/mavlink/common"
 )
 
@@ -26,18 +26,18 @@ func TestMavlinkDriver(t *testing.T) {
 	m.connect = func(port string) (io.ReadWriteCloser, error) { return nil, nil }
 
 	d := NewDriver(m)
-	gobottest.Refute(t, d.Connection(), nil)
-	gobottest.Assert(t, d.interval, 10*time.Millisecond)
+	assert.NotNil(t, d.Connection())
+	assert.Equal(t, 10*time.Millisecond, d.interval)
 
 	d = NewDriver(m, 100*time.Millisecond)
-	gobottest.Assert(t, d.interval, 100*time.Millisecond)
+	assert.Equal(t, 100*time.Millisecond, d.interval)
 }
 
 func TestMavlinkDriverName(t *testing.T) {
 	d := initTestMavlinkDriver()
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Mavlink"), true)
+	assert.True(t, strings.HasPrefix(d.Name(), "Mavlink"))
 	d.SetName("NewName")
-	gobottest.Assert(t, d.Name(), "NewName")
+	assert.Equal(t, "NewName", d.Name())
 }
 
 func TestMavlinkDriverStart(t *testing.T) {
@@ -59,11 +59,11 @@ func TestMavlinkDriverStart(t *testing.T) {
 		err <- data.(error)
 	})
 
-	gobottest.Assert(t, d.Start(), nil)
+	assert.NoError(t, d.Start())
 
 	select {
 	case p := <-packet:
-		gobottest.Assert(t, d.SendPacket(p), nil)
+		assert.NoError(t, d.SendPacket(p))
 
 	case <-time.After(100 * time.Millisecond):
 		t.Errorf("packet was not emitted")
@@ -82,5 +82,5 @@ func TestMavlinkDriverStart(t *testing.T) {
 
 func TestMavlinkDriverHalt(t *testing.T) {
 	d := initTestMavlinkDriver()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.NoError(t, d.Halt())
 }

@@ -1,14 +1,13 @@
 package i2c
 
 import (
+	"bytes"
 	"errors"
 	"strings"
 	"testing"
 
-	"bytes"
-
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
@@ -30,32 +29,32 @@ func TestNewBH1750Driver(t *testing.T) {
 	if !ok {
 		t.Errorf("NewBH1750Driver() should have returned a *BH1750Driver")
 	}
-	gobottest.Refute(t, d.Driver, nil)
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "BH1750"), true)
-	gobottest.Assert(t, d.defaultAddress, 0x23)
+	assert.NotNil(t, d.Driver)
+	assert.True(t, strings.HasPrefix(d.Name(), "BH1750"))
+	assert.Equal(t, 0x23, d.defaultAddress)
 }
 
 func TestBH1750Options(t *testing.T) {
 	// This is a general test, that options are applied in constructor by using the common WithBus() option and
 	// least one of this driver. Further tests for options can also be done by call of "WithOption(val)(d)".
 	d := NewBH1750Driver(newI2cTestAdaptor(), WithBus(2))
-	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
+	assert.Equal(t, 2, d.GetBusOrDefault(1))
 }
 
 func TestBH1750Start(t *testing.T) {
 	d := NewBH1750Driver(newI2cTestAdaptor())
-	gobottest.Assert(t, d.Start(), nil)
+	assert.NoError(t, d.Start())
 }
 
 func TestBH1750Halt(t *testing.T) {
 	d, _ := initTestBH1750DriverWithStubbedAdaptor()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.NoError(t, d.Halt())
 }
 
 func TestBH1750NullLux(t *testing.T) {
 	d, _ := initTestBH1750DriverWithStubbedAdaptor()
 	lux, _ := d.Lux()
-	gobottest.Assert(t, lux, 0)
+	assert.Equal(t, 0, lux)
 }
 
 func TestBH1750Lux(t *testing.T) {
@@ -68,13 +67,13 @@ func TestBH1750Lux(t *testing.T) {
 	}
 
 	lux, _ := d.Lux()
-	gobottest.Assert(t, lux, 1213)
+	assert.Equal(t, 1213, lux)
 }
 
 func TestBH1750NullRawSensorData(t *testing.T) {
 	d, _ := initTestBH1750DriverWithStubbedAdaptor()
 	level, _ := d.RawSensorData()
-	gobottest.Assert(t, level, 0)
+	assert.Equal(t, 0, level)
 }
 
 func TestBH1750RawSensorData(t *testing.T) {
@@ -87,7 +86,7 @@ func TestBH1750RawSensorData(t *testing.T) {
 	}
 
 	level, _ := d.RawSensorData()
-	gobottest.Assert(t, level, 1456)
+	assert.Equal(t, 1456, level)
 }
 
 func TestBH1750LuxError(t *testing.T) {
@@ -97,7 +96,7 @@ func TestBH1750LuxError(t *testing.T) {
 	}
 
 	_, err := d.Lux()
-	gobottest.Assert(t, err, errors.New("wrong number of bytes read"))
+	assert.ErrorContains(t, err, "wrong number of bytes read")
 }
 
 func TestBH1750RawSensorDataError(t *testing.T) {
@@ -107,5 +106,5 @@ func TestBH1750RawSensorDataError(t *testing.T) {
 	}
 
 	_, err := d.RawSensorData()
-	gobottest.Assert(t, err, errors.New("wrong number of bytes read"))
+	assert.ErrorContains(t, err, "wrong number of bytes read")
 }

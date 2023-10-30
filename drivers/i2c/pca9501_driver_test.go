@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
@@ -47,16 +47,16 @@ func TestNewPCA9501Driver(t *testing.T) {
 	if !ok {
 		t.Errorf("NewPCA9501Driver() should have returned a *PCA9501Driver")
 	}
-	gobottest.Refute(t, d.Driver, nil)
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "PCA9501"), true)
-	gobottest.Assert(t, d.defaultAddress, 0x3f)
+	assert.NotNil(t, d.Driver)
+	assert.True(t, strings.HasPrefix(d.Name(), "PCA9501"))
+	assert.Equal(t, 0x3f, d.defaultAddress)
 }
 
 func TestPCA9501Options(t *testing.T) {
 	// This is a general test, that options are applied in constructor by using the common WithBus() option and
 	// least one of this driver. Further tests for options can also be done by call of "WithOption(val)(d)".
 	d := NewPCA9501Driver(newI2cTestAdaptor(), WithBus(2))
-	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
+	assert.Equal(t, 2, d.GetBusOrDefault(1))
 }
 
 func TestPCA9501CommandsWriteGPIO(t *testing.T) {
@@ -71,7 +71,7 @@ func TestPCA9501CommandsWriteGPIO(t *testing.T) {
 	// act
 	result := d.Command("WriteGPIO")(pinVal)
 	// assert
-	gobottest.Assert(t, result.(map[string]interface{})["err"], nil)
+	assert.Nil(t, result.(map[string]interface{})["err"])
 }
 
 func TestPCA9501CommandsReadGPIO(t *testing.T) {
@@ -83,7 +83,7 @@ func TestPCA9501CommandsReadGPIO(t *testing.T) {
 	// act
 	result := d.Command("ReadGPIO")(pin)
 	// assert
-	gobottest.Assert(t, result.(map[string]interface{})["err"], nil)
+	assert.Nil(t, result.(map[string]interface{})["err"])
 }
 
 func TestPCA9501CommandsWriteEEPROM(t *testing.T) {
@@ -95,7 +95,7 @@ func TestPCA9501CommandsWriteEEPROM(t *testing.T) {
 	// act
 	result := d.Command("WriteEEPROM")(addressVal)
 	// assert
-	gobottest.Assert(t, result.(map[string]interface{})["err"], nil)
+	assert.Nil(t, result.(map[string]interface{})["err"])
 }
 
 func TestPCA9501CommandsReadEEPROM(t *testing.T) {
@@ -110,11 +110,11 @@ func TestPCA9501CommandsReadEEPROM(t *testing.T) {
 	// act
 	result := d.Command("ReadEEPROM")(address)
 	// assert
-	gobottest.Assert(t, result.(map[string]interface{})["err"], nil)
+	assert.Nil(t, result.(map[string]interface{})["err"])
 }
 
 func TestPCA9501WriteGPIO(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		setVal          uint8
 		ioDirAllInput   uint8
 		ioStateAllInput uint8
@@ -160,11 +160,11 @@ func TestPCA9501WriteGPIO(t *testing.T) {
 			// act
 			err := d.WriteGPIO(tc.pin, tc.setVal)
 			// assert
-			gobottest.Assert(t, err, nil)
-			gobottest.Assert(t, numCallsRead, 2)
-			gobottest.Assert(t, len(a.written), 2)
-			gobottest.Assert(t, a.written[0], tc.wantPin)
-			gobottest.Assert(t, a.written[1], tc.wantState)
+			assert.NoError(t, err)
+			assert.Equal(t, 2, numCallsRead)
+			assert.Equal(t, 2, len(a.written))
+			assert.Equal(t, tc.wantPin, a.written[0])
+			assert.Equal(t, tc.wantState, a.written[1])
 		})
 	}
 }
@@ -192,9 +192,9 @@ func TestPCA9501WriteGPIOErrorAtWriteDirection(t *testing.T) {
 	// act
 	err := d.WriteGPIO(7, 0)
 	// assert
-	gobottest.Assert(t, err, wantErr)
-	gobottest.Assert(t, numCallsRead < 2, true)
-	gobottest.Assert(t, numCallsWrite, 1)
+	assert.Equal(t, wantErr, err)
+	assert.True(t, numCallsRead < 2)
+	assert.Equal(t, 1, numCallsWrite)
 }
 
 func TestPCA9501WriteGPIOErrorAtWriteValue(t *testing.T) {
@@ -218,12 +218,12 @@ func TestPCA9501WriteGPIOErrorAtWriteValue(t *testing.T) {
 	// act
 	err := d.WriteGPIO(7, 0)
 	// assert
-	gobottest.Assert(t, err, wantErr)
-	gobottest.Assert(t, numCallsWrite, 2)
+	assert.Equal(t, wantErr, err)
+	assert.Equal(t, 2, numCallsWrite)
 }
 
 func TestPCA9501ReadGPIO(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		ctrlState uint8
 		want      uint8
 	}{
@@ -254,11 +254,11 @@ func TestPCA9501ReadGPIO(t *testing.T) {
 			// act
 			got, err := d.ReadGPIO(pin)
 			// assert
-			gobottest.Assert(t, err, nil)
-			gobottest.Assert(t, got, tc.want)
-			gobottest.Assert(t, numCallsRead, 2)
-			gobottest.Assert(t, len(a.written), 1)
-			gobottest.Assert(t, a.written[0], wantCtrlState)
+			assert.NoError(t, err)
+			assert.Equal(t, tc.want, got)
+			assert.Equal(t, 2, numCallsRead)
+			assert.Equal(t, 1, len(a.written))
+			assert.Equal(t, wantCtrlState, a.written[0])
 		})
 	}
 }
@@ -286,9 +286,9 @@ func TestPCA9501ReadGPIOErrorAtReadDirection(t *testing.T) {
 	// act
 	_, err := d.ReadGPIO(1)
 	// assert
-	gobottest.Assert(t, err, wantErr)
-	gobottest.Assert(t, numCallsRead, 1)
-	gobottest.Assert(t, numCallsWrite, 0)
+	assert.Equal(t, wantErr, err)
+	assert.Equal(t, 1, numCallsRead)
+	assert.Equal(t, 0, numCallsWrite)
 }
 
 func TestPCA9501ReadGPIOErrorAtReadValue(t *testing.T) {
@@ -314,8 +314,8 @@ func TestPCA9501ReadGPIOErrorAtReadValue(t *testing.T) {
 	// act
 	_, err := d.ReadGPIO(2)
 	// assert
-	gobottest.Assert(t, err, wantErr)
-	gobottest.Assert(t, numCallsWrite, 1)
+	assert.Equal(t, wantErr, err)
+	assert.Equal(t, 1, numCallsWrite)
 }
 
 func TestPCA9501WriteEEPROM(t *testing.T) {
@@ -334,10 +334,10 @@ func TestPCA9501WriteEEPROM(t *testing.T) {
 	// act
 	err := d.WriteEEPROM(addressEEPROM, want)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, numCallsWrite, 1)
-	gobottest.Assert(t, a.written[0], addressEEPROM)
-	gobottest.Assert(t, a.written[1], want)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, numCallsWrite)
+	assert.Equal(t, addressEEPROM, a.written[0])
+	assert.Equal(t, want, a.written[1])
 }
 
 func TestPCA9501ReadEEPROM(t *testing.T) {
@@ -363,11 +363,11 @@ func TestPCA9501ReadEEPROM(t *testing.T) {
 	// act
 	val, err := d.ReadEEPROM(addressEEPROM)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, val, want)
-	gobottest.Assert(t, numCallsWrite, 1)
-	gobottest.Assert(t, a.written[0], addressEEPROM)
-	gobottest.Assert(t, numCallsRead, 1)
+	assert.NoError(t, err)
+	assert.Equal(t, want, val)
+	assert.Equal(t, 1, numCallsWrite)
+	assert.Equal(t, addressEEPROM, a.written[0])
+	assert.Equal(t, 1, numCallsRead)
 }
 
 func TestPCA9501ReadEEPROMErrorWhileWriteAddress(t *testing.T) {
@@ -387,8 +387,8 @@ func TestPCA9501ReadEEPROMErrorWhileWriteAddress(t *testing.T) {
 	// act
 	_, err := d.ReadEEPROM(15)
 	// assert
-	gobottest.Assert(t, err, wantErr)
-	gobottest.Assert(t, numCallsRead, 0)
+	assert.Equal(t, wantErr, err)
+	assert.Equal(t, 0, numCallsRead)
 }
 
 func TestPCA9501ReadEEPROMErrorWhileReadValue(t *testing.T) {
@@ -408,8 +408,8 @@ func TestPCA9501ReadEEPROMErrorWhileReadValue(t *testing.T) {
 	// act
 	_, err := d.ReadEEPROM(15)
 	// assert
-	gobottest.Assert(t, numCallsWrite, 1)
-	gobottest.Assert(t, err, wantErr)
+	assert.Equal(t, 1, numCallsWrite)
+	assert.Equal(t, wantErr, err)
 }
 
 func TestPCA9501_initialize(t *testing.T) {
@@ -419,6 +419,6 @@ func TestPCA9501_initialize(t *testing.T) {
 	// act
 	err := d.initialize()
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, a.address, want)
+	assert.NoError(t, err)
+	assert.Equal(t, want, a.address)
 }

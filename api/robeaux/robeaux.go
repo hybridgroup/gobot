@@ -86,18 +86,23 @@ type bindataFileInfo struct {
 func (fi bindataFileInfo) Name() string {
 	return fi.name
 }
+
 func (fi bindataFileInfo) Size() int64 {
 	return fi.size
 }
+
 func (fi bindataFileInfo) Mode() os.FileMode {
 	return fi.mode
 }
+
 func (fi bindataFileInfo) ModTime() time.Time {
 	return fi.modTime
 }
+
 func (fi bindataFileInfo) IsDir() bool {
 	return false
 }
+
 func (fi bindataFileInfo) Sys() interface{} {
 	return nil
 }
@@ -916,11 +921,13 @@ var _bindata = map[string]func() (*asset, error){
 // directory embedded in the file by go-bindata.
 // For example if you run go-bindata on data/... and data contains the
 // following hierarchy:
-//     data/
-//       foo.txt
-//       img/
-//         a.png
-//         b.png
+//
+//	data/
+//	  foo.txt
+//	  img/
+//	    a.png
+//	    b.png
+//
 // then AssetDir("data") would return []string{"foo.txt", "img"}
 // AssetDir("data/img") would return []string{"a.png", "b.png"}
 // AssetDir("foo.txt") and AssetDir("notexist") would return an error
@@ -1009,7 +1016,7 @@ func RestoreAsset(dir, name string) error {
 	if err != nil {
 		return err
 	}
-	err = os.MkdirAll(_filePath(dir, filepath.Dir(name)), os.FileMode(0755))
+	err = os.MkdirAll(_filePath(dir, filepath.Dir(name)), os.FileMode(0o755))
 	if err != nil {
 		return err
 	}

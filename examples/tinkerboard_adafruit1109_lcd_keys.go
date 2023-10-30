@@ -110,9 +110,7 @@ func main() {
 					}
 				}
 			})
-
 		})
-
 	}
 
 	robot := gobot.NewRobot("adaBot",

@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 	"gobot.io/x/gobot/v2/platforms/sphero"
 )
 
@@ -21,13 +21,13 @@ func initTestOllieDriver() *Driver {
 func TestOllieDriver(t *testing.T) {
 	d := initTestOllieDriver()
 	d.SetName("NewName")
-	gobottest.Assert(t, d.Name(), "NewName")
+	assert.Equal(t, "NewName", d.Name())
 }
 
 func TestOllieDriverStartAndHalt(t *testing.T) {
 	d := initTestOllieDriver()
-	gobottest.Assert(t, d.Start(), nil)
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.Halt())
 }
 
 func TestLocatorData(t *testing.T) {
@@ -49,11 +49,11 @@ func TestLocatorData(t *testing.T) {
 	}
 
 	for _, point := range tables {
-		//0x0B is the locator ID
+		// 0x0B is the locator ID
 		packet := []byte{0xFF, 0xFF, 0x00, 0x00, 0x0B, point.x1, point.x2, point.y1, point.y2, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
 
 		d.GetLocatorData(func(p Point2D) {
-			gobottest.Assert(t, p.Y, point.y)
+			assert.Equal(t, point.y, p.Y)
 		})
 		d.HandleResponses(packet, nil)
 	}
@@ -68,12 +68,13 @@ func TestDataStreaming(t *testing.T) {
 	_ = d.On("sensordata", func(data interface{}) {
 		cont := data.(DataStreamingPacket)
 		fmt.Printf("got streaming packet: %+v \n", cont)
-		gobottest.Assert(t, cont.RawAccX, int16(10))
+		assert.Equal(t, int16(10), cont.RawAccX)
 		response = true
 	})
 
-	//example data packet
-	p1 := []string{"FFFE030053000A003900FAFFFE0007FFFF000000",
+	// example data packet
+	p1 := []string{
+		"FFFE030053000A003900FAFFFE0007FFFF000000",
 		"000000000000000000FFECFFFB00010000004B01",
 		"BD1034FFFF000300000000000000000000000000",
 		"0000002701FDE500560000000000000065000000",
@@ -92,10 +93,10 @@ func TestDataStreaming(t *testing.T) {
 
 	}
 
-	//send empty packet to indicate start of next message
+	// send empty packet to indicate start of next message
 	d.HandleResponses([]byte{0xFF}, nil)
 	time.Sleep(10 * time.Millisecond)
 	if response == false {
-		t.Error("no response recieved")
+		t.Error("no response received")
 	}
 }

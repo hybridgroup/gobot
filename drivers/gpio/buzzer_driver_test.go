@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*BuzzerDriver)(nil)
@@ -17,65 +17,65 @@ func initTestBuzzerDriver(conn DigitalWriter) *BuzzerDriver {
 
 func TestBuzzerDriverDefaultName(t *testing.T) {
 	g := initTestBuzzerDriver(newGpioTestAdaptor())
-	gobottest.Assert(t, strings.HasPrefix(g.Name(), "Buzzer"), true)
+	assert.True(t, strings.HasPrefix(g.Name(), "Buzzer"))
 }
 
 func TestBuzzerDriverSetName(t *testing.T) {
 	g := initTestBuzzerDriver(newGpioTestAdaptor())
 	g.SetName("mybot")
-	gobottest.Assert(t, g.Name(), "mybot")
+	assert.Equal(t, "mybot", g.Name())
 }
 
 func TestBuzzerDriverStart(t *testing.T) {
 	d := initTestBuzzerDriver(newGpioTestAdaptor())
-	gobottest.Assert(t, d.Start(), nil)
+	assert.NoError(t, d.Start())
 }
 
 func TestBuzzerDriverHalt(t *testing.T) {
 	d := initTestBuzzerDriver(newGpioTestAdaptor())
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.NoError(t, d.Halt())
 }
 
 func TestBuzzerDriverToggle(t *testing.T) {
 	d := initTestBuzzerDriver(newGpioTestAdaptor())
 	_ = d.Off()
 	_ = d.Toggle()
-	gobottest.Assert(t, d.State(), true)
+	assert.True(t, d.State())
 	_ = d.Toggle()
-	gobottest.Assert(t, d.State(), false)
+	assert.False(t, d.State())
 }
 
 func TestBuzzerDriverTone(t *testing.T) {
 	d := initTestBuzzerDriver(newGpioTestAdaptor())
-	gobottest.Assert(t, d.Tone(100, 0.01), nil)
+	assert.NoError(t, d.Tone(100, 0.01))
 }
 
 func TestBuzzerDriverOnError(t *testing.T) {
 	a := newGpioTestAdaptor()
 	d := initTestBuzzerDriver(a)
-	a.TestAdaptorDigitalWrite(func(string, byte) (err error) {
+	a.digitalWriteFunc = func(string, byte) (err error) {
 		return errors.New("write error")
-	})
+	}
 
-	gobottest.Assert(t, d.On(), errors.New("write error"))
+	assert.ErrorContains(t, d.On(), "write error")
 }
 
 func TestBuzzerDriverOffError(t *testing.T) {
 	a := newGpioTestAdaptor()
 	d := initTestBuzzerDriver(a)
-	a.TestAdaptorDigitalWrite(func(string, byte) (err error) {
+	a.digitalWriteFunc = func(string, byte) (err error) {
 		return errors.New("write error")
-	})
+	}
 
-	gobottest.Assert(t, d.Off(), errors.New("write error"))
+	assert.ErrorContains(t, d.Off(), "write error")
 }
 
 func TestBuzzerDriverToneError(t *testing.T) {
 	a := newGpioTestAdaptor()
 	d := initTestBuzzerDriver(a)
-	a.TestAdaptorDigitalWrite(func(string, byte) (err error) {
+	a.digitalWriteFunc = func(string, byte) (err error) {
 		return errors.New("write error")
-	})
+	}
 
-	gobottest.Assert(t, d.Tone(100, 0.01), errors.New("write error"))
+	assert.ErrorContains(t, d.Tone(100, 0.01), "write error")
 }

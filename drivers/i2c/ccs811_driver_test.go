@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
@@ -24,29 +24,29 @@ func TestNewCCS811Driver(t *testing.T) {
 	if !ok {
 		t.Errorf("NewCCS811Driver() should have returned a *CCS811Driver")
 	}
-	gobottest.Refute(t, d.Driver, nil)
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "CCS811"), true)
-	gobottest.Assert(t, d.defaultAddress, 0x5A)
-	gobottest.Refute(t, d.measMode, nil)
-	gobottest.Assert(t, d.ntcResistanceValue, uint32(100000))
+	assert.NotNil(t, d.Driver)
+	assert.True(t, strings.HasPrefix(d.Name(), "CCS811"))
+	assert.Equal(t, 0x5A, d.defaultAddress)
+	assert.NotNil(t, d.measMode)
+	assert.Equal(t, uint32(100000), d.ntcResistanceValue)
 }
 
 func TestCCS811Options(t *testing.T) {
 	// This is a general test, that options are applied in constructor by using the common WithBus() option and
 	// least one of this driver. Further tests for options can also be done by call of "WithOption(val)(d)".
 	d := NewCCS811Driver(newI2cTestAdaptor(), WithBus(2), WithAddress(0xFF), WithCCS811NTCResistance(0xFF))
-	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
-	gobottest.Assert(t, d.GetAddressOrDefault(0x5a), 0xFF)
-	gobottest.Assert(t, d.ntcResistanceValue, uint32(0xFF))
+	assert.Equal(t, 2, d.GetBusOrDefault(1))
+	assert.Equal(t, 0xFF, d.GetAddressOrDefault(0x5a))
+	assert.Equal(t, uint32(0xFF), d.ntcResistanceValue)
 }
 
 func TestCCS811WithCCS811MeasMode(t *testing.T) {
 	d := NewCCS811Driver(newI2cTestAdaptor(), WithCCS811MeasMode(CCS811DriveMode10Sec))
-	gobottest.Assert(t, d.measMode.driveMode, CCS811DriveMode(CCS811DriveMode10Sec))
+	assert.Equal(t, CCS811DriveMode10Sec, d.measMode.driveMode)
 }
 
 func TestCCS811GetGasData(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		readReturn func([]byte) (int, error)
 		eco2       uint16
 		tvoc       uint16
@@ -91,15 +91,15 @@ func TestCCS811GetGasData(t *testing.T) {
 			// act
 			eco2, tvoc, err := d.GetGasData()
 			// assert
-			gobottest.Assert(t, eco2, tc.eco2)
-			gobottest.Assert(t, tvoc, tc.tvoc)
-			gobottest.Assert(t, err, tc.err)
+			assert.Equal(t, tc.eco2, eco2)
+			assert.Equal(t, tc.tvoc, tvoc)
+			assert.Equal(t, tc.err, err)
 		})
 	}
 }
 
 func TestCCS811GetTemperature(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		readReturn func([]byte) (int, error)
 		temp       float32
 		err        error
@@ -148,14 +148,14 @@ func TestCCS811GetTemperature(t *testing.T) {
 			// act
 			temp, err := d.GetTemperature()
 			// assert
-			gobottest.Assert(t, temp, tc.temp)
-			gobottest.Assert(t, err, tc.err)
+			assert.Equal(t, tc.temp, temp)
+			assert.Equal(t, tc.err, err)
 		})
 	}
 }
 
 func TestCCS811HasData(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		readReturn func([]byte) (int, error)
 		result     bool
 		err        error
@@ -212,8 +212,8 @@ func TestCCS811HasData(t *testing.T) {
 			// act
 			result, err := d.HasData()
 			// assert
-			gobottest.Assert(t, result, tc.result)
-			gobottest.Assert(t, err, tc.err)
+			assert.Equal(t, tc.result, result)
+			assert.Equal(t, tc.err, err)
 		})
 	}
 }
@@ -255,13 +255,13 @@ func TestCCS811_initialize(t *testing.T) {
 	// arrange, act - initialize() must be called on Start()
 	err := d.Start()
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, numCallsRead, 1)
-	gobottest.Assert(t, len(a.written), 9)
-	gobottest.Assert(t, a.written[0], wantChipIDReg)
-	gobottest.Assert(t, a.written[1], wantResetReg)
-	gobottest.Assert(t, a.written[2:6], wantResetRegSequence)
-	gobottest.Assert(t, a.written[6], wantAppStartReg)
-	gobottest.Assert(t, a.written[7], wantMeasReg)
-	gobottest.Assert(t, a.written[8], wantMeasRegVal)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, numCallsRead)
+	assert.Equal(t, 9, len(a.written))
+	assert.Equal(t, wantChipIDReg, a.written[0])
+	assert.Equal(t, wantResetReg, a.written[1])
+	assert.Equal(t, wantResetRegSequence, a.written[2:6])
+	assert.Equal(t, wantAppStartReg, a.written[6])
+	assert.Equal(t, wantMeasReg, a.written[7])
+	assert.Equal(t, wantMeasRegVal, a.written[8])
 }

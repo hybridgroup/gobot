@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
@@ -28,48 +28,48 @@ func TestNewMPU6050Driver(t *testing.T) {
 	if !ok {
 		t.Errorf("NewMPU6050Driver() should have returned a *MPU6050Driver")
 	}
-	gobottest.Refute(t, d.Driver, nil)
-	gobottest.Assert(t, strings.HasPrefix(d.name, "MPU6050"), true)
-	gobottest.Assert(t, d.defaultAddress, 0x68)
-	gobottest.Assert(t, d.dlpf, MPU6050DlpfConfig(0x00))
-	gobottest.Assert(t, d.frameSync, MPU6050FrameSyncConfig(0x00))
-	gobottest.Assert(t, d.accelFs, MPU6050AccelFsConfig(0x00))
-	gobottest.Assert(t, d.gyroFs, MPU6050GyroFsConfig(0x00))
-	gobottest.Assert(t, d.clock, MPU6050Pwr1ClockConfig(0x01))
-	gobottest.Assert(t, d.gravity, 9.80665)
+	assert.NotNil(t, d.Driver)
+	assert.True(t, strings.HasPrefix(d.name, "MPU6050"))
+	assert.Equal(t, 0x68, d.defaultAddress)
+	assert.Equal(t, MPU6050DlpfConfig(0x00), d.dlpf)
+	assert.Equal(t, MPU6050FrameSyncConfig(0x00), d.frameSync)
+	assert.Equal(t, MPU6050AccelFsConfig(0x00), d.accelFs)
+	assert.Equal(t, MPU6050GyroFsConfig(0x00), d.gyroFs)
+	assert.Equal(t, MPU6050Pwr1ClockConfig(0x01), d.clock)
+	assert.Equal(t, 9.80665, d.gravity)
 }
 
 func TestMPU6050Options(t *testing.T) {
 	// This is a general test, that options are applied in constructor by using the common WithBus() option and
 	// least one of this driver. Further tests for options can also be done by call of "WithOption(val)(d)".
 	d := NewMPU6050Driver(newI2cTestAdaptor(), WithBus(2), WithMPU6050DigitalFilter(0x06))
-	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
-	gobottest.Assert(t, d.dlpf, MPU6050DlpfConfig(0x06))
+	assert.Equal(t, 2, d.GetBusOrDefault(1))
+	assert.Equal(t, MPU6050DlpfConfig(0x06), d.dlpf)
 }
 
 func TestWithMPU6050FrameSync(t *testing.T) {
 	d := NewMPU6050Driver(newI2cTestAdaptor(), WithMPU6050FrameSync(0x07))
-	gobottest.Assert(t, d.frameSync, MPU6050FrameSyncConfig(0x07))
+	assert.Equal(t, MPU6050FrameSyncConfig(0x07), d.frameSync)
 }
 
 func TestWithMPU6050AccelFullScaleRange(t *testing.T) {
 	d := NewMPU6050Driver(newI2cTestAdaptor(), WithMPU6050AccelFullScaleRange(0x02))
-	gobottest.Assert(t, d.accelFs, MPU6050AccelFsConfig(0x02))
+	assert.Equal(t, MPU6050AccelFsConfig(0x02), d.accelFs)
 }
 
 func TestWithMPU6050GyroFullScaleRange(t *testing.T) {
 	d := NewMPU6050Driver(newI2cTestAdaptor(), WithMPU6050GyroFullScaleRange(0x03))
-	gobottest.Assert(t, d.gyroFs, MPU6050GyroFsConfig(0x03))
+	assert.Equal(t, MPU6050GyroFsConfig(0x03), d.gyroFs)
 }
 
 func TestWithMPU6050ClockSource(t *testing.T) {
 	d := NewMPU6050Driver(newI2cTestAdaptor(), WithMPU6050ClockSource(0x05))
-	gobottest.Assert(t, d.clock, MPU6050Pwr1ClockConfig(0x05))
+	assert.Equal(t, MPU6050Pwr1ClockConfig(0x05), d.clock)
 }
 
 func TestWithMPU6050Gravity(t *testing.T) {
 	d := NewMPU6050Driver(newI2cTestAdaptor(), WithMPU6050Gravity(1.0))
-	gobottest.Assert(t, d.gravity, 1.0)
+	assert.Equal(t, 1.0, d.gravity)
 }
 
 func TestMPU6050GetData(t *testing.T) {
@@ -111,9 +111,9 @@ func TestMPU6050GetData(t *testing.T) {
 	// act
 	_ = d.GetData()
 	// assert
-	gobottest.Assert(t, d.Accelerometer, wantAccel)
-	gobottest.Assert(t, d.Gyroscope, wantGyro)
-	gobottest.Assert(t, d.Temperature, wantTemp)
+	assert.Equal(t, wantAccel, d.Accelerometer)
+	assert.Equal(t, wantGyro, d.Gyroscope)
+	assert.Equal(t, wantTemp, d.Temperature)
 }
 
 func TestMPU6050GetDataReadError(t *testing.T) {
@@ -124,7 +124,7 @@ func TestMPU6050GetDataReadError(t *testing.T) {
 		return 0, errors.New("read error")
 	}
 
-	gobottest.Assert(t, d.GetData(), errors.New("read error"))
+	assert.ErrorContains(t, d.GetData(), "read error")
 }
 
 func TestMPU6050GetDataWriteError(t *testing.T) {
@@ -135,7 +135,7 @@ func TestMPU6050GetDataWriteError(t *testing.T) {
 		return 0, errors.New("write error")
 	}
 
-	gobottest.Assert(t, d.GetData(), errors.New("write error"))
+	assert.ErrorContains(t, d.GetData(), "write error")
 }
 
 func TestMPU6050_initialize(t *testing.T) {
@@ -172,20 +172,20 @@ func TestMPU6050_initialize(t *testing.T) {
 	// act, assert - initialize() must be called on Start()
 	err := d.Start()
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, readCallCounter, 1)
-	gobottest.Assert(t, len(a.written), 13)
-	gobottest.Assert(t, a.written[0], uint8(0x6B))
-	gobottest.Assert(t, a.written[1], uint8(0x80))
-	gobottest.Assert(t, a.written[2], uint8(0x6B))
-	gobottest.Assert(t, a.written[3], uint8(0x68))
-	gobottest.Assert(t, a.written[4], uint8(0x07))
-	gobottest.Assert(t, a.written[5], uint8(0x1A))
-	gobottest.Assert(t, a.written[6], uint8(0x00))
-	gobottest.Assert(t, a.written[7], uint8(0x1B))
-	gobottest.Assert(t, a.written[8], uint8(0x00))
-	gobottest.Assert(t, a.written[9], uint8(0x1C))
-	gobottest.Assert(t, a.written[10], uint8(0x00))
-	gobottest.Assert(t, a.written[11], uint8(0x6B))
-	gobottest.Assert(t, a.written[12], uint8(0x01))
+	assert.NoError(t, err)
+	assert.Equal(t, 1, readCallCounter)
+	assert.Equal(t, 13, len(a.written))
+	assert.Equal(t, uint8(0x6B), a.written[0])
+	assert.Equal(t, uint8(0x80), a.written[1])
+	assert.Equal(t, uint8(0x6B), a.written[2])
+	assert.Equal(t, uint8(0x68), a.written[3])
+	assert.Equal(t, uint8(0x07), a.written[4])
+	assert.Equal(t, uint8(0x1A), a.written[5])
+	assert.Equal(t, uint8(0x00), a.written[6])
+	assert.Equal(t, uint8(0x1B), a.written[7])
+	assert.Equal(t, uint8(0x00), a.written[8])
+	assert.Equal(t, uint8(0x1C), a.written[9])
+	assert.Equal(t, uint8(0x00), a.written[10])
+	assert.Equal(t, uint8(0x6B), a.written[11])
+	assert.Equal(t, uint8(0x01), a.written[12])
 }

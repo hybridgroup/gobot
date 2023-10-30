@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on spi.Driver, which implements the gobot.Driver
@@ -28,8 +28,8 @@ func TestNewAPA102Driver(t *testing.T) {
 	if !ok {
 		t.Errorf("NewAPA102Driver() should have returned a *APA102Driver")
 	}
-	gobottest.Refute(t, d.Driver, nil)
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "APA102"), true)
+	assert.NotNil(t, d.Driver)
+	assert.True(t, strings.HasPrefix(d.Name(), "APA102"))
 }
 
 func TestDriverLEDs(t *testing.T) {
@@ -40,5 +40,5 @@ func TestDriverLEDs(t *testing.T) {
 	d.SetRGBA(2, color.RGBA{255, 255, 255, 15})
 	d.SetRGBA(3, color.RGBA{255, 255, 255, 15})
 
-	gobottest.Assert(t, d.Draw(), nil)
+	assert.NoError(t, d.Draw())
 }

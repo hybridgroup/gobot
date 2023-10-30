@@ -41,7 +41,6 @@ func main() {
 		}
 
 		gobot.Every(2*time.Second, func() {
-
 			if !wasCardDetected {
 				fmt.Println("\n+++ poll for card +++")
 				if err := d.IsCardPresent(); err != nil {
@@ -64,7 +63,6 @@ func main() {
 					fmt.Printf("-- start text --\n%s\n-- end  text --\n", text)
 				}
 			}
-
 		})
 	}
 

@@ -9,8 +9,10 @@ import (
 	"time"
 )
 
-var _ File = (*MockFile)(nil)
-var _ filesystem = (*MockFilesystem)(nil)
+var (
+	_ File       = (*MockFile)(nil)
+	_ filesystem = (*MockFilesystem)(nil)
+)
 
 // MockFilesystem represents a filesystem of mock files.
 type MockFilesystem struct {

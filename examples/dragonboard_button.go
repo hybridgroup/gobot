@@ -11,11 +11,11 @@ import (
 
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/gpio"
-	"gobot.io/x/gobot/v2/platforms/chip"
+	"gobot.io/x/gobot/v2/platforms/dragonboard"
 )
 
 func main() {
-	dragonAdaptor := chip.NewAdaptor()
+	dragonAdaptor := dragonboard.NewAdaptor()
 	button := gpio.NewButtonDriver(dragonAdaptor, "GPIO_A")
 
 	work := func() {

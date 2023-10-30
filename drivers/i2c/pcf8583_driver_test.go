@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
@@ -26,20 +26,20 @@ func TestNewPCF8583Driver(t *testing.T) {
 	if !ok {
 		t.Errorf("NewPCF8583Driver() should have returned a *PCF8583Driver")
 	}
-	gobottest.Refute(t, d.Driver, nil)
-	gobottest.Assert(t, strings.HasPrefix(d.name, "PCF8583"), true)
-	gobottest.Assert(t, d.defaultAddress, 0x50)
-	gobottest.Assert(t, d.mode, PCF8583Control(0x00))
-	gobottest.Assert(t, d.yearOffset, 0)
-	gobottest.Assert(t, d.ramOffset, uint8(0x10))
+	assert.NotNil(t, d.Driver)
+	assert.True(t, strings.HasPrefix(d.name, "PCF8583"))
+	assert.Equal(t, 0x50, d.defaultAddress)
+	assert.Equal(t, PCF8583Control(0x00), d.mode)
+	assert.Equal(t, 0, d.yearOffset)
+	assert.Equal(t, uint8(0x10), d.ramOffset)
 }
 
 func TestPCF8583Options(t *testing.T) {
 	// This is a general test, that options are applied in constructor by using the common WithBus() option and
 	// least one of this driver. Further tests for options can also be done by call of "WithOption(val)(d)".
 	d := NewPCF8583Driver(newI2cTestAdaptor(), WithBus(2), WithPCF8583Mode(PCF8583CtrlModeClock50))
-	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
-	gobottest.Assert(t, d.mode, PCF8583CtrlModeClock50)
+	assert.Equal(t, 2, d.GetBusOrDefault(1))
+	assert.Equal(t, PCF8583CtrlModeClock50, d.mode)
 }
 
 func TestPCF8583CommandsWriteTime(t *testing.T) {
@@ -60,7 +60,7 @@ func TestPCF8583CommandsWriteTime(t *testing.T) {
 	// act
 	result := d.Command("WriteTime")(map[string]interface{}{"val": time.Now()})
 	// assert
-	gobottest.Assert(t, result.(map[string]interface{})["err"], nil)
+	assert.Nil(t, result.(map[string]interface{})["err"])
 }
 
 func TestPCF8583CommandsReadTime(t *testing.T) {
@@ -68,7 +68,7 @@ func TestPCF8583CommandsReadTime(t *testing.T) {
 	d, a := initTestPCF8583WithStubbedAdaptor()
 	d.yearOffset = 2019
 	milliSec := 550 * time.Millisecond // 0.55 sec = 550 ms
-	want := time.Date(2021, time.December, 24, 18, 00, 00, int(milliSec), time.UTC)
+	want := time.Date(2021, time.December, 24, 18, 0, 0, int(milliSec), time.UTC)
 	reg0Val := uint8(0x00) // clock mode 32.768 kHz
 	reg1Val := uint8(0x55) // BCD: 1/10 and 1/100 sec (55)
 	reg2Val := uint8(0x00) // BCD: 10 and 1 sec (00)
@@ -94,8 +94,8 @@ func TestPCF8583CommandsReadTime(t *testing.T) {
 	// act
 	result := d.Command("ReadTime")(map[string]interface{}{})
 	// assert
-	gobottest.Assert(t, result.(map[string]interface{})["err"], nil)
-	gobottest.Assert(t, result.(map[string]interface{})["val"], want)
+	assert.Nil(t, result.(map[string]interface{})["err"])
+	assert.Equal(t, want, result.(map[string]interface{})["val"])
 }
 
 func TestPCF8583CommandsWriteCounter(t *testing.T) {
@@ -116,7 +116,7 @@ func TestPCF8583CommandsWriteCounter(t *testing.T) {
 	// act
 	result := d.Command("WriteCounter")(map[string]interface{}{"val": int32(123456)})
 	// assert
-	gobottest.Assert(t, result.(map[string]interface{})["err"], nil)
+	assert.Nil(t, result.(map[string]interface{})["err"])
 }
 
 func TestPCF8583CommandsReadCounter(t *testing.T) {
@@ -145,34 +145,34 @@ func TestPCF8583CommandsReadCounter(t *testing.T) {
 	// act
 	result := d.Command("ReadCounter")(map[string]interface{}{})
 	// assert
-	gobottest.Assert(t, result.(map[string]interface{})["err"], nil)
-	gobottest.Assert(t, result.(map[string]interface{})["val"], want)
+	assert.Nil(t, result.(map[string]interface{})["err"])
+	assert.Equal(t, want, result.(map[string]interface{})["val"])
 }
 
 func TestPCF8583CommandsWriteRAM(t *testing.T) {
 	// arrange
 	d, _ := initTestPCF8583WithStubbedAdaptor()
-	var addressValue = map[string]interface{}{
+	addressValue := map[string]interface{}{
 		"address": uint8(0x12),
 		"val":     uint8(0x45),
 	}
 	// act
 	result := d.Command("WriteRAM")(addressValue)
 	// assert
-	gobottest.Assert(t, result.(map[string]interface{})["err"], nil)
+	assert.Nil(t, result.(map[string]interface{})["err"])
 }
 
 func TestPCF8583CommandsReadRAM(t *testing.T) {
 	// arrange
 	d, _ := initTestPCF8583WithStubbedAdaptor()
-	var address = map[string]interface{}{
+	address := map[string]interface{}{
 		"address": uint8(0x34),
 	}
 	// act
 	result := d.Command("ReadRAM")(address)
 	// assert
-	gobottest.Assert(t, result.(map[string]interface{})["err"], nil)
-	gobottest.Assert(t, result.(map[string]interface{})["val"], uint8(0))
+	assert.Nil(t, result.(map[string]interface{})["err"])
+	assert.Equal(t, uint8(0), result.(map[string]interface{})["val"])
 }
 
 func TestPCF8583WriteTime(t *testing.T) {
@@ -210,21 +210,21 @@ func TestPCF8583WriteTime(t *testing.T) {
 	// act
 	err := d.WriteTime(initDate)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, d.yearOffset, initDate.Year())
-	gobottest.Assert(t, numCallsRead, 1)
-	gobottest.Assert(t, len(a.written), 11)
-	gobottest.Assert(t, a.written[0], uint8(pcf8583Reg_CTRL))
-	gobottest.Assert(t, a.written[1], uint8(pcf8583Reg_CTRL))
-	gobottest.Assert(t, a.written[2], wantCtrlStop)
-	gobottest.Assert(t, a.written[3], wantReg1Val)
-	gobottest.Assert(t, a.written[4], wantReg2Val)
-	gobottest.Assert(t, a.written[5], wantReg3Val)
-	gobottest.Assert(t, a.written[6], wantReg4Val)
-	gobottest.Assert(t, a.written[7], wantReg5Val)
-	gobottest.Assert(t, a.written[8], wantReg6Val)
-	gobottest.Assert(t, a.written[9], uint8(pcf8583Reg_CTRL))
-	gobottest.Assert(t, a.written[10], wantCrtlStart)
+	assert.NoError(t, err)
+	assert.Equal(t, initDate.Year(), d.yearOffset)
+	assert.Equal(t, 1, numCallsRead)
+	assert.Equal(t, 11, len(a.written))
+	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[0])
+	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[1])
+	assert.Equal(t, wantCtrlStop, a.written[2])
+	assert.Equal(t, wantReg1Val, a.written[3])
+	assert.Equal(t, wantReg2Val, a.written[4])
+	assert.Equal(t, wantReg3Val, a.written[5])
+	assert.Equal(t, wantReg4Val, a.written[6])
+	assert.Equal(t, wantReg5Val, a.written[7])
+	assert.Equal(t, wantReg6Val, a.written[8])
+	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[9])
+	assert.Equal(t, wantCrtlStart, a.written[10])
 }
 
 func TestPCF8583WriteTimeNoTimeModeFails(t *testing.T) {
@@ -246,11 +246,11 @@ func TestPCF8583WriteTimeNoTimeModeFails(t *testing.T) {
 	// act
 	err := d.WriteTime(time.Now())
 	// assert
-	gobottest.Refute(t, err, nil)
-	gobottest.Assert(t, strings.Contains(err.Error(), "wrong mode 0x30"), true)
-	gobottest.Assert(t, len(a.written), 1)
-	gobottest.Assert(t, a.written[0], uint8(pcf8583Reg_CTRL))
-	gobottest.Assert(t, numCallsRead, 1)
+	assert.NotNil(t, err)
+	assert.Contains(t, err.Error(), "wrong mode 0x30")
+	assert.Equal(t, 1, len(a.written))
+	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[0])
+	assert.Equal(t, 1, numCallsRead)
 }
 
 func TestPCF8583ReadTime(t *testing.T) {
@@ -292,11 +292,11 @@ func TestPCF8583ReadTime(t *testing.T) {
 	// act
 	got, err := d.ReadTime()
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, len(a.written), 1)
-	gobottest.Assert(t, a.written[0], uint8(pcf8583Reg_CTRL))
-	gobottest.Assert(t, numCallsRead, 2)
-	gobottest.Assert(t, got, want)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(a.written))
+	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[0])
+	assert.Equal(t, 2, numCallsRead)
+	assert.Equal(t, want, got)
 }
 
 func TestPCF8583ReadTimeNoTimeModeFails(t *testing.T) {
@@ -318,12 +318,12 @@ func TestPCF8583ReadTimeNoTimeModeFails(t *testing.T) {
 	// act
 	got, err := d.ReadTime()
 	// assert
-	gobottest.Refute(t, err, nil)
-	gobottest.Assert(t, strings.Contains(err.Error(), "wrong mode 0x20"), true)
-	gobottest.Assert(t, got, time.Time{})
-	gobottest.Assert(t, len(a.written), 1)
-	gobottest.Assert(t, a.written[0], uint8(pcf8583Reg_CTRL))
-	gobottest.Assert(t, numCallsRead, 1)
+	assert.NotNil(t, err)
+	assert.Contains(t, err.Error(), "wrong mode 0x20")
+	assert.Equal(t, time.Time{}, got)
+	assert.Equal(t, 1, len(a.written))
+	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[0])
+	assert.Equal(t, 1, numCallsRead)
 }
 
 func TestPCF8583WriteCounter(t *testing.T) {
@@ -357,17 +357,17 @@ func TestPCF8583WriteCounter(t *testing.T) {
 	// act
 	err := d.WriteCounter(initCount)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, numCallsRead, 1)
-	gobottest.Assert(t, len(a.written), 8)
-	gobottest.Assert(t, a.written[0], uint8(pcf8583Reg_CTRL))
-	gobottest.Assert(t, a.written[1], uint8(pcf8583Reg_CTRL))
-	gobottest.Assert(t, a.written[2], wantCtrlStop)
-	gobottest.Assert(t, a.written[3], wantReg1Val)
-	gobottest.Assert(t, a.written[4], wantReg2Val)
-	gobottest.Assert(t, a.written[5], wantReg3Val)
-	gobottest.Assert(t, a.written[6], uint8(pcf8583Reg_CTRL))
-	gobottest.Assert(t, a.written[7], wantCtrlStart)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, numCallsRead)
+	assert.Equal(t, 8, len(a.written))
+	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[0])
+	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[1])
+	assert.Equal(t, wantCtrlStop, a.written[2])
+	assert.Equal(t, wantReg1Val, a.written[3])
+	assert.Equal(t, wantReg2Val, a.written[4])
+	assert.Equal(t, wantReg3Val, a.written[5])
+	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[6])
+	assert.Equal(t, wantCtrlStart, a.written[7])
 }
 
 func TestPCF8583WriteCounterNoCounterModeFails(t *testing.T) {
@@ -389,11 +389,11 @@ func TestPCF8583WriteCounterNoCounterModeFails(t *testing.T) {
 	// act
 	err := d.WriteCounter(123)
 	// assert
-	gobottest.Refute(t, err, nil)
-	gobottest.Assert(t, strings.Contains(err.Error(), "wrong mode 0x10"), true)
-	gobottest.Assert(t, len(a.written), 1)
-	gobottest.Assert(t, a.written[0], uint8(pcf8583Reg_CTRL))
-	gobottest.Assert(t, numCallsRead, 1)
+	assert.NotNil(t, err)
+	assert.Contains(t, err.Error(), "wrong mode 0x10")
+	assert.Equal(t, 1, len(a.written))
+	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[0])
+	assert.Equal(t, 1, numCallsRead)
 }
 
 func TestPCF8583ReadCounter(t *testing.T) {
@@ -430,11 +430,11 @@ func TestPCF8583ReadCounter(t *testing.T) {
 	// act
 	got, err := d.ReadCounter()
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, len(a.written), 1)
-	gobottest.Assert(t, a.written[0], uint8(pcf8583Reg_CTRL))
-	gobottest.Assert(t, numCallsRead, 2)
-	gobottest.Assert(t, got, want)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(a.written))
+	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[0])
+	assert.Equal(t, 2, numCallsRead)
+	assert.Equal(t, want, got)
 }
 
 func TestPCF8583ReadCounterNoCounterModeFails(t *testing.T) {
@@ -456,12 +456,12 @@ func TestPCF8583ReadCounterNoCounterModeFails(t *testing.T) {
 	// act
 	got, err := d.ReadCounter()
 	// assert
-	gobottest.Refute(t, err, nil)
-	gobottest.Assert(t, strings.Contains(err.Error(), "wrong mode 0x30"), true)
-	gobottest.Assert(t, got, int32(0))
-	gobottest.Assert(t, len(a.written), 1)
-	gobottest.Assert(t, a.written[0], uint8(pcf8583Reg_CTRL))
-	gobottest.Assert(t, numCallsRead, 1)
+	assert.NotNil(t, err)
+	assert.Contains(t, err.Error(), "wrong mode 0x30")
+	assert.Equal(t, int32(0), got)
+	assert.Equal(t, 1, len(a.written))
+	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[0])
+	assert.Equal(t, 1, numCallsRead)
 }
 
 func TestPCF8583WriteRam(t *testing.T) {
@@ -480,10 +480,10 @@ func TestPCF8583WriteRam(t *testing.T) {
 	// act
 	err := d.WriteRAM(wantRAMAddress-pcf8583RamOffset, wantRAMValue)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, len(a.written), 2)
-	gobottest.Assert(t, a.written[0], wantRAMAddress)
-	gobottest.Assert(t, a.written[1], wantRAMValue)
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(a.written))
+	assert.Equal(t, wantRAMAddress, a.written[0])
+	assert.Equal(t, wantRAMValue, a.written[1])
 }
 
 func TestPCF8583WriteRamAddressOverflowFails(t *testing.T) {
@@ -493,9 +493,9 @@ func TestPCF8583WriteRamAddressOverflowFails(t *testing.T) {
 	// act
 	err := d.WriteRAM(uint8(0xF0), 15)
 	// assert
-	gobottest.Refute(t, err, nil)
-	gobottest.Assert(t, strings.Contains(err.Error(), "overflow 256"), true)
-	gobottest.Assert(t, len(a.written), 0)
+	assert.NotNil(t, err)
+	assert.Contains(t, err.Error(), "overflow 256")
+	assert.Equal(t, 0, len(a.written))
 }
 
 func TestPCF8583ReadRam(t *testing.T) {
@@ -521,11 +521,11 @@ func TestPCF8583ReadRam(t *testing.T) {
 	// act
 	got, err := d.ReadRAM(wantRAMAddress - pcf8583RamOffset)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, got, want)
-	gobottest.Assert(t, len(a.written), 1)
-	gobottest.Assert(t, a.written[0], wantRAMAddress)
-	gobottest.Assert(t, numCallsRead, 1)
+	assert.NoError(t, err)
+	assert.Equal(t, want, got)
+	assert.Equal(t, 1, len(a.written))
+	assert.Equal(t, wantRAMAddress, a.written[0])
+	assert.Equal(t, 1, numCallsRead)
 }
 
 func TestPCF8583ReadRamAddressOverflowFails(t *testing.T) {
@@ -545,11 +545,11 @@ func TestPCF8583ReadRamAddressOverflowFails(t *testing.T) {
 	// act
 	got, err := d.ReadRAM(uint8(0xF0))
 	// assert
-	gobottest.Refute(t, err, nil)
-	gobottest.Assert(t, strings.Contains(err.Error(), "overflow 256"), true)
-	gobottest.Assert(t, got, uint8(0))
-	gobottest.Assert(t, len(a.written), 0)
-	gobottest.Assert(t, numCallsRead, 0)
+	assert.NotNil(t, err)
+	assert.Contains(t, err.Error(), "overflow 256")
+	assert.Equal(t, uint8(0), got)
+	assert.Equal(t, 0, len(a.written))
+	assert.Equal(t, 0, numCallsRead)
 }
 
 func TestPCF8583_initializeNoModeSwitch(t *testing.T) {
@@ -572,10 +572,10 @@ func TestPCF8583_initializeNoModeSwitch(t *testing.T) {
 	// act, assert - initialize() must be called on Start()
 	err := d.Start()
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, numCallsRead, 1)
-	gobottest.Assert(t, len(a.written), 1)
-	gobottest.Assert(t, a.written[0], uint8(pcf8583Reg_CTRL))
+	assert.NoError(t, err)
+	assert.Equal(t, 1, numCallsRead)
+	assert.Equal(t, 1, len(a.written))
+	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[0])
 }
 
 func TestPCF8583_initializeWithModeSwitch(t *testing.T) {
@@ -604,10 +604,10 @@ func TestPCF8583_initializeWithModeSwitch(t *testing.T) {
 	// act, assert - initialize() must be called on Start()
 	err := d.Start()
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, numCallsRead, 1)
-	gobottest.Assert(t, len(a.written), 3)
-	gobottest.Assert(t, a.written[0], uint8(pcf8583Reg_CTRL))
-	gobottest.Assert(t, a.written[1], uint8(pcf8583Reg_CTRL))
-	gobottest.Assert(t, a.written[2], uint8(wantReg0Val))
+	assert.NoError(t, err)
+	assert.Equal(t, 1, numCallsRead)
+	assert.Equal(t, 3, len(a.written))
+	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[0])
+	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[1])
+	assert.Equal(t, wantReg0Val, a.written[2])
 }

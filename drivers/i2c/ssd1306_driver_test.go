@@ -1,24 +1,27 @@
 package i2c
 
 import (
-	"errors"
 	"fmt"
 	"image"
 	"reflect"
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
 // and tests all implementations, so no further tests needed here for gobot.Driver interface
 var _ gobot.Driver = (*SSD1306Driver)(nil)
 
-func initTestSSD1306DriverWithStubbedAdaptor(width, height int, externalVCC bool) (*SSD1306Driver, *i2cTestAdaptor) {
+func initTestSSD1306DriverWithStubbedAdaptor(
+	width, height int,
+	externalVCC bool, //nolint:unparam // keep for tests
+) (*SSD1306Driver, *i2cTestAdaptor) {
 	a := newI2cTestAdaptor()
-	d := NewSSD1306Driver(a, WithSSD1306DisplayWidth(width), WithSSD1306DisplayHeight(height), WithSSD1306ExternalVCC(externalVCC))
+	d := NewSSD1306Driver(a, WithSSD1306DisplayWidth(width), WithSSD1306DisplayHeight(height),
+		WithSSD1306ExternalVCC(externalVCC))
 	if err := d.Start(); err != nil {
 		panic(err)
 	}
@@ -31,9 +34,9 @@ func TestNewSSD1306Driver(t *testing.T) {
 	if !ok {
 		t.Errorf("new should have returned a *SSD1306Driver")
 	}
-	gobottest.Refute(t, d.Driver, nil)
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "SSD1306"), true)
-	gobottest.Assert(t, d.defaultAddress, 0x3c)
+	assert.NotNil(t, d.Driver)
+	assert.True(t, strings.HasPrefix(d.Name(), "SSD1306"))
+	assert.Equal(t, 0x3c, d.defaultAddress)
 }
 
 func TestSSD1306StartDefault(t *testing.T) {
@@ -44,7 +47,7 @@ func TestSSD1306StartDefault(t *testing.T) {
 	)
 	d := NewSSD1306Driver(newI2cTestAdaptor(),
 		WithSSD1306DisplayWidth(width), WithSSD1306DisplayHeight(height), WithSSD1306ExternalVCC(externalVCC))
-	gobottest.Assert(t, d.Start(), nil)
+	assert.NoError(t, d.Start())
 }
 
 func TestSSD1306Start128x32(t *testing.T) {
@@ -55,7 +58,7 @@ func TestSSD1306Start128x32(t *testing.T) {
 	)
 	d := NewSSD1306Driver(newI2cTestAdaptor(),
 		WithSSD1306DisplayWidth(width), WithSSD1306DisplayHeight(height), WithSSD1306ExternalVCC(externalVCC))
-	gobottest.Assert(t, d.Start(), nil)
+	assert.NoError(t, d.Start())
 }
 
 func TestSSD1306Start96x16(t *testing.T) {
@@ -66,7 +69,7 @@ func TestSSD1306Start96x16(t *testing.T) {
 	)
 	d := NewSSD1306Driver(newI2cTestAdaptor(),
 		WithSSD1306DisplayWidth(width), WithSSD1306DisplayHeight(height), WithSSD1306ExternalVCC(externalVCC))
-	gobottest.Assert(t, d.Start(), nil)
+	assert.NoError(t, d.Start())
 }
 
 func TestSSD1306StartExternalVCC(t *testing.T) {
@@ -77,7 +80,7 @@ func TestSSD1306StartExternalVCC(t *testing.T) {
 	)
 	d := NewSSD1306Driver(newI2cTestAdaptor(),
 		WithSSD1306DisplayWidth(width), WithSSD1306DisplayHeight(height), WithSSD1306ExternalVCC(externalVCC))
-	gobottest.Assert(t, d.Start(), nil)
+	assert.NoError(t, d.Start())
 }
 
 func TestSSD1306StartSizeError(t *testing.T) {
@@ -88,35 +91,35 @@ func TestSSD1306StartSizeError(t *testing.T) {
 	)
 	d := NewSSD1306Driver(newI2cTestAdaptor(),
 		WithSSD1306DisplayWidth(width), WithSSD1306DisplayHeight(height), WithSSD1306ExternalVCC(externalVCC))
-	gobottest.Assert(t, d.Start(), errors.New("128x54 resolution is unsupported, supported resolutions: 128x64, 128x32, 96x16"))
+	assert.ErrorContains(t, d.Start(), "128x54 resolution is unsupported, supported resolutions: 128x64, 128x32, 96x16")
 }
 
 func TestSSD1306Halt(t *testing.T) {
 	s, _ := initTestSSD1306DriverWithStubbedAdaptor(128, 64, false)
-	gobottest.Assert(t, s.Halt(), nil)
+	assert.NoError(t, s.Halt())
 }
 
 func TestSSD1306Options(t *testing.T) {
 	s := NewSSD1306Driver(newI2cTestAdaptor(), WithBus(2), WithSSD1306DisplayHeight(32), WithSSD1306DisplayWidth(128))
-	gobottest.Assert(t, s.GetBusOrDefault(1), 2)
-	gobottest.Assert(t, s.displayHeight, 32)
-	gobottest.Assert(t, s.displayWidth, 128)
+	assert.Equal(t, 2, s.GetBusOrDefault(1))
+	assert.Equal(t, 32, s.displayHeight)
+	assert.Equal(t, 128, s.displayWidth)
 }
 
 func TestSSD1306Display(t *testing.T) {
 	s, _ := initTestSSD1306DriverWithStubbedAdaptor(96, 16, false)
 	_ = s.Start()
-	gobottest.Assert(t, s.Display(), nil)
+	assert.NoError(t, s.Display())
 }
 
 func TestSSD1306ShowImage(t *testing.T) {
 	s, _ := initTestSSD1306DriverWithStubbedAdaptor(128, 64, false)
 	_ = s.Start()
 	img := image.NewRGBA(image.Rect(0, 0, 640, 480))
-	gobottest.Assert(t, s.ShowImage(img), errors.New("image must match display width and height: 128x64"))
+	assert.ErrorContains(t, s.ShowImage(img), "image must match display width and height: 128x64")
 
 	img = image.NewRGBA(image.Rect(0, 0, 128, 64))
-	gobottest.Assert(t, s.ShowImage(img), nil)
+	assert.NoError(t, s.ShowImage(img))
 }
 
 func TestSSD1306Command(t *testing.T) {
@@ -132,7 +135,7 @@ func TestSSD1306Command(t *testing.T) {
 		return 0, nil
 	}
 	err := s.command(0xFF)
-	gobottest.Assert(t, err, nil)
+	assert.NoError(t, err)
 }
 
 func TestSSD1306Commands(t *testing.T) {
@@ -148,7 +151,7 @@ func TestSSD1306Commands(t *testing.T) {
 		return 0, nil
 	}
 	err := s.commands([]byte{0x00, 0xFF})
-	gobottest.Assert(t, err, nil)
+	assert.NoError(t, err)
 }
 
 func TestSSD1306On(t *testing.T) {
@@ -164,7 +167,7 @@ func TestSSD1306On(t *testing.T) {
 		return 0, nil
 	}
 	err := s.On()
-	gobottest.Assert(t, err, nil)
+	assert.NoError(t, err)
 }
 
 func TestSSD1306Off(t *testing.T) {
@@ -180,7 +183,7 @@ func TestSSD1306Off(t *testing.T) {
 		return 0, nil
 	}
 	err := s.Off()
-	gobottest.Assert(t, err, nil)
+	assert.NoError(t, err)
 }
 
 func TestSSD1306Reset(t *testing.T) {
@@ -197,7 +200,7 @@ func TestSSD1306Reset(t *testing.T) {
 		return 0, nil
 	}
 	err := s.Reset()
-	gobottest.Assert(t, err, nil)
+	assert.NoError(t, err)
 }
 
 // COMMANDS
@@ -205,28 +208,28 @@ func TestSSD1306Reset(t *testing.T) {
 func TestSSD1306CommandsDisplay(t *testing.T) {
 	s, _ := initTestSSD1306DriverWithStubbedAdaptor(128, 64, false)
 	result := s.Command("Display")(map[string]interface{}{})
-	gobottest.Assert(t, result.(map[string]interface{})["err"], nil)
+	assert.Nil(t, result.(map[string]interface{})["err"])
 }
 
 func TestSSD1306CommandsOn(t *testing.T) {
 	s, _ := initTestSSD1306DriverWithStubbedAdaptor(128, 64, false)
 
 	result := s.Command("On")(map[string]interface{}{})
-	gobottest.Assert(t, result.(map[string]interface{})["err"], nil)
+	assert.Nil(t, result.(map[string]interface{})["err"])
 }
 
 func TestSSD1306CommandsOff(t *testing.T) {
 	s, _ := initTestSSD1306DriverWithStubbedAdaptor(128, 64, false)
 
 	result := s.Command("Off")(map[string]interface{}{})
-	gobottest.Assert(t, result.(map[string]interface{})["err"], nil)
+	assert.Nil(t, result.(map[string]interface{})["err"])
 }
 
 func TestSSD1306CommandsClear(t *testing.T) {
 	s, _ := initTestSSD1306DriverWithStubbedAdaptor(128, 64, false)
 
 	result := s.Command("Clear")(map[string]interface{}{})
-	gobottest.Assert(t, result.(map[string]interface{})["err"], nil)
+	assert.Nil(t, result.(map[string]interface{})["err"])
 }
 
 func TestSSD1306CommandsSetContrast(t *testing.T) {
@@ -243,19 +246,19 @@ func TestSSD1306CommandsSetContrast(t *testing.T) {
 	result := s.Command("SetContrast")(map[string]interface{}{
 		"contrast": byte(0x10),
 	})
-	gobottest.Assert(t, result.(map[string]interface{})["err"], nil)
+	assert.Nil(t, result.(map[string]interface{})["err"])
 }
 
 func TestSSD1306CommandsSet(t *testing.T) {
 	s, _ := initTestSSD1306DriverWithStubbedAdaptor(128, 64, false)
 
-	gobottest.Assert(t, s.buffer.buffer[0], byte(0))
+	assert.Equal(t, byte(0), s.buffer.buffer[0])
 	s.Command("Set")(map[string]interface{}{
 		"x": int(0),
 		"y": int(0),
 		"c": int(1),
 	})
-	gobottest.Assert(t, s.buffer.buffer[0], byte(1))
+	assert.Equal(t, byte(1), s.buffer.buffer[0])
 }
 
 func TestDisplayBuffer(t *testing.T) {
@@ -273,17 +276,17 @@ func TestDisplayBuffer(t *testing.T) {
 			len(display.buffer), size)
 	}
 
-	gobottest.Assert(t, display.buffer[0], byte(0))
-	gobottest.Assert(t, display.buffer[1], byte(0))
+	assert.Equal(t, byte(0), display.buffer[0])
+	assert.Equal(t, byte(0), display.buffer[1])
 
 	display.SetPixel(0, 0, 1)
 	display.SetPixel(1, 0, 1)
 	display.SetPixel(2, 0, 1)
 	display.SetPixel(0, 1, 1)
-	gobottest.Assert(t, display.buffer[0], byte(3))
-	gobottest.Assert(t, display.buffer[1], byte(1))
+	assert.Equal(t, byte(3), display.buffer[0])
+	assert.Equal(t, byte(1), display.buffer[1])
 
 	display.SetPixel(0, 1, 0)
-	gobottest.Assert(t, display.buffer[0], byte(1))
-	gobottest.Assert(t, display.buffer[1], byte(1))
+	assert.Equal(t, byte(1), display.buffer[0])
+	assert.Equal(t, byte(1), display.buffer[1])
 }

@@ -2,7 +2,7 @@
 Package nats provides Gobot adaptor for the nats message service.
 Installing:
 
-  Please refer to the main [README.md](https://github.com/hybridgroup/gobot/blob/release/README.md)
+	Please refer to the main [README.md](https://github.com/hybridgroup/gobot/blob/release/README.md)
 
 For further information refer to nats README:
 https://github.com/hybridgroup/gobot/blob/master/platforms/nats/README.md

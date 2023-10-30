@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*Driver)(nil)
@@ -16,28 +16,28 @@ func initTestDriver() *Driver {
 
 func TestDriverStart(t *testing.T) {
 	d := initTestDriver()
-	gobottest.Assert(t, d.Start(), nil)
+	assert.NoError(t, d.Start())
 }
 
 func TestDriverHalt(t *testing.T) {
 	d := initTestDriver()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.NoError(t, d.Halt())
 }
 
 func TestDriver(t *testing.T) {
 	d := initTestDriver()
 
-	gobottest.Assert(t, d.Name(), "Pebble")
-	gobottest.Assert(t, d.Connection().Name(), "Pebble")
+	assert.Equal(t, "Pebble", d.Name())
+	assert.Equal(t, "Pebble", d.Connection().Name())
 
 	sem := make(chan bool)
 	d.SendNotification("Hello")
 	d.SendNotification("World")
 
-	gobottest.Assert(t, d.Messages[0], "Hello")
-	gobottest.Assert(t, d.PendingMessage(), "Hello")
-	gobottest.Assert(t, d.PendingMessage(), "World")
-	gobottest.Assert(t, d.PendingMessage(), "")
+	assert.Equal(t, "Hello", d.Messages[0])
+	assert.Equal(t, "Hello", d.PendingMessage())
+	assert.Equal(t, "World", d.PendingMessage())
+	assert.Equal(t, "", d.PendingMessage())
 
 	_ = d.On(d.Event("button"), func(data interface{}) {
 		sem <- true
@@ -64,8 +64,8 @@ func TestDriver(t *testing.T) {
 	}
 
 	d.Command("send_notification")(map[string]interface{}{"message": "Hey buddy!"})
-	gobottest.Assert(t, d.Messages[0], "Hey buddy!")
+	assert.Equal(t, "Hey buddy!", d.Messages[0])
 
 	message := d.Command("pending_message")(map[string]interface{}{})
-	gobottest.Assert(t, message, "Hey buddy!")
+	assert.Equal(t, "Hey buddy!", message)
 }

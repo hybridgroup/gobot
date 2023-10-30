@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*Driver)(nil)
@@ -13,23 +13,23 @@ var _ gobot.Driver = (*Driver)(nil)
 func TestNatsDriver(t *testing.T) {
 	d := NewDriver(initTestNatsAdaptor(), "/test/topic")
 
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "NATS"), true)
-	gobottest.Assert(t, strings.HasPrefix(d.Connection().Name(), "NATS"), true)
-	gobottest.Refute(t, d.adaptor(), nil)
+	assert.True(t, strings.HasPrefix(d.Name(), "NATS"))
+	assert.True(t, strings.HasPrefix(d.Connection().Name(), "NATS"))
+	assert.NotNil(t, d.adaptor())
 
-	gobottest.Assert(t, d.Start(), nil)
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.Halt())
 }
 
 func TestNatsDriverName(t *testing.T) {
 	d := NewDriver(initTestNatsAdaptor(), "/test/topic")
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "NATS"), true)
+	assert.True(t, strings.HasPrefix(d.Name(), "NATS"))
 	d.SetName("NewName")
-	gobottest.Assert(t, d.Name(), "NewName")
+	assert.Equal(t, "NewName", d.Name())
 }
 
 func TestNatsDriverTopic(t *testing.T) {
 	d := NewDriver(initTestNatsAdaptor(), "/test/topic")
 	d.SetTopic("interestingtopic")
-	gobottest.Assert(t, d.Topic(), "interestingtopic")
+	assert.Equal(t, "interestingtopic", d.Topic())
 }

@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
@@ -34,26 +34,26 @@ func TestNewLIDARLiteDriver(t *testing.T) {
 	if !ok {
 		t.Errorf("NewLIDARLiteDriver() should have returned a *LIDARLiteDriver")
 	}
-	gobottest.Refute(t, d.Driver, nil)
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "LIDARLite"), true)
-	gobottest.Assert(t, d.defaultAddress, 0x62)
+	assert.NotNil(t, d.Driver)
+	assert.True(t, strings.HasPrefix(d.Name(), "LIDARLite"))
+	assert.Equal(t, 0x62, d.defaultAddress)
 }
 
 func TestLIDARLiteDriverOptions(t *testing.T) {
 	// This is a general test, that options are applied in constructor by using the common WithBus() option and
 	// least one of this driver. Further tests for options can also be done by call of "WithOption(val)(d)".
 	d := NewLIDARLiteDriver(newI2cTestAdaptor(), WithBus(2))
-	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
+	assert.Equal(t, 2, d.GetBusOrDefault(1))
 }
 
 func TestLIDARLiteDriverStart(t *testing.T) {
 	d := NewLIDARLiteDriver(newI2cTestAdaptor())
-	gobottest.Assert(t, d.Start(), nil)
+	assert.NoError(t, d.Start())
 }
 
 func TestLIDARLiteDriverHalt(t *testing.T) {
 	d := initTestLIDARLiteDriver()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.NoError(t, d.Halt())
 }
 
 func TestLIDARLiteDriverDistance(t *testing.T) {
@@ -72,8 +72,8 @@ func TestLIDARLiteDriverDistance(t *testing.T) {
 
 	distance, err := d.Distance()
 
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, distance, int(25345))
+	assert.NoError(t, err)
+	assert.Equal(t, int(25345), distance)
 
 	// when insufficient bytes have been read
 	d, a = initTestLIDARLiteDriverWithStubbedAdaptor()
@@ -82,8 +82,8 @@ func TestLIDARLiteDriverDistance(t *testing.T) {
 	}
 
 	distance, err = d.Distance()
-	gobottest.Assert(t, distance, int(0))
-	gobottest.Assert(t, err, ErrNotEnoughBytes)
+	assert.Equal(t, int(0), distance)
+	assert.Equal(t, ErrNotEnoughBytes, err)
 
 	// when read error
 	d, a = initTestLIDARLiteDriverWithStubbedAdaptor()
@@ -92,8 +92,8 @@ func TestLIDARLiteDriverDistance(t *testing.T) {
 	}
 
 	distance, err = d.Distance()
-	gobottest.Assert(t, distance, int(0))
-	gobottest.Assert(t, err, errors.New("read error"))
+	assert.Equal(t, int(0), distance)
+	assert.ErrorContains(t, err, "read error")
 }
 
 func TestLIDARLiteDriverDistanceError1(t *testing.T) {
@@ -103,8 +103,8 @@ func TestLIDARLiteDriverDistanceError1(t *testing.T) {
 	}
 
 	distance, err := d.Distance()
-	gobottest.Assert(t, distance, int(0))
-	gobottest.Assert(t, err, errors.New("write error"))
+	assert.Equal(t, int(0), distance)
+	assert.ErrorContains(t, err, "write error")
 }
 
 func TestLIDARLiteDriverDistanceError2(t *testing.T) {
@@ -117,8 +117,8 @@ func TestLIDARLiteDriverDistanceError2(t *testing.T) {
 	}
 
 	distance, err := d.Distance()
-	gobottest.Assert(t, distance, int(0))
-	gobottest.Assert(t, err, errors.New("write error"))
+	assert.Equal(t, int(0), distance)
+	assert.ErrorContains(t, err, "write error")
 }
 
 func TestLIDARLiteDriverDistanceError3(t *testing.T) {
@@ -137,6 +137,6 @@ func TestLIDARLiteDriverDistanceError3(t *testing.T) {
 	}
 
 	distance, err := d.Distance()
-	gobottest.Assert(t, distance, int(0))
-	gobottest.Assert(t, err, errors.New("write error"))
+	assert.Equal(t, int(0), distance)
+	assert.ErrorContains(t, err, "write error")
 }

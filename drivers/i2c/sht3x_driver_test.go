@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
@@ -28,26 +28,26 @@ func TestNewSHT3xDriver(t *testing.T) {
 	if !ok {
 		t.Errorf("NewSHT3xDriver() should have returned a *SHT3xDriver")
 	}
-	gobottest.Refute(t, d.Driver, nil)
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "SHT3x"), true)
-	gobottest.Assert(t, d.defaultAddress, 0x44)
+	assert.NotNil(t, d.Driver)
+	assert.True(t, strings.HasPrefix(d.Name(), "SHT3x"))
+	assert.Equal(t, 0x44, d.defaultAddress)
 }
 
 func TestSHT3xOptions(t *testing.T) {
 	// This is a general test, that options are applied in constructor by using the common WithBus() option and
 	// least one of this driver. Further tests for options can also be done by call of "WithOption(val)(d)".
 	d := NewSHT3xDriver(newI2cTestAdaptor(), WithBus(2))
-	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
+	assert.Equal(t, 2, d.GetBusOrDefault(1))
 }
 
 func TestSHT3xStart(t *testing.T) {
 	d := NewSHT3xDriver(newI2cTestAdaptor())
-	gobottest.Assert(t, d.Start(), nil)
+	assert.NoError(t, d.Start())
 }
 
 func TestSHT3xHalt(t *testing.T) {
 	d, _ := initTestSHT3xDriverWithStubbedAdaptor()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.NoError(t, d.Halt())
 }
 
 func TestSHT3xSampleNormal(t *testing.T) {
@@ -58,13 +58,13 @@ func TestSHT3xSampleNormal(t *testing.T) {
 	}
 
 	temp, rh, _ := d.Sample()
-	gobottest.Assert(t, temp, float32(85.523003))
-	gobottest.Assert(t, rh, float32(74.5845))
+	assert.Equal(t, float32(85.523003), temp)
+	assert.Equal(t, float32(74.5845), rh)
 
 	// check the temp with the units in F
 	d.Units = "F"
 	temp, _, _ = d.Sample()
-	gobottest.Assert(t, temp, float32(185.9414))
+	assert.Equal(t, float32(185.9414), temp)
 }
 
 func TestSHT3xSampleBadCrc(t *testing.T) {
@@ -76,7 +76,7 @@ func TestSHT3xSampleBadCrc(t *testing.T) {
 	}
 
 	_, _, err := d.Sample()
-	gobottest.Assert(t, err, ErrInvalidCrc)
+	assert.Equal(t, ErrInvalidCrc, err)
 
 	// Check that the 2nd crc failure is caught
 	a.i2cReadImpl = func(b []byte) (int, error) {
@@ -85,7 +85,7 @@ func TestSHT3xSampleBadCrc(t *testing.T) {
 	}
 
 	_, _, err = d.Sample()
-	gobottest.Assert(t, err, ErrInvalidCrc)
+	assert.Equal(t, ErrInvalidCrc, err)
 }
 
 func TestSHT3xSampleBadRead(t *testing.T) {
@@ -97,7 +97,7 @@ func TestSHT3xSampleBadRead(t *testing.T) {
 	}
 
 	_, _, err := d.Sample()
-	gobottest.Assert(t, err, ErrNotEnoughBytes)
+	assert.Equal(t, ErrNotEnoughBytes, err)
 }
 
 func TestSHT3xSampleUnits(t *testing.T) {
@@ -110,7 +110,7 @@ func TestSHT3xSampleUnits(t *testing.T) {
 
 	d.Units = "K"
 	_, _, err := d.Sample()
-	gobottest.Assert(t, err, ErrInvalidTemp)
+	assert.Equal(t, ErrInvalidTemp, err)
 }
 
 // Test internal sendCommandDelayGetResponse
@@ -126,7 +126,7 @@ func TestSHT3xSCDGRIoFailures(t *testing.T) {
 	}
 
 	_, err := d.sendCommandDelayGetResponse(nil, nil, 2)
-	gobottest.Assert(t, err, ErrNotEnoughBytes)
+	assert.Equal(t, ErrNotEnoughBytes, err)
 
 	// Don't read any bytes and return an error
 	a.i2cReadImpl = func([]byte) (int, error) {
@@ -134,7 +134,7 @@ func TestSHT3xSCDGRIoFailures(t *testing.T) {
 	}
 
 	_, err = d.sendCommandDelayGetResponse(nil, nil, 1)
-	gobottest.Assert(t, err, invalidRead)
+	assert.Equal(t, invalidRead, err)
 
 	// Don't write any bytes and return an error
 	a.i2cWriteImpl = func([]byte) (int, error) {
@@ -142,7 +142,7 @@ func TestSHT3xSCDGRIoFailures(t *testing.T) {
 	}
 
 	_, err = d.sendCommandDelayGetResponse(nil, nil, 1)
-	gobottest.Assert(t, err, invalidWrite)
+	assert.Equal(t, invalidWrite, err)
 }
 
 // Test Heater and getStatusRegister
@@ -155,8 +155,8 @@ func TestSHT3xHeater(t *testing.T) {
 	}
 
 	status, err := d.Heater()
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, status, true)
+	assert.NoError(t, err)
+	assert.True(t, status)
 
 	// heater disabled
 	a.i2cReadImpl = func(b []byte) (int, error) {
@@ -165,8 +165,8 @@ func TestSHT3xHeater(t *testing.T) {
 	}
 
 	status, err = d.Heater()
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, status, false)
+	assert.NoError(t, err)
+	assert.False(t, status)
 
 	// heater crc failed
 	a.i2cReadImpl = func(b []byte) (int, error) {
@@ -175,7 +175,7 @@ func TestSHT3xHeater(t *testing.T) {
 	}
 
 	_, err = d.Heater()
-	gobottest.Assert(t, err, ErrInvalidCrc)
+	assert.Equal(t, ErrInvalidCrc, err)
 
 	// heater read failed
 	a.i2cReadImpl = func(b []byte) (int, error) {
@@ -184,7 +184,7 @@ func TestSHT3xHeater(t *testing.T) {
 	}
 
 	_, err = d.Heater()
-	gobottest.Refute(t, err, nil)
+	assert.NotNil(t, err)
 }
 
 func TestSHT3xSetHeater(t *testing.T) {
@@ -196,18 +196,18 @@ func TestSHT3xSetHeater(t *testing.T) {
 func TestSHT3xSetAccuracy(t *testing.T) {
 	d, _ := initTestSHT3xDriverWithStubbedAdaptor()
 
-	gobottest.Assert(t, d.Accuracy(), byte(SHT3xAccuracyHigh))
+	assert.Equal(t, byte(SHT3xAccuracyHigh), d.Accuracy())
 
 	err := d.SetAccuracy(SHT3xAccuracyMedium)
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, d.Accuracy(), byte(SHT3xAccuracyMedium))
+	assert.NoError(t, err)
+	assert.Equal(t, byte(SHT3xAccuracyMedium), d.Accuracy())
 
 	err = d.SetAccuracy(SHT3xAccuracyLow)
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, d.Accuracy(), byte(SHT3xAccuracyLow))
+	assert.NoError(t, err)
+	assert.Equal(t, byte(SHT3xAccuracyLow), d.Accuracy())
 
 	err = d.SetAccuracy(0xff)
-	gobottest.Assert(t, err, ErrInvalidAccuracy)
+	assert.Equal(t, ErrInvalidAccuracy, err)
 }
 
 func TestSHT3xSerialNumber(t *testing.T) {
@@ -219,6 +219,6 @@ func TestSHT3xSerialNumber(t *testing.T) {
 
 	sn, err := d.SerialNumber()
 
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, sn, uint32(0x2000beef))
+	assert.NoError(t, err)
+	assert.Equal(t, uint32(0x2000beef), sn)
 }

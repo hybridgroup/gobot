@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*DeviceInformationDriver)(nil)
@@ -17,15 +17,15 @@ func initTestDeviceInformationDriver() *DeviceInformationDriver {
 
 func TestDeviceInformationDriver(t *testing.T) {
 	d := initTestDeviceInformationDriver()
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "DeviceInformation"), true)
+	assert.True(t, strings.HasPrefix(d.Name(), "DeviceInformation"))
 	d.SetName("NewName")
-	gobottest.Assert(t, d.Name(), "NewName")
+	assert.Equal(t, "NewName", d.Name())
 }
 
 func TestDeviceInformationDriverStartAndHalt(t *testing.T) {
 	d := initTestDeviceInformationDriver()
-	gobottest.Assert(t, d.Start(), nil)
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.NoError(t, d.Start())
+	assert.NoError(t, d.Halt())
 }
 
 func TestDeviceInformationDriverGetModelNumber(t *testing.T) {
@@ -35,7 +35,7 @@ func TestDeviceInformationDriverGetModelNumber(t *testing.T) {
 		return []byte("TestDevice"), nil
 	})
 
-	gobottest.Assert(t, d.GetModelNumber(), "TestDevice")
+	assert.Equal(t, "TestDevice", d.GetModelNumber())
 }
 
 func TestDeviceInformationDriverGetFirmwareRevision(t *testing.T) {
@@ -45,7 +45,7 @@ func TestDeviceInformationDriverGetFirmwareRevision(t *testing.T) {
 		return []byte("TestDevice"), nil
 	})
 
-	gobottest.Assert(t, d.GetFirmwareRevision(), "TestDevice")
+	assert.Equal(t, "TestDevice", d.GetFirmwareRevision())
 }
 
 func TestDeviceInformationDriverGetHardwareRevision(t *testing.T) {
@@ -55,7 +55,7 @@ func TestDeviceInformationDriverGetHardwareRevision(t *testing.T) {
 		return []byte("TestDevice"), nil
 	})
 
-	gobottest.Assert(t, d.GetHardwareRevision(), "TestDevice")
+	assert.Equal(t, "TestDevice", d.GetHardwareRevision())
 }
 
 func TestDeviceInformationDriverGetManufacturerName(t *testing.T) {
@@ -65,7 +65,7 @@ func TestDeviceInformationDriverGetManufacturerName(t *testing.T) {
 		return []byte("TestDevice"), nil
 	})
 
-	gobottest.Assert(t, d.GetManufacturerName(), "TestDevice")
+	assert.Equal(t, "TestDevice", d.GetManufacturerName())
 }
 
 func TestDeviceInformationDriverGetPnPId(t *testing.T) {
@@ -75,5 +75,5 @@ func TestDeviceInformationDriverGetPnPId(t *testing.T) {
 		return []byte("TestDevice"), nil
 	})
 
-	gobottest.Assert(t, d.GetPnPId(), "TestDevice")
+	assert.Equal(t, "TestDevice", d.GetPnPId())
 }

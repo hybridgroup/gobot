@@ -32,12 +32,13 @@ type MMA7660Driver struct {
 
 // NewMMA7660Driver creates a new driver with specified i2c interface
 // Params:
-//		c Connector - the Adaptor to use with this Driver
+//
+//	c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.WithBus(int):	bus to use with this driver
-//		i2c.WithAddress(int):	address to use with this driver
 //
+//	i2c.WithBus(int):	bus to use with this driver
+//	i2c.WithAddress(int):	address to use with this driver
 func NewMMA7660Driver(c Connector, options ...func(Config)) *MMA7660Driver {
 	d := &MMA7660Driver{
 		Driver: NewDriver(c, "MMA7660", mma7660DefaultAddress),

@@ -106,7 +106,7 @@ func (l *littleWire) i2cRead(readBuffer []byte, length int, endWithStop uint8) e
 	return l.error()
 }
 
-// i2cUpdateDelay updates i2c signal delay amount. Tune if neccessary to fit your requirements
+// i2cUpdateDelay updates i2c signal delay amount. Tune if necessary to fit your requirements
 func (l *littleWire) i2cUpdateDelay(duration uint) error {
 	C.i2c_updateDelay(l.lwHandle, C.uint(duration))
 	return l.error()

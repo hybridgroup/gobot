@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*MotorDriver)(nil)
@@ -16,64 +16,64 @@ func initTestMotorDriver() *MotorDriver {
 
 func TestMotorDriver(t *testing.T) {
 	d := NewMotorDriver(newGpioTestAdaptor(), "1")
-	gobottest.Refute(t, d.Connection(), nil)
-
+	assert.NotNil(t, d.Connection())
 }
+
 func TestMotorDriverStart(t *testing.T) {
 	d := initTestMotorDriver()
-	gobottest.Assert(t, d.Start(), nil)
+	assert.NoError(t, d.Start())
 }
 
 func TestMotorDriverHalt(t *testing.T) {
 	d := initTestMotorDriver()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.NoError(t, d.Halt())
 }
 
 func TestMotorDriverIsOn(t *testing.T) {
 	d := initTestMotorDriver()
 	d.CurrentMode = "digital"
 	d.CurrentState = 1
-	gobottest.Assert(t, d.IsOn(), true)
+	assert.True(t, d.IsOn())
 	d.CurrentMode = "analog"
 	d.CurrentSpeed = 100
-	gobottest.Assert(t, d.IsOn(), true)
+	assert.True(t, d.IsOn())
 }
 
 func TestMotorDriverIsOff(t *testing.T) {
 	d := initTestMotorDriver()
 	_ = d.Off()
-	gobottest.Assert(t, d.IsOff(), true)
+	assert.True(t, d.IsOff())
 }
 
 func TestMotorDriverOn(t *testing.T) {
 	d := initTestMotorDriver()
 	d.CurrentMode = "digital"
 	_ = d.On()
-	gobottest.Assert(t, d.CurrentState, uint8(1))
+	assert.Equal(t, uint8(1), d.CurrentState)
 	d.CurrentMode = "analog"
 	d.CurrentSpeed = 0
 	_ = d.On()
-	gobottest.Assert(t, d.CurrentSpeed, uint8(255))
+	assert.Equal(t, uint8(255), d.CurrentSpeed)
 }
 
 func TestMotorDriverOff(t *testing.T) {
 	d := initTestMotorDriver()
 	d.CurrentMode = "digital"
 	_ = d.Off()
-	gobottest.Assert(t, d.CurrentState, uint8(0))
+	assert.Equal(t, uint8(0), d.CurrentState)
 	d.CurrentMode = "analog"
 	d.CurrentSpeed = 100
 	_ = d.Off()
-	gobottest.Assert(t, d.CurrentSpeed, uint8(0))
+	assert.Equal(t, uint8(0), d.CurrentSpeed)
 }
 
 func TestMotorDriverToggle(t *testing.T) {
 	d := initTestMotorDriver()
 	_ = d.Off()
 	_ = d.Toggle()
-	gobottest.Assert(t, d.IsOn(), true)
+	assert.True(t, d.IsOn())
 	_ = d.Toggle()
-	gobottest.Assert(t, d.IsOn(), false)
+	assert.False(t, d.IsOn())
 }
 
 func TestMotorDriverMin(t *testing.T) {
@@ -94,15 +94,15 @@ func TestMotorDriverSpeed(t *testing.T) {
 func TestMotorDriverForward(t *testing.T) {
 	d := initTestMotorDriver()
 	_ = d.Forward(100)
-	gobottest.Assert(t, d.CurrentSpeed, uint8(100))
-	gobottest.Assert(t, d.CurrentDirection, "forward")
+	assert.Equal(t, uint8(100), d.CurrentSpeed)
+	assert.Equal(t, "forward", d.CurrentDirection)
 }
 
 func TestMotorDriverBackward(t *testing.T) {
 	d := initTestMotorDriver()
 	_ = d.Backward(100)
-	gobottest.Assert(t, d.CurrentSpeed, uint8(100))
-	gobottest.Assert(t, d.CurrentDirection, "backward")
+	assert.Equal(t, uint8(100), d.CurrentSpeed)
+	assert.Equal(t, "backward", d.CurrentDirection)
 }
 
 func TestMotorDriverDirection(t *testing.T) {
@@ -121,18 +121,18 @@ func TestMotorDriverDigital(t *testing.T) {
 	d.BackwardPin = "3"
 
 	_ = d.On()
-	gobottest.Assert(t, d.CurrentState, uint8(1))
+	assert.Equal(t, uint8(1), d.CurrentState)
 	_ = d.Off()
-	gobottest.Assert(t, d.CurrentState, uint8(0))
+	assert.Equal(t, uint8(0), d.CurrentState)
 }
 
 func TestMotorDriverDefaultName(t *testing.T) {
 	d := initTestMotorDriver()
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Motor"), true)
+	assert.True(t, strings.HasPrefix(d.Name(), "Motor"))
 }
 
 func TestMotorDriverSetName(t *testing.T) {
 	d := initTestMotorDriver()
 	d.SetName("mybot")
-	gobottest.Assert(t, d.Name(), "mybot")
+	assert.Equal(t, "mybot", d.Name())
 }

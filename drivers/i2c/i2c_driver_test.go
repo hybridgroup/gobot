@@ -1,12 +1,10 @@
 package i2c
 
 import (
-	"errors"
-	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*Driver)(nil)
@@ -32,15 +30,15 @@ func TestNewDriver(t *testing.T) {
 	if !ok {
 		t.Errorf("NewDriver() should have returned a *Driver")
 	}
-	gobottest.Assert(t, strings.Contains(d.name, "I2C_BASIC"), true)
-	gobottest.Assert(t, d.defaultAddress, 0x15)
-	gobottest.Assert(t, d.connector, a)
-	gobottest.Assert(t, d.connection, nil)
-	gobottest.Assert(t, d.afterStart(), nil)
-	gobottest.Assert(t, d.beforeHalt(), nil)
-	gobottest.Refute(t, d.Config, nil)
-	gobottest.Refute(t, d.Commander, nil)
-	gobottest.Refute(t, d.mutex, nil)
+	assert.Contains(t, d.name, "I2C_BASIC")
+	assert.Equal(t, 0x15, d.defaultAddress)
+	assert.Equal(t, a, d.connector)
+	assert.Nil(t, d.connection)
+	assert.NoError(t, d.afterStart())
+	assert.NoError(t, d.beforeHalt())
+	assert.NotNil(t, d.Config)
+	assert.NotNil(t, d.Commander)
+	assert.NotNil(t, d.mutex)
 }
 
 func TestSetName(t *testing.T) {
@@ -49,22 +47,22 @@ func TestSetName(t *testing.T) {
 	// act
 	d.SetName("TESTME")
 	// assert
-	gobottest.Assert(t, d.Name(), "TESTME")
+	assert.Equal(t, "TESTME", d.Name())
 }
 
 func TestConnection(t *testing.T) {
 	// arrange
 	d := initTestDriver()
 	// act, assert
-	gobottest.Refute(t, d.Connection(), nil)
+	assert.NotNil(t, d.Connection())
 }
 
 func TestStart(t *testing.T) {
 	// arrange
 	d, a := initDriverWithStubbedAdaptor()
 	// act, assert
-	gobottest.Assert(t, d.Start(), nil)
-	gobottest.Assert(t, 0x15, a.address)
+	assert.NoError(t, d.Start())
+	assert.Equal(t, a.address, 0x15)
 }
 
 func TestStartConnectError(t *testing.T) {
@@ -72,14 +70,14 @@ func TestStartConnectError(t *testing.T) {
 	d, a := initDriverWithStubbedAdaptor()
 	a.Testi2cConnectErr(true)
 	// act, assert
-	gobottest.Assert(t, d.Start(), errors.New("Invalid i2c connection"))
+	assert.ErrorContains(t, d.Start(), "Invalid i2c connection")
 }
 
 func TestHalt(t *testing.T) {
 	// arrange
 	d := initTestDriver()
 	// act, assert
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.NoError(t, d.Halt())
 }
 
 func TestWrite(t *testing.T) {
@@ -100,10 +98,10 @@ func TestWrite(t *testing.T) {
 	// act
 	err := d.Write(address, value)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, numCallsWrite, 1)
-	gobottest.Assert(t, a.written[0], wantAddress)
-	gobottest.Assert(t, a.written[1], uint8(value))
+	assert.NoError(t, err)
+	assert.Equal(t, 1, numCallsWrite)
+	assert.Equal(t, wantAddress, a.written[0])
+	assert.Equal(t, uint8(value), a.written[1])
 }
 
 func TestRead(t *testing.T) {
@@ -131,9 +129,9 @@ func TestRead(t *testing.T) {
 	// act
 	val, err := d.Read(address)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, val, int(want))
-	gobottest.Assert(t, numCallsWrite, 1)
-	gobottest.Assert(t, a.written[0], wantAddress)
-	gobottest.Assert(t, numCallsRead, 1)
+	assert.NoError(t, err)
+	assert.Equal(t, int(want), val)
+	assert.Equal(t, 1, numCallsWrite)
+	assert.Equal(t, wantAddress, a.written[0])
+	assert.Equal(t, 1, numCallsRead)
 }
