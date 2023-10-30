@@ -1,6 +1,7 @@
 package aio
 
 import (
+	"sync"
 	"time"
 
 	"gobot.io/x/gobot/v2"
@@ -18,6 +19,7 @@ type AnalogSensorDriver struct {
 	rawValue int
 	value    float64
 	scale    func(input int) (value float64)
+	mutex    *sync.Mutex // to prevent data race between cyclic and single shot write/read to values and scaler
 }
 
 // NewAnalogSensorDriver returns a new AnalogSensorDriver with a polling interval of
@@ -43,6 +45,7 @@ func NewAnalogSensorDriver(a AnalogReader, pin string, v ...time.Duration) *Anal
 		interval:   10 * time.Millisecond,
 		halt:       make(chan bool),
 		scale:      func(input int) (value float64) { return float64(input) },
+		mutex:      &sync.Mutex{},
 	}
 
 	if len(v) > 0 {
@@ -83,17 +86,17 @@ func (a *AnalogSensorDriver) Start() (err error) {
 		timer := time.NewTimer(a.interval)
 		timer.Stop()
 		for {
-			_, err := a.Read()
+			rawValue, value, err := a.analogRead()
 			if err != nil {
 				a.Publish(a.Event(Error), err)
 			} else {
-				if a.rawValue != oldRawValue && a.rawValue != -1 {
-					a.Publish(a.Event(Data), a.rawValue)
-					oldRawValue = a.rawValue
+				if rawValue != oldRawValue && rawValue != -1 {
+					a.Publish(a.Event(Data), rawValue)
+					oldRawValue = rawValue
 				}
-				if a.value != oldValue && a.value != -1 {
-					a.Publish(a.Event(Value), a.value)
-					oldValue = a.value
+				if value != oldValue && value != -1 {
+					a.Publish(a.Event(Value), value)
+					oldValue = value
 				}
 			}
 
@@ -131,40 +134,62 @@ func (a *AnalogSensorDriver) Pin() string { return a.pin }
 // Connection returns the AnalogSensorDrivers Connection
 func (a *AnalogSensorDriver) Connection() gobot.Connection { return a.connection.(gobot.Connection) }
 
-// Read returns the current reading from the sensor
-func (a *AnalogSensorDriver) Read() (val float64, err error) {
-	if a.rawValue, err = a.ReadRaw(); err != nil {
-		return
-	}
-	a.value = a.scale(a.rawValue)
-	return a.value, nil
+// Read returns the current reading from the sensor, scaled by the current scaler
+func (a *AnalogSensorDriver) Read() (float64, error) {
+	_, value, err := a.analogRead()
+	return value, err
 }
 
 // ReadRaw returns the current reading from the sensor without scaling
-func (a *AnalogSensorDriver) ReadRaw() (val int, err error) {
-	return a.connection.AnalogRead(a.Pin())
+func (a *AnalogSensorDriver) ReadRaw() (int, error) {
+	rawValue, _, err := a.analogRead()
+	return rawValue, err
 }
 
 // SetScaler substitute the default 1:1 return value function by a new scaling function
 func (a *AnalogSensorDriver) SetScaler(scaler func(int) float64) {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
+
 	a.scale = scaler
 }
 
 // Value returns the last read value from the sensor
 func (a *AnalogSensorDriver) Value() float64 {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
+
 	return a.value
 }
 
 // RawValue returns the last read raw value from the sensor
 func (a *AnalogSensorDriver) RawValue() int {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
+
 	return a.rawValue
 }
 
+// analogRead performs an reading from the sensor and sets the internal attributes and returns the raw and scaled value
+func (a *AnalogSensorDriver) analogRead() (int, float64, error) {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
+
+	rawValue, err := a.connection.AnalogRead(a.Pin())
+	if err != nil {
+		return 0, 0, err
+	}
+
+	a.rawValue = rawValue
+	a.value = a.scale(a.rawValue)
+	return a.rawValue, a.value, nil
+}
+
 // AnalogSensorLinearScaler creates a linear scaler function from the given values.
-func AnalogSensorLinearScaler(fromMin, fromMax int, toMin, toMax float64) func(input int) (value float64) {
+func AnalogSensorLinearScaler(fromMin, fromMax int, toMin, toMax float64) func(int) float64 {
 	m := (toMax - toMin) / float64(fromMax-fromMin)
 	n := toMin - m*float64(fromMin)
-	return func(input int) (value float64) {
+	return func(input int) float64 {
 		if input <= fromMin {
 			return toMin
 		}
