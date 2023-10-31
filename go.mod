@@ -36,7 +36,7 @@ require (
 	github.com/klauspost/compress v1.17.1 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/muka/go-bluetooth v0.0.0-20221213043340-85dc80edc4e1 // indirect
-	github.com/nats-io/nkeys v0.4.5 // indirect
+	github.com/nats-io/nkeys v0.4.6 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/saltosystems/winrt-go v0.0.0-20231011131235-9071442c0c84 // indirect
