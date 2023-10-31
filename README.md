@@ -284,7 +284,7 @@ a shared set of drivers provided using the `gobot/drivers/gpio` package:
   - HC-SR04 Ultrasonic Ranging Module
   - HD44780 LCD controller
   - LED
-  - Makey Button
+  - Makey Button (by using driver for Button)
   - MAX7219 LED Dot Matrix
   - Motor
   - Proximity Infra Red (PIR) Motion Sensor
