@@ -18,15 +18,22 @@ type digitalPinMock struct {
 	writeFunc func(val int) (err error)
 }
 
+type gpioTestWritten struct {
+	pin string
+	val byte
+}
+
 type gpioTestAdaptor struct {
-	name             string
-	pinMap           map[string]gobot.DigitalPinner
-	port             string
-	mtx              sync.Mutex
-	digitalReadFunc  func(ping string) (val int, err error)
-	digitalWriteFunc func(pin string, val byte) (err error)
-	pwmWriteFunc     func(pin string, val byte) (err error)
-	servoWriteFunc   func(pin string, val byte) (err error)
+	name               string
+	pinMap             map[string]gobot.DigitalPinner
+	port               string
+	written            []gpioTestWritten
+	simulateWriteError bool
+	mtx                sync.Mutex
+	digitalReadFunc    func(ping string) (val int, err error)
+	digitalWriteFunc   func(pin string, val byte) (err error)
+	pwmWriteFunc       func(pin string, val byte) (err error)
+	servoWriteFunc     func(pin string, val byte) (err error)
 }
 
 func newGpioTestAdaptor() *gpioTestAdaptor {
@@ -62,6 +69,11 @@ func (t *gpioTestAdaptor) DigitalRead(pin string) (val int, err error) {
 func (t *gpioTestAdaptor) DigitalWrite(pin string, val byte) (err error) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
+	if t.simulateWriteError {
+		return fmt.Errorf("write error")
+	}
+	w := gpioTestWritten{pin: pin, val: val}
+	t.written = append(t.written, w)
 	return t.digitalWriteFunc(pin, val)
 }
 
