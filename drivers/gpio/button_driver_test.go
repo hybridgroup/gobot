@@ -1,7 +1,7 @@
 package gpio
 
 import (
-	"errors"
+	"fmt"
 	"strings"
 	"sync"
 	"testing"
@@ -58,7 +58,7 @@ func TestButtonStart(t *testing.T) {
 		select {
 		case val = <-nextVal:
 			if val < 0 {
-				err = errors.New("digital read error")
+				err = fmt.Errorf("digital read error")
 			}
 			return val, err
 		default:
@@ -73,9 +73,11 @@ func TestButtonStart(t *testing.T) {
 	})
 
 	// act
-	assert.NoError(t, d.Start())
+	err := d.Start()
 
 	// assert & rearrange
+	assert.NoError(t, err)
+
 	select {
 	case <-sem:
 	case <-time.After(buttonTestDelay * time.Millisecond):

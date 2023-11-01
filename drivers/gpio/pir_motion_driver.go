@@ -8,13 +8,12 @@ import (
 
 // PIRMotionDriver represents a digital Proximity Infra Red (PIR) motion detecter
 type PIRMotionDriver struct {
-	Active     bool
-	pin        string
-	name       string
-	halt       chan bool
-	interval   time.Duration
-	connection DigitalReader
+	*Driver
 	gobot.Eventer
+	pin      string
+	active   bool
+	halt     chan bool
+	interval time.Duration
 }
 
 // NewPIRMotionDriver returns a new PIRMotionDriver with a polling interval of
@@ -25,14 +24,15 @@ type PIRMotionDriver struct {
 //	time.Duration: Interval at which the PIRMotionDriver is polled for new information
 func NewPIRMotionDriver(a DigitalReader, pin string, v ...time.Duration) *PIRMotionDriver {
 	b := &PIRMotionDriver{
-		name:       gobot.DefaultName("PIRMotion"),
-		connection: a,
-		pin:        pin,
-		Active:     false,
-		Eventer:    gobot.NewEventer(),
-		interval:   10 * time.Millisecond,
-		halt:       make(chan bool),
+		Driver:   NewDriver(a.(gobot.Connection), "PIRMotion"),
+		Eventer:  gobot.NewEventer(),
+		pin:      pin,
+		active:   false,
+		interval: 10 * time.Millisecond,
+		halt:     make(chan bool),
 	}
+	b.afterStart = b.initialize
+	b.beforeHalt = b.shutdown
 
 	if len(v) > 0 {
 		b.interval = v[0]
@@ -45,7 +45,19 @@ func NewPIRMotionDriver(a DigitalReader, pin string, v ...time.Duration) *PIRMot
 	return b
 }
 
-// Start starts the PIRMotionDriver and polls the state of the sensor at the given interval.
+// Pin returns the PIRMotionDriver pin
+func (p *PIRMotionDriver) Pin() string { return p.pin }
+
+// Active gets the current state
+func (p *PIRMotionDriver) Active() bool {
+	// ensure that read and write can not interfere
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+
+	return p.active
+}
+
+// initialize the PIRMotionDriver and polls the state of the sensor at the given interval.
 //
 // Emits the Events:
 //
@@ -57,26 +69,14 @@ func NewPIRMotionDriver(a DigitalReader, pin string, v ...time.Duration) *PIRMot
 // just as long as motion is still being detected.
 // It will only send the MotionStopped event once, however, until
 // motion starts being detected again
-func (p *PIRMotionDriver) Start() (err error) {
+func (p *PIRMotionDriver) initialize() error {
 	go func() {
 		for {
-			newValue, err := p.connection.DigitalRead(p.Pin())
+			newValue, err := p.connection.(DigitalReader).DigitalRead(p.Pin())
 			if err != nil {
 				p.Publish(Error, err)
 			}
-			switch newValue {
-			case 1:
-				if !p.Active {
-					p.Active = true
-					p.Publish(MotionDetected, newValue)
-				}
-			case 0:
-				if p.Active {
-					p.Active = false
-					p.Publish(MotionStopped, newValue)
-				}
-			}
-
+			p.update(newValue)
 			select {
 			case <-time.After(p.interval):
 			case <-p.halt:
@@ -84,23 +84,30 @@ func (p *PIRMotionDriver) Start() (err error) {
 			}
 		}
 	}()
-	return
+	return nil
 }
 
-// Halt stops polling the button for new information
-func (p *PIRMotionDriver) Halt() (err error) {
+// shutdown stops polling
+func (p *PIRMotionDriver) shutdown() error {
 	p.halt <- true
-	return
+	return nil
 }
 
-// Name returns the PIRMotionDriver name
-func (p *PIRMotionDriver) Name() string { return p.name }
+func (p *PIRMotionDriver) update(newValue int) {
+	// ensure that read and write can not interfere
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
 
-// SetName sets the PIRMotionDriver name
-func (p *PIRMotionDriver) SetName(n string) { p.name = n }
-
-// Pin returns the PIRMotionDriver pin
-func (p *PIRMotionDriver) Pin() string { return p.pin }
-
-// Connection returns the PIRMotionDriver Connection
-func (p *PIRMotionDriver) Connection() gobot.Connection { return p.connection.(gobot.Connection) }
+	switch newValue {
+	case 1:
+		if !p.active {
+			p.active = true
+			p.Publish(MotionDetected, newValue)
+		}
+	case 0:
+		if p.active {
+			p.active = false
+			p.Publish(MotionStopped, newValue)
+		}
+	}
+}

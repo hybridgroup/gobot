@@ -75,7 +75,7 @@ func (b *ButtonDriver) SetDefaultState(s int) {
 //	Push int - On button push
 //	Release int - On button release
 //	Error error - On button error
-func (b *ButtonDriver) initialize() (err error) {
+func (b *ButtonDriver) initialize() error {
 	state := b.defaultState
 	go func() {
 		for {
@@ -93,10 +93,10 @@ func (b *ButtonDriver) initialize() (err error) {
 			}
 		}
 	}()
-	return
+	return nil
 }
 
-func (b *ButtonDriver) shutdown() (err error) {
+func (b *ButtonDriver) shutdown() error {
 	b.halt <- true
 	return nil
 }
