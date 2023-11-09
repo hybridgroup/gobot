@@ -58,6 +58,7 @@ fmt_check:
 fmt_fix: 
 	$(MAKE) version_check || true
 	gofumpt -l -w .
+	golangci-lint run -v --fix
 
 examples: $(EXAMPLES)
 

@@ -3,7 +3,6 @@ package gpio
 import (
 	"fmt"
 	"strings"
-	"sync"
 	"testing"
 	"time"
 
@@ -11,22 +10,21 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const (
-	stepAngle   = 0.5 // use non int step angle to check int math
-	stepsPerRev = 720
-)
-
 func initTestEasyDriverWithStubbedAdaptor() (*EasyDriver, *gpioTestAdaptor) {
+	const anglePerStep = 0.5 // use non int step angle to check int math
+
 	a := newGpioTestAdaptor()
-	d := NewEasyDriver(a, stepAngle, "1", "2", "3", "4")
+	d := NewEasyDriver(a, anglePerStep, "1", "2", "3", "4")
 	return d, a
 }
 
 func TestNewEasyDriver(t *testing.T) {
 	// arrange
+	const anglePerStep = 0.5 // use non int step angle to check int math
+
 	a := newGpioTestAdaptor()
 	// act
-	d := NewEasyDriver(a, stepAngle, "1", "2", "3", "4")
+	d := NewEasyDriver(a, anglePerStep, "1", "2", "3", "4")
 	// assert
 	assert.IsType(t, &EasyDriver{}, d)
 	assert.True(t, strings.HasPrefix(d.name, "EasyDriver"))
@@ -39,30 +37,18 @@ func TestNewEasyDriver(t *testing.T) {
 	assert.Equal(t, "2", d.dirPin)
 	assert.Equal(t, "3", d.enPin)
 	assert.Equal(t, "4", d.sleepPin)
-	assert.Equal(t, float32(stepAngle), d.angle)
-	assert.Equal(t, uint(180), d.rpm)
-	assert.Equal(t, int8(1), d.dir)
+	assert.Equal(t, float32(anglePerStep), d.anglePerStep)
+	assert.Equal(t, uint(14), d.speedRpm)
+	assert.Equal(t, "forward", d.direction)
 	assert.Equal(t, 0, d.stepNum)
-	assert.Equal(t, true, d.enabled)
+	assert.Equal(t, false, d.disabled)
 	assert.Equal(t, false, d.sleeping)
-	assert.Nil(t, d.runStopChan)
+	assert.Nil(t, d.stopAsynchRunFunc)
 }
 
-func TestEasyDriverHalt(t *testing.T) {
-	// arrange
-	d, _ := initTestEasyDriverWithStubbedAdaptor()
-	require.NoError(t, d.Run())
-	require.True(t, d.IsMoving())
-	// act
-	err := d.Halt()
-	// assert
-	assert.NoError(t, err)
-	assert.False(t, d.IsMoving())
-}
-
-func TestEasyDriverMove(t *testing.T) {
+func TestEasyDriverMoveDeg_IsMoving(t *testing.T) {
 	tests := map[string]struct {
-		inputSteps             int
+		inputDeg               int
 		simulateDisabled       bool
 		simulateAlreadyRunning bool
 		simulateWriteErr       bool
@@ -72,13 +58,13 @@ func TestEasyDriverMove(t *testing.T) {
 		wantErr                string
 	}{
 		"move_one": {
-			inputSteps: 1,
+			inputDeg:   1,
 			wantWrites: 4,
 			wantSteps:  2,
 			wantMoving: false,
 		},
 		"move_more": {
-			inputSteps: 20,
+			inputDeg:   20,
 			wantWrites: 80,
 			wantSteps:  40,
 			wantMoving: false,
@@ -94,9 +80,9 @@ func TestEasyDriverMove(t *testing.T) {
 			wantErr:                "already running or moving",
 		},
 		"error_write": {
-			inputSteps:       1,
+			inputDeg:         1,
 			simulateWriteErr: true,
-			wantWrites:       1,
+			wantWrites:       0,
 			wantMoving:       false,
 			wantErr:          "write error",
 		},
@@ -105,21 +91,23 @@ func TestEasyDriverMove(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// arrange
 			d, a := initTestEasyDriverWithStubbedAdaptor()
-			d.enabled = !tc.simulateDisabled
-			if tc.simulateAlreadyRunning {
-				d.runStopChan = make(chan struct{})
-				defer func() { close(d.runStopChan); d.runStopChan = nil }()
-			}
-			var numCallsWrite int
-			a.digitalWriteFunc = func(string, byte) error {
-				numCallsWrite++
-				if tc.simulateWriteErr {
-					return fmt.Errorf("write error")
+			defer func() {
+				// for cleanup dangling channels
+				if d.stopAsynchRunFunc != nil {
+					err := d.stopAsynchRunFunc(true)
+					assert.NoError(t, err)
 				}
-				return nil
+			}()
+			// arrange: different behavior
+			d.disabled = tc.simulateDisabled
+			if tc.simulateAlreadyRunning {
+				d.stopAsynchRunFunc = func(bool) error { return nil }
 			}
+			// arrange: writes
+			a.written = nil // reset writes of Start()
+			a.simulateWriteError = tc.simulateWriteErr
 			// act
-			err := d.Move(tc.inputSteps)
+			err := d.MoveDeg(tc.inputDeg)
 			// assert
 			if tc.wantErr != "" {
 				assert.ErrorContains(t, err, tc.wantErr)
@@ -127,7 +115,7 @@ func TestEasyDriverMove(t *testing.T) {
 				assert.NoError(t, err)
 			}
 			assert.Equal(t, tc.wantSteps, d.stepNum)
-			assert.Equal(t, tc.wantWrites, numCallsWrite)
+			assert.Equal(t, tc.wantWrites, len(a.written))
 			assert.Equal(t, tc.wantMoving, d.IsMoving())
 		})
 	}
@@ -163,10 +151,10 @@ func TestEasyDriverRun_IsMoving(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// arrange
 			d, a := initTestEasyDriverWithStubbedAdaptor()
-			d.enabled = !tc.simulateDisabled
+			d.skipStepErrors = true
+			d.disabled = tc.simulateDisabled
 			if tc.simulateAlreadyRunning {
-				d.runStopChan = make(chan struct{})
-				defer func() { close(d.runStopChan); d.runStopChan = nil }()
+				d.stopAsynchRunFunc = func(bool) error { return nil }
 			}
 			simWriteErr := tc.simulateWriteErr // to prevent data race in write function (go-called)
 			a.digitalWriteFunc = func(string, byte) error {
@@ -201,45 +189,250 @@ func TestEasyDriverStop_IsMoving(t *testing.T) {
 	assert.False(t, d.IsMoving())
 }
 
-func TestEasyDriverStep(t *testing.T) {
+func TestEasyDriverHalt_IsMoving(t *testing.T) {
+	// arrange
+	d, _ := initTestEasyDriverWithStubbedAdaptor()
+	require.NoError(t, d.Run())
+	require.True(t, d.IsMoving())
+	// act
+	err := d.Halt()
+	// assert
+	assert.NoError(t, err)
+	assert.False(t, d.IsMoving())
+}
+
+func TestEasyDriverSetDirection(t *testing.T) {
+	const anglePerStep = 0.5 // use non int step angle to check int math
+
 	tests := map[string]struct {
-		countCallsForth        int
-		countCallsBack         int
-		simulateAlreadyRunning bool
-		simulateWriteErr       bool
-		wantSteps              int
-		wantWritten            []byte
-		wantErr                string
+		input            string
+		dirPin           string
+		simulateWriteErr bool
+		wantVal          string
+		wantWritten      byte
+		wantErr          string
+	}{
+		"forward": {
+			input:       "forward",
+			dirPin:      "10",
+			wantWritten: 0,
+			wantVal:     "forward",
+		},
+		"backward": {
+			input:       "backward",
+			dirPin:      "11",
+			wantWritten: 1,
+			wantVal:     "backward",
+		},
+		"unknown": {
+			input:       "unknown",
+			dirPin:      "12",
+			wantWritten: 0xFF,
+			wantVal:     "forward",
+			wantErr:     "Invalid direction 'unknown'",
+		},
+		"error_no_pin": {
+			input:       "forward",
+			dirPin:      "",
+			wantWritten: 0xFF,
+			wantVal:     "forward",
+			wantErr:     "dirPin is not set",
+		},
+		"error_write": {
+			input:            "backward",
+			dirPin:           "13",
+			simulateWriteErr: true,
+			wantWritten:      0xFF,
+			wantVal:          "forward",
+			wantErr:          "write error",
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			a := newGpioTestAdaptor()
+			d := NewEasyDriver(a, anglePerStep, "1", tc.dirPin, "3", "4")
+			a.written = nil // reset writes of Start()
+			a.simulateWriteError = tc.simulateWriteErr
+			require.Equal(t, "forward", d.direction)
+			// act
+			err := d.SetDirection(tc.input)
+			// assert
+			if tc.wantErr != "" {
+				assert.ErrorContains(t, err, tc.wantErr)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tc.dirPin, a.written[0].pin)
+				assert.Equal(t, tc.wantWritten, a.written[0].val)
+			}
+			assert.Equal(t, tc.wantVal, d.direction)
+		})
+	}
+}
+
+func TestEasyDriverMaxSpeed(t *testing.T) {
+	const delayForMaxSpeed = 1428 * time.Microsecond // 1/700Hz
+
+	tests := map[string]struct {
+		anglePerStep float32
+		want         uint
+	}{
+		"maxspeed_for_20spr": {
+			anglePerStep: 360.0 / 20.0,
+			want:         2100,
+		},
+		"maxspeed_for_36spr": {
+			anglePerStep: 360.0 / 36.0,
+			want:         1166,
+		},
+		"maxspeed_for_50spr": {
+			anglePerStep: 360.0 / 50.0,
+			want:         840,
+		},
+		"maxspeed_for_100spr": {
+			anglePerStep: 360.0 / 100.0,
+			want:         420,
+		},
+		"maxspeed_for_400spr": {
+			anglePerStep: 360.0 / 400.0,
+			want:         105,
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			d, _ := initTestEasyDriverWithStubbedAdaptor()
+			d.anglePerStep = tc.anglePerStep
+			d.stepsPerRev = 360.0 / tc.anglePerStep
+			// act
+			got := d.MaxSpeed()
+			d.speedRpm = got
+			got2 := d.getDelayPerStep()
+			// assert
+			assert.Equal(t, tc.want, got)
+			assert.Equal(t, delayForMaxSpeed.Microseconds()/10, got2.Microseconds()/10)
+		})
+	}
+}
+
+func TestEasyDriverSetSpeed(t *testing.T) {
+	const (
+		anglePerStep = 10
+		maxRpm       = 1166
+	)
+
+	tests := map[string]struct {
+		input   uint
+		want    uint
+		wantErr string
+	}{
+		"below_minimum": {
+			input:   0,
+			want:    0,
+			wantErr: "RPM (0) cannot be a zero or negative value",
+		},
+		"minimum": {
+			input: 1,
+			want:  1,
+		},
+		"maximum": {
+			input: maxRpm,
+			want:  maxRpm,
+		},
+		"above_maximum": {
+			input:   maxRpm + 1,
+			want:    maxRpm,
+			wantErr: "cannot be greater then maximal value 1166",
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			d, _ := initTestEasyDriverWithStubbedAdaptor()
+			d.speedRpm = 0
+			d.anglePerStep = anglePerStep
+			d.stepsPerRev = 360.0 / anglePerStep
+			// act
+			err := d.SetSpeed(tc.input)
+			// assert
+			if tc.wantErr != "" {
+				assert.ErrorContains(t, err, tc.wantErr)
+			} else {
+				assert.NoError(t, err)
+			}
+			assert.Equal(t, tc.want, d.speedRpm)
+		})
+	}
+}
+
+func TestEasyDriver_onePinStepping(t *testing.T) {
+	tests := map[string]struct {
+		countCallsForth  int
+		countCallsBack   int
+		simulateWriteErr bool
+		wantSteps        int
+		wantWritten      []gpioTestWritten
+		wantErr          string
 	}{
 		"single": {
 			countCallsForth: 1,
 			wantSteps:       1,
-			wantWritten:     []byte{0x00, 0x01},
+			wantWritten: []gpioTestWritten{
+				{pin: "1", val: 0x00},
+				{pin: "1", val: 0x01},
+			},
 		},
 		"many": {
 			countCallsForth: 4,
 			wantSteps:       4,
-			wantWritten:     []byte{0x0, 0x1, 0x0, 0x1, 0x0, 0x1, 0x0, 0x1},
+			wantWritten: []gpioTestWritten{
+				{pin: "1", val: 0x0},
+				{pin: "1", val: 0x1},
+				{pin: "1", val: 0x0},
+				{pin: "1", val: 0x1},
+				{pin: "1", val: 0x0},
+				{pin: "1", val: 0x1},
+				{pin: "1", val: 0x0},
+				{pin: "1", val: 0x1},
+			},
 		},
 		"forth_and_back": {
 			countCallsForth: 5,
 			countCallsBack:  3,
 			wantSteps:       2,
-			wantWritten:     []byte{0x0, 0x1, 0x0, 0x1, 0x0, 0x1, 0x0, 0x1, 0x0, 0x1, 0x0, 0x1, 0x0, 0x1, 0x0, 0x1},
+			wantWritten: []gpioTestWritten{
+				{pin: "1", val: 0x0},
+				{pin: "1", val: 0x1},
+				{pin: "1", val: 0x0},
+				{pin: "1", val: 0x1},
+				{pin: "1", val: 0x0},
+				{pin: "1", val: 0x1},
+				{pin: "1", val: 0x0},
+				{pin: "1", val: 0x1},
+				{pin: "1", val: 0x0},
+				{pin: "1", val: 0x1},
+				{pin: "1", val: 0x0},
+				{pin: "1", val: 0x1},
+				{pin: "1", val: 0x0},
+				{pin: "1", val: 0x1},
+				{pin: "1", val: 0x0},
+				{pin: "1", val: 0x1},
+			},
 		},
 		"reverse": {
 			countCallsBack: 3,
 			wantSteps:      -3,
-			wantWritten:    []byte{0x0, 0x1, 0x0, 0x1, 0x0, 0x1},
-		},
-		"error_already_running": {
-			countCallsForth:        1,
-			simulateAlreadyRunning: true,
-			wantErr:                "already running or moving",
+			wantWritten: []gpioTestWritten{
+				{pin: "1", val: 0x0},
+				{pin: "1", val: 0x1},
+				{pin: "1", val: 0x0},
+				{pin: "1", val: 0x1},
+				{pin: "1", val: 0x0},
+				{pin: "1", val: 0x1},
+			},
 		},
 		"error_write": {
 			simulateWriteErr: true,
-			wantWritten:      []byte{0x00, 0x00},
 			countCallsBack:   2,
 			wantErr:          "write error",
 		},
@@ -248,29 +441,18 @@ func TestEasyDriverStep(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// arrange
 			d, a := initTestEasyDriverWithStubbedAdaptor()
-			if tc.simulateAlreadyRunning {
-				d.runStopChan = make(chan struct{})
-				defer func() { close(d.runStopChan); d.runStopChan = nil }()
-			}
-			var writtenValues []byte
-			a.digitalWriteFunc = func(pin string, val byte) error {
-				assert.Equal(t, d.stepPin, pin)
-				writtenValues = append(writtenValues, val)
-				if tc.simulateWriteErr {
-					return fmt.Errorf("write error")
-				}
-				return nil
-			}
+			a.written = nil // reset writes of Start()
+			a.simulateWriteError = tc.simulateWriteErr
 			var errs []string
 			// act
 			for i := 0; i < tc.countCallsForth; i++ {
-				if err := d.Step(); err != nil {
+				if err := d.onePinStepping(); err != nil {
 					errs = append(errs, err.Error())
 				}
 			}
-			d.dir = -1
+			d.direction = "backward"
 			for i := 0; i < tc.countCallsBack; i++ {
-				if err := d.Step(); err != nil {
+				if err := d.onePinStepping(); err != nil {
 					errs = append(errs, err.Error())
 				}
 			}
@@ -282,127 +464,14 @@ func TestEasyDriverStep(t *testing.T) {
 			}
 			assert.Equal(t, tc.wantSteps, d.stepNum)
 			assert.Equal(t, tc.wantSteps, d.CurrentStep())
-			assert.Equal(t, tc.wantWritten, writtenValues)
-		})
-	}
-}
-
-func TestEasyDriverSetDirection(t *testing.T) {
-	tests := map[string]struct {
-		dirPin  string
-		input   string
-		wantVal int8
-		wantErr string
-	}{
-		"cw": {
-			input:   "cw",
-			dirPin:  "10",
-			wantVal: 1,
-		},
-		"ccw": {
-			input:   "ccw",
-			dirPin:  "11",
-			wantVal: -1,
-		},
-		"unknown": {
-			input:   "unknown",
-			dirPin:  "12",
-			wantVal: 1,
-		},
-		"error_no_pin": {
-			dirPin:  "",
-			wantVal: 1,
-			wantErr: "dirPin is not set",
-		},
-	}
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			// arrange
-			a := newGpioTestAdaptor()
-			d := NewEasyDriver(a, stepAngle, "1", tc.dirPin, "3", "4")
-			require.Equal(t, int8(1), d.dir)
-			// act
-			err := d.SetDirection(tc.input)
-			// assert
-			if tc.wantErr != "" {
-				assert.ErrorContains(t, err, tc.wantErr)
-			} else {
-				assert.NoError(t, err)
-			}
-			assert.Equal(t, tc.wantVal, d.dir)
-		})
-	}
-}
-
-func TestEasyDriverSetSpeed(t *testing.T) {
-	const (
-		angle = 10
-		max   = 36 // 360/angle
-	)
-
-	tests := map[string]struct {
-		input uint
-		want  uint
-	}{
-		"below_minimum": {
-			input: 0,
-			want:  1,
-		},
-		"minimum": {
-			input: 1,
-			want:  1,
-		},
-		"maximum": {
-			input: max,
-			want:  max,
-		},
-		"above_maximum": {
-			input: max + 1,
-			want:  max,
-		},
-	}
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			// arrange
-			d := EasyDriver{angle: angle}
-			// act
-			err := d.SetSpeed(tc.input)
-			// assert
-			assert.NoError(t, err)
-			assert.Equal(t, tc.want, d.rpm)
-		})
-	}
-}
-
-func TestEasyDriverMaxSpeed(t *testing.T) {
-	tests := map[string]struct {
-		angle float32
-		want  uint
-	}{
-		"180": {
-			angle: 2.0,
-			want:  180,
-		},
-		"360": {
-			angle: 1.0,
-			want:  360,
-		},
-		"720": {
-			angle: 0.5,
-			want:  720,
-		},
-	}
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			// arrange
-			d := EasyDriver{angle: tc.angle}
-			// act & assert
-			assert.Equal(t, tc.want, d.MaxSpeed())
+			assert.Equal(t, tc.wantWritten, a.written)
 		})
 	}
 }
 
 func TestEasyDriverEnable_IsEnabled(t *testing.T) {
+	const anglePerStep = 0.5 // use non int step angle to check int math
+
 	tests := map[string]struct {
 		enPin            string
 		simulateWriteErr bool
@@ -429,7 +498,7 @@ func TestEasyDriverEnable_IsEnabled(t *testing.T) {
 		"error_write": {
 			enPin:            "12",
 			simulateWriteErr: true,
-			wantWrites:       1,
+			wantWrites:       0,
 			wantEnabled:      false,
 			wantErr:          "write error",
 		},
@@ -438,42 +507,34 @@ func TestEasyDriverEnable_IsEnabled(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// arrange
 			a := newGpioTestAdaptor()
-			d := NewEasyDriver(a, stepAngle, "1", "2", tc.enPin, "4")
-			var numCallsWrite int
-			var writtenPin string
-			writtenValue := byte(0xFF)
-			a.digitalWriteFunc = func(pin string, val byte) error {
-				numCallsWrite++
-				writtenPin = pin
-				writtenValue = val
-				if tc.simulateWriteErr {
-					return fmt.Errorf("write error")
-				}
-				return nil
-			}
-			d.enabled = false
+			d := NewEasyDriver(a, anglePerStep, "1", "2", tc.enPin, "4")
+			a.written = nil // reset writes of Start()
+			a.simulateWriteError = tc.simulateWriteErr
+			d.disabled = true
 			require.False(t, d.IsEnabled())
 			// act
 			err := d.Enable()
 			// assert
+			assert.Equal(t, tc.wantWrites, len(a.written))
 			if tc.wantErr != "" {
 				assert.ErrorContains(t, err, tc.wantErr)
 			} else {
 				assert.NoError(t, err)
-				assert.Equal(t, byte(0), writtenValue) // enable pin is active low
+				assert.Equal(t, tc.enPin, a.written[0].pin)
+				assert.Equal(t, byte(0), a.written[0].val) // enable pin is active low
 			}
 			assert.Equal(t, tc.wantEnabled, d.IsEnabled())
-			assert.Equal(t, tc.wantWrites, numCallsWrite)
-			assert.Equal(t, tc.enPin, writtenPin)
 		})
 	}
 }
 
 func TestEasyDriverDisable_IsEnabled(t *testing.T) {
+	const anglePerStep = 0.5 // use non int step angle to check int math
+
 	tests := map[string]struct {
 		enPin            string
 		runBefore        bool
-		simulateWriteErr string
+		simulateWriteErr bool
 		wantWrites       int
 		wantEnabled      bool
 		wantErr          string
@@ -497,7 +558,7 @@ func TestEasyDriverDisable_IsEnabled(t *testing.T) {
 		},
 		"error_write": {
 			enPin:            "12",
-			simulateWriteErr: "write error",
+			simulateWriteErr: true,
 			wantWrites:       1,
 			wantEnabled:      true,
 			wantErr:          "write error",
@@ -507,14 +568,11 @@ func TestEasyDriverDisable_IsEnabled(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// arrange
 			a := newGpioTestAdaptor()
-			d := NewEasyDriver(a, stepAngle, "1", "2", tc.enPin, "4")
-			writeMutex := sync.Mutex{}
+			d := NewEasyDriver(a, anglePerStep, "1", "2", tc.enPin, "4")
 			var numCallsWrite int
 			var writtenPin string
 			writtenValue := byte(0xFF)
 			a.digitalWriteFunc = func(pin string, val byte) error {
-				writeMutex.Lock()
-				defer writeMutex.Unlock()
 				if pin == d.stepPin {
 					// we do not consider call of step()
 					return nil
@@ -522,8 +580,8 @@ func TestEasyDriverDisable_IsEnabled(t *testing.T) {
 				numCallsWrite++
 				writtenPin = pin
 				writtenValue = val
-				if tc.simulateWriteErr != "" {
-					return fmt.Errorf(tc.simulateWriteErr)
+				if tc.simulateWriteErr {
+					return fmt.Errorf("write error")
 				}
 				return nil
 			}
@@ -532,7 +590,7 @@ func TestEasyDriverDisable_IsEnabled(t *testing.T) {
 				require.True(t, d.IsMoving())
 				time.Sleep(time.Millisecond)
 			}
-			d.enabled = true
+			d.disabled = false
 			require.True(t, d.IsEnabled())
 			// act
 			err := d.Disable()
@@ -552,37 +610,68 @@ func TestEasyDriverDisable_IsEnabled(t *testing.T) {
 }
 
 func TestEasyDriverSleep_IsSleeping(t *testing.T) {
+	const anglePerStep = 0.5 // use non int step angle to check int math
+
 	tests := map[string]struct {
-		sleepPin  string
-		runBefore bool
-		wantSleep bool
-		wantErr   string
+		sleepPin         string
+		runBefore        bool
+		simulateWriteErr bool
+		wantWrites       int
+		wantSleep        bool
+		wantErr          string
 	}{
 		"basic": {
-			sleepPin:  "10",
-			wantSleep: true,
+			sleepPin:   "10",
+			wantWrites: 1,
+			wantSleep:  true,
 		},
 		"with_run": {
-			sleepPin:  "11",
-			runBefore: true,
-			wantSleep: true,
+			sleepPin:   "11",
+			runBefore:  true,
+			wantWrites: 1,
+			wantSleep:  true,
 		},
 		"error_no_pin": {
-			sleepPin:  "",
-			wantSleep: false,
-			wantErr:   "sleepPin is not set",
+			sleepPin:   "",
+			wantSleep:  false,
+			wantWrites: 0,
+			wantErr:    "sleepPin is not set",
+		},
+		"error_write": {
+			sleepPin:         "12",
+			simulateWriteErr: true,
+			wantWrites:       1,
+			wantSleep:        false,
+			wantErr:          "write error",
 		},
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
 			a := newGpioTestAdaptor()
-			d := NewEasyDriver(a, stepAngle, "1", "2", "3", tc.sleepPin)
+			d := NewEasyDriver(a, anglePerStep, "1", "2", "3", tc.sleepPin)
+			d.sleeping = false
+			require.False(t, d.IsSleeping())
+			// arrange: writes
+			var numCallsWrite int
+			var writtenPin string
+			writtenValue := byte(0xFF)
+			a.digitalWriteFunc = func(pin string, val byte) error {
+				if pin == d.stepPin {
+					// we do not consider call of step()
+					return nil
+				}
+				numCallsWrite++
+				writtenPin = pin
+				writtenValue = val
+				if tc.simulateWriteErr {
+					return fmt.Errorf("write error")
+				}
+				return nil
+			}
 			if tc.runBefore {
 				require.NoError(t, d.Run())
 			}
-			d.sleeping = false
-			require.False(t, d.IsSleeping())
 			// act
 			err := d.Sleep()
 			// assert
@@ -590,35 +679,68 @@ func TestEasyDriverSleep_IsSleeping(t *testing.T) {
 				assert.ErrorContains(t, err, tc.wantErr)
 			} else {
 				assert.NoError(t, err)
+				assert.Equal(t, byte(0), writtenValue) // sleep pin is active low
 			}
 			assert.Equal(t, tc.wantSleep, d.IsSleeping())
+			assert.Equal(t, tc.wantWrites, numCallsWrite)
+			assert.Equal(t, tc.sleepPin, writtenPin)
 		})
 	}
 }
 
 func TestEasyDriverWake_IsSleeping(t *testing.T) {
+	const anglePerStep = 0.5 // use non int step angle to check int math
+
 	tests := map[string]struct {
-		sleepPin  string
-		wantSleep bool
-		wantErr   string
+		sleepPin         string
+		simulateWriteErr bool
+		wantWrites       int
+		wantSleep        bool
+		wantErr          string
 	}{
 		"basic": {
-			sleepPin:  "10",
-			wantSleep: false,
+			sleepPin:   "10",
+			wantWrites: 1,
+			wantSleep:  false,
 		},
 		"error_no_pin": {
-			sleepPin:  "",
-			wantSleep: true,
-			wantErr:   "sleepPin is not set",
+			sleepPin:   "",
+			wantWrites: 0,
+			wantSleep:  true,
+			wantErr:    "sleepPin is not set",
+		},
+		"error_write": {
+			sleepPin:         "12",
+			simulateWriteErr: true,
+			wantWrites:       1,
+			wantSleep:        true,
+			wantErr:          "write error",
 		},
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
 			a := newGpioTestAdaptor()
-			d := NewEasyDriver(a, stepAngle, "1", "2", "3", tc.sleepPin)
+			d := NewEasyDriver(a, anglePerStep, "1", "2", "3", tc.sleepPin)
 			d.sleeping = true
 			require.True(t, d.IsSleeping())
+			// arrange: writes
+			var numCallsWrite int
+			var writtenPin string
+			writtenValue := byte(0xFF)
+			a.digitalWriteFunc = func(pin string, val byte) error {
+				if pin == d.stepPin {
+					// we do not consider call of step()
+					return nil
+				}
+				numCallsWrite++
+				writtenPin = pin
+				writtenValue = val
+				if tc.simulateWriteErr {
+					return fmt.Errorf("write error")
+				}
+				return nil
+			}
 			// act
 			err := d.Wake()
 			// assert
@@ -626,8 +748,11 @@ func TestEasyDriverWake_IsSleeping(t *testing.T) {
 				assert.ErrorContains(t, err, tc.wantErr)
 			} else {
 				assert.NoError(t, err)
+				assert.Equal(t, byte(1), writtenValue) // sleep pin is active low
 			}
 			assert.Equal(t, tc.wantSleep, d.IsSleeping())
+			assert.Equal(t, tc.wantWrites, numCallsWrite)
+			assert.Equal(t, tc.sleepPin, writtenPin)
 		})
 	}
 }
