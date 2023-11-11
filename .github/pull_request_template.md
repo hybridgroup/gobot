@@ -12,7 +12,7 @@
 
 - [ ] The PR's target branch is 'hybridgroup:dev'
 - [ ] I have added tests that prove my fix is effective or that my feature works
-- [ ] New and existing unit tests pass locally with my changes (e.g. by run `make test`)
+- [ ] New and existing unit tests pass locally with my changes (e.g. by run `make test_race`)
 - [ ] No linter errors exist locally (e.g. by run `make fmt_check`)
 - [ ] I have performed a self-review of my own code
 

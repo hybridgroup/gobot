@@ -42,7 +42,7 @@ Descriptions for each of these will eventually be provided below.
 * Take care to maintain the existing coding style.
 * `golangci-lint` your code, see [instruction for local installation](https://golangci-lint.run/usage/install/#local-installation)
 * `gofumpt` your code (the go version will be automatically obtained from go.mod), see [instructions](https://github.com/mvdan/gofumpt/blob/master/README.md)
-* Add unit tests for any new or changed functionality.
+* Add unit tests for any new or changed functionality and run tests with `-race` flag activated.
 * All pull requests should be "fast forward"
   * If there are commits after yours use “git rebase -i <new_head_branch>”
   * If you have local changes you may need to use “git stash”
@@ -69,14 +69,10 @@ The basics are as follows:
     All import paths should now work fine assuming that you've got the
     proper branch checked out.
 
-3. Get all the needed gobot's dependencies each of them at their needed version. Gobot uses
-   [dep (Dependency management for Go)](https://golang.github.io/dep/) to manage the project's dependencies. To get all
-   the correct dependencies:
+3. Get all dependencies:
 
-   * Install dep tool. Follow the dep [installation](https://golang.github.io/dep/docs/installation.html) instructions in
-     case you don't have it already installed.
    * `cd $GOPATH/src/gobot.io/x/gobot`
-   * `dep ensure` will fetch  all the dependencies at their needed version.
+   * `go mod tidy` will fetch  all the dependencies at their needed version.
 
 ## Landing Pull Requests
 
