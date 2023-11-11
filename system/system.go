@@ -31,8 +31,15 @@ type filesystem interface {
 
 // systemCaller represents unexposed Syscall interface to allow the switch between native and mocked implementation
 // Prevent unsafe call, since go 1.15, see "Pattern 4" in: https://go101.org/article/unsafe.html
+// For go vet false positives, see: https://github.com/golang/go/issues/41205
 type systemCaller interface {
-	syscall(trap uintptr, f File, signal uintptr, payload unsafe.Pointer) (r1, r2 uintptr, err SyscallErrno)
+	syscall(
+		trap uintptr,
+		f File,
+		signal uintptr,
+		payload unsafe.Pointer,
+		address uint16,
+	) (r1, r2 uintptr, err SyscallErrno)
 }
 
 // digitalPinAccesser represents unexposed interface to allow the switch between different implementations and

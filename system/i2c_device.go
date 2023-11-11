@@ -160,7 +160,8 @@ func (d *i2cDevice) ReadBlockData(address int, reg uint8, data []byte) error {
 	buf := make([]byte, dataLen+1)
 	buf[0] = byte(dataLen)
 	copy(buf[1:], data)
-	if err := d.smbusAccess(address, I2C_SMBUS_READ, reg, I2C_SMBUS_I2C_BLOCK_DATA, unsafe.Pointer(&buf[0])); err != nil {
+	if err := d.smbusAccess(address, I2C_SMBUS_READ, reg, I2C_SMBUS_I2C_BLOCK_DATA,
+		unsafe.Pointer(&buf[0])); err != nil {
 		return err
 	}
 	// get data from buffer without first size element
@@ -322,7 +323,7 @@ func (d *i2cDevice) read(address int, b []byte) (n int, err error) {
 func (d *i2cDevice) queryFunctionality(requested uint64, sender string) error {
 	// lazy initialization
 	if d.funcs == 0 {
-		if err := d.syscallIoctl(I2C_FUNCS, unsafe.Pointer(&d.funcs), "Querying functionality"); err != nil {
+		if err := d.syscallIoctl(I2C_FUNCS, unsafe.Pointer(&d.funcs), 0, "Querying functionality"); err != nil {
 			return err
 		}
 	}
@@ -334,7 +335,13 @@ func (d *i2cDevice) queryFunctionality(requested uint64, sender string) error {
 	return nil
 }
 
-func (d *i2cDevice) smbusAccess(address int, readWrite byte, command byte, protocol uint32, dataStart unsafe.Pointer) error {
+func (d *i2cDevice) smbusAccess(
+	address int,
+	readWrite byte,
+	command byte,
+	protocol uint32,
+	dataStart unsafe.Pointer,
+) error {
 	if err := d.setAddress(address); err != nil {
 		return err
 	}
@@ -346,8 +353,9 @@ func (d *i2cDevice) smbusAccess(address int, readWrite byte, command byte, proto
 		data:      dataStart, // the reflected value of unsafePointer equals uintptr(dataStart),
 	}
 
-	sender := fmt.Sprintf("SMBus access r/w: %d, command: %d, protocol: %d, address: %d", readWrite, command, protocol, d.lastAddress)
-	if err := d.syscallIoctl(I2C_SMBUS, unsafe.Pointer(&smbus), sender); err != nil {
+	sender := fmt.Sprintf("SMBus access r/w: %d, command: %d, protocol: %d, address: %d",
+		readWrite, command, protocol, d.lastAddress)
+	if err := d.syscallIoctl(I2C_SMBUS, unsafe.Pointer(&smbus), 0, sender); err != nil {
 		return err
 	}
 
@@ -362,19 +370,19 @@ func (d *i2cDevice) setAddress(address int) error {
 		}
 		return nil
 	}
-	// for go vet false positives, see: https://github.com/golang/go/issues/41205
-	if err := d.syscallIoctl(I2C_SLAVE, unsafe.Pointer(uintptr(byte(address))), "Setting address"); err != nil {
+
+	if err := d.syscallIoctl(I2C_SLAVE, nil, address, "Setting address"); err != nil {
 		return err
 	}
 	d.lastAddress = address
 	return nil
 }
 
-func (d *i2cDevice) syscallIoctl(signal uintptr, payload unsafe.Pointer, sender string) (err error) {
+func (d *i2cDevice) syscallIoctl(signal uintptr, payload unsafe.Pointer, address int, sender string) (err error) {
 	if err := d.openFileLazy(sender); err != nil {
 		return err
 	}
-	if _, _, errno := d.sys.syscall(Syscall_SYS_IOCTL, d.file, signal, payload); errno != 0 {
+	if _, _, errno := d.sys.syscall(Syscall_SYS_IOCTL, d.file, signal, payload, uint16(address)); errno != 0 {
 		return fmt.Errorf("%s failed with syscall.Errno %v", sender, errno)
 	}
 

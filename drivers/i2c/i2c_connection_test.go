@@ -14,18 +14,20 @@ import (
 
 const dev = "/dev/i2c-1"
 
-func getSyscallFuncImpl(errorMask byte) func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err system.SyscallErrno) {
+func getSyscallFuncImpl(
+	errorMask byte,
+) func(trap, a1, a2 uintptr, a3 unsafe.Pointer) (r1, r2 uintptr, err system.SyscallErrno) {
 	// bit 0: error on function query
 	// bit 1: error on set address
 	// bit 2: error on command
-	return func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err system.SyscallErrno) {
+	return func(trap, a1, a2 uintptr, a3 unsafe.Pointer) (r1, r2 uintptr, err system.SyscallErrno) {
 		// function query
 		if (trap == system.Syscall_SYS_IOCTL) && (a2 == system.I2C_FUNCS) {
 			if errorMask&0x01 == 0x01 {
 				return 0, 0, 1
 			}
 
-			var funcPtr *uint64 = (*uint64)(unsafe.Pointer(a3))
+			var funcPtr *uint64 = (*uint64)(a3)
 			*funcPtr = system.I2C_FUNC_SMBUS_READ_BYTE | system.I2C_FUNC_SMBUS_READ_BYTE_DATA |
 				system.I2C_FUNC_SMBUS_READ_WORD_DATA |
 				system.I2C_FUNC_SMBUS_WRITE_BYTE | system.I2C_FUNC_SMBUS_WRITE_BYTE_DATA |

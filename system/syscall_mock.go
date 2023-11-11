@@ -13,18 +13,25 @@ type mockSyscall struct {
 	smbus      *i2cSmbusIoctlData
 	sliceSize  uint8
 	dataSlice  []byte
-	Impl       func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
+	Impl       func(trap, a1, a2 uintptr, a3 unsafe.Pointer) (r1, r2 uintptr, err SyscallErrno)
 }
 
 // Syscall calls the user defined implementation, used for tests, implements the SystemCaller interface
-func (sys *mockSyscall) syscall(trap uintptr, f File, signal uintptr, payload unsafe.Pointer) (r1, r2 uintptr, err SyscallErrno) {
+func (sys *mockSyscall) syscall(
+	trap uintptr,
+	f File,
+	signal uintptr,
+	payload unsafe.Pointer,
+	address uint16,
+) (r1, r2 uintptr, err SyscallErrno) {
 	sys.lastTrap = trap     // points to the used syscall (e.g. "SYS_IOCTL")
 	sys.lastFile = f        // a character device file (e.g. file to path "/dev/i2c-1")
 	sys.lastSignal = signal // points to used function type (e.g. I2C_SMBUS, I2C_RDWR)
 
 	if signal == I2C_SLAVE {
-		// in this case the uintptr corresponds the address
-		sys.devAddress = uintptr(payload)
+		// this is the setup for the address, it needs to be converted to an uintptr,
+		// the given payload is not used in this case, see the comment on the function used for production
+		sys.devAddress = uintptr(address)
 	}
 
 	if signal == I2C_SMBUS {
@@ -54,7 +61,7 @@ func (sys *mockSyscall) syscall(trap uintptr, f File, signal uintptr, payload un
 
 	// call mock implementation
 	if sys.Impl != nil {
-		return sys.Impl(trap, f.Fd(), signal, uintptr(payload))
+		return sys.Impl(trap, f.Fd(), signal, payload)
 	}
 	return 0, 0, 0
 }

@@ -11,18 +11,20 @@ import (
 
 const dev = "/dev/i2c-1"
 
-func getSyscallFuncImpl(errorMask byte) func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno) {
+func getSyscallFuncImpl(
+	errorMask byte,
+) func(trap, a1, a2 uintptr, a3 unsafe.Pointer) (r1, r2 uintptr, err SyscallErrno) {
 	// bit 0: error on function query
 	// bit 1: error on set address
 	// bit 2: error on command
-	return func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno) {
+	return func(trap, a1, a2 uintptr, a3 unsafe.Pointer) (r1, r2 uintptr, err SyscallErrno) {
 		// function query
 		if (trap == Syscall_SYS_IOCTL) && (a2 == I2C_FUNCS) {
 			if errorMask&0x01 == 0x01 {
 				return 0, 0, 1
 			}
 
-			var funcPtr *uint64 = (*uint64)(unsafe.Pointer(a3))
+			var funcPtr *uint64 = (*uint64)(a3)
 			*funcPtr = I2C_FUNC_SMBUS_READ_BYTE | I2C_FUNC_SMBUS_READ_BYTE_DATA |
 				I2C_FUNC_SMBUS_READ_WORD_DATA |
 				I2C_FUNC_SMBUS_WRITE_BYTE | I2C_FUNC_SMBUS_WRITE_BYTE_DATA |
@@ -115,7 +117,7 @@ func TestWriteRead(t *testing.T) {
 func TestReadByte(t *testing.T) {
 	tests := map[string]struct {
 		funcs       uint64
-		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
+		syscallImpl func(trap, a1, a2 uintptr, a3 unsafe.Pointer) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
 	}{
 		"read_byte_ok": {
@@ -124,7 +126,8 @@ func TestReadByte(t *testing.T) {
 		"error_syscall": {
 			funcs:       I2C_FUNC_SMBUS_READ_BYTE,
 			syscallImpl: getSyscallFuncImpl(0x04),
-			wantErr:     "SMBus access r/w: 1, command: 0, protocol: 1, address: 2 failed with syscall.Errno operation not permitted",
+			wantErr: "SMBus access r/w: 1, command: 0, protocol: 1, address: 2 " +
+				"failed with syscall.Errno operation not permitted",
 		},
 		"error_not_supported": {
 			wantErr: "SMBus read byte not supported",
@@ -159,7 +162,7 @@ func TestReadByte(t *testing.T) {
 func TestReadByteData(t *testing.T) {
 	tests := map[string]struct {
 		funcs       uint64
-		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
+		syscallImpl func(trap, a1, a2 uintptr, a3 unsafe.Pointer) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
 	}{
 		"read_byte_data_ok": {
@@ -168,7 +171,8 @@ func TestReadByteData(t *testing.T) {
 		"error_syscall": {
 			funcs:       I2C_FUNC_SMBUS_READ_BYTE_DATA,
 			syscallImpl: getSyscallFuncImpl(0x04),
-			wantErr:     "SMBus access r/w: 1, command: 1, protocol: 2, address: 3 failed with syscall.Errno operation not permitted",
+			wantErr: "SMBus access r/w: 1, command: 1, protocol: 2, address: 3 " +
+				"failed with syscall.Errno operation not permitted",
 		},
 		"error_not_supported": {
 			wantErr: "SMBus read byte data not supported",
@@ -206,7 +210,7 @@ func TestReadByteData(t *testing.T) {
 func TestReadWordData(t *testing.T) {
 	tests := map[string]struct {
 		funcs       uint64
-		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
+		syscallImpl func(trap, a1, a2 uintptr, a3 unsafe.Pointer) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
 	}{
 		"read_word_data_ok": {
@@ -215,7 +219,8 @@ func TestReadWordData(t *testing.T) {
 		"error_syscall": {
 			funcs:       I2C_FUNC_SMBUS_READ_WORD_DATA,
 			syscallImpl: getSyscallFuncImpl(0x04),
-			wantErr:     "SMBus access r/w: 1, command: 2, protocol: 3, address: 4 failed with syscall.Errno operation not permitted",
+			wantErr: "SMBus access r/w: 1, command: 2, protocol: 3, address: 4 " +
+				"failed with syscall.Errno operation not permitted",
 		},
 		"error_not_supported": {
 			wantErr: "SMBus read word data not supported",
@@ -270,7 +275,7 @@ func TestReadBlockData(t *testing.T) {
 	)
 	tests := map[string]struct {
 		funcs       uint64
-		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
+		syscallImpl func(trap, a1, a2 uintptr, a3 unsafe.Pointer) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
 	}{
 		"read_block_data_ok": {
@@ -279,7 +284,8 @@ func TestReadBlockData(t *testing.T) {
 		"error_syscall": {
 			funcs:       I2C_FUNC_SMBUS_READ_I2C_BLOCK,
 			syscallImpl: getSyscallFuncImpl(0x04),
-			wantErr:     "SMBus access r/w: 1, command: 3, protocol: 8, address: 5 failed with syscall.Errno operation not permitted",
+			wantErr: "SMBus access r/w: 1, command: 3, protocol: 8, address: 5 " +
+				"failed with syscall.Errno operation not permitted",
 		},
 		"error_from_used_fallback_if_not_supported": {
 			wantErr: "Read 1 bytes from device by sysfs, expected 10",
@@ -315,7 +321,7 @@ func TestReadBlockData(t *testing.T) {
 func TestWriteByte(t *testing.T) {
 	tests := map[string]struct {
 		funcs       uint64
-		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
+		syscallImpl func(trap, a1, a2 uintptr, a3 unsafe.Pointer) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
 	}{
 		"write_byte_ok": {
@@ -324,7 +330,8 @@ func TestWriteByte(t *testing.T) {
 		"error_syscall": {
 			funcs:       I2C_FUNC_SMBUS_WRITE_BYTE,
 			syscallImpl: getSyscallFuncImpl(0x04),
-			wantErr:     "SMBus access r/w: 0, command: 68, protocol: 1, address: 6 failed with syscall.Errno operation not permitted",
+			wantErr: "SMBus access r/w: 0, command: 68, protocol: 1, address: 6 " +
+				"failed with syscall.Errno operation not permitted",
 		},
 		"error_not_supported": {
 			wantErr: "SMBus write byte not supported",
@@ -357,7 +364,7 @@ func TestWriteByte(t *testing.T) {
 func TestWriteByteData(t *testing.T) {
 	tests := map[string]struct {
 		funcs       uint64
-		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
+		syscallImpl func(trap, a1, a2 uintptr, a3 unsafe.Pointer) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
 	}{
 		"write_byte_data_ok": {
@@ -366,7 +373,8 @@ func TestWriteByteData(t *testing.T) {
 		"error_syscall": {
 			funcs:       I2C_FUNC_SMBUS_WRITE_BYTE_DATA,
 			syscallImpl: getSyscallFuncImpl(0x04),
-			wantErr:     "SMBus access r/w: 0, command: 4, protocol: 2, address: 7 failed with syscall.Errno operation not permitted",
+			wantErr: "SMBus access r/w: 0, command: 4, protocol: 2, address: 7 " +
+				"failed with syscall.Errno operation not permitted",
 		},
 		"error_not_supported": {
 			wantErr: "SMBus write byte data not supported",
@@ -404,7 +412,7 @@ func TestWriteByteData(t *testing.T) {
 func TestWriteWordData(t *testing.T) {
 	tests := map[string]struct {
 		funcs       uint64
-		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
+		syscallImpl func(trap, a1, a2 uintptr, a3 unsafe.Pointer) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
 	}{
 		"write_word_data_ok": {
@@ -413,7 +421,8 @@ func TestWriteWordData(t *testing.T) {
 		"error_syscall": {
 			funcs:       I2C_FUNC_SMBUS_WRITE_WORD_DATA,
 			syscallImpl: getSyscallFuncImpl(0x04),
-			wantErr:     "SMBus access r/w: 0, command: 5, protocol: 3, address: 8 failed with syscall.Errno operation not permitted",
+			wantErr: "SMBus access r/w: 0, command: 5, protocol: 3, address: 8 " +
+				"failed with syscall.Errno operation not permitted",
 		},
 		"error_not_supported": {
 			wantErr: "SMBus write word data not supported",
@@ -469,7 +478,7 @@ func TestWriteBlockData(t *testing.T) {
 	)
 	tests := map[string]struct {
 		funcs       uint64
-		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
+		syscallImpl func(trap, a1, a2 uintptr, a3 unsafe.Pointer) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
 	}{
 		"write_block_data_ok": {
@@ -478,7 +487,8 @@ func TestWriteBlockData(t *testing.T) {
 		"error_syscall": {
 			funcs:       I2C_FUNC_SMBUS_WRITE_I2C_BLOCK,
 			syscallImpl: getSyscallFuncImpl(0x04),
-			wantErr:     "SMBus access r/w: 0, command: 6, protocol: 8, address: 9 failed with syscall.Errno operation not permitted",
+			wantErr: "SMBus access r/w: 0, command: 6, protocol: 8, address: 9 " +
+				"failed with syscall.Errno operation not permitted",
 		},
 	}
 	for name, tc := range tests {
@@ -531,7 +541,7 @@ func Test_queryFunctionality(t *testing.T) {
 	tests := map[string]struct {
 		requested   uint64
 		dev         string
-		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
+		syscallImpl func(trap, a1, a2 uintptr, a3 unsafe.Pointer) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
 		wantFile    bool
 		wantFuncs   uint64
