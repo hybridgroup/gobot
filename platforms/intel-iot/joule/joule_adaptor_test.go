@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/gpio"
 	"gobot.io/x/gobot/v2/drivers/i2c"
@@ -111,13 +112,13 @@ func TestFinalize(t *testing.T) {
 	_ = a.DigitalWrite("J12_1", 1)
 	_ = a.PwmWrite("J12_26", 100)
 
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.Finalize())
 
 	// assert finalize after finalize is working
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.Finalize())
 
 	// assert re-connect is working
-	assert.NoError(t, a.Connect())
+	require.NoError(t, a.Connect())
 }
 
 func TestDigitalIO(t *testing.T) {
@@ -129,25 +130,25 @@ func TestDigitalIO(t *testing.T) {
 	_ = a.DigitalWrite("J12_1", 0)
 
 	i, err := a.DigitalRead("J12_1")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, 0, i)
 
 	_, err = a.DigitalRead("P9_99")
-	assert.ErrorContains(t, err, "'P9_99' is not a valid id for a digital pin")
+	require.ErrorContains(t, err, "'P9_99' is not a valid id for a digital pin")
 }
 
 func TestPwm(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem()
 
 	err := a.PwmWrite("J12_26", 100)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "3921568", fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents)
 
 	err = a.PwmWrite("4", 100)
-	assert.ErrorContains(t, err, "'4' is not a valid id for a pin")
+	require.ErrorContains(t, err, "'4' is not a valid id for a pin")
 
 	err = a.PwmWrite("J12_1", 100)
-	assert.ErrorContains(t, err, "'J12_1' is not a valid id for a PWM pin")
+	require.ErrorContains(t, err, "'J12_1' is not a valid id for a PWM pin")
 }
 
 func TestPwmPinExportError(t *testing.T) {
@@ -176,11 +177,11 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	a := NewAdaptor()
 	a.sys.UseMockSyscall()
 	fs := a.sys.UseMockFilesystem([]string{"/dev/i2c-2"})
-	assert.NoError(t, a.Connect())
+	require.NoError(t, a.Connect())
 	con, err := a.GetI2cConnection(0xff, 2)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	_, err = con.Write([]byte{0xbf})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	fs.WithCloseError = true
 	// act
 	err = a.Finalize()

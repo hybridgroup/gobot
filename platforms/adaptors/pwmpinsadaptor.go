@@ -21,9 +21,9 @@ type (
 )
 
 type pwmPinsOption interface {
-	setInitializer(pwmPinInitializer)
-	setDefaultPeriod(uint32)
-	setPolarityInvertedIdentifier(string)
+	setInitializer(initializer pwmPinInitializer)
+	setDefaultPeriod(period uint32)
+	setPolarityInvertedIdentifier(id string)
 }
 
 // PWMPinsAdaptor is a adaptor for PWM pins, normally used for composition in platforms.

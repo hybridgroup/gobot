@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type busConnMock struct {
@@ -63,7 +64,7 @@ func TestInitialize(t *testing.T) {
 	// act
 	err := d.Initialize(c)
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, c, d.connection)
 	assert.Equal(t, wantSoftReset, c.written[:3])
 	assert.Equal(t, wantInit, c.written[3:21])
@@ -80,7 +81,7 @@ func Test_getVersion(t *testing.T) {
 	// act
 	got, err := d.getVersion()
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, want, got)
 	assert.Equal(t, wantWritten, c.written)
 }
@@ -120,7 +121,7 @@ func Test_switchAntenna(t *testing.T) {
 			// act
 			err := d.switchAntenna(tc.target)
 			// assert
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, tc.wantWritten, c.written)
 		})
 	}
@@ -134,7 +135,7 @@ func Test_stopCrypto1(t *testing.T) {
 	// act
 	err := d.stopCrypto1()
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, wantWritten, c.written)
 }
 
@@ -158,7 +159,7 @@ func Test_communicateWithPICC(t *testing.T) {
 	// transceive, all 8 bits, no CRC
 	err := d.communicateWithPICC(0x0C, dataToFifo, backData, 0x00, false)
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, writtenPrepare, c.written[:8])
 	assert.Equal(t, writtenWriteFifo, c.written[8:12])
 	assert.Equal(t, writtenTransceive, c.written[12:16])
@@ -181,7 +182,7 @@ func Test_calculateCRC(t *testing.T) {
 	// act
 	err := d.calculateCRC(dataToFifo, gotCrcBack)
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, writtenPrepare, c.written[:6])
 	assert.Equal(t, writtenFifo, c.written[6:10])
 	assert.Equal(t, writtenCalc, c.written[10:15])
@@ -197,7 +198,7 @@ func Test_writeFifo(t *testing.T) {
 	// act
 	err := d.writeFifo(dataToFifo)
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, wantWritten, c.written)
 }
 
@@ -210,7 +211,7 @@ func Test_readFifo(t *testing.T) {
 	// act
 	_, err := d.readFifo(backData)
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, wantWritten, c.written)
 	assert.Equal(t, c.simFifo, backData)
 }

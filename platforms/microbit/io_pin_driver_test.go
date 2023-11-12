@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/aio"
 	"gobot.io/x/gobot/v2/drivers/gpio"
@@ -39,8 +40,8 @@ func TestIOPinDriverStartAndHalt(t *testing.T) {
 	a.TestReadCharacteristic(func(cUUID string) ([]byte, error) {
 		return []byte{0, 1, 1, 0}, nil
 	})
-	assert.NoError(t, d.Start())
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
 }
 
 func TestIOPinDriverStartError(t *testing.T) {
@@ -49,7 +50,7 @@ func TestIOPinDriverStartError(t *testing.T) {
 	a.TestReadCharacteristic(func(cUUID string) ([]byte, error) {
 		return nil, errors.New("read error")
 	})
-	assert.ErrorContains(t, d.Start(), "read error")
+	require.ErrorContains(t, d.Start(), "read error")
 }
 
 func TestIOPinDriverDigitalRead(t *testing.T) {
@@ -71,10 +72,10 @@ func TestIOPinDriverDigitalReadInvalidPin(t *testing.T) {
 	d := NewIOPinDriver(a)
 
 	_, err := d.DigitalRead("A3")
-	assert.NotNil(t, err)
+	require.Error(t, err)
 
 	_, err = d.DigitalRead("6")
-	assert.ErrorContains(t, err, "Invalid pin.")
+	require.ErrorContains(t, err, "Invalid pin.")
 }
 
 func TestIOPinDriverDigitalWrite(t *testing.T) {
@@ -82,15 +83,15 @@ func TestIOPinDriverDigitalWrite(t *testing.T) {
 	d := NewIOPinDriver(a)
 
 	// TODO: a better test
-	assert.NoError(t, d.DigitalWrite("0", 1))
+	require.NoError(t, d.DigitalWrite("0", 1))
 }
 
 func TestIOPinDriverDigitalWriteInvalidPin(t *testing.T) {
 	a := NewBleTestAdaptor()
 	d := NewIOPinDriver(a)
 
-	assert.NotNil(t, d.DigitalWrite("A3", 1))
-	assert.ErrorContains(t, d.DigitalWrite("6", 1), "Invalid pin.")
+	require.Error(t, d.DigitalWrite("A3", 1))
+	require.ErrorContains(t, d.DigitalWrite("6", 1), "Invalid pin.")
 }
 
 func TestIOPinDriverAnalogRead(t *testing.T) {
@@ -112,10 +113,10 @@ func TestIOPinDriverAnalogReadInvalidPin(t *testing.T) {
 	d := NewIOPinDriver(a)
 
 	_, err := d.AnalogRead("A3")
-	assert.NotNil(t, err)
+	require.Error(t, err)
 
 	_, err = d.AnalogRead("6")
-	assert.ErrorContains(t, err, "Invalid pin.")
+	require.ErrorContains(t, err, "Invalid pin.")
 }
 
 func TestIOPinDriverDigitalAnalogRead(t *testing.T) {
@@ -139,7 +140,7 @@ func TestIOPinDriverDigitalWriteAnalogRead(t *testing.T) {
 		return []byte{0, 0, 1, 128, 2, 1}, nil
 	})
 
-	assert.NoError(t, d.DigitalWrite("1", 0))
+	require.NoError(t, d.DigitalWrite("1", 0))
 
 	val, _ := d.AnalogRead("1")
 	assert.Equal(t, 128, val)
@@ -155,5 +156,5 @@ func TestIOPinDriverAnalogReadDigitalWrite(t *testing.T) {
 	val, _ := d.AnalogRead("1")
 	assert.Equal(t, 128, val)
 
-	assert.NoError(t, d.DigitalWrite("1", 0))
+	require.NoError(t, d.DigitalWrite("1", 0))
 }

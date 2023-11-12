@@ -29,20 +29,20 @@ func TestNewEasyDriver(t *testing.T) {
 	assert.IsType(t, &EasyDriver{}, d)
 	assert.True(t, strings.HasPrefix(d.name, "EasyDriver"))
 	assert.Equal(t, a, d.connection)
-	assert.NoError(t, d.afterStart())
-	assert.NoError(t, d.beforeHalt())
+	require.NoError(t, d.afterStart())
+	require.NoError(t, d.beforeHalt())
 	assert.NotNil(t, d.Commander)
 	assert.NotNil(t, d.mutex)
 	assert.Equal(t, "1", d.stepPin)
 	assert.Equal(t, "2", d.dirPin)
 	assert.Equal(t, "3", d.enPin)
 	assert.Equal(t, "4", d.sleepPin)
-	assert.Equal(t, float32(anglePerStep), d.anglePerStep)
+	assert.InDelta(t, float32(anglePerStep), d.anglePerStep, 0.0)
 	assert.Equal(t, uint(14), d.speedRpm)
 	assert.Equal(t, "forward", d.direction)
 	assert.Equal(t, 0, d.stepNum)
-	assert.Equal(t, false, d.disabled)
-	assert.Equal(t, false, d.sleeping)
+	assert.False(t, d.disabled)
+	assert.False(t, d.sleeping)
 	assert.Nil(t, d.stopAsynchRunFunc)
 }
 
@@ -95,7 +95,7 @@ func TestEasyDriverMoveDeg_IsMoving(t *testing.T) {
 				// for cleanup dangling channels
 				if d.stopAsynchRunFunc != nil {
 					err := d.stopAsynchRunFunc(true)
-					assert.NoError(t, err)
+					require.NoError(t, err)
 				}
 			}()
 			// arrange: different behavior
@@ -110,12 +110,12 @@ func TestEasyDriverMoveDeg_IsMoving(t *testing.T) {
 			err := d.MoveDeg(tc.inputDeg)
 			// assert
 			if tc.wantErr != "" {
-				assert.ErrorContains(t, err, tc.wantErr)
+				require.ErrorContains(t, err, tc.wantErr)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 			}
 			assert.Equal(t, tc.wantSteps, d.stepNum)
-			assert.Equal(t, tc.wantWrites, len(a.written))
+			assert.Len(t, a.written, tc.wantWrites)
 			assert.Equal(t, tc.wantMoving, d.IsMoving())
 		})
 	}
@@ -168,9 +168,9 @@ func TestEasyDriverRun_IsMoving(t *testing.T) {
 			err := d.Run()
 			// assert
 			if tc.wantErr != "" {
-				assert.ErrorContains(t, err, tc.wantErr)
+				require.ErrorContains(t, err, tc.wantErr)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 			}
 			assert.Equal(t, tc.wantMoving, d.IsMoving())
 		})
@@ -185,7 +185,7 @@ func TestEasyDriverStop_IsMoving(t *testing.T) {
 	// act
 	err := d.Stop()
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.False(t, d.IsMoving())
 }
 
@@ -197,7 +197,7 @@ func TestEasyDriverHalt_IsMoving(t *testing.T) {
 	// act
 	err := d.Halt()
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.False(t, d.IsMoving())
 }
 
@@ -259,9 +259,9 @@ func TestEasyDriverSetDirection(t *testing.T) {
 			err := d.SetDirection(tc.input)
 			// assert
 			if tc.wantErr != "" {
-				assert.ErrorContains(t, err, tc.wantErr)
+				require.ErrorContains(t, err, tc.wantErr)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, tc.dirPin, a.written[0].pin)
 				assert.Equal(t, tc.wantWritten, a.written[0].val)
 			}
@@ -356,9 +356,9 @@ func TestEasyDriverSetSpeed(t *testing.T) {
 			err := d.SetSpeed(tc.input)
 			// assert
 			if tc.wantErr != "" {
-				assert.ErrorContains(t, err, tc.wantErr)
+				require.ErrorContains(t, err, tc.wantErr)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 			}
 			assert.Equal(t, tc.want, d.speedRpm)
 		})
@@ -515,11 +515,11 @@ func TestEasyDriverEnable_IsEnabled(t *testing.T) {
 			// act
 			err := d.Enable()
 			// assert
-			assert.Equal(t, tc.wantWrites, len(a.written))
+			assert.Len(t, a.written, tc.wantWrites)
 			if tc.wantErr != "" {
-				assert.ErrorContains(t, err, tc.wantErr)
+				require.ErrorContains(t, err, tc.wantErr)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, tc.enPin, a.written[0].pin)
 				assert.Equal(t, byte(0), a.written[0].val) // enable pin is active low
 			}
@@ -596,9 +596,9 @@ func TestEasyDriverDisable_IsEnabled(t *testing.T) {
 			err := d.Disable()
 			// assert
 			if tc.wantErr != "" {
-				assert.ErrorContains(t, err, tc.wantErr)
+				require.ErrorContains(t, err, tc.wantErr)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, byte(1), writtenValue) // enable pin is active low
 			}
 			assert.Equal(t, tc.wantEnabled, d.IsEnabled())
@@ -676,9 +676,9 @@ func TestEasyDriverSleep_IsSleeping(t *testing.T) {
 			err := d.Sleep()
 			// assert
 			if tc.wantErr != "" {
-				assert.ErrorContains(t, err, tc.wantErr)
+				require.ErrorContains(t, err, tc.wantErr)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, byte(0), writtenValue) // sleep pin is active low
 			}
 			assert.Equal(t, tc.wantSleep, d.IsSleeping())
@@ -745,9 +745,9 @@ func TestEasyDriverWake_IsSleeping(t *testing.T) {
 			err := d.Wake()
 			// assert
 			if tc.wantErr != "" {
-				assert.ErrorContains(t, err, tc.wantErr)
+				require.ErrorContains(t, err, tc.wantErr)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, byte(1), writtenValue) // sleep pin is active low
 			}
 			assert.Equal(t, tc.wantSleep, d.IsSleeping())

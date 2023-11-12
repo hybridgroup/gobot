@@ -1,5 +1,8 @@
 # note: GolangCI-Lint also searches for config files in all directories from the directory of the first analyzed path up to the root.
 run:
+  build-tags:
+    - utils
+
   # Timeout for analysis, e.g. 30s, 5m.
   # gobot is very expensive, on a machine with heavy load it takes some minutes
   # for first run or after empty the cache by 'golangci-lint cache clean'
@@ -31,10 +34,10 @@ run:
 linters:
   # currently active linters:
   #
-  #INFO [lintersdb] Active 42 linters: [asasalint asciicheck bidichk contextcheck decorder depguard dupword durationcheck errcheck exportloopref
-  # gocheckcompilerdirectives gofmt gofumpt goimports gomoddirectives gomodguard goprintffuncname gosec gosimple govet grouper ineffassign makezero mirror
-  # misspell musttag nilerr nilnil nolintlint nosprintfhostport prealloc reassign revive staticcheck tagalign tenv testableexamples tparallel unconvert unparam
-  # unused wastedassign]
+  #INFO [lintersdb] Active 49 linters: [asasalint asciicheck bidichk contextcheck decorder depguard dupword durationcheck errcheck exportloopref
+  # gocheckcompilerdirectives gochecknoinits gochecksumtype gofmt gofumpt goimports gomoddirectives gomodguard goprintffuncname gosec gosimple govet grouper
+  # inamedparam ineffassign makezero mirror misspell musttag nilerr nilnil nolintlint nosprintfhostport perfsprint prealloc protogetter reassign revive
+  # sloglint staticcheck tagalign tenv testableexamples testifylint tparallel unconvert unparam unused wastedassign]
 
   enable-all: true
 

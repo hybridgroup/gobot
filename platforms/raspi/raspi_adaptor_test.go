@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/gpio"
 	"gobot.io/x/gobot/v2/drivers/i2c"
@@ -103,7 +104,7 @@ func TestFinalize(t *testing.T) {
 	_ = a.PwmWrite("7", 255)
 
 	_, _ = a.GetI2cConnection(0xff, 0)
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.Finalize())
 }
 
 func TestDigitalPWM(t *testing.T) {
@@ -111,28 +112,28 @@ func TestDigitalPWM(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem(mockedPaths)
 	a.PiBlasterPeriod = 20000000
 
-	assert.NoError(t, a.PwmWrite("7", 4))
+	require.NoError(t, a.PwmWrite("7", 4))
 
 	pin, _ := a.PWMPin("7")
 	period, _ := pin.Period()
 	assert.Equal(t, uint32(20000000), period)
 
-	assert.NoError(t, a.PwmWrite("7", 255))
+	require.NoError(t, a.PwmWrite("7", 255))
 
 	assert.Equal(t, "4=1", strings.Split(fs.Files["/dev/pi-blaster"].Contents, "\n")[0])
 
-	assert.NoError(t, a.ServoWrite("11", 90))
+	require.NoError(t, a.ServoWrite("11", 90))
 
 	assert.Equal(t, "17=0.5", strings.Split(fs.Files["/dev/pi-blaster"].Contents, "\n")[0])
 
-	assert.ErrorContains(t, a.PwmWrite("notexist", 1), "Not a valid pin")
-	assert.ErrorContains(t, a.ServoWrite("notexist", 1), "Not a valid pin")
+	require.ErrorContains(t, a.PwmWrite("notexist", 1), "Not a valid pin")
+	require.ErrorContains(t, a.ServoWrite("notexist", 1), "Not a valid pin")
 
 	pin, _ = a.PWMPin("12")
 	period, _ = pin.Period()
 	assert.Equal(t, uint32(20000000), period)
 
-	assert.NoError(t, pin.SetDutyCycle(1.5*1000*1000))
+	require.NoError(t, pin.SetDutyCycle(1.5*1000*1000))
 
 	assert.Equal(t, "18=0.075", strings.Split(fs.Files["/dev/pi-blaster"].Contents, "\n")[0])
 }
@@ -149,19 +150,19 @@ func TestDigitalIO(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem(mockedPaths)
 
 	err := a.DigitalWrite("7", 1)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "1", fs.Files["/sys/class/gpio/gpio4/value"].Contents)
 
 	a.revision = "2"
 	err = a.DigitalWrite("13", 1)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	i, err := a.DigitalRead("13")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, 1, i)
 
-	assert.ErrorContains(t, a.DigitalWrite("notexist", 1), "Not a valid pin")
-	assert.NoError(t, a.Finalize())
+	require.ErrorContains(t, a.DigitalWrite("notexist", 1), "Not a valid pin")
+	require.NoError(t, a.Finalize())
 }
 
 func TestDigitalPinConcurrency(t *testing.T) {
@@ -193,23 +194,23 @@ func TestPWMPin(t *testing.T) {
 		panic(err)
 	}
 
-	assert.Equal(t, 0, len(a.pwmPins))
+	assert.Empty(t, a.pwmPins)
 
 	a.revision = "3"
 	firstSysPin, err := a.PWMPin("35")
-	assert.NoError(t, err)
-	assert.Equal(t, 1, len(a.pwmPins))
+	require.NoError(t, err)
+	assert.Len(t, a.pwmPins, 1)
 
 	secondSysPin, err := a.PWMPin("35")
 
-	assert.NoError(t, err)
-	assert.Equal(t, 1, len(a.pwmPins))
+	require.NoError(t, err)
+	assert.Len(t, a.pwmPins, 1)
 	assert.Equal(t, secondSysPin, firstSysPin)
 
 	otherSysPin, err := a.PWMPin("36")
 
-	assert.NoError(t, err)
-	assert.Equal(t, 2, len(a.pwmPins))
+	require.NoError(t, err)
+	assert.Len(t, a.pwmPins, 2)
 	assert.NotEqual(t, otherSysPin, firstSysPin)
 }
 
@@ -222,18 +223,18 @@ func TestPWMPinsReConnect(t *testing.T) {
 	}
 
 	_, err := a.PWMPin("35")
-	assert.NoError(t, err)
-	assert.Equal(t, 1, len(a.pwmPins))
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, err)
+	assert.Len(t, a.pwmPins, 1)
+	require.NoError(t, a.Finalize())
 	// act
 	err = a.Connect()
 	// assert
-	assert.NoError(t, err)
-	assert.Equal(t, 0, len(a.pwmPins))
+	require.NoError(t, err)
+	assert.Empty(t, a.pwmPins)
 	_, _ = a.PWMPin("35")
 	_, err = a.PWMPin("36")
-	assert.NoError(t, err)
-	assert.Equal(t, 2, len(a.pwmPins))
+	require.NoError(t, err)
+	assert.Len(t, a.pwmPins, 2)
 }
 
 func TestSpiDefaultValues(t *testing.T) {
@@ -262,11 +263,11 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	a := NewAdaptor()
 	a.sys.UseMockSyscall()
 	fs := a.sys.UseMockFilesystem([]string{"/dev/i2c-1"})
-	assert.NoError(t, a.Connect())
+	require.NoError(t, a.Connect())
 	con, err := a.GetI2cConnection(0xff, 1)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	_, err = con.Write([]byte{0xbf})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	fs.WithCloseError = true
 	// act
 	err = a.Finalize()

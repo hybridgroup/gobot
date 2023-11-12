@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/gpio"
 	"gobot.io/x/gobot/v2/system"
@@ -49,7 +50,7 @@ func TestDigitalPinsWithGpiosActiveLow(t *testing.T) {
 	// act
 	a := NewDigitalPinsAdaptor(sys, translate, WithGpiosActiveLow("1", "12", "33"))
 	// assert
-	assert.Equal(t, 3, len(a.pinOptions))
+	assert.Len(t, a.pinOptions, 3)
 }
 
 func TestDigitalPinsConnect(t *testing.T) {
@@ -60,15 +61,15 @@ func TestDigitalPinsConnect(t *testing.T) {
 	assert.Equal(t, (map[string]gobot.DigitalPinner)(nil), a.pins)
 
 	_, err := a.DigitalRead("13")
-	assert.ErrorContains(t, err, "not connected for pin 13")
+	require.ErrorContains(t, err, "not connected for pin 13")
 
 	err = a.DigitalWrite("7", 1)
-	assert.ErrorContains(t, err, "not connected for pin 7")
+	require.ErrorContains(t, err, "not connected for pin 7")
 
 	err = a.Connect()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.NotEqual(t, (map[string]gobot.DigitalPinner)(nil), a.pins)
-	assert.Equal(t, 0, len(a.pins))
+	assert.Empty(t, a.pins)
 }
 
 func TestDigitalPinsFinalize(t *testing.T) {
@@ -83,21 +84,21 @@ func TestDigitalPinsFinalize(t *testing.T) {
 	fs := sys.UseMockFilesystem(mockedPaths)
 	a := NewDigitalPinsAdaptor(sys, testDigitalPinTranslator)
 	// assert that finalize before connect is working
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.Finalize())
 	// arrange
-	assert.NoError(t, a.Connect())
-	assert.NoError(t, a.DigitalWrite("3", 1))
-	assert.Equal(t, 1, len(a.pins))
+	require.NoError(t, a.Connect())
+	require.NoError(t, a.DigitalWrite("3", 1))
+	assert.Len(t, a.pins, 1)
 	// act
 	err := a.Finalize()
 	// assert
-	assert.NoError(t, err)
-	assert.Equal(t, 0, len(a.pins))
+	require.NoError(t, err)
+	assert.Empty(t, a.pins)
 	// assert that finalize after finalize is working
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.Finalize())
 	// arrange missing sysfs file
-	assert.NoError(t, a.Connect())
-	assert.NoError(t, a.DigitalWrite("3", 2))
+	require.NoError(t, a.Connect())
+	require.NoError(t, a.DigitalWrite("3", 2))
 	delete(fs.Files, "/sys/class/gpio/unexport")
 	err = a.Finalize()
 	assert.Contains(t, err.Error(), "/sys/class/gpio/unexport: no such file")
@@ -112,15 +113,15 @@ func TestDigitalPinsReConnect(t *testing.T) {
 		"/sys/class/gpio/gpio15/value",
 	}
 	a, _ := initTestDigitalPinsAdaptorWithMockedFilesystem(mockedPaths)
-	assert.NoError(t, a.DigitalWrite("4", 1))
-	assert.Equal(t, 1, len(a.pins))
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.DigitalWrite("4", 1))
+	assert.Len(t, a.pins, 1)
+	require.NoError(t, a.Finalize())
 	// act
 	err := a.Connect()
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, a.pins)
-	assert.Equal(t, 0, len(a.pins))
+	assert.Empty(t, a.pins)
 }
 
 func TestDigitalIO(t *testing.T) {
@@ -133,10 +134,10 @@ func TestDigitalIO(t *testing.T) {
 	a, _ := initTestDigitalPinsAdaptorWithMockedFilesystem(mockedPaths)
 
 	err := a.DigitalWrite("14", 1)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	i, err := a.DigitalRead("14")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, 1, i)
 }
 
@@ -153,18 +154,18 @@ func TestDigitalRead(t *testing.T) {
 
 	// assert read correct value without error
 	i, err := a.DigitalRead("13")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, 1, i)
 
 	// assert error bubbling for read errors
 	fs.WithReadError = true
 	_, err = a.DigitalRead("13")
-	assert.ErrorContains(t, err, "read error")
+	require.ErrorContains(t, err, "read error")
 
 	// assert error bubbling for write errors
 	fs.WithWriteError = true
 	_, err = a.DigitalRead("7")
-	assert.ErrorContains(t, err, "write error")
+	require.ErrorContains(t, err, "write error")
 }
 
 func TestDigitalReadWithGpiosActiveLow(t *testing.T) {
@@ -193,8 +194,8 @@ func TestDigitalReadWithGpiosActiveLow(t *testing.T) {
 	got1, err1 := a.DigitalRead("14") // for a new pin
 	got2, err2 := a.DigitalRead("15") // for an existing pin (calls ApplyOptions())
 	// assert
-	assert.NoError(t, err1)
-	assert.NoError(t, err2)
+	require.NoError(t, err1)
+	require.NoError(t, err2)
 	assert.Equal(t, 1, got1) // there is no mechanism to negate mocked values
 	assert.Equal(t, 0, got2)
 	assert.Equal(t, "1", fs.Files["/sys/class/gpio/gpio25/active_low"].Contents)
@@ -217,7 +218,7 @@ func TestDigitalWrite(t *testing.T) {
 	WithGpioEventOnFallingEdge("7", gpioEventHandler)(a)
 	WithGpioPollForEdgeDetection("7", 0, nil)(a)
 	err := a.DigitalWrite("7", 1)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "1", fs.Files["/sys/class/gpio/gpio18/value"].Contents)
 
 	// assert second write to same pin without error and just ignore unsupported options
@@ -226,15 +227,15 @@ func TestDigitalWrite(t *testing.T) {
 	WithGpioDebounce("7", 2*time.Second)(a)
 	WithGpioEventOnRisingEdge("7", gpioEventHandler)(a)
 	err = a.DigitalWrite("7", 1)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	// assert error on bad id
-	assert.ErrorContains(t, a.DigitalWrite("notexist", 1), "not a valid pin")
+	require.ErrorContains(t, a.DigitalWrite("notexist", 1), "not a valid pin")
 
 	// assert error bubbling
 	fs.WithWriteError = true
 	err = a.DigitalWrite("7", 0)
-	assert.ErrorContains(t, err, "write error")
+	require.ErrorContains(t, err, "write error")
 }
 
 func TestDigitalWriteWithGpiosActiveLow(t *testing.T) {
@@ -252,7 +253,7 @@ func TestDigitalWriteWithGpiosActiveLow(t *testing.T) {
 	// act
 	err := a.DigitalWrite("8", 2)
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "2", fs.Files["/sys/class/gpio/gpio19/value"].Contents)
 	assert.Equal(t, "1", fs.Files["/sys/class/gpio/gpio19/active_low"].Contents)
 }

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -47,8 +48,8 @@ func TestGroveTemperatureSensorDriverScaling(t *testing.T) {
 			// act
 			got, err := d.Read()
 			// assert
-			assert.NoError(t, err)
-			assert.Equal(t, tt.want, got)
+			require.NoError(t, err)
+			assert.InDelta(t, tt.want, got, 0.0)
 		})
 	}
 }
@@ -66,7 +67,7 @@ func TestGroveTempSensorPublishesTemperatureInCelsius(t *testing.T) {
 		assert.Equal(t, "31.62", fmt.Sprintf("%.2f", data.(float64)))
 		sem <- true
 	})
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 
 	select {
 	case <-sem:
@@ -74,7 +75,7 @@ func TestGroveTempSensorPublishesTemperatureInCelsius(t *testing.T) {
 		t.Errorf("Grove Temperature Sensor Event \"Data\" was not published")
 	}
 
-	assert.Equal(t, 31.61532462352477, d.Temperature())
+	assert.InDelta(t, 31.61532462352477, d.Temperature(), 0.0)
 }
 
 func TestGroveTempDriverDefaultName(t *testing.T) {

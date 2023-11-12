@@ -39,13 +39,13 @@ func TestNewHCSR04Driver(t *testing.T) {
 	assert.NotNil(t, d.Driver)
 	assert.True(t, strings.HasPrefix(d.name, "HCSR04"))
 	assert.Equal(t, a, d.connection)
-	assert.NoError(t, d.afterStart())
-	assert.NoError(t, d.beforeHalt())
+	require.NoError(t, d.afterStart())
+	require.NoError(t, d.beforeHalt())
 	assert.NotNil(t, d.Commander)
 	assert.NotNil(t, d.mutex)
 	assert.Equal(t, triggerPinID, d.triggerPinID)
 	assert.Equal(t, echoPinID, d.echoPinID)
-	assert.Equal(t, false, d.useEdgePolling)
+	assert.False(t, d.useEdgePolling)
 	assert.Equal(t, tpin, d.triggerPin)
 	assert.Equal(t, epin, d.echoPin)
 }
@@ -115,11 +115,11 @@ func TestHCSR04MeasureDistance(t *testing.T) {
 			// assert
 			assert.Equal(t, tc.wantCallsWrite, numCallsWrite)
 			if tc.wantErr != "" {
-				assert.ErrorContains(t, err, tc.wantErr)
+				require.ErrorContains(t, err, tc.wantErr)
 			} else {
 				require.NoError(t, err)
 			}
-			assert.Equal(t, tc.wantVal, got)
+			assert.InDelta(t, tc.wantVal, got, 0.0)
 		})
 	}
 }
@@ -151,7 +151,7 @@ func TestHCSR04Distance(t *testing.T) {
 			// act
 			got := d.Distance()
 			// assert
-			assert.Equal(t, tc.wantVal, got)
+			assert.InDelta(t, tc.wantVal, got, 0.0)
 		})
 	}
 }
@@ -197,7 +197,7 @@ func TestHCSR04StartDistanceMonitor(t *testing.T) {
 			time.Sleep(1 * time.Millisecond) // < 160 ms
 			// assert
 			if tc.wantErr != "" {
-				assert.ErrorContains(t, err, tc.wantErr)
+				require.ErrorContains(t, err, tc.wantErr)
 			} else {
 				require.NoError(t, err)
 				assert.NotNil(t, d.distanceMonitorStopChan)
@@ -240,7 +240,7 @@ func TestHCSR04StopDistanceMonitor(t *testing.T) {
 			time.Sleep(1 * time.Millisecond) // < 160 ms
 			// assert
 			if tc.wantErr != "" {
-				assert.ErrorContains(t, err, tc.wantErr)
+				require.ErrorContains(t, err, tc.wantErr)
 			} else {
 				require.NoError(t, err)
 				assert.Nil(t, d.distanceMonitorStopChan)

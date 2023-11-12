@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -24,6 +25,6 @@ func TestSPRKPlusDriver(t *testing.T) {
 
 func TestSPRKPlusDriverStartAndHalt(t *testing.T) {
 	d := initTestSPRKPlusDriver()
-	assert.NoError(t, d.Start())
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
 }

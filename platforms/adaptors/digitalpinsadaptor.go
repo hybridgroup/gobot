@@ -17,7 +17,7 @@ type (
 )
 
 type digitalPinsOptioner interface {
-	setDigitalPinInitializer(digitalPinInitializer)
+	setDigitalPinInitializer(initializer digitalPinInitializer)
 	setDigitalPinsForSystemGpiod()
 	setDigitalPinsForSystemSpi(sclkPin, nssPin, mosiPin, misoPin string)
 	prepareDigitalPinsActiveLow(pin string, otherPins ...string)

@@ -10,6 +10,7 @@ import (
 
 	multierror "github.com/hashicorp/go-multierror"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func initTestMaster() *Master {
@@ -41,7 +42,7 @@ func TestNullReadWriteCloser(t *testing.T) {
 	assert.Equal(t, 3, i)
 	i, _ = n.Read(make([]byte, 10))
 	assert.Equal(t, 10, i)
-	assert.NoError(t, n.Close())
+	require.NoError(t, n.Close())
 }
 
 func TestMasterRobot(t *testing.T) {
@@ -63,14 +64,14 @@ func TestMasterToJSON(t *testing.T) {
 		return nil
 	})
 	json := NewJSONMaster(g)
-	assert.Equal(t, g.Robots().Len(), len(json.Robots))
-	assert.Equal(t, len(g.Commands()), len(json.Commands))
+	assert.Len(t, json.Robots, g.Robots().Len())
+	assert.Len(t, json.Commands, len(g.Commands()))
 }
 
 func TestMasterStart(t *testing.T) {
 	g := initTestMaster()
-	assert.NoError(t, g.Start())
-	assert.NoError(t, g.Stop())
+	require.NoError(t, g.Start())
+	require.NoError(t, g.Stop())
 	assert.False(t, g.Running())
 }
 
@@ -82,7 +83,7 @@ func TestMasterStartAutoRun(t *testing.T) {
 	assert.True(t, g.Running())
 
 	// stop it
-	assert.NoError(t, g.Stop())
+	require.NoError(t, g.Stop())
 	assert.False(t, g.Running())
 }
 
@@ -99,7 +100,7 @@ func TestMasterStartDriverErrors(t *testing.T) {
 	want = multierror.Append(want, e)
 
 	assert.Equal(t, want, g.Start())
-	assert.NoError(t, g.Stop())
+	require.NoError(t, g.Stop())
 
 	testDriverStart = func() (err error) { return }
 }
@@ -138,7 +139,7 @@ func TestMasterStartRobotAdaptorErrors(t *testing.T) {
 	}
 
 	assert.Equal(t, want, g.Start())
-	assert.NoError(t, g.Stop())
+	require.NoError(t, g.Stop())
 
 	testAdaptorConnect = func() (err error) { return }
 }

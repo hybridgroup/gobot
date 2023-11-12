@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -42,12 +43,12 @@ func TestHMC6352Options(t *testing.T) {
 
 func TestHMC6352Start(t *testing.T) {
 	d := NewHMC6352Driver(newI2cTestAdaptor())
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 }
 
 func TestHMC6352Halt(t *testing.T) {
 	d, _ := initTestHMC6352DriverWithStubbedAdaptor()
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 }
 
 func TestHMC6352Heading(t *testing.T) {
@@ -80,7 +81,7 @@ func TestHMC6352Heading(t *testing.T) {
 
 	heading, err = d.Heading()
 	assert.Equal(t, uint16(0), heading)
-	assert.ErrorContains(t, err, "read error")
+	require.ErrorContains(t, err, "read error")
 
 	// when write error
 	d, a = initTestHMC6352DriverWithStubbedAdaptor()
@@ -90,5 +91,5 @@ func TestHMC6352Heading(t *testing.T) {
 
 	heading, err = d.Heading()
 	assert.Equal(t, uint16(0), heading)
-	assert.ErrorContains(t, err, "write error")
+	require.ErrorContains(t, err, "write error")
 }

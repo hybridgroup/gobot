@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -84,13 +85,13 @@ func TestSpheroDriver(t *testing.T) {
 
 func TestSpheroDriverStart(t *testing.T) {
 	d := initTestSpheroDriver()
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 }
 
 func TestSpheroDriverHalt(t *testing.T) {
 	d := initTestSpheroDriver()
 	d.adaptor().connected = true
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 }
 
 func TestSpheroDriverSetDataStreaming(t *testing.T) {

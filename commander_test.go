@@ -14,7 +14,7 @@ func TestCommander(t *testing.T) {
 	})
 
 	// act && assert
-	assert.Equal(t, 1, len(c.Commands()))
+	assert.Len(t, c.Commands(), 1)
 	assert.NotNil(t, c.Command("test"))
 	assert.Nil(t, c.Command("booyeah"))
 }

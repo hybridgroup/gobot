@@ -50,8 +50,6 @@ func readJoystick(js joystick.Joystick) {
 	for axis := 0; axis < js.AxisCount(); axis++ {
 		printAt(1, axis+8, fmt.Sprintf("Axis %2d Value: %7d", axis, jinfo.AxisData[axis]))
 	}
-
-	return
 }
 
 func main() {

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -25,8 +26,8 @@ func TestTemperatureDriver(t *testing.T) {
 
 func TestTemperatureDriverStartAndHalt(t *testing.T) {
 	d := initTestTemperatureDriver()
-	assert.NoError(t, d.Start())
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
 }
 
 func TestTemperatureDriverReadData(t *testing.T) {

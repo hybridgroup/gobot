@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -47,8 +48,8 @@ func TestAdafruit2327SetServoMotorFreq(t *testing.T) {
 	// act
 	err := d.SetServoMotorFreq(freq)
 	// assert
-	assert.NoError(t, err)
-	assert.Equal(t, 9, len(a.written)) // detailed test, see "TestPCA9685SetPWMFreq"
+	require.NoError(t, err)
+	assert.Len(t, a.written, 9) // detailed test, see "TestPCA9685SetPWMFreq"
 }
 
 func TestAdafruit2327SetServoMotorFreqError(t *testing.T) {
@@ -59,7 +60,7 @@ func TestAdafruit2327SetServoMotorFreqError(t *testing.T) {
 	}
 	const freq = 60.0
 	// act & assert
-	assert.ErrorContains(t, d.SetServoMotorFreq(freq), "write error")
+	require.ErrorContains(t, d.SetServoMotorFreq(freq), "write error")
 }
 
 func TestAdafruit2327SetServoMotorPulse(t *testing.T) {
@@ -74,8 +75,8 @@ func TestAdafruit2327SetServoMotorPulse(t *testing.T) {
 	// act
 	err := d.SetServoMotorPulse(channel, on, off)
 	// assert
-	assert.NoError(t, err)
-	assert.Equal(t, 8, len(a.written)) // detailed test, see "TestPCA9685SetPWM"
+	require.NoError(t, err)
+	assert.Len(t, a.written, 8) // detailed test, see "TestPCA9685SetPWM"
 }
 
 func TestAdafruit2327SetServoMotorPulseError(t *testing.T) {
@@ -90,5 +91,5 @@ func TestAdafruit2327SetServoMotorPulseError(t *testing.T) {
 		off     int32 = 4321
 	)
 	// act & assert
-	assert.ErrorContains(t, d.SetServoMotorPulse(channel, on, off), "write error")
+	require.ErrorContains(t, d.SetServoMotorPulse(channel, on, off), "write error")
 }

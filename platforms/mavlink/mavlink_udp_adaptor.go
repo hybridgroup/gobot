@@ -8,8 +8,8 @@ import (
 
 type UDPConnection interface {
 	Close() error
-	ReadFromUDP([]byte) (int, *net.UDPAddr, error)
-	WriteTo([]byte, net.Addr) (int, error)
+	ReadFromUDP(b []byte) (int, *net.UDPAddr, error)
+	WriteTo(b []byte, a net.Addr) (int, error)
 }
 
 type UDPAdaptor struct {

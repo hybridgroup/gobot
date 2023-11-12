@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -38,26 +39,26 @@ func TestLedDriver(t *testing.T) {
 	}
 
 	err = d.Command("Toggle")(nil)
-	assert.ErrorContains(t, err.(error), "write error")
+	require.ErrorContains(t, err.(error), "write error")
 
 	err = d.Command("On")(nil)
-	assert.ErrorContains(t, err.(error), "write error")
+	require.ErrorContains(t, err.(error), "write error")
 
 	err = d.Command("Off")(nil)
-	assert.ErrorContains(t, err.(error), "write error")
+	require.ErrorContains(t, err.(error), "write error")
 
 	err = d.Command("Brightness")(map[string]interface{}{"level": 100.0})
-	assert.ErrorContains(t, err.(error), "pwm error")
+	require.ErrorContains(t, err.(error), "pwm error")
 }
 
 func TestLedDriverStart(t *testing.T) {
 	d := initTestLedDriver()
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 }
 
 func TestLedDriverHalt(t *testing.T) {
 	d := initTestLedDriver()
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 }
 
 func TestLedDriverToggle(t *testing.T) {
@@ -76,7 +77,7 @@ func TestLedDriverBrightness(t *testing.T) {
 		err = errors.New("pwm error")
 		return
 	}
-	assert.ErrorContains(t, d.Brightness(150), "pwm error")
+	require.ErrorContains(t, d.Brightness(150), "pwm error")
 }
 
 func TestLEDDriverDefaultName(t *testing.T) {

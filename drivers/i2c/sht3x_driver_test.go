@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -42,12 +43,12 @@ func TestSHT3xOptions(t *testing.T) {
 
 func TestSHT3xStart(t *testing.T) {
 	d := NewSHT3xDriver(newI2cTestAdaptor())
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 }
 
 func TestSHT3xHalt(t *testing.T) {
 	d, _ := initTestSHT3xDriverWithStubbedAdaptor()
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 }
 
 func TestSHT3xSampleNormal(t *testing.T) {
@@ -58,13 +59,13 @@ func TestSHT3xSampleNormal(t *testing.T) {
 	}
 
 	temp, rh, _ := d.Sample()
-	assert.Equal(t, float32(85.523003), temp)
-	assert.Equal(t, float32(74.5845), rh)
+	assert.InDelta(t, float32(85.523003), temp, 0.0)
+	assert.InDelta(t, float32(74.5845), rh, 0.0)
 
 	// check the temp with the units in F
 	d.Units = "F"
 	temp, _, _ = d.Sample()
-	assert.Equal(t, float32(185.9414), temp)
+	assert.InDelta(t, float32(185.9414), temp, 0.0)
 }
 
 func TestSHT3xSampleBadCrc(t *testing.T) {
@@ -155,7 +156,7 @@ func TestSHT3xHeater(t *testing.T) {
 	}
 
 	status, err := d.Heater()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.True(t, status)
 
 	// heater disabled
@@ -165,7 +166,7 @@ func TestSHT3xHeater(t *testing.T) {
 	}
 
 	status, err = d.Heater()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.False(t, status)
 
 	// heater crc failed
@@ -184,7 +185,7 @@ func TestSHT3xHeater(t *testing.T) {
 	}
 
 	_, err = d.Heater()
-	assert.NotNil(t, err)
+	require.Error(t, err)
 }
 
 func TestSHT3xSetHeater(t *testing.T) {
@@ -199,11 +200,11 @@ func TestSHT3xSetAccuracy(t *testing.T) {
 	assert.Equal(t, byte(SHT3xAccuracyHigh), d.Accuracy())
 
 	err := d.SetAccuracy(SHT3xAccuracyMedium)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, byte(SHT3xAccuracyMedium), d.Accuracy())
 
 	err = d.SetAccuracy(SHT3xAccuracyLow)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, byte(SHT3xAccuracyLow), d.Accuracy())
 
 	err = d.SetAccuracy(0xff)
@@ -219,6 +220,6 @@ func TestSHT3xSerialNumber(t *testing.T) {
 
 	sn, err := d.SerialNumber()
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, uint32(0x2000beef), sn)
 }

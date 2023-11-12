@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -24,8 +25,8 @@ func TestBatteryDriver(t *testing.T) {
 
 func TestBatteryDriverStartAndHalt(t *testing.T) {
 	d := initTestBatteryDriver()
-	assert.NoError(t, d.Start())
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
 }
 
 func TestBatteryDriverRead(t *testing.T) {

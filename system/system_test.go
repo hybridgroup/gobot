@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNewAccesser(t *testing.T) {
@@ -34,7 +35,7 @@ func TestNewAccesser_NewSpiDevice(t *testing.T) {
 	// act
 	con, err := a.NewSpiDevice(busNum, chipNum, mode, bits, maxSpeed)
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, con)
 	assert.Equal(t, busNum, spi.busNum)
 	assert.Equal(t, chipNum, spi.chipNum)

@@ -30,13 +30,13 @@ func TestNewStepperDriver(t *testing.T) {
 	assert.IsType(t, &StepperDriver{}, d)
 	assert.True(t, strings.HasPrefix(d.name, "Stepper"))
 	assert.Equal(t, a, d.connection)
-	assert.NoError(t, d.afterStart())
-	assert.NoError(t, d.beforeHalt())
+	require.NoError(t, d.afterStart())
+	require.NoError(t, d.beforeHalt())
 	assert.NotNil(t, d.Commander)
 	assert.NotNil(t, d.mutex)
 	assert.Equal(t, "forward", d.direction)
 	assert.Equal(t, StepperModes.DualPhaseStepping, d.phase)
-	assert.Equal(t, float32(stepsPerRev), d.stepsPerRev)
+	assert.InDelta(t, float32(stepsPerRev), d.stepsPerRev, 0.0)
 	assert.Equal(t, 0, d.stepNum)
 	assert.Nil(t, d.stopAsynchRunFunc)
 }
@@ -126,7 +126,7 @@ func TestStepperMove_IsMoving(t *testing.T) {
 				// for cleanup dangling channels
 				if d.stopAsynchRunFunc != nil {
 					err := d.stopAsynchRunFunc(true)
-					assert.NoError(t, err)
+					require.NoError(t, err)
 				}
 			}()
 			// arrange: different behavior
@@ -141,12 +141,12 @@ func TestStepperMove_IsMoving(t *testing.T) {
 			err := d.Move(tc.inputSteps)
 			// assert
 			if tc.wantErr != "" {
-				assert.ErrorContains(t, err, tc.wantErr)
+				require.ErrorContains(t, err, tc.wantErr)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 			}
 			assert.Equal(t, tc.wantSteps, d.stepNum)
-			assert.Equal(t, tc.wantWrites, len(a.written))
+			assert.Len(t, a.written, tc.wantWrites)
 			assert.Equal(t, tc.wantMoving, d.IsMoving())
 		})
 	}
@@ -182,7 +182,7 @@ func TestStepperRun_IsMoving(t *testing.T) {
 				// for cleanup dangling channels
 				if d.stopAsynchRunFunc != nil {
 					err := d.stopAsynchRunFunc(true)
-					assert.NoError(t, err)
+					require.NoError(t, err)
 				}
 			}()
 			// arrange: different behavior
@@ -216,9 +216,9 @@ func TestStepperRun_IsMoving(t *testing.T) {
 			err := d.Run()
 			// assert
 			if tc.wantErr != "" {
-				assert.ErrorContains(t, err, tc.wantErr)
+				require.ErrorContains(t, err, tc.wantErr)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 			}
 			assert.Equal(t, tc.wantMoving, d.IsMoving())
 			if writeChan != nil {
@@ -231,9 +231,9 @@ func TestStepperRun_IsMoving(t *testing.T) {
 					d.stopAsynchRunFunc = nil
 				}
 				if tc.simulateWriteErr {
-					assert.Error(t, asynchErr)
+					require.Error(t, asynchErr)
 				} else {
-					assert.NoError(t, asynchErr)
+					require.NoError(t, asynchErr)
 				}
 			}
 		})
@@ -265,9 +265,9 @@ func TestStepperStop_IsMoving(t *testing.T) {
 			err := d.Stop()
 			// assert
 			if tc.wantErr != "" {
-				assert.ErrorContains(t, err, tc.wantErr)
+				require.ErrorContains(t, err, tc.wantErr)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 			}
 			assert.False(t, d.IsMoving())
 		})
@@ -296,7 +296,7 @@ func TestStepperHalt_IsMoving(t *testing.T) {
 			// act
 			err := d.Halt()
 			// assert
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.False(t, d.IsMoving())
 		})
 	}
@@ -331,9 +331,9 @@ func TestStepperSetDirection(t *testing.T) {
 			err := d.SetDirection(tc.input)
 			// assert
 			if tc.wantErr != "" {
-				assert.ErrorContains(t, err, tc.wantErr)
+				require.ErrorContains(t, err, tc.wantErr)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 			}
 			assert.Equal(t, tc.wantVal, d.direction)
 		})
@@ -419,9 +419,9 @@ func TestStepperSetSpeed(t *testing.T) {
 			err := d.SetSpeed(tc.input)
 			// assert
 			if tc.wantErr != "" {
-				assert.ErrorContains(t, err, tc.wantErr)
+				require.ErrorContains(t, err, tc.wantErr)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 			}
 			assert.Equal(t, tc.want, d.speedRpm)
 		})

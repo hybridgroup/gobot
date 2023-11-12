@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_startEdgePolling(t *testing.T) {
@@ -164,11 +165,11 @@ func Test_startEdgePolling(t *testing.T) {
 			wg.Wait()
 			// assert
 			if tc.wantErr != "" {
-				assert.ErrorContains(t, err, tc.wantErr)
+				require.ErrorContains(t, err, tc.wantErr)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 			}
-			assert.Equal(t, len(tc.simulateReadValues), numCallsRead)
+			assert.Len(t, tc.simulateReadValues, numCallsRead)
 			assert.Equal(t, tc.wantEdgeTypes, edgeTypes)
 		})
 	}

@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -54,7 +55,7 @@ func TestWithBMP280TemperatureOversampling(t *testing.T) {
 	WithBMP280TemperatureOversampling(setVal)(d)
 	// assert
 	assert.Equal(t, setVal, d.ctrlTempOversamp)
-	assert.Equal(t, 0, len(a.written))
+	assert.Empty(t, a.written)
 }
 
 func TestWithBMP280IIRFilter(t *testing.T) {
@@ -68,7 +69,7 @@ func TestWithBMP280IIRFilter(t *testing.T) {
 	WithBMP280IIRFilter(setVal)(d)
 	// assert
 	assert.Equal(t, setVal, d.confFilter)
-	assert.Equal(t, 0, len(a.written))
+	assert.Empty(t, a.written)
 }
 
 func TestBMP280Measurements(t *testing.T) {
@@ -88,14 +89,14 @@ func TestBMP280Measurements(t *testing.T) {
 	}
 	_ = d.Start()
 	temp, err := d.Temperature()
-	assert.NoError(t, err)
-	assert.Equal(t, float32(25.014637), temp)
+	require.NoError(t, err)
+	assert.InDelta(t, float32(25.014637), temp, 0.0)
 	pressure, err := d.Pressure()
-	assert.NoError(t, err)
-	assert.Equal(t, float32(99545.414), pressure)
+	require.NoError(t, err)
+	assert.InDelta(t, float32(99545.414), pressure, 0.0)
 	alt, err := d.Altitude()
-	assert.NoError(t, err)
-	assert.Equal(t, float32(149.22713), alt)
+	require.NoError(t, err)
+	assert.InDelta(t, float32(149.22713), alt, 0.0)
 }
 
 func TestBMP280TemperatureWriteError(t *testing.T) {
@@ -106,8 +107,8 @@ func TestBMP280TemperatureWriteError(t *testing.T) {
 		return 0, errors.New("write error")
 	}
 	temp, err := d.Temperature()
-	assert.ErrorContains(t, err, "write error")
-	assert.Equal(t, float32(0.0), temp)
+	require.ErrorContains(t, err, "write error")
+	assert.InDelta(t, float32(0.0), temp, 0.0)
 }
 
 func TestBMP280TemperatureReadError(t *testing.T) {
@@ -118,8 +119,8 @@ func TestBMP280TemperatureReadError(t *testing.T) {
 		return 0, errors.New("read error")
 	}
 	temp, err := d.Temperature()
-	assert.ErrorContains(t, err, "read error")
-	assert.Equal(t, float32(0.0), temp)
+	require.ErrorContains(t, err, "read error")
+	assert.InDelta(t, float32(0.0), temp, 0.0)
 }
 
 func TestBMP280PressureWriteError(t *testing.T) {
@@ -130,8 +131,8 @@ func TestBMP280PressureWriteError(t *testing.T) {
 		return 0, errors.New("write error")
 	}
 	press, err := d.Pressure()
-	assert.ErrorContains(t, err, "write error")
-	assert.Equal(t, float32(0.0), press)
+	require.ErrorContains(t, err, "write error")
+	assert.InDelta(t, float32(0.0), press, 0.0)
 }
 
 func TestBMP280PressureReadError(t *testing.T) {
@@ -142,8 +143,8 @@ func TestBMP280PressureReadError(t *testing.T) {
 		return 0, errors.New("read error")
 	}
 	press, err := d.Pressure()
-	assert.ErrorContains(t, err, "read error")
-	assert.Equal(t, float32(0.0), press)
+	require.ErrorContains(t, err, "read error")
+	assert.InDelta(t, float32(0.0), press, 0.0)
 }
 
 func TestBMP280_initialization(t *testing.T) {
@@ -188,9 +189,9 @@ func TestBMP280_initialization(t *testing.T) {
 	// act, assert - initialization() must be called on Start()
 	err := d.Start()
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, 1, numCallsRead)
-	assert.Equal(t, 5, len(a.written))
+	assert.Len(t, a.written, 5)
 	assert.Equal(t, wantCalibReg, a.written[0])
 	assert.Equal(t, wantCtrlReg, a.written[1])
 	assert.Equal(t, wantCtrlRegVal, a.written[2])

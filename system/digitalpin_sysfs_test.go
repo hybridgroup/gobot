@@ -92,9 +92,9 @@ func TestApplyOptionsSysfs(t *testing.T) {
 			err := pin.ApplyOptions(optionFunction1, optionFunction2)
 			// assert
 			if tc.wantErr != "" {
-				assert.ErrorContains(t, err, tc.wantErr)
+				require.ErrorContains(t, err, tc.wantErr)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 			}
 			assert.Equal(t, OUT, pin.digitalPinConfig.direction)
 			assert.Equal(t, 15, pin.digitalPinConfig.drive)
@@ -321,9 +321,9 @@ func TestDigitalPinExportSysfs(t *testing.T) {
 			err := pin.Export()
 			// assert
 			if tc.wantErr != "" {
-				assert.ErrorContains(t, err, tc.wantErr)
+				require.ErrorContains(t, err, tc.wantErr)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.NotNil(t, pin.valFile)
 				assert.NotNil(t, pin.dirFile)
 				assert.Equal(t, tc.wantDirection, fs.Files[dirPath].Contents)
@@ -351,28 +351,28 @@ func TestDigitalPinSysfs(t *testing.T) {
 	assert.Nil(t, pin.valFile)
 
 	err := pin.Unexport()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "10", fs.Files["/sys/class/gpio/unexport"].Contents)
 
 	require.NoError(t, pin.Export())
 
 	err = pin.Write(1)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "1", fs.Files["/sys/class/gpio/gpio10/value"].Contents)
 
 	err = pin.ApplyOptions(WithPinDirectionInput())
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "in", fs.Files["/sys/class/gpio/gpio10/direction"].Contents)
 
 	data, _ := pin.Read()
-	assert.Equal(t, data, 1)
+	assert.Equal(t, 1, data)
 
 	pin2 := newDigitalPinSysfs(fs, "30")
 	err = pin2.Write(1)
-	assert.ErrorContains(t, err, "pin has not been exported")
+	require.ErrorContains(t, err, "pin has not been exported")
 
 	data, err = pin2.Read()
-	assert.ErrorContains(t, err, "pin has not been exported")
+	require.ErrorContains(t, err, "pin has not been exported")
 	assert.Equal(t, 0, data)
 
 	writeFile = func(File, []byte) error {
@@ -380,14 +380,14 @@ func TestDigitalPinSysfs(t *testing.T) {
 	}
 
 	err = pin.Unexport()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	writeFile = func(File, []byte) error {
 		return &os.PathError{Err: errors.New("write error")}
 	}
 
 	err = pin.Unexport()
-	assert.ErrorContains(t, err.(*os.PathError).Err, "write error")
+	require.ErrorContains(t, err.(*os.PathError).Err, "write error")
 }
 
 func TestDigitalPinUnexportErrorSysfs(t *testing.T) {
@@ -401,5 +401,5 @@ func TestDigitalPinUnexportErrorSysfs(t *testing.T) {
 	}
 
 	err := pin.Unexport()
-	assert.ErrorContains(t, err, " : device or resource busy")
+	require.ErrorContains(t, err, " : device or resource busy")
 }

@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -30,8 +31,8 @@ func TestNewDriver(t *testing.T) {
 	assert.IsType(t, &Driver{}, d)
 	assert.Contains(t, d.name, "GPIO_BASIC")
 	assert.Equal(t, a, d.connection)
-	assert.NoError(t, d.afterStart())
-	assert.NoError(t, d.beforeHalt())
+	require.NoError(t, d.afterStart())
+	require.NoError(t, d.beforeHalt())
 	assert.NotNil(t, d.Commander)
 	assert.NotNil(t, d.mutex)
 }
@@ -56,20 +57,20 @@ func TestStart(t *testing.T) {
 	// arrange
 	d := initTestDriver()
 	// act, assert
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 	// arrange after start function
 	d.afterStart = func() error { return fmt.Errorf("after start error") }
 	// act, assert
-	assert.ErrorContains(t, d.Start(), "after start error")
+	require.ErrorContains(t, d.Start(), "after start error")
 }
 
 func TestHalt(t *testing.T) {
 	// arrange
 	d := initTestDriver()
 	// act, assert
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 	// arrange after start function
 	d.beforeHalt = func() error { return fmt.Errorf("before halt error") }
 	// act, assert
-	assert.ErrorContains(t, d.Halt(), "before halt error")
+	require.ErrorContains(t, d.Halt(), "before halt error")
 }

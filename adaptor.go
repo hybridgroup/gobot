@@ -8,7 +8,7 @@ import (
 // DigitalPinOptioner is the interface to provide the possibility to change pin behavior for the next usage
 type DigitalPinOptioner interface {
 	// SetLabel change the pins label
-	SetLabel(string) (changed bool)
+	SetLabel(label string) (changed bool)
 	// SetDirectionOutput sets the pins direction to output with the given initial value
 	SetDirectionOutput(initialState int) (changed bool)
 	// SetDirectionInput sets the pins direction to input
@@ -38,7 +38,7 @@ type DigitalPinOptioner interface {
 // DigitalPinOptionApplier is the interface to apply options to change pin behavior immediately
 type DigitalPinOptionApplier interface {
 	// ApplyOptions apply all given options to the pin immediately
-	ApplyOptions(...func(DigitalPinOptioner) bool) error
+	ApplyOptions(options ...func(DigitalPinOptioner) bool) error
 }
 
 // DigitalPinner is the interface for system gpio interactions
@@ -50,7 +50,7 @@ type DigitalPinner interface {
 	// Read reads the current value of the pin
 	Read() (int, error)
 	// Write writes to the pin
-	Write(int) error
+	Write(val int) error
 	// DigitalPinOptionApplier is the interface to change pin behavior immediately
 	DigitalPinOptionApplier
 }
@@ -78,7 +78,7 @@ type PWMPinner interface {
 	// Enabled returns the enabled state of the PWM pin
 	Enabled() (bool, error)
 	// SetEnabled enables/disables the PWM pin
-	SetEnabled(bool) error
+	SetEnabled(val bool) error
 	// Polarity returns true if the polarity of the PWM pin is normal, otherwise false
 	Polarity() (bool, error)
 	// SetPolarity sets the polarity of the PWM pin to normal if called with true and to inverted if called with false
@@ -86,11 +86,11 @@ type PWMPinner interface {
 	// Period returns the current PWM period in nanoseconds for pin
 	Period() (uint32, error)
 	// SetPeriod sets the current PWM period in nanoseconds for pin
-	SetPeriod(uint32) error
+	SetPeriod(period uint32) error
 	// DutyCycle returns the duty cycle in nanoseconds for the PWM pin
 	DutyCycle() (uint32, error)
 	// SetDutyCycle writes the duty cycle in nanoseconds to the PWM pin
-	SetDutyCycle(uint32) error
+	SetDutyCycle(dutyCyle uint32) error
 }
 
 // PWMPinnerProvider is the interface that an Adaptor should implement to allow
@@ -210,7 +210,7 @@ type Adaptor interface {
 	// Name returns the label for the Adaptor
 	Name() string
 	// SetName sets the label for the Adaptor
-	SetName(string)
+	SetName(name string)
 	// Connect initiates the Adaptor
 	Connect() error
 	// Finalize terminates the Adaptor

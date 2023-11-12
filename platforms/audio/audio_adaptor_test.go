@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -16,8 +17,8 @@ var _ gobot.Adaptor = (*Adaptor)(nil)
 func TestAudioAdaptor(t *testing.T) {
 	a := NewAdaptor()
 
-	assert.NoError(t, a.Connect())
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.Connect())
+	require.NoError(t, a.Finalize())
 }
 
 func TestAudioAdaptorName(t *testing.T) {
@@ -40,7 +41,7 @@ func TestAudioAdaptorCommandsMp3(t *testing.T) {
 func TestAudioAdaptorCommandsUnknown(t *testing.T) {
 	cmd, err := CommandName("whatever.unk")
 	assert.NotEqual(t, "mpg123", cmd)
-	assert.ErrorContains(t, err, "Unknown filetype for audio file.")
+	require.ErrorContains(t, err, "Unknown filetype for audio file.")
 }
 
 func TestAudioAdaptorSoundWithNoFilename(t *testing.T) {
@@ -65,7 +66,7 @@ func TestAudioAdaptorSoundWithValidMP3Filename(t *testing.T) {
 
 	errors := a.Sound("../../examples/laser.mp3")
 
-	assert.Equal(t, 0, len(errors))
+	assert.Empty(t, errors)
 }
 
 func myExecCommand(command string, args ...string) *exec.Cmd {

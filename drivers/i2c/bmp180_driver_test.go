@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -72,11 +73,11 @@ func TestBMP180Measurements(t *testing.T) {
 	}
 	_ = bmp180.Start()
 	temp, err := bmp180.Temperature()
-	assert.NoError(t, err)
-	assert.Equal(t, float32(15.0), temp)
+	require.NoError(t, err)
+	assert.InDelta(t, float32(15.0), temp, 0.0)
 	pressure, err := bmp180.Pressure()
-	assert.NoError(t, err)
-	assert.Equal(t, float32(69964), pressure)
+	require.NoError(t, err)
+	assert.InDelta(t, float32(69964), pressure, 0.0)
 }
 
 func TestBMP180TemperatureError(t *testing.T) {
@@ -108,7 +109,7 @@ func TestBMP180TemperatureError(t *testing.T) {
 	}
 	_ = bmp180.Start()
 	_, err := bmp180.Temperature()
-	assert.ErrorContains(t, err, "temp error")
+	require.ErrorContains(t, err, "temp error")
 }
 
 func TestBMP180PressureError(t *testing.T) {
@@ -138,7 +139,7 @@ func TestBMP180PressureError(t *testing.T) {
 	}
 	_ = bmp180.Start()
 	_, err := bmp180.Pressure()
-	assert.ErrorContains(t, err, "press error")
+	require.ErrorContains(t, err, "press error")
 }
 
 func TestBMP180PressureWriteError(t *testing.T) {
@@ -150,7 +151,7 @@ func TestBMP180PressureWriteError(t *testing.T) {
 	}
 
 	_, err := bmp180.Pressure()
-	assert.ErrorContains(t, err, "write error")
+	require.ErrorContains(t, err, "write error")
 }
 
 func TestBMP180_initialization(t *testing.T) {
@@ -183,9 +184,9 @@ func TestBMP180_initialization(t *testing.T) {
 	// act, assert - initialization() must be called on Start()
 	err := d.Start()
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, 1, numCallsRead)
-	assert.Equal(t, 1, len(a.written))
+	assert.Len(t, a.written, 1)
 	assert.Equal(t, uint8(0xAA), a.written[0])
 	assert.Equal(t, int16(408), d.calCoeffs.ac1)
 	assert.Equal(t, int16(-72), d.calCoeffs.ac2)

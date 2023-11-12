@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -39,6 +40,6 @@ func TestMFRC522WriteByteData(t *testing.T) {
 	// act
 	err := d.connection.WriteByteData(0x00, 0x00)
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, []byte{0x00, 0x00}, a.spi.Written())
 }

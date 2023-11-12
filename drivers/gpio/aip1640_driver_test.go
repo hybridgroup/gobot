@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -32,12 +33,12 @@ func TestAIP1640Driver(t *testing.T) {
 
 func TestAIP1640DriverStart(t *testing.T) {
 	d := initTestAIP1640Driver()
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 }
 
 func TestAIP1640DriverHalt(t *testing.T) {
 	d := initTestAIP1640Driver()
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 }
 
 func TestAIP1640DriverDefaultName(t *testing.T) {
@@ -55,39 +56,39 @@ func TestAIP1640DriveDrawPixel(t *testing.T) {
 	d := initTestAIP1640Driver()
 	d.DrawPixel(2, 3, true)
 	d.DrawPixel(0, 3, true)
-	assert.Equal(t, d.buffer[7-3], uint8(5))
+	assert.Equal(t, uint8(5), d.buffer[7-3])
 }
 
 func TestAIP1640DriverDrawRow(t *testing.T) {
 	d := initTestAIP1640Driver()
 	d.DrawRow(4, 0x3C)
-	assert.Equal(t, d.buffer[7-4], uint8(0x3C))
+	assert.Equal(t, uint8(0x3C), d.buffer[7-4])
 }
 
 func TestAIP1640DriverDrawMatrix(t *testing.T) {
 	d := initTestAIP1640Driver()
 	drawing := [8]byte{0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF}
 	d.DrawMatrix(drawing)
-	assert.Equal(t, d.buffer, [8]byte{0xEF, 0xCD, 0xAB, 0x89, 0x67, 0x45, 0x23, 0x01})
+	assert.Equal(t, [8]byte{0xEF, 0xCD, 0xAB, 0x89, 0x67, 0x45, 0x23, 0x01}, d.buffer)
 }
 
 func TestAIP1640DriverClear(t *testing.T) {
 	d := initTestAIP1640Driver()
 	drawing := [8]byte{0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF}
 	d.DrawMatrix(drawing)
-	assert.Equal(t, d.buffer, [8]byte{0xEF, 0xCD, 0xAB, 0x89, 0x67, 0x45, 0x23, 0x01})
+	assert.Equal(t, [8]byte{0xEF, 0xCD, 0xAB, 0x89, 0x67, 0x45, 0x23, 0x01}, d.buffer)
 	d.Clear()
-	assert.Equal(t, d.buffer, [8]byte{})
+	assert.Equal(t, [8]byte{}, d.buffer)
 }
 
 func TestAIP1640DriverSetIntensity(t *testing.T) {
 	d := initTestAIP1640Driver()
 	d.SetIntensity(3)
-	assert.Equal(t, d.intensity, uint8(3))
+	assert.Equal(t, uint8(3), d.intensity)
 }
 
 func TestAIP1640DriverSetIntensityHigherThan7(t *testing.T) {
 	d := initTestAIP1640Driver()
 	d.SetIntensity(19)
-	assert.Equal(t, d.intensity, uint8(7))
+	assert.Equal(t, uint8(7), d.intensity)
 }

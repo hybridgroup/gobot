@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -30,12 +31,12 @@ func TestNewDriver(t *testing.T) {
 
 func TestStart(t *testing.T) {
 	d := NewDriver(newSpiTestAdaptor(), "SPI_BASIC")
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 }
 
 func TestHalt(t *testing.T) {
 	d, _ := initTestDriverWithStubbedAdaptor()
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 }
 
 func TestSetName(t *testing.T) {

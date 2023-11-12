@@ -6,12 +6,11 @@ package firmata
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"io"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/aio"
 	"gobot.io/x/gobot/v2/drivers/gpio"
@@ -114,11 +113,11 @@ func TestNewAdaptor(t *testing.T) {
 
 func TestAdaptorFinalize(t *testing.T) {
 	a := initTestAdaptor()
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.Finalize())
 
 	a = initTestAdaptor()
 	a.Board.(*mockFirmataBoard).disconnectError = errors.New("close error")
-	assert.ErrorContains(t, a.Finalize(), "close error")
+	require.ErrorContains(t, a.Finalize(), "close error")
 }
 
 func TestAdaptorConnect(t *testing.T) {
@@ -128,94 +127,94 @@ func TestAdaptorConnect(t *testing.T) {
 	a := NewAdaptor("/dev/null")
 	a.PortOpener = openSP
 	a.Board = newMockFirmataBoard()
-	assert.NoError(t, a.Connect())
+	require.NoError(t, a.Connect())
 
 	a = NewAdaptor("/dev/null")
 	a.Board = newMockFirmataBoard()
 	a.PortOpener = func(port string) (io.ReadWriteCloser, error) {
 		return nil, errors.New("connect error")
 	}
-	assert.ErrorContains(t, a.Connect(), "connect error")
+	require.ErrorContains(t, a.Connect(), "connect error")
 
 	a = NewAdaptor(&readWriteCloser{})
 	a.Board = newMockFirmataBoard()
-	assert.NoError(t, a.Connect())
+	require.NoError(t, a.Connect())
 
 	a = NewAdaptor("/dev/null")
 	a.Board = nil
-	assert.NoError(t, a.Disconnect())
+	require.NoError(t, a.Disconnect())
 }
 
 func TestAdaptorServoWrite(t *testing.T) {
 	a := initTestAdaptor()
-	assert.NoError(t, a.ServoWrite("1", 50))
+	require.NoError(t, a.ServoWrite("1", 50))
 }
 
 func TestAdaptorServoWriteBadPin(t *testing.T) {
 	a := initTestAdaptor()
-	assert.NotNil(t, a.ServoWrite("xyz", 50))
+	require.Error(t, a.ServoWrite("xyz", 50))
 }
 
 func TestAdaptorPwmWrite(t *testing.T) {
 	a := initTestAdaptor()
-	assert.NoError(t, a.PwmWrite("1", 50))
+	require.NoError(t, a.PwmWrite("1", 50))
 }
 
 func TestAdaptorPwmWriteBadPin(t *testing.T) {
 	a := initTestAdaptor()
-	assert.NotNil(t, a.PwmWrite("xyz", 50))
+	require.Error(t, a.PwmWrite("xyz", 50))
 }
 
 func TestAdaptorDigitalWrite(t *testing.T) {
 	a := initTestAdaptor()
-	assert.NoError(t, a.DigitalWrite("1", 1))
+	require.NoError(t, a.DigitalWrite("1", 1))
 }
 
 func TestAdaptorDigitalWriteBadPin(t *testing.T) {
 	a := initTestAdaptor()
-	assert.NotNil(t, a.DigitalWrite("xyz", 50))
+	require.Error(t, a.DigitalWrite("xyz", 50))
 }
 
 func TestAdaptorDigitalRead(t *testing.T) {
 	a := initTestAdaptor()
 	val, err := a.DigitalRead("1")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, 1, val)
 
 	val, err = a.DigitalRead("0")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, 0, val)
 }
 
 func TestAdaptorDigitalReadBadPin(t *testing.T) {
 	a := initTestAdaptor()
 	_, err := a.DigitalRead("xyz")
-	assert.NotNil(t, err)
+	require.Error(t, err)
 }
 
 func TestAdaptorAnalogRead(t *testing.T) {
 	a := initTestAdaptor()
 	val, err := a.AnalogRead("1")
 	assert.Equal(t, 133, val)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	val, err = a.AnalogRead("0")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, 0, val)
 }
 
 func TestAdaptorAnalogReadBadPin(t *testing.T) {
 	a := initTestAdaptor()
 	_, err := a.AnalogRead("xyz")
-	assert.NotNil(t, err)
+	require.Error(t, err)
 }
 
 func TestServoConfig(t *testing.T) {
 	a := initTestAdaptor()
 	err := a.ServoConfig("9", 0, 0)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	// test atoi error
 	err = a.ServoConfig("a", 0, 0)
-	assert.Equal(t, strings.Contains(fmt.Sprintf("%v", err), "invalid syntax"), true)
+	require.ErrorContains(t, err, "invalid syntax")
 }

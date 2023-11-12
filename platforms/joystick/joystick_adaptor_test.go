@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"gobot.io/x/gobot/v2"
 )
@@ -24,12 +25,12 @@ func TestJoystickAdaptorName(t *testing.T) {
 	a := initTestAdaptor()
 	assert.True(t, strings.HasPrefix(a.Name(), "Joystick"))
 	a.SetName("NewName")
-	assert.Equal(t, a.Name(), "NewName")
+	assert.Equal(t, "NewName", a.Name())
 }
 
 func TestAdaptorConnect(t *testing.T) {
 	a := initTestAdaptor()
-	assert.NoError(t, a.Connect())
+	require.NoError(t, a.Connect())
 
 	a = NewAdaptor("6")
 	err := a.Connect()
@@ -39,5 +40,5 @@ func TestAdaptorConnect(t *testing.T) {
 func TestAdaptorFinalize(t *testing.T) {
 	a := initTestAdaptor()
 	_ = a.Connect()
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.Finalize())
 }

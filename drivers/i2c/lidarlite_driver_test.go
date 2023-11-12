@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -48,12 +49,12 @@ func TestLIDARLiteDriverOptions(t *testing.T) {
 
 func TestLIDARLiteDriverStart(t *testing.T) {
 	d := NewLIDARLiteDriver(newI2cTestAdaptor())
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 }
 
 func TestLIDARLiteDriverHalt(t *testing.T) {
 	d := initTestLIDARLiteDriver()
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 }
 
 func TestLIDARLiteDriverDistance(t *testing.T) {
@@ -72,7 +73,7 @@ func TestLIDARLiteDriverDistance(t *testing.T) {
 
 	distance, err := d.Distance()
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, int(25345), distance)
 
 	// when insufficient bytes have been read
@@ -93,7 +94,7 @@ func TestLIDARLiteDriverDistance(t *testing.T) {
 
 	distance, err = d.Distance()
 	assert.Equal(t, int(0), distance)
-	assert.ErrorContains(t, err, "read error")
+	require.ErrorContains(t, err, "read error")
 }
 
 func TestLIDARLiteDriverDistanceError1(t *testing.T) {
@@ -104,7 +105,7 @@ func TestLIDARLiteDriverDistanceError1(t *testing.T) {
 
 	distance, err := d.Distance()
 	assert.Equal(t, int(0), distance)
-	assert.ErrorContains(t, err, "write error")
+	require.ErrorContains(t, err, "write error")
 }
 
 func TestLIDARLiteDriverDistanceError2(t *testing.T) {
@@ -118,7 +119,7 @@ func TestLIDARLiteDriverDistanceError2(t *testing.T) {
 
 	distance, err := d.Distance()
 	assert.Equal(t, int(0), distance)
-	assert.ErrorContains(t, err, "write error")
+	require.ErrorContains(t, err, "write error")
 }
 
 func TestLIDARLiteDriverDistanceError3(t *testing.T) {
@@ -138,5 +139,5 @@ func TestLIDARLiteDriverDistanceError3(t *testing.T) {
 
 	distance, err := d.Distance()
 	assert.Equal(t, int(0), distance)
-	assert.ErrorContains(t, err, "write error")
+	require.ErrorContains(t, err, "write error")
 }

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -210,10 +211,10 @@ func TestPCF8583WriteTime(t *testing.T) {
 	// act
 	err := d.WriteTime(initDate)
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, initDate.Year(), d.yearOffset)
 	assert.Equal(t, 1, numCallsRead)
-	assert.Equal(t, 11, len(a.written))
+	assert.Len(t, a.written, 11)
 	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[0])
 	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[1])
 	assert.Equal(t, wantCtrlStop, a.written[2])
@@ -246,9 +247,9 @@ func TestPCF8583WriteTimeNoTimeModeFails(t *testing.T) {
 	// act
 	err := d.WriteTime(time.Now())
 	// assert
-	assert.NotNil(t, err)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "wrong mode 0x30")
-	assert.Equal(t, 1, len(a.written))
+	assert.Len(t, a.written, 1)
 	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[0])
 	assert.Equal(t, 1, numCallsRead)
 }
@@ -292,8 +293,8 @@ func TestPCF8583ReadTime(t *testing.T) {
 	// act
 	got, err := d.ReadTime()
 	// assert
-	assert.NoError(t, err)
-	assert.Equal(t, 1, len(a.written))
+	require.NoError(t, err)
+	assert.Len(t, a.written, 1)
 	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[0])
 	assert.Equal(t, 2, numCallsRead)
 	assert.Equal(t, want, got)
@@ -318,10 +319,10 @@ func TestPCF8583ReadTimeNoTimeModeFails(t *testing.T) {
 	// act
 	got, err := d.ReadTime()
 	// assert
-	assert.NotNil(t, err)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "wrong mode 0x20")
 	assert.Equal(t, time.Time{}, got)
-	assert.Equal(t, 1, len(a.written))
+	assert.Len(t, a.written, 1)
 	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[0])
 	assert.Equal(t, 1, numCallsRead)
 }
@@ -357,9 +358,9 @@ func TestPCF8583WriteCounter(t *testing.T) {
 	// act
 	err := d.WriteCounter(initCount)
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, 1, numCallsRead)
-	assert.Equal(t, 8, len(a.written))
+	assert.Len(t, a.written, 8)
 	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[0])
 	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[1])
 	assert.Equal(t, wantCtrlStop, a.written[2])
@@ -389,9 +390,9 @@ func TestPCF8583WriteCounterNoCounterModeFails(t *testing.T) {
 	// act
 	err := d.WriteCounter(123)
 	// assert
-	assert.NotNil(t, err)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "wrong mode 0x10")
-	assert.Equal(t, 1, len(a.written))
+	assert.Len(t, a.written, 1)
 	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[0])
 	assert.Equal(t, 1, numCallsRead)
 }
@@ -430,8 +431,8 @@ func TestPCF8583ReadCounter(t *testing.T) {
 	// act
 	got, err := d.ReadCounter()
 	// assert
-	assert.NoError(t, err)
-	assert.Equal(t, 1, len(a.written))
+	require.NoError(t, err)
+	assert.Len(t, a.written, 1)
 	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[0])
 	assert.Equal(t, 2, numCallsRead)
 	assert.Equal(t, want, got)
@@ -456,10 +457,10 @@ func TestPCF8583ReadCounterNoCounterModeFails(t *testing.T) {
 	// act
 	got, err := d.ReadCounter()
 	// assert
-	assert.NotNil(t, err)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "wrong mode 0x30")
 	assert.Equal(t, int32(0), got)
-	assert.Equal(t, 1, len(a.written))
+	assert.Len(t, a.written, 1)
 	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[0])
 	assert.Equal(t, 1, numCallsRead)
 }
@@ -480,8 +481,8 @@ func TestPCF8583WriteRam(t *testing.T) {
 	// act
 	err := d.WriteRAM(wantRAMAddress-pcf8583RamOffset, wantRAMValue)
 	// assert
-	assert.NoError(t, err)
-	assert.Equal(t, 2, len(a.written))
+	require.NoError(t, err)
+	assert.Len(t, a.written, 2)
 	assert.Equal(t, wantRAMAddress, a.written[0])
 	assert.Equal(t, wantRAMValue, a.written[1])
 }
@@ -493,9 +494,9 @@ func TestPCF8583WriteRamAddressOverflowFails(t *testing.T) {
 	// act
 	err := d.WriteRAM(uint8(0xF0), 15)
 	// assert
-	assert.NotNil(t, err)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "overflow 256")
-	assert.Equal(t, 0, len(a.written))
+	assert.Empty(t, a.written)
 }
 
 func TestPCF8583ReadRam(t *testing.T) {
@@ -521,9 +522,9 @@ func TestPCF8583ReadRam(t *testing.T) {
 	// act
 	got, err := d.ReadRAM(wantRAMAddress - pcf8583RamOffset)
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, want, got)
-	assert.Equal(t, 1, len(a.written))
+	assert.Len(t, a.written, 1)
 	assert.Equal(t, wantRAMAddress, a.written[0])
 	assert.Equal(t, 1, numCallsRead)
 }
@@ -545,10 +546,10 @@ func TestPCF8583ReadRamAddressOverflowFails(t *testing.T) {
 	// act
 	got, err := d.ReadRAM(uint8(0xF0))
 	// assert
-	assert.NotNil(t, err)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "overflow 256")
 	assert.Equal(t, uint8(0), got)
-	assert.Equal(t, 0, len(a.written))
+	assert.Empty(t, a.written)
 	assert.Equal(t, 0, numCallsRead)
 }
 
@@ -572,9 +573,9 @@ func TestPCF8583_initializeNoModeSwitch(t *testing.T) {
 	// act, assert - initialize() must be called on Start()
 	err := d.Start()
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, 1, numCallsRead)
-	assert.Equal(t, 1, len(a.written))
+	assert.Len(t, a.written, 1)
 	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[0])
 }
 
@@ -604,9 +605,9 @@ func TestPCF8583_initializeWithModeSwitch(t *testing.T) {
 	// act, assert - initialize() must be called on Start()
 	err := d.Start()
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, 1, numCallsRead)
-	assert.Equal(t, 3, len(a.written))
+	assert.Len(t, a.written, 3)
 	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[0])
 	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[1])
 	assert.Equal(t, wantReg0Val, a.written[2])

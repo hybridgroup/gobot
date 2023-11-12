@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -36,7 +37,7 @@ func TestNewPIRMotionDriver(t *testing.T) {
 	assert.NotNil(t, d.mutex)
 	assert.NotNil(t, d.Eventer)
 	assert.Equal(t, "1", d.pin)
-	assert.Equal(t, false, d.active)
+	assert.False(t, d.active)
 	assert.Equal(t, 10*time.Millisecond, d.interval)
 	assert.NotNil(t, d.halt)
 	// act & assert other interval
@@ -75,7 +76,7 @@ func TestPIRMotionStart(t *testing.T) {
 	err := d.Start()
 
 	// assert & rearrange
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	select {
 	case <-sem:
@@ -134,7 +135,7 @@ func TestPIRMotionHalt(t *testing.T) {
 		}
 	}()
 	// act & assert
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 	wg.Wait() // wait until the go function was really finished
 }
 

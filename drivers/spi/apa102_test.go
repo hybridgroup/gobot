@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -40,5 +41,5 @@ func TestDriverLEDs(t *testing.T) {
 	d.SetRGBA(2, color.RGBA{255, 255, 255, 15})
 	d.SetRGBA(3, color.RGBA{255, 255, 255, 15})
 
-	assert.NoError(t, d.Draw())
+	require.NoError(t, d.Draw())
 }

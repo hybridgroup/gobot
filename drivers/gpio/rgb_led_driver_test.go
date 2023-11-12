@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -42,26 +43,26 @@ func TestRgbLedDriver(t *testing.T) {
 	}
 
 	err = d.Command("Toggle")(nil)
-	assert.ErrorContains(t, err.(error), "pwm error")
+	require.ErrorContains(t, err.(error), "pwm error")
 
 	err = d.Command("On")(nil)
-	assert.ErrorContains(t, err.(error), "pwm error")
+	require.ErrorContains(t, err.(error), "pwm error")
 
 	err = d.Command("Off")(nil)
-	assert.ErrorContains(t, err.(error), "pwm error")
+	require.ErrorContains(t, err.(error), "pwm error")
 
 	err = d.Command("SetRGB")(map[string]interface{}{"r": 0xff, "g": 0xff, "b": 0xff})
-	assert.ErrorContains(t, err.(error), "pwm error")
+	require.ErrorContains(t, err.(error), "pwm error")
 }
 
 func TestRgbLedDriverStart(t *testing.T) {
 	d := initTestRgbLedDriver()
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 }
 
 func TestRgbLedDriverHalt(t *testing.T) {
 	d := initTestRgbLedDriver()
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 }
 
 func TestRgbLedDriverToggle(t *testing.T) {
@@ -76,14 +77,14 @@ func TestRgbLedDriverToggle(t *testing.T) {
 func TestRgbLedDriverSetLevel(t *testing.T) {
 	a := newGpioTestAdaptor()
 	d := NewRgbLedDriver(a, "1", "2", "3")
-	assert.NoError(t, d.SetLevel("1", 150))
+	require.NoError(t, d.SetLevel("1", 150))
 
 	d = NewRgbLedDriver(a, "1", "2", "3")
 	a.pwmWriteFunc = func(string, byte) (err error) {
 		err = errors.New("pwm error")
 		return
 	}
-	assert.ErrorContains(t, d.SetLevel("1", 150), "pwm error")
+	require.ErrorContains(t, d.SetLevel("1", 150), "pwm error")
 }
 
 func TestRgbLedDriverDefaultName(t *testing.T) {
