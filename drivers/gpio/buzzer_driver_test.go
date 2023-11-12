@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -28,12 +29,12 @@ func TestBuzzerDriverSetName(t *testing.T) {
 
 func TestBuzzerDriverStart(t *testing.T) {
 	d := initTestBuzzerDriver(newGpioTestAdaptor())
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 }
 
 func TestBuzzerDriverHalt(t *testing.T) {
 	d := initTestBuzzerDriver(newGpioTestAdaptor())
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 }
 
 func TestBuzzerDriverToggle(t *testing.T) {
@@ -47,7 +48,7 @@ func TestBuzzerDriverToggle(t *testing.T) {
 
 func TestBuzzerDriverTone(t *testing.T) {
 	d := initTestBuzzerDriver(newGpioTestAdaptor())
-	assert.NoError(t, d.Tone(100, 0.01))
+	require.NoError(t, d.Tone(100, 0.01))
 }
 
 func TestBuzzerDriverOnError(t *testing.T) {
@@ -57,7 +58,7 @@ func TestBuzzerDriverOnError(t *testing.T) {
 		return errors.New("write error")
 	}
 
-	assert.ErrorContains(t, d.On(), "write error")
+	require.ErrorContains(t, d.On(), "write error")
 }
 
 func TestBuzzerDriverOffError(t *testing.T) {
@@ -67,7 +68,7 @@ func TestBuzzerDriverOffError(t *testing.T) {
 		return errors.New("write error")
 	}
 
-	assert.ErrorContains(t, d.Off(), "write error")
+	require.ErrorContains(t, d.Off(), "write error")
 }
 
 func TestBuzzerDriverToneError(t *testing.T) {
@@ -77,5 +78,5 @@ func TestBuzzerDriverToneError(t *testing.T) {
 		return errors.New("write error")
 	}
 
-	assert.ErrorContains(t, d.Tone(100, 0.01), "write error")
+	require.ErrorContains(t, d.Tone(100, 0.01), "write error")
 }

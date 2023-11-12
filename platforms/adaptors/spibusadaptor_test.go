@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2/drivers/spi"
 	"gobot.io/x/gobot/v2/system"
 )
@@ -40,7 +41,7 @@ func TestNewSpiAdaptor(t *testing.T) {
 	assert.Equal(t, 4, a.SpiDefaultBitCount())
 	assert.Equal(t, int64(5), a.SpiDefaultMaxSpeed())
 	_, err := a.GetSpiConnection(10, 0, 0, 8, 10000000)
-	assert.ErrorContains(t, err, "not connected")
+	require.ErrorContains(t, err, "not connected")
 }
 
 func TestGetSpiConnection(t *testing.T) {
@@ -53,32 +54,32 @@ func TestGetSpiConnection(t *testing.T) {
 		maxSpeed = int64(11)
 	)
 	a, spi := initTestSpiBusAdaptorWithMockedSpi()
-	assert.Equal(t, 0, len(a.connections))
+	assert.Empty(t, a.connections)
 	// act
 	con1, err1 := a.GetSpiConnection(busNum, chipNum, mode, bits, maxSpeed)
 	// assert
-	assert.NoError(t, err1)
+	require.NoError(t, err1)
 	assert.NotNil(t, con1)
-	assert.Equal(t, 1, len(a.connections))
+	assert.Len(t, a.connections, 1)
 	// assert cached connection
 	con1a, err2 := a.GetSpiConnection(busNum, chipNum, mode, bits, maxSpeed)
-	assert.NoError(t, err2)
+	require.NoError(t, err2)
 	assert.Equal(t, con1, con1a)
-	assert.Equal(t, 1, len(a.connections))
+	assert.Len(t, a.connections, 1)
 	// assert second connection
 	con2, err3 := a.GetSpiConnection(busNum, chipNum+1, mode, bits, maxSpeed)
-	assert.NoError(t, err3)
+	require.NoError(t, err3)
 	assert.NotNil(t, con2)
 	assert.NotEqual(t, con1, con2)
-	assert.Equal(t, 2, len(a.connections))
+	assert.Len(t, a.connections, 2)
 	// assert bus validation error
 	con, err := a.GetSpiConnection(busNum+1, chipNum, mode, bits, maxSpeed)
-	assert.ErrorContains(t, err, "16 not valid")
+	require.ErrorContains(t, err, "16 not valid")
 	assert.Nil(t, con)
 	// assert create error
 	spi.CreateError = true
 	con, err = a.GetSpiConnection(busNum, chipNum+2, mode, bits, maxSpeed)
-	assert.ErrorContains(t, err, "error while create SPI connection in mock")
+	require.ErrorContains(t, err, "error while create SPI connection in mock")
 	assert.Nil(t, con)
 }
 
@@ -86,20 +87,20 @@ func TestSpiFinalize(t *testing.T) {
 	// arrange
 	a, _ := initTestSpiBusAdaptorWithMockedSpi()
 	_, e := a.GetSpiConnection(spiTestAllowedBus, 2, 3, 4, 5)
-	assert.NoError(t, e)
-	assert.Equal(t, 1, len(a.connections))
+	require.NoError(t, e)
+	assert.Len(t, a.connections, 1)
 	// act
 	err := a.Finalize()
 	// assert
-	assert.NoError(t, err)
-	assert.Equal(t, 0, len(a.connections))
+	require.NoError(t, err)
+	assert.Empty(t, a.connections)
 }
 
 func TestSpiFinalizeWithError(t *testing.T) {
 	// arrange
 	a, spi := initTestSpiBusAdaptorWithMockedSpi()
 	_, e := a.GetSpiConnection(spiTestAllowedBus, 2, 3, 4, 5)
-	assert.NoError(t, e)
+	require.NoError(t, e)
 	spi.SetCloseError(true)
 	// act
 	err := a.Finalize()
@@ -110,10 +111,10 @@ func TestSpiFinalizeWithError(t *testing.T) {
 func TestSpiReConnect(t *testing.T) {
 	// arrange
 	a, _ := initTestSpiBusAdaptorWithMockedSpi()
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.Finalize())
 	// act
-	assert.NoError(t, a.Connect())
+	require.NoError(t, a.Connect())
 	// assert
 	assert.NotNil(t, a.connections)
-	assert.Equal(t, 0, len(a.connections))
+	assert.Empty(t, a.connections)
 }

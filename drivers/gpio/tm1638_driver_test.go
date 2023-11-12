@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -32,12 +33,12 @@ func TestTM1638Driver(t *testing.T) {
 
 func TestTM1638DriverStart(t *testing.T) {
 	d := initTestTM1638Driver()
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 }
 
 func TestTM1638DriverHalt(t *testing.T) {
 	d := initTestTM1638Driver()
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 }
 
 func TestTM1638DriverDefaultName(t *testing.T) {
@@ -54,19 +55,19 @@ func TestTM1638DriverSetName(t *testing.T) {
 func TestTM1638DriverFromStringToByteArray(t *testing.T) {
 	d := initTestTM1638Driver()
 	data := d.fromStringToByteArray("Hello World")
-	assert.Equal(t, data, []byte{0x76, 0x7B, 0x30, 0x30, 0x5C, 0x00, 0x1D, 0x5C, 0x50, 0x30, 0x5E})
+	assert.Equal(t, []byte{0x76, 0x7B, 0x30, 0x30, 0x5C, 0x00, 0x1D, 0x5C, 0x50, 0x30, 0x5E}, data)
 }
 
 func TestTM1638DriverAddFonts(t *testing.T) {
 	d := initTestTM1638Driver()
 	d.AddFonts(map[string]byte{"µ": 0x1C, "ß": 0x7F})
 	data := d.fromStringToByteArray("µß")
-	assert.Equal(t, data, []byte{0x1C, 0x7F})
+	assert.Equal(t, []byte{0x1C, 0x7F}, data)
 }
 
 func TestTM1638DriverClearFonts(t *testing.T) {
 	d := initTestTM1638Driver()
 	d.ClearFonts()
 	data := d.fromStringToByteArray("Hello World")
-	assert.Equal(t, data, []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00})
+	assert.Equal(t, []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, data)
 }

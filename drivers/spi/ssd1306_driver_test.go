@@ -5,7 +5,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -19,29 +19,29 @@ func initTestSSDDriver() *SSD1306Driver {
 
 func TestDriverSSDStart(t *testing.T) {
 	d := initTestSSDDriver()
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 }
 
 func TestDriverSSDHalt(t *testing.T) {
 	d := initTestSSDDriver()
 	_ = d.Start()
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 }
 
 func TestDriverSSDDisplay(t *testing.T) {
 	d := initTestSSDDriver()
 	_ = d.Start()
-	assert.NoError(t, d.Display())
+	require.NoError(t, d.Display())
 }
 
 func TestSSD1306DriverShowImage(t *testing.T) {
 	d := initTestSSDDriver()
 	_ = d.Start()
 	img := image.NewRGBA(image.Rect(0, 0, 640, 480))
-	assert.ErrorContains(t, d.ShowImage(img), "Image must match the display width and height")
+	require.ErrorContains(t, d.ShowImage(img), "Image must match the display width and height")
 
 	img = image.NewRGBA(image.Rect(0, 0, 128, 64))
-	assert.NoError(t, d.ShowImage(img))
+	require.NoError(t, d.ShowImage(img))
 }
 
 type gpioTestAdaptor struct {

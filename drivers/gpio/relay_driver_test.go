@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -38,12 +39,12 @@ func TestRelayDriverSetName(t *testing.T) {
 
 func TestRelayDriverStart(t *testing.T) {
 	d, _ := initTestRelayDriver()
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 }
 
 func TestRelayDriverHalt(t *testing.T) {
 	d, _ := initTestRelayDriver()
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 }
 
 func TestRelayDriverToggle(t *testing.T) {

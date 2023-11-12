@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -32,15 +33,15 @@ func TestLeapMotionAdaptorName(t *testing.T) {
 
 func TestLeapMotionAdaptorConnect(t *testing.T) {
 	a := initTestLeapMotionAdaptor()
-	assert.NoError(t, a.Connect())
+	require.NoError(t, a.Connect())
 
 	a.connect = func(port string) (io.ReadWriteCloser, error) {
 		return nil, errors.New("connection error")
 	}
-	assert.ErrorContains(t, a.Connect(), "connection error")
+	require.ErrorContains(t, a.Connect(), "connection error")
 }
 
 func TestLeapMotionAdaptorFinalize(t *testing.T) {
 	a := initTestLeapMotionAdaptor()
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.Finalize())
 }

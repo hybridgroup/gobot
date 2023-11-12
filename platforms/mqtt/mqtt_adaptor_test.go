@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -85,12 +86,12 @@ func TestMqttAdaptorConnectSSLError(t *testing.T) {
 
 func TestMqttAdaptorConnectWithAuthError(t *testing.T) {
 	a := NewAdaptorWithAuth("xyz://localhost:1883", "client", "user", "pass")
-	assert.ErrorContains(t, a.Connect(), "network Error : unknown protocol")
+	require.ErrorContains(t, a.Connect(), "network Error : unknown protocol")
 }
 
 func TestMqttAdaptorFinalize(t *testing.T) {
 	a := initTestMqttAdaptor()
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.Finalize())
 }
 
 func TestMqttAdaptorCannotPublishUnlessConnected(t *testing.T) {
@@ -124,5 +125,5 @@ func TestMqttAdaptorOnWhenConnected(t *testing.T) {
 func TestMqttAdaptorQoS(t *testing.T) {
 	a := initTestMqttAdaptor()
 	a.SetQoS(1)
-	assert.Equal(t, a.qos, 1)
+	assert.Equal(t, 1, a.qos)
 }

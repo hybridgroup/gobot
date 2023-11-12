@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestAnalogActuatorDriver(t *testing.T) {
@@ -15,16 +16,16 @@ func TestAnalogActuatorDriver(t *testing.T) {
 	assert.Equal(t, "47", d.Pin())
 
 	err := d.RawWrite(100)
-	assert.NoError(t, err)
-	assert.Equal(t, 1, len(a.written))
+	require.NoError(t, err)
+	assert.Len(t, a.written, 1)
 	assert.Equal(t, 100, a.written[0])
 
 	err = d.Write(247.0)
-	assert.NoError(t, err)
-	assert.Equal(t, 2, len(a.written))
+	require.NoError(t, err)
+	assert.Len(t, a.written, 2)
 	assert.Equal(t, 247, a.written[1])
 	assert.Equal(t, 247, d.RawValue())
-	assert.Equal(t, 247.0, d.Value())
+	assert.InDelta(t, 247.0, d.Value(), 0.0)
 }
 
 func TestAnalogActuatorDriverWithScaler(t *testing.T) {
@@ -35,12 +36,12 @@ func TestAnalogActuatorDriverWithScaler(t *testing.T) {
 
 	err := d.Command("RawWrite")(map[string]interface{}{"val": "100"})
 	assert.Nil(t, err)
-	assert.Equal(t, 1, len(a.written))
+	assert.Len(t, a.written, 1)
 	assert.Equal(t, 100, a.written[0])
 
 	err = d.Command("Write")(map[string]interface{}{"val": "247.0"})
 	assert.Nil(t, err)
-	assert.Equal(t, 2, len(a.written))
+	assert.Len(t, a.written, 2)
 	assert.Equal(t, 100, a.written[1])
 }
 
@@ -76,8 +77,8 @@ func TestAnalogActuatorDriverLinearScaler(t *testing.T) {
 			// act
 			err := d.Write(tt.input)
 			// assert
-			assert.NoError(t, err)
-			assert.Equal(t, 1, len(a.written))
+			require.NoError(t, err)
+			assert.Len(t, a.written, 1)
 			assert.Equal(t, tt.want, a.written[0])
 		})
 	}
@@ -85,12 +86,12 @@ func TestAnalogActuatorDriverLinearScaler(t *testing.T) {
 
 func TestAnalogActuatorDriverStart(t *testing.T) {
 	d := NewAnalogActuatorDriver(newAioTestAdaptor(), "1")
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 }
 
 func TestAnalogActuatorDriverHalt(t *testing.T) {
 	d := NewAnalogActuatorDriver(newAioTestAdaptor(), "1")
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 }
 
 func TestAnalogActuatorDriverDefaultName(t *testing.T) {

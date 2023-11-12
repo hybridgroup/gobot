@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -32,12 +33,12 @@ func TestMAX7219Driver(t *testing.T) {
 
 func TestMAX7219DriverStart(t *testing.T) {
 	d := initTestMAX7219Driver()
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 }
 
 func TestMAX7219DriverHalt(t *testing.T) {
 	d := initTestMAX7219Driver()
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 }
 
 func TestMAX7219DriverDefaultName(t *testing.T) {

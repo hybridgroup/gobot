@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -29,16 +30,16 @@ func TestBebopAdaptorName(t *testing.T) {
 
 func TestBebopAdaptorConnect(t *testing.T) {
 	a := initTestBebopAdaptor()
-	assert.NoError(t, a.Connect())
+	require.NoError(t, a.Connect())
 
 	a.connect = func(a *Adaptor) error {
 		return errors.New("connection error")
 	}
-	assert.ErrorContains(t, a.Connect(), "connection error")
+	require.ErrorContains(t, a.Connect(), "connection error")
 }
 
 func TestBebopAdaptorFinalize(t *testing.T) {
 	a := initTestBebopAdaptor()
 	_ = a.Connect()
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.Finalize())
 }

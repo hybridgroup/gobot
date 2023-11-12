@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -20,10 +21,10 @@ func TestAdaptor(t *testing.T) {
 
 func TestAdaptorConnect(t *testing.T) {
 	a := initTestAdaptor()
-	assert.NoError(t, a.Connect())
+	require.NoError(t, a.Connect())
 }
 
 func TestAdaptorFinalize(t *testing.T) {
 	a := initTestAdaptor()
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.Finalize())
 }

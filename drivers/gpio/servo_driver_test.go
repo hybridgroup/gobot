@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -29,26 +30,26 @@ func TestServoDriver(t *testing.T) {
 	}
 
 	err = d.Command("Min")(nil)
-	assert.ErrorContains(t, err.(error), "pwm error")
+	require.ErrorContains(t, err.(error), "pwm error")
 
 	err = d.Command("Center")(nil)
-	assert.ErrorContains(t, err.(error), "pwm error")
+	require.ErrorContains(t, err.(error), "pwm error")
 
 	err = d.Command("Max")(nil)
-	assert.ErrorContains(t, err.(error), "pwm error")
+	require.ErrorContains(t, err.(error), "pwm error")
 
 	err = d.Command("Move")(map[string]interface{}{"angle": 100.0})
-	assert.ErrorContains(t, err.(error), "pwm error")
+	require.ErrorContains(t, err.(error), "pwm error")
 }
 
 func TestServoDriverStart(t *testing.T) {
 	d := initTestServoDriver()
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 }
 
 func TestServoDriverHalt(t *testing.T) {
 	d := initTestServoDriver()
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 }
 
 func TestServoDriverMove(t *testing.T) {

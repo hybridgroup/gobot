@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/aio"
 	"gobot.io/x/gobot/v2/drivers/gpio"
@@ -58,7 +59,7 @@ func TestPWM(t *testing.T) {
 	fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/duty_cycle"].Contents = "0"
 	fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/period"].Contents = "0"
 
-	assert.ErrorContains(t, a.PwmWrite("P9_99", 175), "'P9_99' is not a valid id for a PWM pin")
+	require.ErrorContains(t, a.PwmWrite("P9_99", 175), "'P9_99' is not a valid id for a PWM pin")
 	_ = a.PwmWrite("P9_21", 175)
 	assert.Equal(
 		t,
@@ -83,7 +84,7 @@ func TestPWM(t *testing.T) {
 		fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/duty_cycle"].Contents,
 	)
 
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.Finalize())
 }
 
 func TestAnalog(t *testing.T) {
@@ -96,17 +97,17 @@ func TestAnalog(t *testing.T) {
 	fs.Files["/sys/bus/iio/devices/iio:device0/in_voltage1_raw"].Contents = "567\n"
 	i, err := a.AnalogRead("P9_40")
 	assert.Equal(t, 567, i)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	_, err = a.AnalogRead("P9_99")
-	assert.ErrorContains(t, err, "Not a valid analog pin")
+	require.ErrorContains(t, err, "Not a valid analog pin")
 
 	fs.WithReadError = true
 	_, err = a.AnalogRead("P9_40")
-	assert.ErrorContains(t, err, "read error")
+	require.ErrorContains(t, err, "read error")
 	fs.WithReadError = false
 
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.Finalize())
 }
 
 func TestDigitalIO(t *testing.T) {
@@ -138,22 +139,22 @@ func TestDigitalIO(t *testing.T) {
 
 	// no such LED
 	err := a.DigitalWrite("usr10101", 1)
-	assert.ErrorContains(t, err, " : /sys/class/leds/beaglebone:green:usr10101/brightness: no such file")
+	require.ErrorContains(t, err, " : /sys/class/leds/beaglebone:green:usr10101/brightness: no such file")
 
 	_ = a.DigitalWrite("P9_12", 1)
 	assert.Equal(t, "1", fs.Files["/sys/class/gpio/gpio60/value"].Contents)
 
-	assert.ErrorContains(t, a.DigitalWrite("P9_99", 1), "'P9_99' is not a valid id for a digital pin")
+	require.ErrorContains(t, a.DigitalWrite("P9_99", 1), "'P9_99' is not a valid id for a digital pin")
 
 	_, err = a.DigitalRead("P9_99")
-	assert.ErrorContains(t, err, "'P9_99' is not a valid id for a digital pin")
+	require.ErrorContains(t, err, "'P9_99' is not a valid id for a digital pin")
 
 	fs.Files["/sys/class/gpio/gpio66/value"].Contents = "1"
 	i, err := a.DigitalRead("P8_07")
 	assert.Equal(t, 1, i)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.Finalize())
 }
 
 func TestName(t *testing.T) {
@@ -188,7 +189,7 @@ func TestDigitalPinDirectionFileError(t *testing.T) {
 
 	// no pin added after previous problem, so no pin to unexport in finalize
 	err = a.Finalize()
-	assert.Equal(t, err, nil)
+	require.NoError(t, err)
 }
 
 func TestDigitalPinFinalizeFileError(t *testing.T) {
@@ -202,7 +203,7 @@ func TestDigitalPinFinalizeFileError(t *testing.T) {
 	a, _ := initTestAdaptorWithMockedFilesystem(mockPaths)
 
 	err := a.DigitalWrite("P9_12", 1)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	err = a.Finalize()
 	assert.Contains(t, err.Error(), "/sys/class/gpio/unexport: no such file")
@@ -233,11 +234,11 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	a := NewAdaptor()
 	a.sys.UseMockSyscall()
 	fs := a.sys.UseMockFilesystem([]string{"/dev/i2c-2"})
-	assert.NoError(t, a.Connect())
+	require.NoError(t, a.Connect())
 	con, err := a.GetI2cConnection(0xff, 2)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	_, err = con.Write([]byte{0xbf})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	fs.WithCloseError = true
 	// act
 	err = a.Finalize()

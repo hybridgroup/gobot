@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestRobotConnectionEach(t *testing.T) {
@@ -23,24 +24,24 @@ func TestRobotToJSON(t *testing.T) {
 		return nil
 	})
 	json := NewJSONRobot(r)
-	assert.Equal(t, r.Devices().Len(), len(json.Devices))
-	assert.Equal(t, len(r.Commands()), len(json.Commands))
+	assert.Len(t, json.Devices, r.Devices().Len())
+	assert.Len(t, json.Commands, len(r.Commands()))
 }
 
 func TestRobotDevicesToJSON(t *testing.T) {
 	r := newTestRobot("Robot99")
 	json := NewJSONRobot(r)
-	assert.Equal(t, r.Devices().Len(), len(json.Devices))
+	assert.Len(t, json.Devices, r.Devices().Len())
 	assert.Equal(t, "Device1", json.Devices[0].Name)
 	assert.Equal(t, "*gobot.testDriver", json.Devices[0].Driver)
 	assert.Equal(t, "Connection1", json.Devices[0].Connection)
-	assert.Equal(t, 1, len(json.Devices[0].Commands))
+	assert.Len(t, json.Devices[0].Commands, 1)
 }
 
 func TestRobotStart(t *testing.T) {
 	r := newTestRobot("Robot99")
-	assert.NoError(t, r.Start())
-	assert.NoError(t, r.Stop())
+	require.NoError(t, r.Start())
+	require.NoError(t, r.Stop())
 	assert.False(t, r.Running())
 }
 
@@ -55,13 +56,13 @@ func TestRobotStartAutoRun(t *testing.T) {
 	)
 
 	go func() {
-		assert.NoError(t, r.Start())
+		require.NoError(t, r.Start())
 	}()
 
 	time.Sleep(10 * time.Millisecond)
 	assert.True(t, r.Running())
 
 	// stop it
-	assert.NoError(t, r.Stop())
+	require.NoError(t, r.Stop())
 	assert.False(t, r.Running())
 }

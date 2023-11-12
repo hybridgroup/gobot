@@ -2,10 +2,12 @@ package i2c
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/aio"
 	"gobot.io/x/gobot/v2/drivers/gpio"
@@ -152,15 +154,15 @@ func TestGrovePiSomeRead(t *testing.T) {
 			// act
 			switch {
 			case strings.Contains(name, "DigitalRead"):
-				got, err = g.DigitalRead(fmt.Sprintf("%d", tc.usedPin))
+				got, err = g.DigitalRead(strconv.Itoa(tc.usedPin))
 			case strings.Contains(name, "AnalogRead"):
-				got, err = g.AnalogRead(fmt.Sprintf("%d", tc.usedPin))
+				got, err = g.AnalogRead(strconv.Itoa(tc.usedPin))
 			case strings.Contains(name, "UltrasonicRead"):
-				got, err = g.UltrasonicRead(fmt.Sprintf("%d", tc.usedPin), 2)
+				got, err = g.UltrasonicRead(strconv.Itoa(tc.usedPin), 2)
 			case strings.Contains(name, "FirmwareVersionRead"):
 				gotString, err = g.FirmwareVersionRead()
 			case strings.Contains(name, "DHTRead"):
-				gotF1, gotF2, err = g.DHTRead(fmt.Sprintf("%d", tc.usedPin), 1, 2)
+				gotF1, gotF2, err = g.DHTRead(strconv.Itoa(tc.usedPin), 1, 2)
 			default:
 				t.Errorf("unknown command %s", name)
 				return
@@ -168,10 +170,10 @@ func TestGrovePiSomeRead(t *testing.T) {
 			// assert
 			assert.Equal(t, tc.wantErr, err)
 			assert.Equal(t, tc.wantWritten, a.written)
-			assert.Equal(t, len(tc.simResponse), numCallsRead)
+			assert.Len(t, tc.simResponse, numCallsRead)
 			assert.Equal(t, tc.wantResult, got)
-			assert.Equal(t, tc.wantResultF1, gotF1)
-			assert.Equal(t, tc.wantResultF2, gotF2)
+			assert.InDelta(t, tc.wantResultF1, gotF1, 0.0)
+			assert.InDelta(t, tc.wantResultF2, gotF2, 0.0)
 			assert.Equal(t, tc.wantResultString, gotString)
 		})
 	}
@@ -211,15 +213,15 @@ func TestGrovePiSomeWrite(t *testing.T) {
 			// act
 			switch name {
 			case "DigitalWrite":
-				err = g.DigitalWrite(fmt.Sprintf("%d", tc.usedPin), byte(tc.usedValue))
+				err = g.DigitalWrite(strconv.Itoa(tc.usedPin), byte(tc.usedValue))
 			case "AnalogWrite":
-				err = g.AnalogWrite(fmt.Sprintf("%d", tc.usedPin), tc.usedValue)
+				err = g.AnalogWrite(strconv.Itoa(tc.usedPin), tc.usedValue)
 			default:
 				t.Errorf("unknown command %s", name)
 				return
 			}
 			// assert
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, tc.wantWritten, a.written)
 		})
 	}

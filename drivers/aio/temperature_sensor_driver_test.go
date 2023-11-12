@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestTemperatureSensorDriver(t *testing.T) {
@@ -48,8 +49,8 @@ func TestTemperatureSensorDriverNtcScaling(t *testing.T) {
 			// act
 			got, err := d.Read()
 			// assert
-			assert.NoError(t, err)
-			assert.Equal(t, tt.want, got)
+			require.NoError(t, err)
+			assert.InDelta(t, tt.want, got, 0.0)
 		})
 	}
 }
@@ -83,8 +84,8 @@ func TestTemperatureSensorDriverLinearScaling(t *testing.T) {
 			// act
 			got, err := d.Read()
 			// assert
-			assert.NoError(t, err)
-			assert.Equal(t, tt.want, got)
+			require.NoError(t, err)
+			assert.InDelta(t, tt.want, got, 0.0)
 		})
 	}
 }
@@ -104,7 +105,7 @@ func TestTempSensorPublishesTemperatureInCelsius(t *testing.T) {
 		assert.Equal(t, "31.62", fmt.Sprintf("%.2f", data.(float64)))
 		sem <- true
 	})
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 
 	select {
 	case <-sem:
@@ -112,7 +113,7 @@ func TestTempSensorPublishesTemperatureInCelsius(t *testing.T) {
 		t.Errorf(" Temperature Sensor Event \"Data\" was not published")
 	}
 
-	assert.Equal(t, 31.61532462352477, d.Value())
+	assert.InDelta(t, 31.61532462352477, d.Value(), 0.0)
 }
 
 func TestTempSensorPublishesError(t *testing.T) {
@@ -126,7 +127,7 @@ func TestTempSensorPublishesError(t *testing.T) {
 		return
 	}
 
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 
 	// expect error
 	_ = d.Once(d.Event(Error), func(data interface{}) {
@@ -148,7 +149,7 @@ func TestTempSensorHalt(t *testing.T) {
 		<-d.halt
 		close(done)
 	}()
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 	select {
 	case <-done:
 	case <-time.After(100 * time.Millisecond):

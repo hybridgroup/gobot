@@ -16,18 +16,18 @@ import (
 )
 
 type firmataBoard interface {
-	Connect(io.ReadWriteCloser) error
+	Connect(conn io.ReadWriteCloser) error
 	Disconnect() error
 	Pins() []client.Pin
-	AnalogWrite(int, int) error
-	SetPinMode(int, int) error
-	ReportAnalog(int, int) error
-	ReportDigital(int, int) error
-	DigitalWrite(int, int) error
-	I2cRead(int, int) error
-	I2cWrite(int, []byte) error
-	I2cConfig(int) error
-	ServoConfig(int, int, int) error
+	AnalogWrite(pin int, value int) (err error)
+	SetPinMode(pin int, mode int) error
+	ReportAnalog(pin int, state int) error
+	ReportDigital(pin int, state int) error
+	DigitalWrite(pin int, value int) error
+	I2cRead(address int, numBytes int) error
+	I2cWrite(address int, data []byte) error
+	I2cConfig(delay int) error
+	ServoConfig(pin int, max int, min int) error
 	WriteSysex(data []byte) error
 	gobot.Eventer
 }

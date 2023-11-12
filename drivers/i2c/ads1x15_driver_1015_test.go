@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func initTestADS1015DriverWithStubbedAdaptor() (*ADS1x15Driver, *i2cTestAdaptor) {
@@ -73,38 +74,38 @@ func TestADS1015AnalogRead(t *testing.T) {
 
 	val, err := d.AnalogRead("0")
 	assert.Equal(t, 32767, val)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	val, err = d.AnalogRead("1")
 	assert.Equal(t, 32767, val)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	val, err = d.AnalogRead("2")
 	assert.Equal(t, 32767, val)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	val, err = d.AnalogRead("3")
 	assert.Equal(t, 32767, val)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	val, err = d.AnalogRead("0-1")
 	assert.Equal(t, 32767, val)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	val, err = d.AnalogRead("0-3")
 	assert.Equal(t, 32767, val)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	val, err = d.AnalogRead("1-3")
 	assert.Equal(t, 32767, val)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	val, err = d.AnalogRead("2-3")
 	assert.Equal(t, 32767, val)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	_, err = d.AnalogRead("3-2")
-	assert.NotNil(t, err.Error())
+	require.Error(t, err)
 }
 
 func TestADS1x15AnalogReadError(t *testing.T) {
@@ -115,14 +116,14 @@ func TestADS1x15AnalogReadError(t *testing.T) {
 	}
 
 	_, err := d.AnalogRead("0")
-	assert.ErrorContains(t, err, "read error")
+	require.ErrorContains(t, err, "read error")
 }
 
 func TestADS1x15AnalogReadInvalidPin(t *testing.T) {
 	d, _ := initTestADS1015DriverWithStubbedAdaptor()
 
 	_, err := d.AnalogRead("99")
-	assert.ErrorContains(t, err, "Invalid channel (99), must be between 0 and 3")
+	require.ErrorContains(t, err, "Invalid channel (99), must be between 0 and 3")
 }
 
 func TestADS1x15AnalogReadWriteError(t *testing.T) {
@@ -133,41 +134,41 @@ func TestADS1x15AnalogReadWriteError(t *testing.T) {
 	}
 
 	_, err := d.AnalogRead("0")
-	assert.ErrorContains(t, err, "write error")
+	require.ErrorContains(t, err, "write error")
 
 	_, err = d.AnalogRead("0-1")
-	assert.ErrorContains(t, err, "write error")
+	require.ErrorContains(t, err, "write error")
 
 	_, err = d.AnalogRead("2-3")
-	assert.ErrorContains(t, err, "write error")
+	require.ErrorContains(t, err, "write error")
 }
 
 func TestADS1x15ReadInvalidChannel(t *testing.T) {
 	d, _ := initTestADS1015DriverWithStubbedAdaptor()
 
 	_, err := d.Read(9, 1, 1600)
-	assert.ErrorContains(t, err, "Invalid channel (9), must be between 0 and 3")
+	require.ErrorContains(t, err, "Invalid channel (9), must be between 0 and 3")
 }
 
 func TestADS1x15ReadInvalidGain(t *testing.T) {
 	d, _ := initTestADS1015DriverWithStubbedAdaptor()
 
 	_, err := d.Read(0, 8, 1600)
-	assert.ErrorContains(t, err, "Gain (8) must be one of: [0 1 2 3 4 5 6 7]")
+	require.ErrorContains(t, err, "Gain (8) must be one of: [0 1 2 3 4 5 6 7]")
 }
 
 func TestADS1x15ReadInvalidDataRate(t *testing.T) {
 	d, _ := initTestADS1015DriverWithStubbedAdaptor()
 
 	_, err := d.Read(0, 1, 321)
-	assert.ErrorContains(t, err, "Invalid data rate (321). Accepted values: [128 250 490 920 1600 2400 3300]")
+	require.ErrorContains(t, err, "Invalid data rate (321). Accepted values: [128 250 490 920 1600 2400 3300]")
 }
 
 func TestADS1x15ReadDifferenceInvalidChannel(t *testing.T) {
 	d, _ := initTestADS1015DriverWithStubbedAdaptor()
 
 	_, err := d.ReadDifference(9, 1, 1600)
-	assert.ErrorContains(t, err, "Invalid channel (9), must be between 0 and 3")
+	require.ErrorContains(t, err, "Invalid channel (9), must be between 0 and 3")
 }
 
 func TestADS1015_rawRead(t *testing.T) {
@@ -269,10 +270,10 @@ func TestADS1015_rawRead(t *testing.T) {
 			// act
 			got, err := d.rawRead(channel, channelOffset, tt.gain, tt.dataRate)
 			// assert
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, tt.want, got)
 			assert.Equal(t, 3, numCallsRead)
-			assert.Equal(t, 6, len(a.written))
+			assert.Len(t, a.written, 6)
 			assert.Equal(t, uint8(ads1x15PointerConfig), a.written[0])
 			assert.Equal(t, tt.wantConfig[0], a.written[1])            // MSByte: OS, MUX, PGA, MODE
 			assert.Equal(t, tt.wantConfig[1], a.written[2])            // LSByte: DR, COMP_*

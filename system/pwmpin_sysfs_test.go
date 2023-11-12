@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -35,39 +36,39 @@ func TestPwmPin(t *testing.T) {
 	assert.Equal(t, "10", pin.pin)
 
 	err := pin.Unexport()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "10", fs.Files["/sys/class/pwm/pwmchip0/unexport"].Contents)
 
 	err = pin.Export()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "10", fs.Files["/sys/class/pwm/pwmchip0/export"].Contents)
 
-	assert.NoError(t, pin.SetPolarity(false))
+	require.NoError(t, pin.SetPolarity(false))
 	assert.Equal(t, inverted, fs.Files["/sys/class/pwm/pwmchip0/pwm10/polarity"].Contents)
 	pol, _ := pin.Polarity()
 	assert.False(t, pol)
-	assert.NoError(t, pin.SetPolarity(true))
+	require.NoError(t, pin.SetPolarity(true))
 	assert.Equal(t, normal, fs.Files["/sys/class/pwm/pwmchip0/pwm10/polarity"].Contents)
 	pol, _ = pin.Polarity()
 	assert.True(t, pol)
 
 	assert.NotEqual(t, "1", fs.Files["/sys/class/pwm/pwmchip0/pwm10/enable"].Contents)
 	err = pin.SetEnabled(true)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "1", fs.Files["/sys/class/pwm/pwmchip0/pwm10/enable"].Contents)
 	err = pin.SetPolarity(true)
-	assert.ErrorContains(t, err, "Cannot set PWM polarity when enabled")
+	require.ErrorContains(t, err, "Cannot set PWM polarity when enabled")
 
 	fs.Files["/sys/class/pwm/pwmchip0/pwm10/period"].Contents = "6"
 	data, _ := pin.Period()
 	assert.Equal(t, uint32(6), data)
-	assert.NoError(t, pin.SetPeriod(100000))
+	require.NoError(t, pin.SetPeriod(100000))
 	data, _ = pin.Period()
 	assert.Equal(t, uint32(100000), data)
 
 	assert.NotEqual(t, "1", fs.Files["/sys/class/pwm/pwmchip0/pwm10/duty_cycle"].Contents)
 	err = pin.SetDutyCycle(100)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "100", fs.Files["/sys/class/pwm/pwmchip0/pwm10/duty_cycle"].Contents)
 	data, _ = pin.DutyCycle()
 	assert.Equal(t, uint32(100), data)
@@ -88,7 +89,7 @@ func TestPwmPinAlreadyExported(t *testing.T) {
 	}
 
 	// no error indicates that the pin was already exported
-	assert.NoError(t, pin.Export())
+	require.NoError(t, pin.Export())
 }
 
 func TestPwmPinExportError(t *testing.T) {
@@ -107,7 +108,7 @@ func TestPwmPinExportError(t *testing.T) {
 
 	// no error indicates that the pin was already exported
 	err := pin.Export()
-	assert.ErrorContains(t, err, "Export() failed for id 10 with  : bad address")
+	require.ErrorContains(t, err, "Export() failed for id 10 with  : bad address")
 }
 
 func TestPwmPinUnxportError(t *testing.T) {
@@ -125,7 +126,7 @@ func TestPwmPinUnxportError(t *testing.T) {
 	}
 
 	err := pin.Unexport()
-	assert.ErrorContains(t, err, "Unexport() failed for id 10 with  : device or resource busy")
+	require.ErrorContains(t, err, "Unexport() failed for id 10 with  : device or resource busy")
 }
 
 func TestPwmPinPeriodError(t *testing.T) {
@@ -143,7 +144,7 @@ func TestPwmPinPeriodError(t *testing.T) {
 	}
 
 	_, err := pin.Period()
-	assert.ErrorContains(t, err, "Period() failed for id 10 with  : device or resource busy")
+	require.ErrorContains(t, err, "Period() failed for id 10 with  : device or resource busy")
 }
 
 func TestPwmPinPolarityError(t *testing.T) {
@@ -161,7 +162,7 @@ func TestPwmPinPolarityError(t *testing.T) {
 	}
 
 	_, err := pin.Polarity()
-	assert.ErrorContains(t, err, "Polarity() failed for id 10 with  : device or resource busy")
+	require.ErrorContains(t, err, "Polarity() failed for id 10 with  : device or resource busy")
 }
 
 func TestPwmPinDutyCycleError(t *testing.T) {
@@ -179,5 +180,5 @@ func TestPwmPinDutyCycleError(t *testing.T) {
 	}
 
 	_, err := pin.DutyCycle()
-	assert.ErrorContains(t, err, "DutyCycle() failed for id 10 with  : device or resource busy")
+	require.ErrorContains(t, err, "DutyCycle() failed for id 10 with  : device or resource busy")
 }

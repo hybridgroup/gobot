@@ -12,14 +12,14 @@ import (
 )
 
 type lw interface {
-	digitalWrite(uint8, uint8) error
-	pinMode(uint8, uint8) error
+	digitalWrite(pin uint8, state uint8) error
+	pinMode(pin uint8, mode uint8) error
 	pwmInit() error
 	pwmStop() error
-	pwmUpdateCompare(uint8, uint8) error
-	pwmUpdatePrescaler(uint) error
+	pwmUpdateCompare(channelA uint8, channelb uint8) error
+	pwmUpdatePrescaler(value uint) error
 	servoInit() error
-	servoUpdateLocation(uint8, uint8) error
+	servoUpdateLocation(locationA uint8, locationB uint8) error
 	i2cInit() error
 	i2cStart(address7bit uint8, direction uint8) error
 	i2cWrite(sendBuffer []byte, length int, endWithStop uint8) error

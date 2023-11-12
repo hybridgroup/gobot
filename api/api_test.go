@@ -80,8 +80,8 @@ func TestIndex(t *testing.T) {
 
 	a.ServeHTTP(response, request)
 
-	assert.Equal(t, response.Code, http.StatusMovedPermanently)
-	assert.Equal(t, response.Header()["Location"][0], "/index.html")
+	assert.Equal(t, http.StatusMovedPermanently, response.Code)
+	assert.Equal(t, "/index.html", response.Header()["Location"][0])
 }
 
 func TestMcp(t *testing.T) {
@@ -144,7 +144,7 @@ func TestRobots(t *testing.T) {
 
 	var body map[string]interface{}
 	_ = json.NewDecoder(response.Body).Decode(&body)
-	assert.Equal(t, 3, len(body["robots"].([]interface{})))
+	assert.Len(t, body["robots"].([]interface{}), 3)
 }
 
 func TestRobot(t *testing.T) {
@@ -177,7 +177,7 @@ func TestRobotDevices(t *testing.T) {
 
 	var body map[string]interface{}
 	_ = json.NewDecoder(response.Body).Decode(&body)
-	assert.Equal(t, 3, len(body["devices"].([]interface{})))
+	assert.Len(t, body["devices"].([]interface{}), 3)
 
 	// unknown robot
 	request, _ = http.NewRequest("GET", "/api/robots/UnknownRobot1/devices", nil)
@@ -283,7 +283,7 @@ func TestRobotDeviceCommands(t *testing.T) {
 
 	var body map[string]interface{}
 	_ = json.NewDecoder(response.Body).Decode(&body)
-	assert.Equal(t, 2, len(body["commands"].([]interface{})))
+	assert.Len(t, body["commands"].([]interface{}), 2)
 
 	// unknown device
 	request, _ = http.NewRequest("GET",
@@ -345,7 +345,7 @@ func TestRobotConnections(t *testing.T) {
 
 	var body map[string]interface{}
 	_ = json.NewDecoder(response.Body).Decode(&body)
-	assert.Equal(t, 3, len(body["connections"].([]interface{})))
+	assert.Len(t, body["connections"].([]interface{}), 3)
 
 	// unknown robot
 	request, _ = http.NewRequest("GET", "/api/robots/UnknownRobot1/connections", nil)

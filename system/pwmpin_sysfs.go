@@ -91,7 +91,7 @@ func (p *pwmPinSysFs) SetEnabled(enable bool) error {
 	if enable {
 		enableVal = 1
 	}
-	if _, err := p.write(p.fs, p.pwmEnablePath(), []byte(fmt.Sprintf("%v", enableVal))); err != nil {
+	if _, err := p.write(p.fs, p.pwmEnablePath(), []byte(strconv.Itoa(enableVal))); err != nil {
 		if pwmDebug {
 			p.printState()
 		}
@@ -158,6 +158,7 @@ func (p *pwmPinSysFs) Period() (uint32, error) {
 
 // SetPeriod writes the current period in nanoseconds
 func (p *pwmPinSysFs) SetPeriod(period uint32) error {
+	//nolint:perfsprint // ok here
 	if _, err := p.write(p.fs, p.pwmPeriodPath(), []byte(fmt.Sprintf("%v", period))); err != nil {
 
 		if pwmDebug {
@@ -181,6 +182,7 @@ func (p *pwmPinSysFs) DutyCycle() (uint32, error) {
 
 // SetDutyCycle writes the duty cycle in nanoseconds
 func (p *pwmPinSysFs) SetDutyCycle(duty uint32) error {
+	//nolint:perfsprint // ok here
 	if _, err := p.write(p.fs, p.pwmDutyCyclePath(), []byte(fmt.Sprintf("%v", duty))); err != nil {
 		if pwmDebug {
 			p.printState()

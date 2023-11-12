@@ -37,7 +37,7 @@ type MAVLinkMessage interface {
 	Len() uint8
 	Crc() uint8
 	Pack() []byte
-	Decode([]byte)
+	Decode(buf []byte)
 }
 
 // A MAVLinkPacket represents a raw packet received from a micro air vehicle

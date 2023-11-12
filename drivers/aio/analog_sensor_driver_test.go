@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -37,7 +38,7 @@ func TestAnalogSensorDriver(t *testing.T) {
 	assert.Nil(t, ret["err"])
 
 	ret = d.Command("Read")(nil).(map[string]interface{})
-	assert.Equal(t, 247.0, ret["val"].(float64))
+	assert.InDelta(t, 247.0, ret["val"].(float64), 0.0)
 	assert.Nil(t, ret["err"])
 
 	// refresh value on read
@@ -47,11 +48,11 @@ func TestAnalogSensorDriver(t *testing.T) {
 		val = 150
 		return
 	}
-	assert.Equal(t, 0.0, d.Value())
+	assert.InDelta(t, 0.0, d.Value(), 0.0)
 	val, err := d.Read()
-	assert.NoError(t, err)
-	assert.Equal(t, 150.0, val)
-	assert.Equal(t, 150.0, d.Value())
+	require.NoError(t, err)
+	assert.InDelta(t, 150.0, val, 0.0)
+	assert.InDelta(t, 150.0, d.Value(), 0.0)
 	assert.Equal(t, 150, d.RawValue())
 }
 
@@ -85,8 +86,8 @@ func TestAnalogSensorDriverWithLinearScaler(t *testing.T) {
 			// act
 			got, err := d.Read()
 			// assert
-			assert.NoError(t, err)
-			assert.Equal(t, tt.want, got)
+			require.NoError(t, err)
+			assert.InDelta(t, tt.want, got, 0.0)
 		})
 	}
 }
@@ -104,7 +105,7 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 	})
 
 	_ = d.Once(d.Event(Value), func(data interface{}) {
-		assert.Equal(t, 10000.0, data.(float64))
+		assert.InDelta(t, 10000.0, data.(float64), 0.0)
 		sem <- true
 	})
 
@@ -114,7 +115,7 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 		return
 	}
 
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 
 	select {
 	case <-sem:
@@ -170,7 +171,7 @@ func TestAnalogSensorDriverHalt(t *testing.T) {
 		<-d.halt
 		close(done)
 	}()
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 	select {
 	case <-done:
 	case <-time.After(100 * time.Millisecond):

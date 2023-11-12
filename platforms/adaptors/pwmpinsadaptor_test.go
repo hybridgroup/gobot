@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/gpio"
 	"gobot.io/x/gobot/v2/system"
@@ -117,12 +118,12 @@ func TestPWMPinsConnect(t *testing.T) {
 	assert.Equal(t, (map[string]gobot.PWMPinner)(nil), a.pins)
 
 	err := a.PwmWrite("33", 1)
-	assert.ErrorContains(t, err, "not connected")
+	require.ErrorContains(t, err, "not connected")
 
 	err = a.Connect()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.NotEqual(t, (map[string]gobot.PWMPinner)(nil), a.pins)
-	assert.Equal(t, 0, len(a.pins))
+	assert.Empty(t, a.pins)
 }
 
 func TestPWMPinsFinalize(t *testing.T) {
@@ -133,27 +134,27 @@ func TestPWMPinsFinalize(t *testing.T) {
 	fs.Files[pwmPeriodPath].Contents = "0"
 	fs.Files[pwmDutyCyclePath].Contents = "0"
 	// assert that finalize before connect is working
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.Finalize())
 	// arrange
-	assert.NoError(t, a.Connect())
-	assert.NoError(t, a.PwmWrite("33", 1))
-	assert.Equal(t, 1, len(a.pins))
+	require.NoError(t, a.Connect())
+	require.NoError(t, a.PwmWrite("33", 1))
+	assert.Len(t, a.pins, 1)
 	// act
 	err := a.Finalize()
 	// assert
-	assert.NoError(t, err)
-	assert.Equal(t, 0, len(a.pins))
+	require.NoError(t, err)
+	assert.Empty(t, a.pins)
 	// assert that finalize after finalize is working
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.Finalize())
 	// arrange missing sysfs file
-	assert.NoError(t, a.Connect())
-	assert.NoError(t, a.PwmWrite("33", 2))
+	require.NoError(t, a.Connect())
+	require.NoError(t, a.PwmWrite("33", 2))
 	delete(fs.Files, pwmUnexportPath)
 	err = a.Finalize()
 	assert.Contains(t, err.Error(), pwmUnexportPath+": no such file")
 	// arrange write error
-	assert.NoError(t, a.Connect())
-	assert.NoError(t, a.PwmWrite("33", 2))
+	require.NoError(t, a.Connect())
+	require.NoError(t, a.PwmWrite("33", 2))
 	fs.WithWriteError = true
 	err = a.Finalize()
 	assert.Contains(t, err.Error(), "write error")
@@ -162,31 +163,31 @@ func TestPWMPinsFinalize(t *testing.T) {
 func TestPWMPinsReConnect(t *testing.T) {
 	// arrange
 	a, _ := initTestPWMPinsAdaptorWithMockedFilesystem(pwmMockPaths)
-	assert.NoError(t, a.PwmWrite("33", 1))
-	assert.Equal(t, 1, len(a.pins))
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.PwmWrite("33", 1))
+	assert.Len(t, a.pins, 1)
+	require.NoError(t, a.Finalize())
 	// act
 	err := a.Connect()
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, a.pins)
-	assert.Equal(t, 0, len(a.pins))
+	assert.Empty(t, a.pins)
 }
 
 func TestPwmWrite(t *testing.T) {
 	a, fs := initTestPWMPinsAdaptorWithMockedFilesystem(pwmMockPaths)
 
 	err := a.PwmWrite("33", 100)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	assert.Equal(t, "44", fs.Files[pwmExportPath].Contents)
 	assert.Equal(t, "1", fs.Files[pwmEnablePath].Contents)
-	assert.Equal(t, fmt.Sprintf("%d", a.periodDefault), fs.Files[pwmPeriodPath].Contents)
+	assert.Equal(t, fmt.Sprintf("%d", a.periodDefault), fs.Files[pwmPeriodPath].Contents) //nolint:perfsprint // ok here
 	assert.Equal(t, "3921568", fs.Files[pwmDutyCyclePath].Contents)
 	assert.Equal(t, "normal", fs.Files[pwmPolarityPath].Contents)
 
 	err = a.PwmWrite("notexist", 42)
-	assert.ErrorContains(t, err, "'notexist' is not a valid id of a PWM pin")
+	require.ErrorContains(t, err, "'notexist' is not a valid id of a PWM pin")
 
 	fs.WithWriteError = true
 	err = a.PwmWrite("33", 100)
@@ -204,17 +205,17 @@ func TestServoWrite(t *testing.T) {
 	err := a.ServoWrite("33", 0)
 	assert.Equal(t, "44", fs.Files[pwmExportPath].Contents)
 	assert.Equal(t, "1", fs.Files[pwmEnablePath].Contents)
-	assert.Equal(t, fmt.Sprintf("%d", a.periodDefault), fs.Files[pwmPeriodPath].Contents)
+	assert.Equal(t, fmt.Sprintf("%d", a.periodDefault), fs.Files[pwmPeriodPath].Contents) //nolint:perfsprint // ok here
 	assert.Equal(t, "500000", fs.Files[pwmDutyCyclePath].Contents)
 	assert.Equal(t, "normal", fs.Files[pwmPolarityPath].Contents)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	err = a.ServoWrite("33", 180)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "2000000", fs.Files[pwmDutyCyclePath].Contents)
 
 	err = a.ServoWrite("notexist", 42)
-	assert.ErrorContains(t, err, "'notexist' is not a valid id of a PWM pin")
+	require.ErrorContains(t, err, "'notexist' is not a valid id of a PWM pin")
 
 	fs.WithWriteError = true
 	err = a.ServoWrite("33", 100)
@@ -233,25 +234,25 @@ func TestSetPeriod(t *testing.T) {
 	// act
 	err := a.SetPeriod("33", newPeriod)
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "44", fs.Files[pwmExportPath].Contents)
 	assert.Equal(t, "1", fs.Files[pwmEnablePath].Contents)
-	assert.Equal(t, fmt.Sprintf("%d", newPeriod), fs.Files[pwmPeriodPath].Contents)
+	assert.Equal(t, fmt.Sprintf("%d", newPeriod), fs.Files[pwmPeriodPath].Contents) //nolint:perfsprint // ok here
 	assert.Equal(t, "0", fs.Files[pwmDutyCyclePath].Contents)
 	assert.Equal(t, "normal", fs.Files[pwmPolarityPath].Contents)
 
 	// arrange test for automatic adjustment of duty cycle to lower value
 	err = a.PwmWrite("33", 127) // 127 is a little bit smaller than 50% of period
-	assert.NoError(t, err)
-	assert.Equal(t, fmt.Sprintf("%d", 1270000), fs.Files[pwmDutyCyclePath].Contents)
+	require.NoError(t, err)
+	assert.Equal(t, strconv.Itoa(1270000), fs.Files[pwmDutyCyclePath].Contents)
 	newPeriod = newPeriod / 10
 
 	// act
 	err = a.SetPeriod("33", newPeriod)
 
 	// assert
-	assert.NoError(t, err)
-	assert.Equal(t, fmt.Sprintf("%d", 127000), fs.Files[pwmDutyCyclePath].Contents)
+	require.NoError(t, err)
+	assert.Equal(t, strconv.Itoa(127000), fs.Files[pwmDutyCyclePath].Contents)
 
 	// arrange test for automatic adjustment of duty cycle to higher value
 	newPeriod = newPeriod * 20
@@ -260,13 +261,13 @@ func TestSetPeriod(t *testing.T) {
 	err = a.SetPeriod("33", newPeriod)
 
 	// assert
-	assert.NoError(t, err)
-	assert.Equal(t, fmt.Sprintf("%d", 2540000), fs.Files[pwmDutyCyclePath].Contents)
+	require.NoError(t, err)
+	assert.Equal(t, strconv.Itoa(2540000), fs.Files[pwmDutyCyclePath].Contents)
 
 	// act
 	err = a.SetPeriod("not_exist", newPeriod)
 	// assert
-	assert.ErrorContains(t, err, "'not_exist' is not a valid id of a PWM pin")
+	require.ErrorContains(t, err, "'not_exist' is not a valid id of a PWM pin")
 }
 
 func Test_PWMPin(t *testing.T) {
@@ -346,7 +347,7 @@ func Test_PWMPin(t *testing.T) {
 			got, err := a.PWMPin(tc.pin)
 			// assert
 			if tc.wantErr == "" {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.NotNil(t, got)
 			} else {
 				if !strings.Contains(err.Error(), tc.wantErr) {

@@ -47,22 +47,22 @@ const (
 
 // PwmWriter interface represents an Adaptor which has Pwm capabilities
 type PwmWriter interface {
-	PwmWrite(string, byte) (err error)
+	PwmWrite(pin string, val byte) (err error)
 }
 
 // ServoWriter interface represents an Adaptor which has Servo capabilities
 type ServoWriter interface {
-	ServoWrite(string, byte) (err error)
+	ServoWrite(pin string, val byte) (err error)
 }
 
 // DigitalWriter interface represents an Adaptor which has DigitalWrite capabilities
 type DigitalWriter interface {
-	DigitalWrite(string, byte) (err error)
+	DigitalWrite(pin string, val byte) (err error)
 }
 
 // DigitalReader interface represents an Adaptor which has DigitalRead capabilities
 type DigitalReader interface {
-	DigitalRead(string) (val int, err error)
+	DigitalRead(pin string) (val int, err error)
 }
 
 // Driver implements the interface gobot.Driver.

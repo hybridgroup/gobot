@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 	common "gobot.io/x/gobot/v2/platforms/mavlink/common"
 )
@@ -59,11 +60,11 @@ func TestMavlinkDriverStart(t *testing.T) {
 		err <- data.(error)
 	})
 
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 
 	select {
 	case p := <-packet:
-		assert.NoError(t, d.SendPacket(p))
+		require.NoError(t, d.SendPacket(p))
 
 	case <-time.After(100 * time.Millisecond):
 		t.Errorf("packet was not emitted")
@@ -82,5 +83,5 @@ func TestMavlinkDriverStart(t *testing.T) {
 
 func TestMavlinkDriverHalt(t *testing.T) {
 	d := initTestMavlinkDriver()
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 }

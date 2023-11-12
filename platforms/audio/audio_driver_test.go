@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -20,9 +21,9 @@ func TestAudioDriver(t *testing.T) {
 
 	assert.NotNil(t, d.Connection())
 
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 }
 
 func TestAudioDriverName(t *testing.T) {
@@ -46,5 +47,5 @@ func TestAudioDriverSoundWithDefaultFilename(t *testing.T) {
 	d := NewDriver(NewAdaptor(), "../../examples/laser.mp3")
 
 	errors := d.Play()
-	assert.Equal(t, 0, len(errors))
+	assert.Empty(t, errors)
 }

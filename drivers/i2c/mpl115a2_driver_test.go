@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -78,18 +79,18 @@ func TestMPL115A2ReadData(t *testing.T) {
 	press, errP := d.Pressure()
 	temp, errT := d.Temperature()
 	// assert
-	assert.NoError(t, errP)
-	assert.NoError(t, errT)
+	require.NoError(t, errP)
+	require.NoError(t, errT)
 	assert.Equal(t, 2, readCallCounter)
-	assert.Equal(t, 6, len(a.written))
+	assert.Len(t, a.written, 6)
 	assert.Equal(t, uint8(0x12), a.written[0])
 	assert.Equal(t, uint8(0x00), a.written[1])
 	assert.Equal(t, uint8(0x00), a.written[2])
 	assert.Equal(t, uint8(0x12), a.written[3])
 	assert.Equal(t, uint8(0x00), a.written[4])
 	assert.Equal(t, uint8(0x00), a.written[5])
-	assert.Equal(t, float32(96.585915), press)
-	assert.Equal(t, float32(23.317757), temp)
+	assert.InDelta(t, float32(96.585915), press, 0.0)
+	assert.InDelta(t, float32(23.317757), temp, 0.0)
 }
 
 func TestMPL115A2ReadDataError(t *testing.T) {
@@ -101,7 +102,7 @@ func TestMPL115A2ReadDataError(t *testing.T) {
 	}
 	_, err := d.Pressure()
 
-	assert.ErrorContains(t, err, "write error")
+	require.ErrorContains(t, err, "write error")
 }
 
 func TestMPL115A2_initialization(t *testing.T) {
@@ -124,12 +125,12 @@ func TestMPL115A2_initialization(t *testing.T) {
 	// act, assert - initialization() must be called on Start()
 	err := d.Start()
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, 1, readCallCounter)
-	assert.Equal(t, 1, len(a.written))
+	assert.Len(t, a.written, 1)
 	assert.Equal(t, uint8(0x04), a.written[0])
-	assert.Equal(t, float32(2009.75), d.a0)
-	assert.Equal(t, float32(-2.3758545), d.b1)
-	assert.Equal(t, float32(-0.9204712), d.b2)
-	assert.Equal(t, float32(0.0007901192), d.c12)
+	assert.InDelta(t, float32(2009.75), d.a0, 0.0)
+	assert.InDelta(t, float32(-2.3758545), d.b1, 0.0)
+	assert.InDelta(t, float32(-0.9204712), d.b2, 0.0)
+	assert.InDelta(t, float32(0.0007901192), d.c12, 0.0)
 }

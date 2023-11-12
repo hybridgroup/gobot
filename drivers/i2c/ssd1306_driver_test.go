@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -47,7 +48,7 @@ func TestSSD1306StartDefault(t *testing.T) {
 	)
 	d := NewSSD1306Driver(newI2cTestAdaptor(),
 		WithSSD1306DisplayWidth(width), WithSSD1306DisplayHeight(height), WithSSD1306ExternalVCC(externalVCC))
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 }
 
 func TestSSD1306Start128x32(t *testing.T) {
@@ -58,7 +59,7 @@ func TestSSD1306Start128x32(t *testing.T) {
 	)
 	d := NewSSD1306Driver(newI2cTestAdaptor(),
 		WithSSD1306DisplayWidth(width), WithSSD1306DisplayHeight(height), WithSSD1306ExternalVCC(externalVCC))
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 }
 
 func TestSSD1306Start96x16(t *testing.T) {
@@ -69,7 +70,7 @@ func TestSSD1306Start96x16(t *testing.T) {
 	)
 	d := NewSSD1306Driver(newI2cTestAdaptor(),
 		WithSSD1306DisplayWidth(width), WithSSD1306DisplayHeight(height), WithSSD1306ExternalVCC(externalVCC))
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 }
 
 func TestSSD1306StartExternalVCC(t *testing.T) {
@@ -80,7 +81,7 @@ func TestSSD1306StartExternalVCC(t *testing.T) {
 	)
 	d := NewSSD1306Driver(newI2cTestAdaptor(),
 		WithSSD1306DisplayWidth(width), WithSSD1306DisplayHeight(height), WithSSD1306ExternalVCC(externalVCC))
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 }
 
 func TestSSD1306StartSizeError(t *testing.T) {
@@ -91,12 +92,12 @@ func TestSSD1306StartSizeError(t *testing.T) {
 	)
 	d := NewSSD1306Driver(newI2cTestAdaptor(),
 		WithSSD1306DisplayWidth(width), WithSSD1306DisplayHeight(height), WithSSD1306ExternalVCC(externalVCC))
-	assert.ErrorContains(t, d.Start(), "128x54 resolution is unsupported, supported resolutions: 128x64, 128x32, 96x16")
+	require.ErrorContains(t, d.Start(), "128x54 resolution is unsupported, supported resolutions: 128x64, 128x32, 96x16")
 }
 
 func TestSSD1306Halt(t *testing.T) {
 	s, _ := initTestSSD1306DriverWithStubbedAdaptor(128, 64, false)
-	assert.NoError(t, s.Halt())
+	require.NoError(t, s.Halt())
 }
 
 func TestSSD1306Options(t *testing.T) {
@@ -109,17 +110,17 @@ func TestSSD1306Options(t *testing.T) {
 func TestSSD1306Display(t *testing.T) {
 	s, _ := initTestSSD1306DriverWithStubbedAdaptor(96, 16, false)
 	_ = s.Start()
-	assert.NoError(t, s.Display())
+	require.NoError(t, s.Display())
 }
 
 func TestSSD1306ShowImage(t *testing.T) {
 	s, _ := initTestSSD1306DriverWithStubbedAdaptor(128, 64, false)
 	_ = s.Start()
 	img := image.NewRGBA(image.Rect(0, 0, 640, 480))
-	assert.ErrorContains(t, s.ShowImage(img), "image must match display width and height: 128x64")
+	require.ErrorContains(t, s.ShowImage(img), "image must match display width and height: 128x64")
 
 	img = image.NewRGBA(image.Rect(0, 0, 128, 64))
-	assert.NoError(t, s.ShowImage(img))
+	require.NoError(t, s.ShowImage(img))
 }
 
 func TestSSD1306Command(t *testing.T) {
@@ -135,7 +136,7 @@ func TestSSD1306Command(t *testing.T) {
 		return 0, nil
 	}
 	err := s.command(0xFF)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestSSD1306Commands(t *testing.T) {
@@ -151,7 +152,7 @@ func TestSSD1306Commands(t *testing.T) {
 		return 0, nil
 	}
 	err := s.commands([]byte{0x00, 0xFF})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestSSD1306On(t *testing.T) {
@@ -167,7 +168,7 @@ func TestSSD1306On(t *testing.T) {
 		return 0, nil
 	}
 	err := s.On()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestSSD1306Off(t *testing.T) {
@@ -183,7 +184,7 @@ func TestSSD1306Off(t *testing.T) {
 		return 0, nil
 	}
 	err := s.Off()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestSSD1306Reset(t *testing.T) {
@@ -200,7 +201,7 @@ func TestSSD1306Reset(t *testing.T) {
 		return 0, nil
 	}
 	err := s.Reset()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 // COMMANDS

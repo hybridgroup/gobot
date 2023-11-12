@@ -64,18 +64,18 @@ func TestAfter(t *testing.T) {
 }
 
 func TestFromScale(t *testing.T) {
-	assert.Equal(t, 0.5, FromScale(5, 0, 10))
+	assert.InDelta(t, 0.5, FromScale(5, 0, 10), 0.0)
 }
 
 func TestToScale(t *testing.T) {
-	assert.Equal(t, 10.0, ToScale(500, 0, 10))
-	assert.Equal(t, 0.0, ToScale(-1, 0, 10))
-	assert.Equal(t, 5.0, ToScale(0.5, 0, 10))
+	assert.InDelta(t, 10.0, ToScale(500, 0, 10), 0.0)
+	assert.InDelta(t, 0.0, ToScale(-1, 0, 10), 0.0)
+	assert.InDelta(t, 5.0, ToScale(0.5, 0, 10), 0.0)
 }
 
 func TestRescale(t *testing.T) {
-	assert.Equal(t, 5.0, Rescale(500, 0, 1000, 0, 10))
-	assert.Equal(t, 490.0, Rescale(-1.0, -1, 0, 490, 350))
+	assert.InDelta(t, 5.0, Rescale(500, 0, 1000, 0, 10), 0.0)
+	assert.InDelta(t, 490.0, Rescale(-1.0, -1, 0, 490, 350), 0.0)
 }
 
 func TestRand(t *testing.T) {

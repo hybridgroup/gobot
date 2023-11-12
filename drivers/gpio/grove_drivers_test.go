@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -91,7 +92,7 @@ func TestDriverPublishesError(t *testing.T) {
 		}
 		testAdaptor.digitalReadFunc = returnErr
 
-		assert.NoError(t, driver.Start())
+		require.NoError(t, driver.Start())
 
 		// expect error
 		_ = driver.Once(driver.Event(Error), func(data interface{}) {

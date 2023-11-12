@@ -43,31 +43,31 @@ type Connection gobot.SpiOperations
 // optional SPI params such as which SPI bus it wants to use.
 type Config interface {
 	// SetBusNumber sets which bus to use
-	SetBusNumber(int)
+	SetBusNumber(bus int)
 
 	// GetBusNumberOrDefault gets which bus to use
 	GetBusNumberOrDefault(def int) int
 
 	// SetChipNumber sets which chip to use
-	SetChipNumber(int)
+	SetChipNumber(chip int)
 
 	// GetChipNumberOrDefault gets which chip to use
 	GetChipNumberOrDefault(def int) int
 
 	// SetMode sets which mode to use
-	SetMode(int)
+	SetMode(mode int)
 
 	// GetModeOrDefault gets which mode to use
 	GetModeOrDefault(def int) int
 
 	// SetUsedBits sets how many bits to use
-	SetBitCount(int)
+	SetBitCount(count int)
 
 	// GetBitCountOrDefault gets how many bits to use
 	GetBitCountOrDefault(def int) int
 
 	// SetSpeed sets which speed to use (in Hz)
-	SetSpeed(int64)
+	SetSpeed(speed int64)
 
 	// GetSpeedOrDefault gets which speed to use (in Hz)
 	GetSpeedOrDefault(def int64) int64

@@ -10,6 +10,7 @@ import (
 
 	"github.com/donovanhide/eventsource"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -88,13 +89,13 @@ func TestNewAdaptor(t *testing.T) {
 
 func TestAdaptorConnect(t *testing.T) {
 	a := initTestAdaptor()
-	assert.NoError(t, a.Connect())
+	require.NoError(t, a.Connect())
 }
 
 func TestAdaptorFinalize(t *testing.T) {
 	a := initTestAdaptor()
 	_ = a.Connect()
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.Finalize())
 }
 
 func TestAdaptorAnalogRead(t *testing.T) {
@@ -254,7 +255,7 @@ func TestAdaptorFunction(t *testing.T) {
 	a.setAPIServer(testServer.URL)
 
 	_, err := a.Function("hello", "")
-	assert.ErrorContains(t, err, "timeout")
+	require.ErrorContains(t, err, "timeout")
 
 	testServer.Close()
 }
@@ -309,7 +310,7 @@ func TestAdaptorVariable(t *testing.T) {
 	a.setAPIServer(testServer.URL)
 
 	_, err := a.Variable("not_existent")
-	assert.ErrorContains(t, err, "Variable not found")
+	require.ErrorContains(t, err, "Variable not found")
 
 	testServer.Close()
 }
@@ -386,14 +387,14 @@ func TestAdaptorEventStream(t *testing.T) {
 	assert.Equal(t, "https://api.particle.io/v1/devices/myDevice/events/ping?access_token=token", url)
 
 	_, err := a.EventStream("nothing", "ping")
-	assert.ErrorContains(t, err, "source param should be: all, devices or device")
+	require.ErrorContains(t, err, "source param should be: all, devices or device")
 
 	eventSource = func(u string) (chan eventsource.Event, chan error, error) {
 		return nil, nil, errors.New("error connecting sse")
 	}
 
 	_, err = a.EventStream("devices", "")
-	assert.ErrorContains(t, err, "error connecting sse")
+	require.ErrorContains(t, err, "error connecting sse")
 
 	eventChan := make(chan eventsource.Event)
 	errorChan := make(chan error)
@@ -403,5 +404,5 @@ func TestAdaptorEventStream(t *testing.T) {
 	}
 
 	_, err = a.EventStream("devices", "")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }

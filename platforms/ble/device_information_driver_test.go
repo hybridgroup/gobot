@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -24,8 +25,8 @@ func TestDeviceInformationDriver(t *testing.T) {
 
 func TestDeviceInformationDriverStartAndHalt(t *testing.T) {
 	d := initTestDeviceInformationDriver()
-	assert.NoError(t, d.Start())
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
 }
 
 func TestDeviceInformationDriverGetModelNumber(t *testing.T) {

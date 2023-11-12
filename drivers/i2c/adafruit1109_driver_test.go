@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -49,12 +50,12 @@ func TestNewAdafruit1109Driver(t *testing.T) {
 
 func TestAdafruit1109Connect(t *testing.T) {
 	d, _ := initTestAdafruit1109WithStubbedAdaptor()
-	assert.NoError(t, d.Connect())
+	require.NoError(t, d.Connect())
 }
 
 func TestAdafruit1109Finalize(t *testing.T) {
 	d, _ := initTestAdafruit1109WithStubbedAdaptor()
-	assert.NoError(t, d.Finalize())
+	require.NoError(t, d.Finalize())
 }
 
 func TestAdafruit1109SetName(t *testing.T) {
@@ -65,7 +66,7 @@ func TestAdafruit1109SetName(t *testing.T) {
 
 func TestAdafruit1109Start(t *testing.T) {
 	d, _ := initTestAdafruit1109WithStubbedAdaptor()
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 }
 
 func TestAdafruit1109StartWriteErr(t *testing.T) {
@@ -73,7 +74,7 @@ func TestAdafruit1109StartWriteErr(t *testing.T) {
 	adaptor.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}
-	assert.ErrorContains(t, d.Start(), "write error")
+	require.ErrorContains(t, d.Start(), "write error")
 }
 
 func TestAdafruit1109StartReadErr(t *testing.T) {
@@ -81,13 +82,13 @@ func TestAdafruit1109StartReadErr(t *testing.T) {
 	adaptor.i2cReadImpl = func([]byte) (int, error) {
 		return 0, errors.New("read error")
 	}
-	assert.ErrorContains(t, d.Start(), "MCP write-read: MCP write-ReadByteData(reg=0): read error")
+	require.ErrorContains(t, d.Start(), "MCP write-read: MCP write-ReadByteData(reg=0): read error")
 }
 
 func TestAdafruit1109Halt(t *testing.T) {
 	d, _ := initTestAdafruit1109WithStubbedAdaptor()
 	_ = d.Start()
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 }
 
 func TestAdafruit1109DigitalRead(t *testing.T) {
@@ -128,9 +129,9 @@ func TestAdafruit1109DigitalRead(t *testing.T) {
 			// act
 			got, err := d.DigitalRead(name)
 			// assert
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, 1, numCallsRead)
-			assert.Equal(t, 1, len(a.written))
+			assert.Len(t, a.written, 1)
 			assert.Equal(t, tc.wantReg, a.written[0])
 			assert.Equal(t, 1, got)
 		})
@@ -160,7 +161,7 @@ func TestAdafruit1109SelectButton(t *testing.T) {
 			// act
 			got, err := d.SelectButton()
 			// assert
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, 1, numCallsRead)
 			assert.Equal(t, tc.want, got)
 		})
@@ -190,7 +191,7 @@ func TestAdafruit1109UpButton(t *testing.T) {
 			// act
 			got, err := d.UpButton()
 			// assert
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, 1, numCallsRead)
 			assert.Equal(t, tc.want, got)
 		})
@@ -220,7 +221,7 @@ func TestAdafruit1109DownButton(t *testing.T) {
 			// act
 			got, err := d.DownButton()
 			// assert
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, 1, numCallsRead)
 			assert.Equal(t, tc.want, got)
 		})
@@ -250,7 +251,7 @@ func TestAdafruit1109LeftButton(t *testing.T) {
 			// act
 			got, err := d.LeftButton()
 			// assert
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, 1, numCallsRead)
 			assert.Equal(t, tc.want, got)
 		})
@@ -280,7 +281,7 @@ func TestAdafruit1109RightButton(t *testing.T) {
 			// act
 			got, err := d.RightButton()
 			// assert
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, 1, numCallsRead)
 			assert.Equal(t, tc.want, got)
 		})

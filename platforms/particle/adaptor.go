@@ -273,7 +273,7 @@ func (s *Adaptor) request(method string, url string, params url.Values) (m map[s
 
 func (s *Adaptor) servoPinOpen(pin string) error {
 	params := url.Values{
-		"params":       {fmt.Sprintf("%v", pin)},
+		"params":       {pin},
 		"access_token": {s.AccessToken},
 	}
 	url := fmt.Sprintf("%v/servoOpen", s.deviceURL())

@@ -37,7 +37,7 @@ func TestNewButtonDriver(t *testing.T) {
 	assert.NotNil(t, d.mutex)
 	assert.NotNil(t, d.Eventer)
 	assert.Equal(t, "1", d.pin)
-	assert.Equal(t, false, d.active)
+	assert.False(t, d.active)
 	assert.Equal(t, 0, d.defaultState)
 	assert.Equal(t, 10*time.Millisecond, d.interval)
 	assert.NotNil(t, d.halt)
@@ -76,7 +76,7 @@ func TestButtonStart(t *testing.T) {
 	err := d.Start()
 
 	// assert & rearrange
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	select {
 	case <-sem:
@@ -146,7 +146,7 @@ func TestButtonSetDefaultState(t *testing.T) {
 
 	// assert & rearrange
 	require.Equal(t, 1, d.defaultState)
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 
 	select {
 	case <-sem:
@@ -182,7 +182,7 @@ func TestButtonHalt(t *testing.T) {
 		}
 	}()
 	// act & assert
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 	wg.Wait() // wait until the go function was really finished
 }
 

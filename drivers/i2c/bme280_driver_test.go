@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -72,8 +73,8 @@ func TestBME280Measurements(t *testing.T) {
 	}
 	_ = bme280.Start()
 	hum, err := bme280.Humidity()
-	assert.NoError(t, err)
-	assert.Equal(t, float32(51.20179), hum)
+	require.NoError(t, err)
+	assert.InDelta(t, float32(51.20179), hum, 0.0)
 }
 
 func TestBME280InitH1Error(t *testing.T) {
@@ -92,7 +93,7 @@ func TestBME280InitH1Error(t *testing.T) {
 		return buf.Len(), nil
 	}
 
-	assert.ErrorContains(t, bme280.Start(), "h1 read error")
+	require.ErrorContains(t, bme280.Start(), "h1 read error")
 }
 
 func TestBME280InitH2Error(t *testing.T) {
@@ -111,7 +112,7 @@ func TestBME280InitH2Error(t *testing.T) {
 		return buf.Len(), nil
 	}
 
-	assert.ErrorContains(t, bme280.Start(), "h2 read error")
+	require.ErrorContains(t, bme280.Start(), "h2 read error")
 }
 
 func TestBME280HumidityWriteError(t *testing.T) {
@@ -122,8 +123,8 @@ func TestBME280HumidityWriteError(t *testing.T) {
 		return 0, errors.New("write error")
 	}
 	hum, err := bme280.Humidity()
-	assert.ErrorContains(t, err, "write error")
-	assert.Equal(t, float32(0.0), hum)
+	require.ErrorContains(t, err, "write error")
+	assert.InDelta(t, float32(0.0), hum, 0.0)
 }
 
 func TestBME280HumidityReadError(t *testing.T) {
@@ -134,8 +135,8 @@ func TestBME280HumidityReadError(t *testing.T) {
 		return 0, errors.New("read error")
 	}
 	hum, err := bme280.Humidity()
-	assert.ErrorContains(t, err, "read error")
-	assert.Equal(t, float32(0.0), hum)
+	require.ErrorContains(t, err, "read error")
+	assert.InDelta(t, float32(0.0), hum, 0.0)
 }
 
 func TestBME280HumidityNotEnabled(t *testing.T) {
@@ -159,8 +160,8 @@ func TestBME280HumidityNotEnabled(t *testing.T) {
 	}
 	_ = bme280.Start()
 	hum, err := bme280.Humidity()
-	assert.ErrorContains(t, err, "Humidity disabled")
-	assert.Equal(t, float32(0.0), hum)
+	require.ErrorContains(t, err, "Humidity disabled")
+	assert.InDelta(t, float32(0.0), hum, 0.0)
 }
 
 func TestBME280_initializationBME280(t *testing.T) {
@@ -186,5 +187,5 @@ func TestBME280_initializationBME280(t *testing.T) {
 		}
 		return 0, nil
 	}
-	assert.NoError(t, bme280.Start())
+	require.NoError(t, bme280.Start())
 }

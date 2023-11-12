@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -36,7 +37,7 @@ func TestCameraDriverName(t *testing.T) {
 func TestCameraDriverStart(t *testing.T) {
 	sem := make(chan bool)
 	d := initTestCameraDriver()
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 	d.On(d.Event("frame"), func(data interface{}) {
 		sem <- true
 	})
@@ -47,7 +48,7 @@ func TestCameraDriverStart(t *testing.T) {
 	}
 
 	d = NewCameraDriver("")
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 
 	d = NewCameraDriver(true)
 	assert.NotNil(t, d.Start())
@@ -55,5 +56,5 @@ func TestCameraDriverStart(t *testing.T) {
 
 func TestCameraDriverHalt(t *testing.T) {
 	d := initTestCameraDriver()
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 }

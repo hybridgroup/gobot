@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -43,29 +44,29 @@ func TestMMA7660Options(t *testing.T) {
 
 func TestMMA7660Start(t *testing.T) {
 	d := NewMMA7660Driver(newI2cTestAdaptor())
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 }
 
 func TestMMA7660Halt(t *testing.T) {
 	d, _ := initTestMMA7660DriverWithStubbedAdaptor()
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 }
 
 func TestMMA7660Acceleration(t *testing.T) {
 	d, _ := initTestMMA7660DriverWithStubbedAdaptor()
 	x, y, z := d.Acceleration(21.0, 21.0, 21.0)
-	assert.Equal(t, 1.0, x)
-	assert.Equal(t, 1.0, y)
-	assert.Equal(t, 1.0, z)
+	assert.InDelta(t, 1.0, x, 0.0)
+	assert.InDelta(t, 1.0, y, 0.0)
+	assert.InDelta(t, 1.0, z, 0.0)
 }
 
 func TestMMA7660NullXYZ(t *testing.T) {
 	d, _ := initTestMMA7660DriverWithStubbedAdaptor()
 
 	x, y, z, _ := d.XYZ()
-	assert.Equal(t, 0.0, x)
-	assert.Equal(t, 0.0, y)
-	assert.Equal(t, 0.0, z)
+	assert.InDelta(t, 0.0, x, 0.0)
+	assert.InDelta(t, 0.0, y, 0.0)
+	assert.InDelta(t, 0.0, z, 0.0)
 }
 
 func TestMMA7660XYZ(t *testing.T) {
@@ -78,9 +79,9 @@ func TestMMA7660XYZ(t *testing.T) {
 	}
 
 	x, y, z, _ := d.XYZ()
-	assert.Equal(t, 17.0, x)
-	assert.Equal(t, 18.0, y)
-	assert.Equal(t, 19.0, z)
+	assert.InDelta(t, 17.0, x, 0.0)
+	assert.InDelta(t, 18.0, y, 0.0)
+	assert.InDelta(t, 19.0, z, 0.0)
 }
 
 func TestMMA7660XYZError(t *testing.T) {
@@ -90,7 +91,7 @@ func TestMMA7660XYZError(t *testing.T) {
 	}
 
 	_, _, _, err := d.XYZ()
-	assert.ErrorContains(t, err, "read error")
+	require.ErrorContains(t, err, "read error")
 }
 
 func TestMMA7660XYZNotReady(t *testing.T) {

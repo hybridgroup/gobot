@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strconv"
 
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/system"
@@ -54,7 +55,7 @@ func (p *PWMPin) Enabled() (bool, error) {
 
 // SetEnabled enables/disables the PWM pin
 func (p *PWMPin) SetEnabled(e bool) error {
-	if err := p.writeFile(fmt.Sprintf("pwm%s/enable", p.fn), fmt.Sprintf("%v", bool2int(e))); err != nil {
+	if err := p.writeFile(fmt.Sprintf("pwm%s/enable", p.fn), strconv.Itoa(bool2int(e))); err != nil {
 		return err
 	}
 	p.enabled = e
@@ -89,6 +90,7 @@ func (p *PWMPin) SetPeriod(period uint32) error {
 	if period < minimumPeriod {
 		return errors.New("Cannot set the period more then minimum")
 	}
+	//nolint:perfsprint // ok here
 	if err := p.writeFile(fmt.Sprintf("pwm%s/period", p.fn), fmt.Sprintf("%v", period)); err != nil {
 		return err
 	}
@@ -116,6 +118,7 @@ func (p *PWMPin) SetDutyCycle(duty uint32) error {
 	if rate < minimumRate {
 		duty = uint32(minimumRate * float64(p.period) / 100)
 	}
+	//nolint:perfsprint // ok here
 	if err := p.writeFile(fmt.Sprintf("pwm%s/duty_cycle", p.fn), fmt.Sprintf("%v", duty)); err != nil {
 		return err
 	}

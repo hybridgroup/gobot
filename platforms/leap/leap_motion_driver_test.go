@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -69,7 +70,7 @@ func TestLeapMotionDriverName(t *testing.T) {
 
 func TestLeapMotionDriverStart(t *testing.T) {
 	d, _ := initTestLeapMotionDriver()
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 
 	d2, rwc := initTestLeapMotionDriver()
 	e := errors.New("write error")
@@ -79,7 +80,7 @@ func TestLeapMotionDriverStart(t *testing.T) {
 
 func TestLeapMotionDriverHalt(t *testing.T) {
 	d, _ := initTestLeapMotionDriver()
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 }
 
 func TestLeapMotionDriverParser(t *testing.T) {
@@ -92,17 +93,17 @@ func TestLeapMotionDriverParser(t *testing.T) {
 	}
 
 	assert.Equal(t, uint64(134211791358), parsedFrame.Timestamp)
-	assert.Equal(t, 247.410, parsedFrame.Hands[0].X())
-	assert.Equal(t, 275.868, parsedFrame.Hands[0].Y())
-	assert.Equal(t, 132.843, parsedFrame.Hands[0].Z())
+	assert.InDelta(t, 247.410, parsedFrame.Hands[0].X(), 0.0)
+	assert.InDelta(t, 275.868, parsedFrame.Hands[0].Y(), 0.0)
+	assert.InDelta(t, 132.843, parsedFrame.Hands[0].Z(), 0.0)
 
-	assert.Equal(t, 214.293, parsedFrame.Pointables[0].BTipPosition[0])
-	assert.Equal(t, 213.865, parsedFrame.Pointables[0].BTipPosition[1])
-	assert.Equal(t, 95.0224, parsedFrame.Pointables[0].BTipPosition[2])
+	assert.InDelta(t, 214.293, parsedFrame.Pointables[0].BTipPosition[0], 0.0)
+	assert.InDelta(t, 213.865, parsedFrame.Pointables[0].BTipPosition[1], 0.0)
+	assert.InDelta(t, 95.0224, parsedFrame.Pointables[0].BTipPosition[2], 0.0)
 
-	assert.Equal(t, -0.468069, parsedFrame.Pointables[0].Bases[0][0][0])
-	assert.Equal(t, 0.807844, parsedFrame.Pointables[0].Bases[0][0][1])
-	assert.Equal(t, -0.358190, parsedFrame.Pointables[0].Bases[0][0][2])
+	assert.InDelta(t, -0.468069, parsedFrame.Pointables[0].Bases[0][0][0], 0.0)
+	assert.InDelta(t, 0.807844, parsedFrame.Pointables[0].Bases[0][0][1], 0.0)
+	assert.InDelta(t, -0.358190, parsedFrame.Pointables[0].Bases[0][0][2], 0.0)
 
-	assert.Equal(t, 19.7871, parsedFrame.Pointables[0].Width)
+	assert.InDelta(t, 19.7871, parsedFrame.Pointables[0].Width, 0.0)
 }

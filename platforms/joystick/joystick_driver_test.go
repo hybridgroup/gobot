@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"gobot.io/x/gobot/v2"
 
@@ -30,13 +31,13 @@ func TestJoystickDriverName(t *testing.T) {
 	d, _ := initTestDriver("./configs/dualshock3.json")
 	assert.True(t, strings.HasPrefix(d.Name(), "Joystick"))
 	d.SetName("NewName")
-	assert.Equal(t, d.Name(), "NewName")
+	assert.Equal(t, "NewName", d.Name())
 }
 
 func TestDriverStart(t *testing.T) {
 	d, _ := initTestDriver("./configs/dualshock3.json")
 	d.interval = 1 * time.Millisecond
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 	time.Sleep(2 * time.Millisecond)
 }
 
@@ -45,7 +46,7 @@ func TestDriverHalt(t *testing.T) {
 	go func() {
 		<-d.halt
 	}()
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 }
 
 func TestDriverHandleEventDS3(t *testing.T) {

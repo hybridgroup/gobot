@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/aio"
 	"gobot.io/x/gobot/v2/drivers/gpio"
@@ -235,7 +236,7 @@ func TestConnect(t *testing.T) {
 
 	assert.Equal(t, 6, a.DefaultI2cBus())
 	assert.Equal(t, "arduino", a.board)
-	assert.NoError(t, a.Connect())
+	require.NoError(t, a.Connect())
 }
 
 func TestArduinoSetupFail263(t *testing.T) {
@@ -272,17 +273,17 @@ func TestArduinoSetupFail131(t *testing.T) {
 
 func TestArduinoI2CSetupFailTristate(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
-	assert.NoError(t, a.arduinoSetup())
+	require.NoError(t, a.arduinoSetup())
 
 	fs.WithWriteError = true
 	err := a.arduinoI2CSetup()
-	assert.ErrorContains(t, err, "write error")
+	require.ErrorContains(t, err, "write error")
 }
 
 func TestArduinoI2CSetupFail14(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 
-	assert.NoError(t, a.arduinoSetup())
+	require.NoError(t, a.arduinoSetup())
 	delete(fs.Files, "/sys/class/gpio/gpio14/direction")
 
 	err := a.arduinoI2CSetup()
@@ -292,7 +293,7 @@ func TestArduinoI2CSetupFail14(t *testing.T) {
 func TestArduinoI2CSetupUnexportFail(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 
-	assert.NoError(t, a.arduinoSetup())
+	require.NoError(t, a.arduinoSetup())
 	delete(fs.Files, "/sys/class/gpio/unexport")
 
 	err := a.arduinoI2CSetup()
@@ -302,7 +303,7 @@ func TestArduinoI2CSetupUnexportFail(t *testing.T) {
 func TestArduinoI2CSetupFail236(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 
-	assert.NoError(t, a.arduinoSetup())
+	require.NoError(t, a.arduinoSetup())
 	delete(fs.Files, "/sys/class/gpio/gpio236/direction")
 
 	err := a.arduinoI2CSetup()
@@ -312,7 +313,7 @@ func TestArduinoI2CSetupFail236(t *testing.T) {
 func TestArduinoI2CSetupFail28(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 
-	assert.NoError(t, a.arduinoSetup())
+	require.NoError(t, a.arduinoSetup())
 	delete(fs.Files, "/sys/kernel/debug/gpio_debug/gpio28/current_pinmux")
 
 	err := a.arduinoI2CSetup()
@@ -338,7 +339,7 @@ func TestConnectArduinoWriteError(t *testing.T) {
 func TestConnectSparkfun(t *testing.T) {
 	a, _ := initTestAdaptorWithMockedFilesystem("sparkfun")
 
-	assert.NoError(t, a.Connect())
+	require.NoError(t, a.Connect())
 	assert.Equal(t, 1, a.DefaultI2cBus())
 	assert.Equal(t, "sparkfun", a.board)
 }
@@ -346,7 +347,7 @@ func TestConnectSparkfun(t *testing.T) {
 func TestConnectMiniboard(t *testing.T) {
 	a, _ := initTestAdaptorWithMockedFilesystem("miniboard")
 
-	assert.NoError(t, a.Connect())
+	require.NoError(t, a.Connect())
 	assert.Equal(t, 1, a.DefaultI2cBus())
 	assert.Equal(t, "miniboard", a.board)
 }
@@ -365,10 +366,10 @@ func TestFinalize(t *testing.T) {
 	_ = a.PwmWrite("5", 100)
 
 	_, _ = a.GetI2cConnection(0xff, 6)
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.Finalize())
 
 	// assert that finalize after finalize is working
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.Finalize())
 
 	// assert that re-connect is working
 	_ = a.Connect()
@@ -400,7 +401,7 @@ func TestDigitalIO(t *testing.T) {
 
 	_ = a.DigitalWrite("2", 0)
 	i, err := a.DigitalRead("2")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, 0, i)
 }
 
@@ -453,7 +454,7 @@ func TestDigitalWriteError(t *testing.T) {
 	fs.WithWriteError = true
 
 	err := a.DigitalWrite("13", 1)
-	assert.ErrorContains(t, err, "write error")
+	require.ErrorContains(t, err, "write error")
 }
 
 func TestDigitalReadWriteError(t *testing.T) {
@@ -461,18 +462,18 @@ func TestDigitalReadWriteError(t *testing.T) {
 	fs.WithWriteError = true
 
 	_, err := a.DigitalRead("13")
-	assert.ErrorContains(t, err, "write error")
+	require.ErrorContains(t, err, "write error")
 }
 
 func TestPwm(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 
 	err := a.PwmWrite("5", 100)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "1960", fs.Files["/sys/class/pwm/pwmchip0/pwm1/duty_cycle"].Contents)
 
 	err = a.PwmWrite("7", 100)
-	assert.ErrorContains(t, err, "'7' is not a valid id for a PWM pin")
+	require.ErrorContains(t, err, "'7' is not a valid id for a PWM pin")
 }
 
 func TestPwmExportError(t *testing.T) {
@@ -480,7 +481,7 @@ func TestPwmExportError(t *testing.T) {
 	fs := a.sys.UseMockFilesystem(pwmMockPathsMux13Arduino)
 	delete(fs.Files, "/sys/class/pwm/pwmchip0/export")
 	err := a.Connect()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	err = a.PwmWrite("5", 100)
 	assert.Contains(t, err.Error(), "/sys/class/pwm/pwmchip0/export: no such file")
@@ -501,7 +502,7 @@ func TestPwmWritePinError(t *testing.T) {
 	fs.WithWriteError = true
 
 	err := a.PwmWrite("5", 100)
-	assert.ErrorContains(t, err, "write error")
+	require.ErrorContains(t, err, "write error")
 }
 
 func TestPwmWriteError(t *testing.T) {
@@ -533,7 +534,7 @@ func TestAnalogError(t *testing.T) {
 	fs.WithReadError = true
 
 	_, err := a.AnalogRead("0")
-	assert.ErrorContains(t, err, "read error")
+	require.ErrorContains(t, err, "read error")
 }
 
 func TestI2cWorkflow(t *testing.T) {
@@ -541,17 +542,17 @@ func TestI2cWorkflow(t *testing.T) {
 	a.sys.UseMockSyscall()
 
 	con, err := a.GetI2cConnection(0xff, 6)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	_, err = con.Write([]byte{0x00, 0x01})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	data := []byte{42, 42}
 	_, err = con.Read(data)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, []byte{0x00, 0x01}, data)
 
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.Finalize())
 }
 
 func TestI2cFinalizeWithErrors(t *testing.T) {
@@ -559,16 +560,16 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	a := NewAdaptor()
 	a.sys.UseMockSyscall()
 	fs := a.sys.UseMockFilesystem(pwmMockPathsMux13ArduinoI2c)
-	assert.NoError(t, a.Connect())
+	require.NoError(t, a.Connect())
 	con, err := a.GetI2cConnection(0xff, 6)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	_, err = con.Write([]byte{0x0A})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	fs.WithCloseError = true
 	// act
 	err = a.Finalize()
 	// assert
-	assert.NotNil(t, err)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "close error")
 }
 

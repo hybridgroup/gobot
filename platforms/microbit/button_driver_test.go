@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -25,8 +26,8 @@ func TestButtonDriver(t *testing.T) {
 
 func TestButtonDriverStartAndHalt(t *testing.T) {
 	d := initTestButtonDriver()
-	assert.NoError(t, d.Start())
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
 }
 
 func TestButtonDriverReadData(t *testing.T) {

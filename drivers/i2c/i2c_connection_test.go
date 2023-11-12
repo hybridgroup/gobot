@@ -8,6 +8,7 @@ import (
 	"unsafe"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/system"
 )
@@ -77,7 +78,7 @@ func TestI2CAddress(t *testing.T) {
 
 func TestI2CClose(t *testing.T) {
 	c := NewConnection(initI2CDevice(), 0x06)
-	assert.NoError(t, c.Close())
+	require.NoError(t, c.Close())
 }
 
 func TestI2CRead(t *testing.T) {
@@ -89,7 +90,7 @@ func TestI2CRead(t *testing.T) {
 func TestI2CReadAddressError(t *testing.T) {
 	c := NewConnection(initI2CDeviceAddressError(), 0x06)
 	_, err := c.Read([]byte{})
-	assert.ErrorContains(t, err, "Setting address failed with syscall.Errno operation not permitted")
+	require.ErrorContains(t, err, "Setting address failed with syscall.Errno operation not permitted")
 }
 
 func TestI2CWrite(t *testing.T) {
@@ -101,7 +102,7 @@ func TestI2CWrite(t *testing.T) {
 func TestI2CWriteAddressError(t *testing.T) {
 	c := NewConnection(initI2CDeviceAddressError(), 0x06)
 	_, err := c.Write([]byte{0x01})
-	assert.ErrorContains(t, err, "Setting address failed with syscall.Errno operation not permitted")
+	require.ErrorContains(t, err, "Setting address failed with syscall.Errno operation not permitted")
 }
 
 func TestI2CReadByte(t *testing.T) {
@@ -113,7 +114,7 @@ func TestI2CReadByte(t *testing.T) {
 func TestI2CReadByteAddressError(t *testing.T) {
 	c := NewConnection(initI2CDeviceAddressError(), 0x06)
 	_, err := c.ReadByte()
-	assert.ErrorContains(t, err, "Setting address failed with syscall.Errno operation not permitted")
+	require.ErrorContains(t, err, "Setting address failed with syscall.Errno operation not permitted")
 }
 
 func TestI2CReadByteData(t *testing.T) {
@@ -125,7 +126,7 @@ func TestI2CReadByteData(t *testing.T) {
 func TestI2CReadByteDataAddressError(t *testing.T) {
 	c := NewConnection(initI2CDeviceAddressError(), 0x06)
 	_, err := c.ReadByteData(0x01)
-	assert.ErrorContains(t, err, "Setting address failed with syscall.Errno operation not permitted")
+	require.ErrorContains(t, err, "Setting address failed with syscall.Errno operation not permitted")
 }
 
 func TestI2CReadWordData(t *testing.T) {
@@ -137,65 +138,65 @@ func TestI2CReadWordData(t *testing.T) {
 func TestI2CReadWordDataAddressError(t *testing.T) {
 	c := NewConnection(initI2CDeviceAddressError(), 0x06)
 	_, err := c.ReadWordData(0x01)
-	assert.ErrorContains(t, err, "Setting address failed with syscall.Errno operation not permitted")
+	require.ErrorContains(t, err, "Setting address failed with syscall.Errno operation not permitted")
 }
 
 func TestI2CWriteByte(t *testing.T) {
 	c := NewConnection(initI2CDevice(), 0x06)
 	err := c.WriteByte(0x01)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestI2CWriteByteAddressError(t *testing.T) {
 	c := NewConnection(initI2CDeviceAddressError(), 0x06)
 	err := c.WriteByte(0x01)
-	assert.ErrorContains(t, err, "Setting address failed with syscall.Errno operation not permitted")
+	require.ErrorContains(t, err, "Setting address failed with syscall.Errno operation not permitted")
 }
 
 func TestI2CWriteByteData(t *testing.T) {
 	c := NewConnection(initI2CDevice(), 0x06)
 	err := c.WriteByteData(0x01, 0x01)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestI2CWriteByteDataAddressError(t *testing.T) {
 	c := NewConnection(initI2CDeviceAddressError(), 0x06)
 	err := c.WriteByteData(0x01, 0x01)
-	assert.ErrorContains(t, err, "Setting address failed with syscall.Errno operation not permitted")
+	require.ErrorContains(t, err, "Setting address failed with syscall.Errno operation not permitted")
 }
 
 func TestI2CWriteWordData(t *testing.T) {
 	c := NewConnection(initI2CDevice(), 0x06)
 	err := c.WriteWordData(0x01, 0x01)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestI2CWriteWordDataAddressError(t *testing.T) {
 	c := NewConnection(initI2CDeviceAddressError(), 0x06)
 	err := c.WriteWordData(0x01, 0x01)
-	assert.ErrorContains(t, err, "Setting address failed with syscall.Errno operation not permitted")
+	require.ErrorContains(t, err, "Setting address failed with syscall.Errno operation not permitted")
 }
 
 func TestI2CWriteBlockData(t *testing.T) {
 	c := NewConnection(initI2CDevice(), 0x06)
 	err := c.WriteBlockData(0x01, []byte{0x01, 0x02})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestI2CWriteBlockDataAddressError(t *testing.T) {
 	c := NewConnection(initI2CDeviceAddressError(), 0x06)
 	err := c.WriteBlockData(0x01, []byte{0x01, 0x02})
-	assert.ErrorContains(t, err, "Setting address failed with syscall.Errno operation not permitted")
+	require.ErrorContains(t, err, "Setting address failed with syscall.Errno operation not permitted")
 }
 
 func Test_setBit(t *testing.T) {
-	var expectedVal uint8 = 129
-	actualVal := setBit(1, 7)
-	assert.Equal(t, actualVal, expectedVal)
+	var wantVal uint8 = 129
+	gotVal := setBit(1, 7)
+	assert.Equal(t, wantVal, gotVal)
 }
 
 func Test_clearBit(t *testing.T) {
-	var expectedVal uint8
-	actualVal := clearBit(128, 7)
-	assert.Equal(t, actualVal, expectedVal)
+	var wantVal uint8
+	gotVal := clearBit(128, 7)
+	assert.Equal(t, wantVal, gotVal)
 }

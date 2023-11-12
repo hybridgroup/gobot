@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -30,7 +31,7 @@ func TestNewHMC5883LDriver(t *testing.T) {
 	assert.Equal(t, uint32(15000), d.outputRate)
 	assert.Equal(t, int8(0), d.applyBias)
 	assert.Equal(t, 0, d.measurementMode)
-	assert.Equal(t, 390.0, d.gain)
+	assert.InDelta(t, 390.0, d.gain, 0.0)
 }
 
 func TestHMC5883LOptions(t *testing.T) {
@@ -56,7 +57,7 @@ func TestHMC5883LWithHMC5883LApplyBias(t *testing.T) {
 func TestHMC5883LWithHMC5883LGain(t *testing.T) {
 	d := NewHMC5883LDriver(newI2cTestAdaptor())
 	WithHMC5883LGain(230)(d)
-	assert.Equal(t, 230.0, d.gain)
+	assert.InDelta(t, 230.0, d.gain, 0.0)
 }
 
 func TestHMC5883LRead(t *testing.T) {
@@ -121,10 +122,10 @@ func TestHMC5883LRead(t *testing.T) {
 			// act
 			gotX, gotY, gotZ, err := d.Read()
 			// assert
-			assert.NoError(t, err)
-			assert.Equal(t, tc.wantX, gotX)
-			assert.Equal(t, tc.wantY, gotY)
-			assert.Equal(t, tc.wantZ, gotZ)
+			require.NoError(t, err)
+			assert.InDelta(t, tc.wantX, gotX, 0.0)
+			assert.InDelta(t, tc.wantY, gotY, 0.0)
+			assert.InDelta(t, tc.wantZ, gotZ, 0.0)
 		})
 	}
 }
@@ -177,12 +178,12 @@ func TestHMC5883L_readRawData(t *testing.T) {
 			// act
 			gotX, gotY, gotZ, err := d.readRawData()
 			// assert
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, tc.wantX, gotX)
 			assert.Equal(t, tc.wantY, gotY)
 			assert.Equal(t, tc.wantZ, gotZ)
 			assert.Equal(t, 1, numCallsRead)
-			assert.Equal(t, 1, len(a.written))
+			assert.Len(t, a.written, 1)
 			assert.Equal(t, uint8(hmc5883lAxisX), a.written[0])
 		})
 	}
@@ -203,8 +204,8 @@ func TestHMC5883L_initialize(t *testing.T) {
 	// act, assert - initialize() must be called on Start()
 	err := d.Start()
 	// assert
-	assert.NoError(t, err)
-	assert.Equal(t, 6, len(a.written))
+	require.NoError(t, err)
+	assert.Len(t, a.written, 6)
 	assert.Equal(t, uint8(hmc5883lRegA), a.written[0])
 	assert.Equal(t, wantRegA, a.written[1])
 	assert.Equal(t, uint8(hmc5883lRegB), a.written[2])
