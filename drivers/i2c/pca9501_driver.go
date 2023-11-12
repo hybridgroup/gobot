@@ -37,6 +37,7 @@ func NewPCA9501Driver(a Connector, options ...func(Config)) *PCA9501Driver {
 	p.afterStart = p.initialize
 
 	// API commands
+	//nolint:forcetypeassert // ok here
 	p.AddCommand("WriteGPIO", func(params map[string]interface{}) interface{} {
 		pin := params["pin"].(uint8)
 		val := params["val"].(uint8)
@@ -44,12 +45,14 @@ func NewPCA9501Driver(a Connector, options ...func(Config)) *PCA9501Driver {
 		return map[string]interface{}{"err": err}
 	})
 
+	//nolint:forcetypeassert // ok here
 	p.AddCommand("ReadGPIO", func(params map[string]interface{}) interface{} {
 		pin := params["pin"].(uint8)
 		val, err := p.ReadGPIO(pin)
 		return map[string]interface{}{"val": val, "err": err}
 	})
 
+	//nolint:forcetypeassert // ok here
 	p.AddCommand("WriteEEPROM", func(params map[string]interface{}) interface{} {
 		address := params["address"].(uint8)
 		val := params["val"].(uint8)
@@ -57,6 +60,7 @@ func NewPCA9501Driver(a Connector, options ...func(Config)) *PCA9501Driver {
 		return map[string]interface{}{"err": err}
 	})
 
+	//nolint:forcetypeassert // ok here
 	p.AddCommand("ReadEEPROM", func(params map[string]interface{}) interface{} {
 		address := params["address"].(uint8)
 		val, err := p.ReadEEPROM(address)
@@ -149,10 +153,11 @@ func (p *PCA9501Driver) WriteEEPROM(address uint8, val uint8) error {
 	return p.connectionMem.WriteByteData(address, val)
 }
 
-func (p *PCA9501Driver) initialize() (err error) {
+func (p *PCA9501Driver) initialize() error {
 	// initialize the EEPROM connection
 	bus := p.GetBusOrDefault(p.connector.DefaultI2cBus())
 	addressMem := p.GetAddressOrDefault(pca9501DefaultAddress) | 0x40
+	var err error
 	p.connectionMem, err = p.connector.GetI2cConnection(addressMem, bus)
-	return
+	return err
 }

@@ -127,14 +127,14 @@ func TestHD44780DriverWriteError(t *testing.T) {
 	var a *gpioTestAdaptor
 
 	d, a = initTestHD44780Driver4BitModeWithStubbedAdaptor()
-	a.digitalWriteFunc = func(string, byte) (err error) {
+	a.digitalWriteFunc = func(string, byte) error {
 		return errors.New("write error")
 	}
 	_ = d.Start()
 	require.ErrorContains(t, d.Write("hello gobot"), "write error")
 
 	d, a = initTestHD44780Driver8BitModeWithStubbedAdaptor()
-	a.digitalWriteFunc = func(string, byte) (err error) {
+	a.digitalWriteFunc = func(string, byte) error {
 		return errors.New("write error")
 	}
 	_ = d.Start()

@@ -1,6 +1,10 @@
 package gpio
 
-import "gobot.io/x/gobot/v2"
+import (
+	"log"
+
+	"gobot.io/x/gobot/v2"
+)
 
 // RgbLedDriver represents a digital RGB Led
 type RgbLedDriver struct {
@@ -26,7 +30,7 @@ type RgbLedDriver struct {
 //	"On" - See RgbLedDriver.On
 //	"Off" - See RgbLedDriver.Off
 func NewRgbLedDriver(a DigitalWriter, redPin string, greenPin string, bluePin string) *RgbLedDriver {
-	l := &RgbLedDriver{
+	d := &RgbLedDriver{
 		name:       gobot.DefaultName("RGBLED"),
 		pinRed:     redPin,
 		pinGreen:   greenPin,
@@ -36,123 +40,128 @@ func NewRgbLedDriver(a DigitalWriter, redPin string, greenPin string, bluePin st
 		Commander:  gobot.NewCommander(),
 	}
 
-	l.AddCommand("SetRGB", func(params map[string]interface{}) interface{} {
+	//nolint:forcetypeassert // ok here
+	d.AddCommand("SetRGB", func(params map[string]interface{}) interface{} {
 		r := byte(params["r"].(int))
 		g := byte(params["g"].(int))
 		b := byte(params["b"].(int))
-		return l.SetRGB(r, g, b)
+		return d.SetRGB(r, g, b)
 	})
 
-	l.AddCommand("Toggle", func(params map[string]interface{}) interface{} {
-		return l.Toggle()
+	d.AddCommand("Toggle", func(params map[string]interface{}) interface{} {
+		return d.Toggle()
 	})
 
-	l.AddCommand("On", func(params map[string]interface{}) interface{} {
-		return l.On()
+	d.AddCommand("On", func(params map[string]interface{}) interface{} {
+		return d.On()
 	})
 
-	l.AddCommand("Off", func(params map[string]interface{}) interface{} {
-		return l.Off()
+	d.AddCommand("Off", func(params map[string]interface{}) interface{} {
+		return d.Off()
 	})
 
-	return l
+	return d
 }
 
 // Start implements the Driver interface
-func (l *RgbLedDriver) Start() (err error) { return }
+func (d *RgbLedDriver) Start() error { return nil }
 
 // Halt implements the Driver interface
-func (l *RgbLedDriver) Halt() (err error) { return }
+func (d *RgbLedDriver) Halt() error { return nil }
 
 // Name returns the RGBLEDDrivers name
-func (l *RgbLedDriver) Name() string { return l.name }
+func (d *RgbLedDriver) Name() string { return d.name }
 
 // SetName sets the RGBLEDDrivers name
-func (l *RgbLedDriver) SetName(n string) { l.name = n }
+func (d *RgbLedDriver) SetName(n string) { d.name = n }
 
 // Pin returns the RgbLedDrivers pins
-func (l *RgbLedDriver) Pin() string {
-	return "r=" + l.pinRed + ", g=" + l.pinGreen + ", b=" + l.pinBlue
+func (d *RgbLedDriver) Pin() string {
+	return "r=" + d.pinRed + ", g=" + d.pinGreen + ", b=" + d.pinBlue
 }
 
 // RedPin returns the RgbLedDrivers redPin
-func (l *RgbLedDriver) RedPin() string { return l.pinRed }
+func (d *RgbLedDriver) RedPin() string { return d.pinRed }
 
 // GreenPin returns the RgbLedDrivers redPin
-func (l *RgbLedDriver) GreenPin() string { return l.pinGreen }
+func (d *RgbLedDriver) GreenPin() string { return d.pinGreen }
 
 // BluePin returns the RgbLedDrivers bluePin
-func (l *RgbLedDriver) BluePin() string { return l.pinBlue }
+func (d *RgbLedDriver) BluePin() string { return d.pinBlue }
 
 // Connection returns the RgbLedDriver Connection
-func (l *RgbLedDriver) Connection() gobot.Connection {
-	return l.connection.(gobot.Connection)
+func (d *RgbLedDriver) Connection() gobot.Connection {
+	if conn, ok := d.connection.(gobot.Connection); ok {
+		return conn
+	}
+
+	log.Printf("%s has no gobot connection\n", d.name)
+	return nil
 }
 
 // State return true if the led is On and false if the led is Off
-func (l *RgbLedDriver) State() bool {
-	return l.high
+func (d *RgbLedDriver) State() bool {
+	return d.high
 }
 
 // On sets the led's pins to their various states
-func (l *RgbLedDriver) On() (err error) {
-	if err = l.SetLevel(l.pinRed, l.redColor); err != nil {
-		return
+func (d *RgbLedDriver) On() error {
+	if err := d.SetLevel(d.pinRed, d.redColor); err != nil {
+		return err
 	}
 
-	if err = l.SetLevel(l.pinGreen, l.greenColor); err != nil {
-		return
+	if err := d.SetLevel(d.pinGreen, d.greenColor); err != nil {
+		return err
 	}
 
-	if err = l.SetLevel(l.pinBlue, l.blueColor); err != nil {
-		return
+	if err := d.SetLevel(d.pinBlue, d.blueColor); err != nil {
+		return err
 	}
 
-	l.high = true
-	return
+	d.high = true
+	return nil
 }
 
 // Off sets the led to black.
-func (l *RgbLedDriver) Off() (err error) {
-	if err = l.SetLevel(l.pinRed, 0); err != nil {
-		return
+func (d *RgbLedDriver) Off() error {
+	if err := d.SetLevel(d.pinRed, 0); err != nil {
+		return err
 	}
 
-	if err = l.SetLevel(l.pinGreen, 0); err != nil {
-		return
+	if err := d.SetLevel(d.pinGreen, 0); err != nil {
+		return err
 	}
 
-	if err = l.SetLevel(l.pinBlue, 0); err != nil {
-		return
+	if err := d.SetLevel(d.pinBlue, 0); err != nil {
+		return err
 	}
 
-	l.high = false
-	return
+	d.high = false
+	return nil
 }
 
 // Toggle sets the led to the opposite of it's current state
-func (l *RgbLedDriver) Toggle() (err error) {
-	if l.State() {
-		err = l.Off()
-	} else {
-		err = l.On()
+func (d *RgbLedDriver) Toggle() error {
+	if d.State() {
+		return d.Off()
 	}
-	return
+
+	return d.On()
 }
 
 // SetLevel sets the led to the specified color level
-func (l *RgbLedDriver) SetLevel(pin string, level byte) (err error) {
-	if writer, ok := l.connection.(PwmWriter); ok {
+func (d *RgbLedDriver) SetLevel(pin string, level byte) error {
+	if writer, ok := d.connection.(PwmWriter); ok {
 		return writer.PwmWrite(pin, level)
 	}
 	return ErrPwmWriteUnsupported
 }
 
 // SetRGB sets the Red Green Blue value of the LED.
-func (l *RgbLedDriver) SetRGB(r, g, b byte) error {
-	l.redColor = r
-	l.greenColor = g
-	l.blueColor = b
+func (d *RgbLedDriver) SetRGB(r, g, b byte) error {
+	d.redColor = r
+	d.greenColor = g
+	d.blueColor = b
 
-	return l.On()
+	return d.On()
 }

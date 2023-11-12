@@ -243,6 +243,8 @@ func (d *digitalPinConfig) SetEventHandlerForEdge(
 // the adaptor. E.g. sysfs driver in gobot has not implemented edge detection yet. The function is only useful
 // together with SetEventHandlerForEdge() and its corresponding With*() functions.
 // The function is intended to use by WithPinPollForEdgeDetection().
+//
+//nolint:nonamedreturns // useful here
 func (d *digitalPinConfig) SetPollForEdgeDetection(
 	pollInterval time.Duration,
 	pollQuitChan chan struct{},

@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -49,65 +50,65 @@ type gpioTestAdaptor struct {
 	port string
 	mtx  sync.Mutex
 	Connector
-	digitalWriteFunc func() (err error)
-	servoWriteFunc   func() (err error)
-	pwmWriteFunc     func() (err error)
+	digitalWriteFunc func() error
+	servoWriteFunc   func() error
+	pwmWriteFunc     func() error
 	analogReadFunc   func() (val int, err error)
 	digitalReadFunc  func() (val int, err error)
 }
 
-func (t *gpioTestAdaptor) ServoWrite(string, byte) (err error) {
+func (t *gpioTestAdaptor) ServoWrite(string, byte) error {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 	return t.servoWriteFunc()
 }
 
-func (t *gpioTestAdaptor) PwmWrite(string, byte) (err error) {
+func (t *gpioTestAdaptor) PwmWrite(string, byte) error {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 	return t.pwmWriteFunc()
 }
 
-func (t *gpioTestAdaptor) AnalogRead(string) (val int, err error) {
+func (t *gpioTestAdaptor) AnalogRead(string) (int, error) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 	return t.analogReadFunc()
 }
 
-func (t *gpioTestAdaptor) DigitalRead(string) (val int, err error) {
+func (t *gpioTestAdaptor) DigitalRead(string) (int, error) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 	return t.digitalReadFunc()
 }
 
-func (t *gpioTestAdaptor) DigitalWrite(string, byte) (err error) {
+func (t *gpioTestAdaptor) DigitalWrite(string, byte) error {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 	return t.digitalWriteFunc()
 }
-func (t *gpioTestAdaptor) Connect() (err error)  { return }
-func (t *gpioTestAdaptor) Finalize() (err error) { return }
-func (t *gpioTestAdaptor) Name() string          { return t.name }
-func (t *gpioTestAdaptor) SetName(n string)      { t.name = n }
-func (t *gpioTestAdaptor) Port() string          { return t.port }
+func (t *gpioTestAdaptor) Connect() error   { return nil }
+func (t *gpioTestAdaptor) Finalize() error  { return nil }
+func (t *gpioTestAdaptor) Name() string     { return t.name }
+func (t *gpioTestAdaptor) SetName(n string) { t.name = n }
+func (t *gpioTestAdaptor) Port() string     { return t.port }
 
 func newGpioTestAdaptor() *gpioTestAdaptor {
 	a := newSpiTestAdaptor()
 	return &gpioTestAdaptor{
 		port: "/dev/null",
-		digitalWriteFunc: func() (err error) {
+		digitalWriteFunc: func() error {
 			return nil
 		},
-		servoWriteFunc: func() (err error) {
+		servoWriteFunc: func() error {
 			return nil
 		},
-		pwmWriteFunc: func() (err error) {
+		pwmWriteFunc: func() error {
 			return nil
 		},
-		analogReadFunc: func() (val int, err error) {
+		analogReadFunc: func() (int, error) {
 			return 99, nil
 		},
-		digitalReadFunc: func() (val int, err error) {
+		digitalReadFunc: func() (int, error) {
 			return 1, nil
 		},
 		Connector: a,

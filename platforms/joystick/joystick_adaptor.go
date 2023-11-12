@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strconv"
 
-	"gobot.io/x/gobot/v2"
-
 	js "github.com/0xcafed00d/joystick"
+
+	"gobot.io/x/gobot/v2"
 )
 
 // Adaptor represents a connection to a joystick
@@ -25,12 +25,12 @@ func NewAdaptor(id string) *Adaptor {
 		connect: func(j *Adaptor) error {
 			i, err := strconv.Atoi(id)
 			if err != nil {
-				return fmt.Errorf("Invalid joystick ID: %v", err)
+				return fmt.Errorf("invalid joystick ID: %v", err)
 			}
 
 			joy, err := js.Open(i)
 			if err != nil {
-				return fmt.Errorf("No joystick available: %v", err)
+				return fmt.Errorf("no joystick available: %v", err)
 			}
 
 			j.id = id

@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"go.bug.st/serial"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/i2c"
 	"gobot.io/x/gobot/v2/platforms/firmata/client"
@@ -19,7 +20,7 @@ type firmataBoard interface {
 	Connect(conn io.ReadWriteCloser) error
 	Disconnect() error
 	Pins() []client.Pin
-	AnalogWrite(pin int, value int) (err error)
+	AnalogWrite(pin int, value int) error
 	SetPinMode(pin int, mode int) error
 	ReportAnalog(pin int, state int) error
 	ReportDigital(pin int, state int) error
@@ -186,18 +187,18 @@ func (f *Adaptor) DigitalWrite(pin string, level byte) error {
 
 // DigitalRead retrieves digital value from specified pin.
 // Returns -1 if the response from the board has timed out
-func (f *Adaptor) DigitalRead(pin string) (val int, err error) {
+func (f *Adaptor) DigitalRead(pin string) (int, error) {
 	p, err := strconv.Atoi(pin)
 	if err != nil {
-		return
+		return 0, err
 	}
 
 	if f.Board.Pins()[p].Mode != client.Input {
-		if err = f.Board.SetPinMode(p, client.Input); err != nil {
-			return
+		if err := f.Board.SetPinMode(p, client.Input); err != nil {
+			return 0, err
 		}
-		if err = f.Board.ReportDigital(p, 1); err != nil {
-			return
+		if err := f.Board.ReportDigital(p, 1); err != nil {
+			return 0, err
 		}
 		<-time.After(10 * time.Millisecond)
 	}

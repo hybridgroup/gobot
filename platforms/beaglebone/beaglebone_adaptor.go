@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	multierror "github.com/hashicorp/go-multierror"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/platforms/adaptors"
 	"gobot.io/x/gobot/v2/system"
@@ -140,26 +141,26 @@ func (c *Adaptor) DigitalWrite(id string, val byte) error {
 }
 
 // AnalogRead returns an analog value from specified pin
-func (c *Adaptor) AnalogRead(pin string) (val int, err error) {
+func (c *Adaptor) AnalogRead(pin string) (int, error) {
 	analogPin, err := c.translateAnalogPin(pin)
 	if err != nil {
-		return
+		return 0, err
 	}
 	fi, err := c.sys.OpenFile(fmt.Sprintf("%v/%v", c.analogPath, analogPin), os.O_RDONLY, 0o644)
 	defer fi.Close() //nolint:staticcheck // for historical reasons
 
 	if err != nil {
-		return
+		return 0, err
 	}
 
 	buf := make([]byte, 1024)
 	_, err = fi.Read(buf)
 	if err != nil {
-		return
+		return 0, err
 	}
 
-	val, _ = strconv.Atoi(strings.Split(string(buf), "\n")[0])
-	return
+	val, _ := strconv.Atoi(strings.Split(string(buf), "\n")[0])
+	return val, nil
 }
 
 func (c *Adaptor) validateSpiBusNumber(busNr int) error {
@@ -218,13 +219,13 @@ func (c *Adaptor) translateAndMuxPWMPin(id string) (string, int, error) {
 	return path, pinInfo.channel, nil
 }
 
-func (p pwmPinData) findPWMDir(sys *system.Accesser) (dir string, err error) {
+func (p pwmPinData) findPWMDir(sys *system.Accesser) (string, error) {
 	items, _ := sys.Find(p.dir, p.dirRegexp)
 	if len(items) == 0 {
 		return "", fmt.Errorf("No path found for PWM directory pattern, '%s' in path '%s'", p.dirRegexp, p.dir)
 	}
 
-	dir = items[0]
+	dir := items[0]
 	info, err := sys.Stat(dir)
 	if err != nil {
 		return "", fmt.Errorf("Error (%v) on access '%s'", err, dir)
@@ -233,7 +234,7 @@ func (p pwmPinData) findPWMDir(sys *system.Accesser) (dir string, err error) {
 		return "", fmt.Errorf("The item '%s' is not a directory, which is not expected", dir)
 	}
 
-	return
+	return dir, nil
 }
 
 func (c *Adaptor) muxPin(pin, cmd string) error {

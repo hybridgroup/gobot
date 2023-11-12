@@ -205,8 +205,8 @@ func NewDriver(port string) *Driver {
 	return NewDriverWithIP("192.168.10.1", port)
 }
 
-// NewDriverWithIP creates a driver for the Tello EDU drone. Pass in the ip address and UDP port to use for the responses
-// from the drone.
+// NewDriverWithIP creates a driver for the Tello EDU drone. Pass in the ip address and UDP port to use for
+// the responses from the drone.
 func NewDriverWithIP(ip string, port string) *Driver {
 	d := &Driver{
 		name:      gobot.DefaultName("Tello"),
@@ -533,6 +533,8 @@ func bound(x, y float32) float32 { //nolint:unparam // keep y as parameter
 // Values are from 0 to 1.
 // x, y, z denote forward, side and vertical translation,
 // and psi  yaw (rotation around the z-axis).
+//
+//nolint:nonamedreturns // sufficient here
 func (d *Driver) Vector() (x, y, z, psi float32) {
 	return d.ry, d.rx, d.ly, d.lx
 }
@@ -890,7 +892,8 @@ func (d *Driver) SendStickCommand() error {
 	// speed control
 	axis5 := int16(d.throttle)
 
-	packedAxis := int64(axis1)&0x7FF | int64(axis2&0x7FF)<<11 | 0x7FF&int64(axis3)<<22 | 0x7FF&int64(axis4)<<33 | int64(axis5)<<44
+	packedAxis := int64(axis1)&0x7FF | int64(axis2&0x7FF)<<11 | 0x7FF&int64(axis3)<<22 | 0x7FF&int64(axis4)<<33 |
+		int64(axis5)<<44
 	if err := binary.Write(buf, binary.LittleEndian, byte(0xFF&packedAxis)); err != nil {
 		return err
 	}
@@ -1071,8 +1074,8 @@ func (d *Driver) processVideo() error {
 	return nil
 }
 
-func (d *Driver) createPacket(cmd int16, pktType byte, len int16) (*bytes.Buffer, error) {
-	l := len + 11
+func (d *Driver) createPacket(cmd int16, pktType byte, pktLen int16) (*bytes.Buffer, error) {
+	l := pktLen + 11
 	buf := &bytes.Buffer{}
 
 	if err := binary.Write(buf, binary.LittleEndian, byte(messageStart)); err != nil {

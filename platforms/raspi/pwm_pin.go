@@ -54,7 +54,7 @@ func (p *PWMPin) Polarity() (bool, error) {
 }
 
 // SetPolarity does not do anything when using PiBlaster
-func (p *PWMPin) SetPolarity(bool) (err error) {
+func (p *PWMPin) SetPolarity(bool) error {
 	return nil
 }
 
@@ -106,7 +106,7 @@ func (p *PWMPin) SetDutyCycle(duty uint32) error {
 	return nil
 }
 
-func (p *PWMPin) writeValue(data string) (err error) {
+func (p *PWMPin) writeValue(data string) error {
 	fi, err := p.sys.OpenFile(p.path, os.O_WRONLY|os.O_APPEND, 0o644)
 	defer fi.Close() //nolint:staticcheck // for historical reasons
 
@@ -115,5 +115,5 @@ func (p *PWMPin) writeValue(data string) (err error) {
 	}
 
 	_, err = fi.WriteString(data)
-	return
+	return err
 }

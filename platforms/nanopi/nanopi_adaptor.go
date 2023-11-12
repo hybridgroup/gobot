@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	multierror "github.com/hashicorp/go-multierror"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/platforms/adaptors"
 	"gobot.io/x/gobot/v2/system"
@@ -167,14 +168,14 @@ func (c *Adaptor) translatePWMPin(id string) (string, int, error) {
 	return path, pinInfo.channel, nil
 }
 
-func (p pwmPinDefinition) findPWMDir(sys *system.Accesser) (dir string, err error) {
+func (p pwmPinDefinition) findPWMDir(sys *system.Accesser) (string, error) {
 	items, _ := sys.Find(p.dir, p.dirRegexp)
 	if len(items) == 0 {
 		return "", fmt.Errorf("No path found for PWM directory pattern, '%s' in path '%s'. See README.md for activation",
 			p.dirRegexp, p.dir)
 	}
 
-	dir = items[0]
+	dir := items[0]
 	info, err := sys.Stat(dir)
 	if err != nil {
 		return "", fmt.Errorf("Error (%v) on access '%s'", err, dir)
@@ -183,5 +184,5 @@ func (p pwmPinDefinition) findPWMDir(sys *system.Accesser) (dir string, err erro
 		return "", fmt.Errorf("The item '%s' is not a directory, which is not expected", dir)
 	}
 
-	return
+	return dir, nil
 }

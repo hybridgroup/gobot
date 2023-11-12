@@ -53,6 +53,7 @@ func (d *Driver) Connection() gobot.Connection {
 //
 //	string: The filename of the audio to start playing
 func (d *Driver) Sound(fileName string) []error {
+	//nolint:forcetypeassert // ok here
 	return d.Connection().(*Adaptor).Sound(fileName)
 }
 
@@ -62,11 +63,11 @@ func (d *Driver) Play() []error {
 }
 
 // Start starts the Driver
-func (d *Driver) Start() (err error) {
-	return
+func (d *Driver) Start() error {
+	return nil
 }
 
 // Halt halts the Driver
-func (d *Driver) Halt() (err error) {
-	return
+func (d *Driver) Halt() error {
+	return nil
 }

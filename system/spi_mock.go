@@ -17,7 +17,10 @@ type MockSpiAccess struct {
 	sysdev      *spiMock
 }
 
-func (spi *MockSpiAccess) createDevice(busNum, chipNum, mode, bits int, maxSpeed int64) (gobot.SpiSystemDevicer, error) {
+func (spi *MockSpiAccess) createDevice(
+	busNum, chipNum, mode, bits int,
+	maxSpeed int64,
+) (gobot.SpiSystemDevicer, error) {
 	spi.busNum = busNum
 	spi.chipNum = chipNum
 	spi.mode = mode

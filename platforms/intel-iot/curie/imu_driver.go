@@ -75,6 +75,7 @@ func NewIMUDriver(a *firmata.Adaptor) *IMUDriver {
 // Start starts up the IMUDriver
 func (imu *IMUDriver) Start() error {
 	return imu.connection.On("SysexResponse", func(res interface{}) {
+		//nolint:forcetypeassert // ok here
 		data := res.([]byte)
 		if err := imu.handleEvent(data); err != nil {
 			panic(err)

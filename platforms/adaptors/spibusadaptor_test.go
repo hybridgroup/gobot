@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2/drivers/spi"
 	"gobot.io/x/gobot/v2/system"
 )
@@ -105,7 +106,7 @@ func TestSpiFinalizeWithError(t *testing.T) {
 	// act
 	err := a.Finalize()
 	// assert
-	assert.Contains(t, err.Error(), "error while SPI close")
+	require.ErrorContains(t, err, "error while SPI close")
 }
 
 func TestSpiReConnect(t *testing.T) {

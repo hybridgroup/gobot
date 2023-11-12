@@ -90,7 +90,7 @@ func TestMasterStartAutoRun(t *testing.T) {
 func TestMasterStartDriverErrors(t *testing.T) {
 	g := initTestMaster1Robot()
 	e := errors.New("driver start error 1")
-	testDriverStart = func() (err error) {
+	testDriverStart = func() error {
 		return e
 	}
 
@@ -102,13 +102,13 @@ func TestMasterStartDriverErrors(t *testing.T) {
 	assert.Equal(t, want, g.Start())
 	require.NoError(t, g.Stop())
 
-	testDriverStart = func() (err error) { return }
+	testDriverStart = func() error { return nil }
 }
 
 func TestMasterHaltFromRobotDriverErrors(t *testing.T) {
 	g := initTestMaster1Robot()
 	var ec int
-	testDriverHalt = func() (err error) {
+	testDriverHalt = func() error {
 		ec++
 		return fmt.Errorf("driver halt error %d", ec)
 	}
@@ -126,7 +126,7 @@ func TestMasterHaltFromRobotDriverErrors(t *testing.T) {
 func TestMasterStartRobotAdaptorErrors(t *testing.T) {
 	g := initTestMaster1Robot()
 	var ec int
-	testAdaptorConnect = func() (err error) {
+	testAdaptorConnect = func() error {
 		ec++
 		return fmt.Errorf("adaptor start error %d", ec)
 	}
@@ -141,13 +141,13 @@ func TestMasterStartRobotAdaptorErrors(t *testing.T) {
 	assert.Equal(t, want, g.Start())
 	require.NoError(t, g.Stop())
 
-	testAdaptorConnect = func() (err error) { return }
+	testAdaptorConnect = func() error { return nil }
 }
 
 func TestMasterFinalizeErrors(t *testing.T) {
 	g := initTestMaster1Robot()
 	var ec int
-	testAdaptorFinalize = func() (err error) {
+	testAdaptorFinalize = func() error {
 		ec++
 		return fmt.Errorf("adaptor finalize error %d", ec)
 	}

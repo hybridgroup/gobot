@@ -260,16 +260,17 @@ func (a *Adafruit2348Driver) oneStep(motor int, dir Adafruit2348Direction, style
 		pwmA = 0
 		pwmB = 0
 		currStep := a.stepperMotors[motor].currentStep
-		if currStep >= 0 && currStep < adafruit2348StepperMicrosteps {
+		switch {
+		case currStep >= 0 && currStep < adafruit2348StepperMicrosteps:
 			pwmA = a.stepperMicrostepCurve[adafruit2348StepperMicrosteps-currStep]
 			pwmB = a.stepperMicrostepCurve[currStep]
-		} else if currStep >= adafruit2348StepperMicrosteps && currStep < adafruit2348StepperMicrosteps*2 {
+		case currStep >= adafruit2348StepperMicrosteps && currStep < adafruit2348StepperMicrosteps*2:
 			pwmA = a.stepperMicrostepCurve[currStep-adafruit2348StepperMicrosteps]
 			pwmB = a.stepperMicrostepCurve[adafruit2348StepperMicrosteps*2-currStep]
-		} else if currStep >= adafruit2348StepperMicrosteps*2 && currStep < adafruit2348StepperMicrosteps*3 {
+		case currStep >= adafruit2348StepperMicrosteps*2 && currStep < adafruit2348StepperMicrosteps*3:
 			pwmA = a.stepperMicrostepCurve[adafruit2348StepperMicrosteps*3-currStep]
 			pwmB = a.stepperMicrostepCurve[currStep-adafruit2348StepperMicrosteps*2]
-		} else if currStep >= adafruit2348StepperMicrosteps*3 && currStep < adafruit2348StepperMicrosteps*4 {
+		case currStep >= adafruit2348StepperMicrosteps*3 && currStep < adafruit2348StepperMicrosteps*4:
 			pwmA = a.stepperMicrostepCurve[currStep-adafruit2348StepperMicrosteps*3]
 			pwmB = a.stepperMicrostepCurve[adafruit2348StepperMicrosteps*4-currStep]
 		}

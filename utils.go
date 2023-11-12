@@ -46,11 +46,12 @@ func FromScale(input, min, max float64) float64 {
 // If input is greater than max then ToScale returns max
 func ToScale(input, min, max float64) float64 {
 	i := input*(math.Max(min, max)-math.Min(min, max)) + math.Min(min, max)
-	if i < math.Min(min, max) {
+	switch {
+	case i < math.Min(min, max):
 		return math.Min(min, max)
-	} else if i > math.Max(min, max) {
+	case i > math.Max(min, max):
 		return math.Max(min, max)
-	} else {
+	default:
 		return i
 	}
 }

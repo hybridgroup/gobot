@@ -50,7 +50,11 @@ type DigitalPinsAdaptor struct {
 // to the internal file name or chip/line nomenclature. This varies by each platform. If for some reasons the default
 // initializer is not suitable, it can be given by the option "WithDigitalPinInitializer()". This is especially needed,
 // if some values needs to be adjusted after the pin was created but before the pin is exported.
-func NewDigitalPinsAdaptor(sys *system.Accesser, t digitalPinTranslator, options ...func(Optioner)) *DigitalPinsAdaptor {
+func NewDigitalPinsAdaptor(
+	sys *system.Accesser,
+	t digitalPinTranslator,
+	options ...func(Optioner),
+) *DigitalPinsAdaptor {
 	a := &DigitalPinsAdaptor{
 		sys:        sys,
 		translate:  t,
@@ -219,10 +223,11 @@ func (a *DigitalPinsAdaptor) Connect() error {
 }
 
 // Finalize closes connection to digital pins
-func (a *DigitalPinsAdaptor) Finalize() (err error) {
+func (a *DigitalPinsAdaptor) Finalize() error {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
+	var err error
 	for _, pin := range a.pins {
 		if pin != nil {
 			if e := pin.Unexport(); e != nil {
@@ -232,7 +237,7 @@ func (a *DigitalPinsAdaptor) Finalize() (err error) {
 	}
 	a.pins = nil
 	a.pinOptions = nil
-	return
+	return err
 }
 
 // DigitalPin returns a digital pin. If the pin is initially acquired, it is an input.
@@ -395,7 +400,10 @@ func (a *DigitalPinsAdaptor) prepareDigitalPinPollForEdgeDetection(
 	a.pinOptions[id] = append(a.pinOptions[id], system.WithPinPollForEdgeDetection(pollInterval, pollQuitChan))
 }
 
-func (a *DigitalPinsAdaptor) digitalPin(id string, opts ...func(gobot.DigitalPinOptioner) bool) (gobot.DigitalPinner, error) {
+func (a *DigitalPinsAdaptor) digitalPin(
+	id string,
+	opts ...func(gobot.DigitalPinOptioner) bool,
+) (gobot.DigitalPinner, error) {
 	if a.pins == nil {
 		return nil, fmt.Errorf("not connected for pin %s", id)
 	}

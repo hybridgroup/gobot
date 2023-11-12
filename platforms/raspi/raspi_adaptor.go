@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	multierror "github.com/hashicorp/go-multierror"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/platforms/adaptors"
 	"gobot.io/x/gobot/v2/system"
@@ -139,7 +140,7 @@ func (c *Adaptor) PWMPin(id string) (gobot.PWMPinner, error) {
 }
 
 // PwmWrite writes a PWM signal to the specified pin
-func (c *Adaptor) PwmWrite(pin string, val byte) (err error) {
+func (c *Adaptor) PwmWrite(pin string, val byte) error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -153,7 +154,7 @@ func (c *Adaptor) PwmWrite(pin string, val byte) (err error) {
 }
 
 // ServoWrite writes a servo signal to the specified pin
-func (c *Adaptor) ServoWrite(pin string, angle byte) (err error) {
+func (c *Adaptor) ServoWrite(pin string, angle byte) error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -184,14 +185,14 @@ func (c *Adaptor) validateI2cBusNumber(busNr int) error {
 }
 
 func (c *Adaptor) getPinTranslatorFunction() func(string) (string, int, error) {
-	return func(pin string) (chip string, line int, err error) {
+	return func(pin string) (string, int, error) {
+		var line int
 		if val, ok := pins[pin][c.readRevision()]; ok {
 			line = val
 		} else if val, ok := pins[pin]["*"]; ok {
 			line = val
 		} else {
-			err = errors.New("Not a valid pin")
-			return
+			return "", 0, errors.New("Not a valid pin")
 		}
 		// TODO: Pi1 model B has only this single "gpiochip0", a change of the translator is needed,
 		// to support different chips with different revisions
@@ -210,11 +211,12 @@ func (c *Adaptor) readRevision() string {
 			if strings.Contains(v, "Revision") {
 				s := strings.Split(v, " ")
 				version, _ := strconv.ParseInt("0x"+s[len(s)-1], 0, 64)
-				if version <= 3 {
+				switch {
+				case version <= 3:
 					c.revision = "1"
-				} else if version <= 15 {
+				case version <= 15:
 					c.revision = "2"
-				} else {
+				default:
 					c.revision = "3"
 				}
 			}

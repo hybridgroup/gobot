@@ -19,13 +19,13 @@ type firmataI2cConnection struct {
 
 // NewFirmataI2cConnection creates an I2C connection to an I2C device at
 // the specified address
-func NewFirmataI2cConnection(adaptor *Adaptor, address int) (connection *firmataI2cConnection) {
+func NewFirmataI2cConnection(adaptor *Adaptor, address int) *firmataI2cConnection {
 	return &firmataI2cConnection{adaptor: adaptor, address: address}
 }
 
 // Read tries to read a full buffer from the i2c device.
 // Returns an empty array if the response from the board has timed out.
-func (c *firmataI2cConnection) Read(b []byte) (read int, err error) {
+func (c *firmataI2cConnection) Read(b []byte) (int, error) {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
@@ -33,7 +33,7 @@ func (c *firmataI2cConnection) Read(b []byte) (read int, err error) {
 }
 
 // Write writes the buffer content in data to the i2c device.
-func (c *firmataI2cConnection) Write(data []byte) (written int, err error) {
+func (c *firmataI2cConnection) Write(data []byte) (int, error) {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
@@ -205,7 +205,7 @@ func (c *firmataI2cConnection) readInternal(b []byte) (int, error) {
 	}
 
 	if err := c.adaptor.Board.Once(c.adaptor.Board.Event("I2cReply"), func(data interface{}) {
-		ret <- data.(client.I2cReply).Data
+		ret <- data.(client.I2cReply).Data //nolint:forcetypeassert // ok here
 	}); err != nil {
 		return 0, err
 	}
@@ -227,7 +227,7 @@ func (c *firmataI2cConnection) writeInternal(data []byte) (int, error) {
 		written += len(chunk)
 	}
 	if len(data) > 0 {
-		if err := c.adaptor.Board.I2cWrite(c.address, data[:]); err != nil {
+		if err := c.adaptor.Board.I2cWrite(c.address, data); err != nil {
 			return written, err
 		}
 		written += len(data)

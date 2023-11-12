@@ -61,7 +61,7 @@ func (m *UDPAdaptor) close() error {
 }
 
 // Finalize returns true if connection to devices is closed successfully
-func (m *UDPAdaptor) Finalize() (err error) {
+func (m *UDPAdaptor) Finalize() error {
 	return m.close()
 }
 

@@ -56,9 +56,7 @@ func (d *MCP3002Driver) Read(channel int) (int, error) {
 }
 
 // AnalogRead returns value from analog reading of specified pin
-func (d *MCP3002Driver) AnalogRead(pin string) (value int, err error) {
+func (d *MCP3002Driver) AnalogRead(pin string) (int, error) {
 	channel, _ := strconv.Atoi(pin)
-	value, err = d.Read(channel)
-
-	return
+	return d.Read(channel)
 }

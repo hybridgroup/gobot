@@ -42,7 +42,7 @@ var (
 )
 
 // Write writes string(b) to f.Contents
-func (f *MockFile) Write(b []byte) (n int, err error) {
+func (f *MockFile) Write(b []byte) (int, error) {
 	if f.fs.WithWriteError {
 		return 0, errWrite
 	}
@@ -50,24 +50,24 @@ func (f *MockFile) Write(b []byte) (n int, err error) {
 }
 
 // Seek seeks to a specific offset in a file
-func (f *MockFile) Seek(offset int64, whence int) (ret int64, err error) {
+func (f *MockFile) Seek(offset int64, whence int) (int64, error) {
 	return offset, nil
 }
 
 // WriteString writes s to f.Contents
-func (f *MockFile) WriteString(s string) (ret int, err error) {
+func (f *MockFile) WriteString(s string) (int, error) {
 	f.Contents = s
 	f.Seq = f.fs.next()
 	return len(s), nil
 }
 
 // Sync implements the File interface Sync function
-func (f *MockFile) Sync() (err error) {
+func (f *MockFile) Sync() error {
 	return nil
 }
 
 // Read copies b bytes from f.Contents
-func (f *MockFile) Read(b []byte) (n int, err error) {
+func (f *MockFile) Read(b []byte) (int, error) {
 	if f.fs.WithReadError {
 		return 0, errRead
 	}
@@ -83,7 +83,7 @@ func (f *MockFile) Read(b []byte) (n int, err error) {
 }
 
 // ReadAt calls MockFile.Read
-func (f *MockFile) ReadAt(b []byte, off int64) (n int, err error) {
+func (f *MockFile) ReadAt(b []byte, off int64) (int, error) {
 	return f.Read(b)
 }
 
@@ -119,7 +119,7 @@ func newMockFilesystem(items []string) *MockFilesystem {
 }
 
 // OpenFile opens file name from fs.Files, if the file does not exist it returns an os.PathError
-func (fs *MockFilesystem) openFile(name string, _ int, _ os.FileMode) (file File, err error) {
+func (fs *MockFilesystem) openFile(name string, _ int, _ os.FileMode) (File, error) {
 	f, ok := fs.Files[name]
 	if ok {
 		f.Opened = true

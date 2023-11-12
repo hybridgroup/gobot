@@ -191,7 +191,7 @@ func WithPCF8591ForceRefresh(val uint8) func(Config) {
 //     because some missing integration steps in each conversion (each byte value is a little bit lower than expected)
 //
 // So, for default, we drop the first three bytes to get the right value.
-func (p *PCF8591Driver) AnalogRead(description string) (value int, err error) {
+func (p *PCF8591Driver) AnalogRead(description string) (int, error) {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
@@ -232,7 +232,7 @@ func (p *PCF8591Driver) AnalogRead(description string) (value int, err error) {
 	}
 
 	// prepare return value
-	value = int(uval)
+	value := int(uval)
 	if mc.pcf8591IsDiff() {
 		if uval > 127 {
 			// first bit is set, means negative
@@ -240,13 +240,13 @@ func (p *PCF8591Driver) AnalogRead(description string) (value int, err error) {
 		}
 	}
 
-	return value, err
+	return value, nil
 }
 
 // AnalogWrite writes the given value to the analog output (DAC)
 // Vlsb = (Vref-Vagnd)/256, Vaout = Vagnd+Vlsb*value
 // implements the aio.AnalogWriter interface, pin is unused here
-func (p *PCF8591Driver) AnalogWrite(pin string, value int) (err error) {
+func (p *PCF8591Driver) AnalogWrite(pin string, value int) error {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
@@ -260,8 +260,7 @@ func (p *PCF8591Driver) AnalogWrite(pin string, value int) (err error) {
 	}
 
 	ctrlByte := p.lastCtrlByte | byte(pcf8591_ANAON)
-	err = p.connection.WriteByteData(ctrlByte, byteVal)
-	if err != nil {
+	if err := p.connection.WriteByteData(ctrlByte, byteVal); err != nil {
 		return err
 	}
 
@@ -281,8 +280,8 @@ func (p *PCF8591Driver) AnalogOutputState(state bool) error {
 	return p.analogOutputState(state)
 }
 
-// PCF8591ParseModeChan is used to get a working combination between mode (single, mixed, 2 differential, 3 differential)
-// and the related channel to read from, parsed from the given description string.
+// PCF8591ParseModeChan is used to get a working combination between mode (single, mixed, 2 differential,
+// 3 differential) and the related channel to read from, parsed from the given description string.
 func PCF8591ParseModeChan(description string) (*pcf8591ModeChan, error) {
 	mc, ok := pcf8591ModeMap[description]
 	if !ok {
@@ -303,10 +302,8 @@ func (p *PCF8591Driver) writeCtrlByte(ctrlByte uint8, forceRefresh bool) error {
 			return err
 		}
 		p.lastCtrlByte = ctrlByte
-	} else {
-		if pcf8591Debug {
-			log.Printf("write skipped because control byte unchanged: 0x%X\n", ctrlByte)
-		}
+	} else if pcf8591Debug {
+		log.Printf("write skipped because control byte unchanged: 0x%X\n", ctrlByte)
 	}
 	return nil
 }
@@ -343,7 +340,7 @@ func (p *PCF8591Driver) initialize() error {
 	return p.analogOutputState(false)
 }
 
-func (p *PCF8591Driver) shutdown() (err error) {
+func (p *PCF8591Driver) shutdown() error {
 	return p.analogOutputState(false)
 }
 

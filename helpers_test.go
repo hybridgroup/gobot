@@ -24,12 +24,12 @@ type testDriver struct {
 }
 
 var (
-	testDriverStart = func() (err error) { return }
-	testDriverHalt  = func() (err error) { return }
+	testDriverStart = func() error { return nil }
+	testDriverHalt  = func() error { return nil }
 )
 
-func (t *testDriver) Start() (err error)     { return testDriverStart() }
-func (t *testDriver) Halt() (err error)      { return testDriverHalt() }
+func (t *testDriver) Start() error           { return testDriverStart() }
+func (t *testDriver) Halt() error            { return testDriverHalt() }
 func (t *testDriver) Name() string           { return t.name }
 func (t *testDriver) SetName(n string)       { t.name = n }
 func (t *testDriver) Pin() string            { return t.pin }
@@ -54,15 +54,15 @@ type testAdaptor struct {
 }
 
 var (
-	testAdaptorConnect  = func() (err error) { return }
-	testAdaptorFinalize = func() (err error) { return }
+	testAdaptorConnect  = func() error { return nil }
+	testAdaptorFinalize = func() error { return nil }
 )
 
-func (t *testAdaptor) Finalize() (err error) { return testAdaptorFinalize() }
-func (t *testAdaptor) Connect() (err error)  { return testAdaptorConnect() }
-func (t *testAdaptor) Name() string          { return t.name }
-func (t *testAdaptor) SetName(n string)      { t.name = n }
-func (t *testAdaptor) Port() string          { return t.port }
+func (t *testAdaptor) Finalize() error  { return testAdaptorFinalize() }
+func (t *testAdaptor) Connect() error   { return testAdaptorConnect() }
+func (t *testAdaptor) Name() string     { return t.name }
+func (t *testAdaptor) SetName(n string) { t.name = n }
+func (t *testAdaptor) Port() string     { return t.port }
 
 func newTestAdaptor(name string, port string) *testAdaptor { //nolint:unparam // keep for tests
 	return &testAdaptor{

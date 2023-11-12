@@ -52,11 +52,11 @@ type loopbackAdaptor struct {
 	port string
 }
 
-func (t *loopbackAdaptor) Finalize() (err error) { return }
-func (t *loopbackAdaptor) Connect() (err error)  { return }
-func (t *loopbackAdaptor) Name() string          { return t.name }
-func (t *loopbackAdaptor) SetName(n string)      { t.name = n }
-func (t *loopbackAdaptor) Port() string          { return t.port }
+func (t *loopbackAdaptor) Finalize() error  { return nil }
+func (t *loopbackAdaptor) Connect() error   { return nil }
+func (t *loopbackAdaptor) Name() string     { return t.name }
+func (t *loopbackAdaptor) SetName(n string) { t.name = n }
+func (t *loopbackAdaptor) Port() string     { return t.port }
 
 func NewLoopbackAdaptor(port string) *loopbackAdaptor {
 	return &loopbackAdaptor{
@@ -75,8 +75,8 @@ type pingDriver struct {
 	gobot.Commander
 }
 
-func (t *pingDriver) Start() (err error)           { return }
-func (t *pingDriver) Halt() (err error)            { return }
+func (t *pingDriver) Start() error                 { return nil }
+func (t *pingDriver) Halt() error                  { return nil }
 func (t *pingDriver) Name() string                 { return t.name }
 func (t *pingDriver) SetName(n string)             { t.name = n }
 func (t *pingDriver) Pin() string                  { return t.pin }

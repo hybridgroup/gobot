@@ -25,7 +25,7 @@ const (
 	TM1638FixedAddr = 0x04
 )
 
-// TM1638Driver is the gobot driver for modules based on the TM1638, which has 8 7-segment displays, 8 LEDs and 8 buttons
+// TM1638Driver is the driver for modules based on the TM1638, which has 8 7-segment displays, 8 LEDs and 8 buttons.
 // Buttons are not supported
 //
 // Datasheet EN: https://retrocip.cz/files/tm1638.pdf

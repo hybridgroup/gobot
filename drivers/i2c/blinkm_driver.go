@@ -31,6 +31,7 @@ func NewBlinkMDriver(c Connector, options ...func(Config)) *BlinkMDriver {
 		option(b)
 	}
 
+	//nolint:forcetypeassert // ok here
 	b.AddCommand("Rgb", func(params map[string]interface{}) interface{} {
 		red := byte(params["red"].(float64))
 		green := byte(params["green"].(float64))
@@ -38,6 +39,7 @@ func NewBlinkMDriver(c Connector, options ...func(Config)) *BlinkMDriver {
 		return b.Rgb(red, green, blue)
 	})
 
+	//nolint:forcetypeassert // ok here
 	b.AddCommand("Fade", func(params map[string]interface{}) interface{} {
 		red := byte(params["red"].(float64))
 		green := byte(params["green"].(float64))
@@ -59,40 +61,40 @@ func NewBlinkMDriver(c Connector, options ...func(Config)) *BlinkMDriver {
 }
 
 // Rgb sets color using r,g,b params
-func (b *BlinkMDriver) Rgb(red byte, green byte, blue byte) (err error) {
-	if _, err = b.connection.Write([]byte("n")); err != nil {
-		return
+func (b *BlinkMDriver) Rgb(red byte, green byte, blue byte) error {
+	if _, err := b.connection.Write([]byte("n")); err != nil {
+		return err
 	}
-	_, err = b.connection.Write([]byte{red, green, blue})
-	return
+	_, err := b.connection.Write([]byte{red, green, blue})
+	return err
 }
 
 // Fade removes color using r,g,b params
-func (b *BlinkMDriver) Fade(red byte, green byte, blue byte) (err error) {
-	if _, err = b.connection.Write([]byte("c")); err != nil {
-		return
+func (b *BlinkMDriver) Fade(red byte, green byte, blue byte) error {
+	if _, err := b.connection.Write([]byte("c")); err != nil {
+		return err
 	}
-	_, err = b.connection.Write([]byte{red, green, blue})
-	return
+	_, err := b.connection.Write([]byte{red, green, blue})
+	return err
 }
 
 // FirmwareVersion returns version with MAYOR.minor format
-func (b *BlinkMDriver) FirmwareVersion() (version string, err error) {
-	if _, err = b.connection.Write([]byte("Z")); err != nil {
-		return
+func (b *BlinkMDriver) FirmwareVersion() (string, error) {
+	if _, err := b.connection.Write([]byte("Z")); err != nil {
+		return "", err
 	}
 	data := []byte{0, 0}
 	read, err := b.connection.Read(data)
 	if read != 2 || err != nil {
-		return
+		return "", err
 	}
 	return fmt.Sprintf("%v.%v", data[0], data[1]), nil
 }
 
 // Color returns an array with current rgb color
-func (b *BlinkMDriver) Color() (color []byte, err error) {
-	if _, err = b.connection.Write([]byte("g")); err != nil {
-		return
+func (b *BlinkMDriver) Color() ([]byte, error) {
+	if _, err := b.connection.Write([]byte("g")); err != nil {
+		return []byte{}, err
 	}
 	data := []byte{0, 0, 0}
 	read, err := b.connection.Read(data)

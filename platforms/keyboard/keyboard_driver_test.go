@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -14,7 +15,7 @@ var _ gobot.Driver = (*Driver)(nil)
 
 func initTestKeyboardDriver() *Driver {
 	d := NewDriver()
-	d.connect = func(k *Driver) (err error) {
+	d.connect = func(k *Driver) error {
 		k.stdin = &os.File{}
 		return nil
 	}

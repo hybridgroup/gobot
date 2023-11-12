@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/warthog618/gpiod"
+
 	"gobot.io/x/gobot/v2"
 )
 

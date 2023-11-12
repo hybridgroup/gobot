@@ -12,7 +12,10 @@ type gpioSpiAccess struct {
 	cfg spiGpioConfig
 }
 
-func (*periphioSpiAccess) createDevice(busNum, chipNum, mode, bits int, maxSpeed int64) (gobot.SpiSystemDevicer, error) {
+func (*periphioSpiAccess) createDevice(
+	busNum, chipNum, mode, bits int,
+	maxSpeed int64,
+) (gobot.SpiSystemDevicer, error) {
 	return newSpiPeriphIo(busNum, chipNum, mode, bits, maxSpeed)
 }
 
@@ -24,7 +27,10 @@ func (psa *periphioSpiAccess) isSupported() bool {
 	return true
 }
 
-func (gsa *gpioSpiAccess) createDevice(busNum, chipNum, mode, bits int, maxSpeed int64) (gobot.SpiSystemDevicer, error) {
+func (gsa *gpioSpiAccess) createDevice(
+	busNum, chipNum, mode, bits int,
+	maxSpeed int64,
+) (gobot.SpiSystemDevicer, error) {
 	return newSpiGpio(gsa.cfg, maxSpeed)
 }
 

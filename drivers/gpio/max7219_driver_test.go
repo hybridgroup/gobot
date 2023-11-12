@@ -6,15 +6,16 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
 var _ gobot.Driver = (*MAX7219Driver)(nil)
 
 // --------- HELPERS
-func initTestMAX7219Driver() (driver *MAX7219Driver) {
-	driver, _ = initTestMAX7219DriverWithStubbedAdaptor()
-	return
+func initTestMAX7219Driver() *MAX7219Driver {
+	d, _ := initTestMAX7219DriverWithStubbedAdaptor()
+	return d
 }
 
 func initTestMAX7219DriverWithStubbedAdaptor() (*MAX7219Driver, *gpioTestAdaptor) {

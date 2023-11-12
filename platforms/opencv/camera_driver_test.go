@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -14,7 +15,7 @@ var _ gobot.Driver = (*CameraDriver)(nil)
 
 func initTestCameraDriver() *CameraDriver {
 	d := NewCameraDriver("")
-	d.start = func(c *CameraDriver) (err error) {
+	d.start = func(c *CameraDriver) error {
 		d.camera = &testCapture{}
 		return nil
 	}

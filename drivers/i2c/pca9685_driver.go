@@ -61,11 +61,13 @@ func NewPCA9685Driver(c Connector, options ...func(Config)) *PCA9685Driver {
 		option(p)
 	}
 
+	//nolint:forcetypeassert // ok here
 	p.AddCommand("PwmWrite", func(params map[string]interface{}) interface{} {
 		pin := params["pin"].(string)
 		val, _ := strconv.Atoi(params["val"].(string))
 		return p.PwmWrite(pin, byte(val))
 	})
+	//nolint:forcetypeassert // ok here
 	p.AddCommand("ServoWrite", func(params map[string]interface{}) interface{} {
 		pin := params["pin"].(string)
 		val, _ := strconv.Atoi(params["val"].(string))
@@ -93,7 +95,7 @@ func NewPCA9685Driver(c Connector, options ...func(Config)) *PCA9685Driver {
 //	off uint16 - the time to stop the pulse
 //
 // Most typically you set "on" to a zero value, and then set "off" to your desired duty.
-func (p *PCA9685Driver) SetPWM(channel int, on uint16, off uint16) (err error) {
+func (p *PCA9685Driver) SetPWM(channel int, on uint16, off uint16) error {
 	if _, err := p.connection.Write([]byte{byte(pca9685Led0OnLReg + 4*channel), byte(on) & 0xFF}); err != nil {
 		return err
 	}
@@ -106,11 +108,8 @@ func (p *PCA9685Driver) SetPWM(channel int, on uint16, off uint16) (err error) {
 		return err
 	}
 
-	if _, err := p.connection.Write([]byte{byte(pca9685Led0OffHReg + 4*channel), byte(off >> 8)}); err != nil {
-		return err
-	}
-
-	return
+	_, err := p.connection.Write([]byte{byte(pca9685Led0OffHReg + 4*channel), byte(off >> 8)})
+	return err
 }
 
 // SetAllPWM sets all channels to a pwm value from 0-4095.
@@ -120,7 +119,7 @@ func (p *PCA9685Driver) SetPWM(channel int, on uint16, off uint16) (err error) {
 //	off uint16 - the time to stop the pulse
 //
 // Most typically you set "on" to a zero value, and then set "off" to your desired duty.
-func (p *PCA9685Driver) SetAllPWM(on uint16, off uint16) (err error) {
+func (p *PCA9685Driver) SetAllPWM(on uint16, off uint16) error {
 	if _, err := p.connection.Write([]byte{byte(pca9685AllLedOnLReg), byte(on) & 0xFF}); err != nil {
 		return err
 	}
@@ -133,11 +132,8 @@ func (p *PCA9685Driver) SetAllPWM(on uint16, off uint16) (err error) {
 		return err
 	}
 
-	if _, err := p.connection.Write([]byte{byte(pca9685AllLedOffHReg), byte(off >> 8)}); err != nil {
-		return err
-	}
-
-	return
+	_, err := p.connection.Write([]byte{byte(pca9685AllLedOffHReg), byte(off >> 8)})
+	return err
 }
 
 // SetPWMFreq sets the PWM frequency in Hz between 24Hz and 1526Hz, the default is 200Hz.
@@ -180,20 +176,17 @@ func (p *PCA9685Driver) SetPWMFreq(freq float32) error {
 
 	// initiate a restart
 	restartMode := oldmode | pca9685Mode1RegRestartBit
-	if _, err := p.connection.Write([]byte{byte(pca9685Mode1Reg), restartMode}); err != nil {
-		return err
-	}
-
-	return nil
+	_, err = p.connection.Write([]byte{byte(pca9685Mode1Reg), restartMode})
+	return err
 }
 
 // PwmWrite writes a PWM signal to the specified channel aka "pin".
 // Value values are from 0-255, to conform to the PwmWriter interface.
 // If you need finer control, please look at SetPWM().
-func (p *PCA9685Driver) PwmWrite(pin string, val byte) (err error) {
+func (p *PCA9685Driver) PwmWrite(pin string, val byte) error {
 	i, err := strconv.Atoi(pin)
 	if err != nil {
-		return
+		return err
 	}
 	v := gobot.ToScale(gobot.FromScale(float64(val), 0, 255), 0, 4095)
 	return p.SetPWM(i, 0, uint16(v))
@@ -202,10 +195,10 @@ func (p *PCA9685Driver) PwmWrite(pin string, val byte) (err error) {
 // ServoWrite writes a servo signal to the specified channel aka "pin".
 // Valid values are from 0-180, to conform to the ServoWriter interface.
 // If you need finer control, please look at SetPWM().
-func (p *PCA9685Driver) ServoWrite(pin string, val byte) (err error) {
+func (p *PCA9685Driver) ServoWrite(pin string, val byte) error {
 	i, err := strconv.Atoi(pin)
 	if err != nil {
-		return
+		return err
 	}
 	v := gobot.ToScale(gobot.FromScale(float64(val), 0, 180), 200, 500)
 	return p.SetPWM(i, 0, uint16(v))

@@ -37,13 +37,13 @@ func (p *SerialPort) Open() error {
 }
 
 // Read reads bytes from BLE serial port connection
-func (p *SerialPort) Read(b []byte) (n int, err error) {
+func (p *SerialPort) Read(b []byte) (int, error) {
 	if len(p.responseData) == 0 {
-		return
+		return 0, nil
 	}
 
 	p.responseMutex.Lock()
-	n = len(b)
+	n := len(b)
 	if len(p.responseData) < n {
 		n = len(p.responseData)
 	}
@@ -56,14 +56,14 @@ func (p *SerialPort) Read(b []byte) (n int, err error) {
 	}
 	p.responseMutex.Unlock()
 
-	return
+	return n, nil
 }
 
 // Write writes to the BLE serial port connection
-func (p *SerialPort) Write(b []byte) (n int, err error) {
-	err = p.client.WriteCharacteristic(p.tid, b)
-	n = len(b)
-	return
+func (p *SerialPort) Write(b []byte) (int, error) {
+	err := p.client.WriteCharacteristic(p.tid, b)
+	n := len(b)
+	return n, err
 }
 
 // Close closes the BLE serial port connection

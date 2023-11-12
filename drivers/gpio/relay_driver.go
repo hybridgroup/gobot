@@ -1,6 +1,10 @@
 package gpio
 
-import "gobot.io/x/gobot/v2"
+import (
+	"log"
+
+	"gobot.io/x/gobot/v2"
+)
 
 // RelayDriver represents a digital relay
 type RelayDriver struct {
@@ -20,7 +24,7 @@ type RelayDriver struct {
 //	"On" - See RelayDriver.On
 //	"Off" - See RelayDriver.Off
 func NewRelayDriver(a DigitalWriter, pin string) *RelayDriver {
-	l := &RelayDriver{
+	d := &RelayDriver{
 		name:       gobot.DefaultName("Relay"),
 		pin:        pin,
 		connection: a,
@@ -29,93 +33,89 @@ func NewRelayDriver(a DigitalWriter, pin string) *RelayDriver {
 		Commander:  gobot.NewCommander(),
 	}
 
-	l.AddCommand("Toggle", func(params map[string]interface{}) interface{} {
-		return l.Toggle()
+	d.AddCommand("Toggle", func(params map[string]interface{}) interface{} {
+		return d.Toggle()
 	})
 
-	l.AddCommand("On", func(params map[string]interface{}) interface{} {
-		return l.On()
+	d.AddCommand("On", func(params map[string]interface{}) interface{} {
+		return d.On()
 	})
 
-	l.AddCommand("Off", func(params map[string]interface{}) interface{} {
-		return l.Off()
+	d.AddCommand("Off", func(params map[string]interface{}) interface{} {
+		return d.Off()
 	})
 
-	return l
+	return d
 }
 
 // Start implements the Driver interface
-func (l *RelayDriver) Start() (err error) { return }
+func (d *RelayDriver) Start() error { return nil }
 
 // Halt implements the Driver interface
-func (l *RelayDriver) Halt() (err error) { return }
+func (d *RelayDriver) Halt() error { return nil }
 
 // Name returns the RelayDrivers name
-func (l *RelayDriver) Name() string { return l.name }
+func (d *RelayDriver) Name() string { return d.name }
 
 // SetName sets the RelayDrivers name
-func (l *RelayDriver) SetName(n string) { l.name = n }
+func (d *RelayDriver) SetName(n string) { d.name = n }
 
 // Pin returns the RelayDrivers name
-func (l *RelayDriver) Pin() string { return l.pin }
+func (d *RelayDriver) Pin() string { return d.pin }
 
 // Connection returns the RelayDrivers Connection
-func (l *RelayDriver) Connection() gobot.Connection {
-	return l.connection.(gobot.Connection)
+func (d *RelayDriver) Connection() gobot.Connection {
+	if conn, ok := d.connection.(gobot.Connection); ok {
+		return conn
+	}
+
+	log.Printf("%s has no gobot connection\n", d.name)
+	return nil
 }
 
 // State return true if the relay is On and false if the relay is Off
-func (l *RelayDriver) State() bool {
-	if l.Inverted {
-		return !l.high
+func (d *RelayDriver) State() bool {
+	if d.Inverted {
+		return !d.high
 	}
-	return l.high
+	return d.high
 }
 
 // On sets the relay to a high state.
-func (l *RelayDriver) On() (err error) {
+func (d *RelayDriver) On() error {
 	newValue := byte(1)
-	if l.Inverted {
+	if d.Inverted {
 		newValue = 0
 	}
-	if err = l.connection.DigitalWrite(l.Pin(), newValue); err != nil {
-		return
+	if err := d.connection.DigitalWrite(d.Pin(), newValue); err != nil {
+		return err
 	}
 
-	if l.Inverted {
-		l.high = false
-	} else {
-		l.high = true
-	}
+	d.high = !d.Inverted
 
-	return
+	return nil
 }
 
 // Off sets the relay to a low state.
-func (l *RelayDriver) Off() (err error) {
+func (d *RelayDriver) Off() error {
 	newValue := byte(0)
-	if l.Inverted {
+	if d.Inverted {
 		newValue = 1
 	}
-	if err = l.connection.DigitalWrite(l.Pin(), newValue); err != nil {
-		return
+	if err := d.connection.DigitalWrite(d.Pin(), newValue); err != nil {
+		return err
 	}
 
-	if l.Inverted {
-		l.high = true
-	} else {
-		l.high = false
-	}
+	d.high = d.Inverted
 
-	return
+	return nil
 }
 
 // Toggle sets the relay to the opposite of it's current state
-func (l *RelayDriver) Toggle() (err error) {
-	if l.State() {
-		err = l.Off()
-	} else {
-		err = l.On()
+func (d *RelayDriver) Toggle() error {
+	if d.State() {
+		return d.Off()
 	}
-	return
+
+	return d.On()
 }

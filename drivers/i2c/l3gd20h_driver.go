@@ -1,3 +1,4 @@
+//nolint:lll // ok here
 package i2c
 
 import (
@@ -111,6 +112,8 @@ func (d *L3GD20HDriver) FullScaleRange() (uint8, error) {
 }
 
 // XYZ returns the current change in degrees per second, for the 3 axis.
+//
+//nolint:nonamedreturns // is sufficient here
 func (d *L3GD20HDriver) XYZ() (x float32, y float32, z float32, err error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()

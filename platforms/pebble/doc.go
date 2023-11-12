@@ -10,7 +10,8 @@ installed on Pebble watch. Then install running:
 
 Example:
 
-Before running the example, make sure configuration settings match with your program. In the example, api host is your computer IP, robot name is 'pebble' and robot api port is 8080
+Before running the example, make sure configuration settings match with your program. In the example, api host is
+your computer IP, robot name is 'pebble' and robot api port is 8080
 
 	package main
 

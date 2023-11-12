@@ -123,16 +123,16 @@ func WithBME280HumidityOversampling(val BME280HumidityOversampling) func(Config)
 }
 
 // Humidity returns the current humidity in percentage of relative humidity
-func (d *BME280Driver) Humidity() (humidity float32, err error) {
+func (d *BME280Driver) Humidity() (float32, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	var rawH uint32
-	if rawH, err = d.rawHumidity(); err != nil {
+	rawH, err := d.rawHumidity()
+	if err != nil {
 		return 0.0, err
 	}
-	humidity = d.calculateHumidity(rawH)
-	return
+	humidity := d.calculateHumidity(rawH)
+	return humidity, nil
 }
 
 func (d *BME280Driver) initializationBME280() error {

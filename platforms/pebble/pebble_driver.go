@@ -37,11 +37,12 @@ func NewDriver(adaptor *Adaptor) *Driver {
 	p.AddEvent("accel")
 	p.AddEvent("tap")
 
+	//nolint:forcetypeassert // ok here
 	p.AddCommand("publish_event", func(params map[string]interface{}) interface{} {
 		p.PublishEvent(params["name"].(string), params["data"].(string))
 		return nil
 	})
-
+	//nolint:forcetypeassert // ok here
 	p.AddCommand("send_notification", func(params map[string]interface{}) interface{} {
 		p.SendNotification(params["message"].(string))
 		return nil
@@ -58,10 +59,10 @@ func (d *Driver) SetName(n string)             { d.name = n }
 func (d *Driver) Connection() gobot.Connection { return d.connection }
 
 // Start returns true if driver is initialized correctly
-func (d *Driver) Start() (err error) { return }
+func (d *Driver) Start() error { return nil }
 
 // Halt returns true if driver is halted successfully
-func (d *Driver) Halt() (err error) { return }
+func (d *Driver) Halt() error { return nil }
 
 // PublishEvent publishes event with specified name and data in gobot
 func (d *Driver) PublishEvent(name string, data string) {

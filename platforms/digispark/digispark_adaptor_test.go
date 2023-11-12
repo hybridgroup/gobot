@@ -1,3 +1,4 @@
+//nolint:forcetypeassert // ok here
 package digispark
 
 import (
@@ -7,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/gpio"
 )
@@ -77,7 +79,7 @@ func (l *mock) i2cUpdateDelay(duration uint) error                              
 
 func initTestAdaptor() *Adaptor {
 	a := NewAdaptor()
-	a.connect = func(a *Adaptor) (err error) { return nil }
+	a.connect = func(a *Adaptor) error { return nil }
 	a.littleWire = new(mock)
 	errorFunc = func() error { return nil }
 	pwmInitErrorFunc = func() error { return nil }

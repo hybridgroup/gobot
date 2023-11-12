@@ -47,6 +47,7 @@ func (m *Driver) Connection() gobot.Connection {
 }
 
 func (m *Driver) adaptor() *Adaptor {
+	//nolint:forcetypeassert // ok here
 	return m.Connection().(*Adaptor)
 }
 
@@ -68,6 +69,7 @@ func (m *Driver) SetTopic(topic string) { m.topic = topic }
 
 // Publish a message to the current device topic
 func (m *Driver) Publish(data interface{}) bool {
+	//nolint:forcetypeassert // ok here
 	message := data.([]byte)
 	return m.adaptor().Publish(m.topic, message)
 }

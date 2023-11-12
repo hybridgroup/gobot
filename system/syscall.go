@@ -29,6 +29,8 @@ type nativeSyscall struct{}
 // detect this problem and this unpack procedure would cause unpredictable results.
 // So the decision was taken to give the address here as a separate parameter, although it is not used in every call.
 // Note also, that the size of the address variable at Kernel side is u16, therefore uint16 is used here.
+//
+//nolint:nonamedreturns // useful here
 func (sys *nativeSyscall) syscall(
 	trap uintptr,
 	f File,

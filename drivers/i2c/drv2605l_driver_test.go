@@ -9,6 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -64,7 +65,8 @@ func TestDRV2605LHalt(t *testing.T) {
 	d, a := initTestDRV2605LDriverWithStubbedAdaptor()
 	a.written = []byte{}
 	require.NoError(t, d.Halt())
-	assert.Equal(t, append(append(writeStopPlaybackData, readCurrentStandbyModeData), writeNewStandbyModeData...), a.written)
+	assert.Equal(t, append(append(writeStopPlaybackData, readCurrentStandbyModeData), writeNewStandbyModeData...),
+		a.written)
 }
 
 func TestDRV2605LGetPause(t *testing.T) {

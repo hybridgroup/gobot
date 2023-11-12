@@ -1,3 +1,4 @@
+//nolint:forcetypeassert // ok here
 package aio
 
 import (
@@ -8,6 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -28,9 +30,8 @@ func TestAnalogSensorDriver(t *testing.T) {
 	assert.Equal(t, "42", d.Pin())
 	assert.Equal(t, 30*time.Second, d.interval)
 
-	a.analogReadFunc = func() (val int, err error) {
-		val = 100
-		return
+	a.analogReadFunc = func() (int, error) {
+		return 100, nil
 	}
 
 	ret := d.Command("ReadRaw")(nil).(map[string]interface{})
@@ -44,9 +45,8 @@ func TestAnalogSensorDriver(t *testing.T) {
 	// refresh value on read
 	a = newAioTestAdaptor()
 	d = NewAnalogSensorDriver(a, "3")
-	a.analogReadFunc = func() (val int, err error) {
-		val = 150
-		return
+	a.analogReadFunc = func() (int, error) {
+		return 150, nil
 	}
 	assert.InDelta(t, 0.0, d.Value(), 0.0)
 	val, err := d.Read()
@@ -80,7 +80,7 @@ func TestAnalogSensorDriverWithLinearScaler(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// arrange
 			d.SetScaler(AnalogSensorLinearScaler(0, 255, tt.toMin, tt.toMax))
-			a.analogReadFunc = func() (val int, err error) {
+			a.analogReadFunc = func() (int, error) {
 				return tt.input, nil
 			}
 			// act
@@ -110,9 +110,8 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 	})
 
 	// send data
-	a.analogReadFunc = func() (val int, err error) {
-		val = 100
-		return
+	a.analogReadFunc = func() (int, error) {
+		return 100, nil
 	}
 
 	require.NoError(t, d.Start())
@@ -130,9 +129,8 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 	})
 
 	// send error
-	a.analogReadFunc = func() (val int, err error) {
-		err = errors.New("read error")
-		return
+	a.analogReadFunc = func() (int, error) {
+		return 0, errors.New("read error")
 	}
 
 	select {
@@ -150,9 +148,8 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 		sem <- true
 	})
 
-	a.analogReadFunc = func() (val int, err error) {
-		val = 200
-		return
+	a.analogReadFunc = func() (int, error) {
+		return 200, nil
 	}
 
 	d.halt <- true

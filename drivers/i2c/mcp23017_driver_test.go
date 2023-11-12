@@ -1,3 +1,4 @@
+//nolint:forcetypeassert // ok here
 package i2c
 
 import (
@@ -7,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -25,7 +27,7 @@ var pinPort = map[string]interface{}{
 	"port": "A",
 }
 
-func initTestMCP23017(b uint8) (driver *MCP23017Driver) {
+func initTestMCP23017(b uint8) *MCP23017Driver {
 	// create the driver without starting it
 	a := newI2cTestAdaptor()
 	d := NewMCP23017Driver(a, WithMCP23017Bank(b))

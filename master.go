@@ -88,7 +88,7 @@ func (g *Master) Stop() error {
 
 // Running returns if the Master is currently started or not
 func (g *Master) Running() bool {
-	return g.running.Load().(bool)
+	return g.running.Load().(bool) //nolint:forcetypeassert // no error return value, so there is no better way
 }
 
 // Robots returns all robots associated with this Gobot Master.

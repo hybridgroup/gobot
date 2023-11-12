@@ -98,7 +98,7 @@ func NewDRV2605LDriver(c Connector, options ...func(Config)) *DRV2605LDriver {
 
 // SetMode sets the device in one of the eight modes as described in the
 // datasheet. Defaults to mode 0, internal trig.
-func (d *DRV2605LDriver) SetMode(newMode DRV2605Mode) (err error) {
+func (d *DRV2605LDriver) SetMode(newMode DRV2605Mode) error {
 	mode, err := d.connection.ReadByteData(drv2605RegMode)
 	if err != nil {
 		return err
@@ -115,7 +115,7 @@ func (d *DRV2605LDriver) SetMode(newMode DRV2605Mode) (err error) {
 }
 
 // SetStandbyMode controls device low power mode
-func (d *DRV2605LDriver) SetStandbyMode(standby bool) (err error) {
+func (d *DRV2605LDriver) SetStandbyMode(standby bool) error {
 	modeVal, err := d.connection.ReadByteData(drv2605RegMode)
 	if err != nil {
 		return err
@@ -133,16 +133,15 @@ func (d *DRV2605LDriver) SetStandbyMode(standby bool) (err error) {
 
 // SelectLibrary selects which waveform library to play from, 1-7.
 // See datasheet for more info.
-func (d *DRV2605LDriver) SelectLibrary(library uint8) (err error) {
-	err = d.connection.WriteByteData(drv2605RegLibrary, library&0x7)
-	return err
+func (d *DRV2605LDriver) SelectLibrary(library uint8) error {
+	return d.connection.WriteByteData(drv2605RegLibrary, library&0x7)
 }
 
 // GetPauseWaveform returns a special waveform ID used in SetSequence() to encode
 // pauses between waveforms. Time is specified in tens of milliseconds
 // ranging from 0ms (delayTime10MS = 0) to 1270ms (delayTime10MS = 127).
 // Times out of range are clipped to fit.
-func (d *DRV2605LDriver) GetPauseWaveform(delayTime10MS uint8) (pauseID uint8) {
+func (d *DRV2605LDriver) GetPauseWaveform(delayTime10MS uint8) uint8 {
 	if delayTime10MS > 127 {
 		delayTime10MS = 127
 	}
@@ -156,7 +155,7 @@ func (d *DRV2605LDriver) GetPauseWaveform(delayTime10MS uint8) (pauseID uint8) {
 // sequences will be truncated.
 // A waveform id of zero marks the end of the sequence.
 // Pauses can be encoded using GetPauseWaveform().
-func (d *DRV2605LDriver) SetSequence(waveforms []uint8) (err error) {
+func (d *DRV2605LDriver) SetSequence(waveforms []uint8) error {
 	if len(waveforms) < 8 {
 		waveforms = append(waveforms, 0)
 	}
@@ -164,26 +163,26 @@ func (d *DRV2605LDriver) SetSequence(waveforms []uint8) (err error) {
 		waveforms = waveforms[0:8]
 	}
 	for i, w := range waveforms {
-		if err = d.connection.WriteByteData(uint8(drv2605RegWaveSeq1+i), w); err != nil {
+		if err := d.connection.WriteByteData(uint8(drv2605RegWaveSeq1+i), w); err != nil {
 			return err
 		}
 	}
+
 	return nil
 }
 
 // Go plays the current sequence of waveforms.
-func (d *DRV2605LDriver) Go() (err error) {
-	err = d.connection.WriteByteData(drv2605RegGo, 1)
-	return err
+func (d *DRV2605LDriver) Go() error {
+	return d.connection.WriteByteData(drv2605RegGo, 1)
 }
 
-func (d *DRV2605LDriver) writeByteRegisters(regValPairs []struct{ reg, val uint8 }) (err error) {
+func (d *DRV2605LDriver) writeByteRegisters(regValPairs []struct{ reg, val uint8 }) error {
 	for _, rv := range regValPairs {
-		if err = d.connection.WriteByteData(rv.reg, rv.val); err != nil {
-			break
+		if err := d.connection.WriteByteData(rv.reg, rv.val); err != nil {
+			return err
 		}
 	}
-	return err
+	return nil
 }
 
 func (d *DRV2605LDriver) initialize() error {
@@ -215,15 +214,16 @@ func (d *DRV2605LDriver) initialize() error {
 	})
 }
 
-func (d *DRV2605LDriver) shutdown() (err error) {
+func (d *DRV2605LDriver) shutdown() error {
 	if d.connection != nil {
 		// stop playback
-		if err = d.connection.WriteByteData(drv2605RegGo, 0); err != nil {
+		if err := d.connection.WriteByteData(drv2605RegGo, 0); err != nil {
 			return err
 		}
 
 		// enter standby
 		return d.SetStandbyMode(true)
 	}
-	return
+
+	return nil
 }

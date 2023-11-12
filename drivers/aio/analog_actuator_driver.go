@@ -1,6 +1,7 @@
 package aio
 
 import (
+	"log"
 	"strconv"
 
 	"gobot.io/x/gobot/v2"
@@ -32,7 +33,7 @@ func NewAnalogActuatorDriver(a AnalogWriter, pin string) *AnalogActuatorDriver {
 		connection: a,
 		pin:        pin,
 		Commander:  gobot.NewCommander(),
-		scale:      func(input float64) (value int) { return int(input) },
+		scale:      func(input float64) int { return int(input) },
 	}
 
 	d.AddCommand("Write", func(params map[string]interface{}) interface{} {
@@ -52,10 +53,10 @@ func NewAnalogActuatorDriver(a AnalogWriter, pin string) *AnalogActuatorDriver {
 }
 
 // Start starts driver
-func (a *AnalogActuatorDriver) Start() (err error) { return }
+func (a *AnalogActuatorDriver) Start() error { return nil }
 
 // Halt is for halt
-func (a *AnalogActuatorDriver) Halt() (err error) { return }
+func (a *AnalogActuatorDriver) Halt() error { return nil }
 
 // Name returns the drivers name
 func (a *AnalogActuatorDriver) Name() string { return a.name }
@@ -67,10 +68,17 @@ func (a *AnalogActuatorDriver) SetName(n string) { a.name = n }
 func (a *AnalogActuatorDriver) Pin() string { return a.pin }
 
 // Connection returns the drivers Connection
-func (a *AnalogActuatorDriver) Connection() gobot.Connection { return a.connection.(gobot.Connection) }
+func (a *AnalogActuatorDriver) Connection() gobot.Connection {
+	if conn, ok := a.connection.(gobot.Connection); ok {
+		return conn
+	}
+
+	log.Printf("%s has no gobot connection\n", a.name)
+	return nil
+}
 
 // RawWrite write the given raw value to the actuator
-func (a *AnalogActuatorDriver) RawWrite(val int) (err error) {
+func (a *AnalogActuatorDriver) RawWrite(val int) error {
 	a.lastRawValue = val
 	return a.connection.AnalogWrite(a.Pin(), val)
 }
@@ -81,19 +89,19 @@ func (a *AnalogActuatorDriver) SetScaler(scaler func(float64) int) {
 }
 
 // Write writes the given value to the actuator
-func (a *AnalogActuatorDriver) Write(val float64) (err error) {
+func (a *AnalogActuatorDriver) Write(val float64) error {
 	a.lastValue = val
 	rawValue := a.scale(val)
 	return a.RawWrite(rawValue)
 }
 
 // RawValue returns the last written raw value
-func (a *AnalogActuatorDriver) RawValue() (val int) {
+func (a *AnalogActuatorDriver) RawValue() int {
 	return a.lastRawValue
 }
 
 // Value returns the last written value
-func (a *AnalogActuatorDriver) Value() (val float64) {
+func (a *AnalogActuatorDriver) Value() float64 {
 	return a.lastValue
 }
 
@@ -101,7 +109,7 @@ func (a *AnalogActuatorDriver) Value() (val float64) {
 func AnalogActuatorLinearScaler(fromMin, fromMax float64, toMin, toMax int) func(input float64) (value int) {
 	m := float64(toMax-toMin) / (fromMax - fromMin)
 	n := float64(toMin) - m*fromMin
-	return func(input float64) (value int) {
+	return func(input float64) int {
 		if input <= fromMin {
 			return toMin
 		}

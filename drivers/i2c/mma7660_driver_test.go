@@ -8,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -90,8 +91,11 @@ func TestMMA7660XYZError(t *testing.T) {
 		return 0, errors.New("read error")
 	}
 
-	_, _, _, err := d.XYZ()
+	x, y, z, err := d.XYZ()
 	require.ErrorContains(t, err, "read error")
+	assert.InDelta(t, 0.0, x, 0.0)
+	assert.InDelta(t, 0.0, y, 0.0)
+	assert.InDelta(t, 0.0, z, 0.0)
 }
 
 func TestMMA7660XYZNotReady(t *testing.T) {
@@ -103,6 +107,9 @@ func TestMMA7660XYZNotReady(t *testing.T) {
 		return buf.Len(), nil
 	}
 
-	_, _, _, err := d.XYZ()
+	x, y, z, err := d.XYZ()
 	assert.Equal(t, ErrNotReady, err)
+	assert.InDelta(t, 0.0, x, 0.0)
+	assert.InDelta(t, 0.0, y, 0.0)
+	assert.InDelta(t, 0.0, z, 0.0)
 }

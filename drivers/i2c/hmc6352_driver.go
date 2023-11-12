@@ -30,22 +30,21 @@ func NewHMC6352Driver(c Connector, options ...func(Config)) *HMC6352Driver {
 }
 
 // Heading returns the current heading
-func (h *HMC6352Driver) Heading() (heading uint16, err error) {
-	if _, err = h.connection.Write([]byte("A")); err != nil {
-		return
+func (h *HMC6352Driver) Heading() (uint16, error) {
+	if _, err := h.connection.Write([]byte("A")); err != nil {
+		return 0, err
 	}
 	buf := []byte{0, 0}
 	bytesRead, err := h.connection.Read(buf)
 	if err != nil {
-		return
+		return 0, err
 	}
 	if bytesRead == 2 {
-		heading = (uint16(buf[1]) + uint16(buf[0])*256) / 10
-		return
+		heading := (uint16(buf[1]) + uint16(buf[0])*256) / 10
+		return heading, nil
 	}
 
-	err = ErrNotEnoughBytes
-	return
+	return 0, ErrNotEnoughBytes
 }
 
 func (h *HMC6352Driver) initialize() error {

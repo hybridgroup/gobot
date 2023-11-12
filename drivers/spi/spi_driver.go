@@ -1,6 +1,7 @@
 package spi
 
 import (
+	"log"
 	"sync"
 
 	"gobot.io/x/gobot/v2"
@@ -108,7 +109,14 @@ func (d *Driver) Name() string { return d.name }
 func (d *Driver) SetName(n string) { d.name = n }
 
 // Connection returns the Connection of the device.
-func (d *Driver) Connection() gobot.Connection { return d.connector.(gobot.Connection) }
+func (d *Driver) Connection() gobot.Connection {
+	if conn, ok := d.connector.(gobot.Connection); ok {
+		return conn
+	}
+
+	log.Printf("%s has no gobot connection\n", d.name)
+	return nil
+}
 
 // Start initializes the driver.
 func (d *Driver) Start() error {
@@ -130,7 +138,7 @@ func (d *Driver) Start() error {
 }
 
 // Halt stops the driver.
-func (d *Driver) Halt() (err error) {
+func (d *Driver) Halt() error {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 

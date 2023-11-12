@@ -72,21 +72,21 @@ func NewMPL115A2Driver(c Connector, options ...func(Config)) *MPL115A2Driver {
 }
 
 // Pressure fetches the latest data from the MPL115A2, and returns the pressure in kPa
-func (d *MPL115A2Driver) Pressure() (p float32, err error) {
+func (d *MPL115A2Driver) Pressure() (float32, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	p, _, err = d.getData()
-	return
+	p, _, err := d.getData()
+	return p, err
 }
 
 // Temperature fetches the latest data from the MPL115A2, and returns the temperature in °C
-func (d *MPL115A2Driver) Temperature() (t float32, err error) {
+func (d *MPL115A2Driver) Temperature() (float32, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	_, t, err = d.getData()
-	return
+	_, t, err := d.getData()
+	return t, err
 }
 
 func (d *MPL115A2Driver) initialization() error {
@@ -125,6 +125,8 @@ func (d *MPL115A2Driver) initialization() error {
 }
 
 // getData fetches the latest data from the MPL115A2
+//
+//nolint:nonamedreturns // is sufficient here
 func (d *MPL115A2Driver) getData() (p, t float32, err error) {
 	var temperature uint16
 	var pressure uint16
@@ -137,7 +139,7 @@ func (d *MPL115A2Driver) getData() (p, t float32, err error) {
 
 	data := []byte{0, 0, 0, 0}
 	if err = d.connection.ReadBlockData(mpl115A2Reg_PressureMSB, data); err != nil {
-		return
+		return 0, 0, err
 	}
 
 	buf := bytes.NewBuffer(data)
@@ -155,5 +157,5 @@ func (d *MPL115A2Driver) getData() (p, t float32, err error) {
 	p = (65.0/1023.0)*pressureComp + 50.0
 	t = ((float32(temperature) - 498.0) / -5.35) + 25.0
 
-	return
+	return p, t, err
 }

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"go.bug.st/serial"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -20,7 +21,7 @@ type Adaptor struct {
 	finalizeChannel   chan struct{}
 }
 
-// NewAdaptor returns a new MegaPi Adaptor with specified serial port used to talk to the MegaPi with a baud rate of 115200
+// NewAdaptor returns a new Adaptor with specified serial port used to talk to the MegaPi with a baud rate of 115200
 func NewAdaptor(device string) *Adaptor {
 	c := &serial.Mode{BaudRate: 115200}
 	return &Adaptor{

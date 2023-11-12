@@ -80,28 +80,36 @@ func ReadMAVLinkPacket(r io.Reader) (*MAVLinkPacket, error) {
 }
 
 // CraftMAVLinkPacket returns a new MAVLinkPacket from a MAVLinkMessage
-func CraftMAVLinkPacket(SystemID uint8, ComponentID uint8, Message MAVLinkMessage) *MAVLinkPacket {
+func CraftMAVLinkPacket(systemID uint8, cComponentID uint8, mMessage MAVLinkMessage) *MAVLinkPacket {
 	return NewMAVLinkPacket(
 		0xFE,
-		Message.Len(),
+		mMessage.Len(),
 		generateSequence(),
-		SystemID,
-		ComponentID,
-		Message.Id(),
-		Message.Pack(),
+		systemID,
+		cComponentID,
+		mMessage.Id(),
+		mMessage.Pack(),
 	)
 }
 
 // NewMAVLinkPacket returns a new MAVLinkPacket
-func NewMAVLinkPacket(Protocol uint8, Length uint8, Sequence uint8, SystemID uint8, ComponentID uint8, MessageID uint8, Data []uint8) *MAVLinkPacket {
+func NewMAVLinkPacket(
+	pProtocol uint8,
+	lLength uint8,
+	sSequence uint8,
+	sSystemID uint8,
+	cComponentID uint8,
+	mMessageID uint8,
+	dData []uint8,
+) *MAVLinkPacket {
 	m := &MAVLinkPacket{
-		Protocol:    Protocol,
-		Length:      Length,
-		Sequence:    Sequence,
-		SystemID:    SystemID,
-		ComponentID: ComponentID,
-		MessageID:   MessageID,
-		Data:        Data,
+		Protocol:    pProtocol,
+		Length:      lLength,
+		Sequence:    sSequence,
+		SystemID:    sSystemID,
+		ComponentID: cComponentID,
+		MessageID:   mMessageID,
+		Data:        dData,
 	}
 	m.Checksum = crcCalculate(m)
 	return m
@@ -158,7 +166,7 @@ func read(r io.Reader, length int) ([]byte, error) {
 	buf := []byte{}
 	for length > 0 {
 		tmp := make([]byte, length)
-		i, err := r.Read(tmp[:])
+		i, err := r.Read(tmp)
 		if err != nil {
 			return nil, err
 		}

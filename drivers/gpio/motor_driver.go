@@ -1,6 +1,8 @@
 package gpio
 
 import (
+	"log"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -33,177 +35,175 @@ func NewMotorDriver(a DigitalWriter, speedPin string) *MotorDriver {
 }
 
 // Name returns the MotorDrivers name
-func (m *MotorDriver) Name() string { return m.name }
+func (d *MotorDriver) Name() string { return d.name }
 
 // SetName sets the MotorDrivers name
-func (m *MotorDriver) SetName(n string) { m.name = n }
+func (d *MotorDriver) SetName(n string) { d.name = n }
 
 // Connection returns the MotorDrivers Connection
-func (m *MotorDriver) Connection() gobot.Connection { return m.connection.(gobot.Connection) }
+func (d *MotorDriver) Connection() gobot.Connection {
+	if conn, ok := d.connection.(gobot.Connection); ok {
+		return conn
+	}
+
+	log.Printf("%s has no gobot connection\n", d.name)
+	return nil
+}
 
 // Start implements the Driver interface
-func (m *MotorDriver) Start() (err error) { return }
+func (d *MotorDriver) Start() error { return nil }
 
 // Halt implements the Driver interface
-func (m *MotorDriver) Halt() (err error) { return }
+func (d *MotorDriver) Halt() error { return nil }
 
 // Off turns the motor off or sets the motor to a 0 speed
-func (m *MotorDriver) Off() (err error) {
-	if m.isDigital() {
-		err = m.changeState(0)
-	} else {
-		err = m.Speed(0)
+func (d *MotorDriver) Off() error {
+	if d.isDigital() {
+		return d.changeState(0)
 	}
-	return
+
+	return d.Speed(0)
 }
 
 // On turns the motor on or sets the motor to a maximum speed
-func (m *MotorDriver) On() (err error) {
-	if m.isDigital() {
-		err = m.changeState(1)
-	} else {
-		if m.CurrentSpeed == 0 {
-			m.CurrentSpeed = 255
-		}
-		err = m.Speed(m.CurrentSpeed)
+func (d *MotorDriver) On() error {
+	if d.isDigital() {
+		return d.changeState(1)
 	}
-	return
+	if d.CurrentSpeed == 0 {
+		d.CurrentSpeed = 255
+	}
+
+	return d.Speed(d.CurrentSpeed)
 }
 
 // Min sets the motor to the minimum speed
-func (m *MotorDriver) Min() (err error) {
-	return m.Off()
+func (d *MotorDriver) Min() error {
+	return d.Off()
 }
 
 // Max sets the motor to the maximum speed
-func (m *MotorDriver) Max() (err error) {
-	return m.Speed(255)
+func (d *MotorDriver) Max() error {
+	return d.Speed(255)
 }
 
 // IsOn returns true if the motor is on
-func (m *MotorDriver) IsOn() bool {
-	if m.isDigital() {
-		return m.CurrentState == 1
+func (d *MotorDriver) IsOn() bool {
+	if d.isDigital() {
+		return d.CurrentState == 1
 	}
-	return m.CurrentSpeed > 0
+	return d.CurrentSpeed > 0
 }
 
 // IsOff returns true if the motor is off
-func (m *MotorDriver) IsOff() bool {
-	return !m.IsOn()
+func (d *MotorDriver) IsOff() bool {
+	return !d.IsOn()
 }
 
 // Toggle sets the motor to the opposite of it's current state
-func (m *MotorDriver) Toggle() (err error) {
-	if m.IsOn() {
-		err = m.Off()
-	} else {
-		err = m.On()
+func (d *MotorDriver) Toggle() error {
+	if d.IsOn() {
+		return d.Off()
 	}
-	return
+
+	return d.On()
 }
 
 // Speed sets the speed of the motor
-func (m *MotorDriver) Speed(value byte) (err error) {
-	if writer, ok := m.connection.(PwmWriter); ok {
-		m.CurrentMode = "analog"
-		m.CurrentSpeed = value
-		return writer.PwmWrite(m.SpeedPin, value)
+func (d *MotorDriver) Speed(value byte) error {
+	if writer, ok := d.connection.(PwmWriter); ok {
+		d.CurrentMode = "analog"
+		d.CurrentSpeed = value
+		return writer.PwmWrite(d.SpeedPin, value)
 	}
 	return ErrPwmWriteUnsupported
 }
 
 // Forward sets the forward pin to the specified speed
-func (m *MotorDriver) Forward(speed byte) (err error) {
-	err = m.Direction("forward")
-	if err != nil {
-		return
+func (d *MotorDriver) Forward(speed byte) error {
+	if err := d.Direction("forward"); err != nil {
+		return err
 	}
-	err = m.Speed(speed)
-	if err != nil {
-		return
+	if err := d.Speed(speed); err != nil {
+		return err
 	}
-	return
+
+	return nil
 }
 
 // Backward sets the backward pin to the specified speed
-func (m *MotorDriver) Backward(speed byte) (err error) {
-	err = m.Direction("backward")
-	if err != nil {
-		return
+func (d *MotorDriver) Backward(speed byte) error {
+	if err := d.Direction("backward"); err != nil {
+		return err
 	}
-	err = m.Speed(speed)
-	if err != nil {
-		return
+	if err := d.Speed(speed); err != nil {
+		return err
 	}
-	return
+
+	return nil
 }
 
 // Direction sets the direction pin to the specified speed
-func (m *MotorDriver) Direction(direction string) (err error) {
-	m.CurrentDirection = direction
-	if m.DirectionPin != "" {
+func (d *MotorDriver) Direction(direction string) error {
+	d.CurrentDirection = direction
+	if d.DirectionPin != "" {
 		var level byte
 		if direction == "forward" {
 			level = 1
 		} else {
 			level = 0
 		}
-		err = m.connection.DigitalWrite(m.DirectionPin, level)
-	} else {
-		var forwardLevel, backwardLevel byte
-		switch direction {
-		case "forward":
-			forwardLevel = 1
-			backwardLevel = 0
-		case "backward":
-			forwardLevel = 0
-			backwardLevel = 1
-		case "none":
-			forwardLevel = 0
-			backwardLevel = 0
-		}
-		err = m.connection.DigitalWrite(m.ForwardPin, forwardLevel)
-		if err != nil {
-			return
-		}
-		err = m.connection.DigitalWrite(m.BackwardPin, backwardLevel)
-		if err != nil {
-			return
-		}
+		return d.connection.DigitalWrite(d.DirectionPin, level)
 	}
-	return
+
+	var forwardLevel, backwardLevel byte
+	switch direction {
+	case "forward":
+		forwardLevel = 1
+		backwardLevel = 0
+	case "backward":
+		forwardLevel = 0
+		backwardLevel = 1
+	case "none":
+		forwardLevel = 0
+		backwardLevel = 0
+	}
+
+	if err := d.connection.DigitalWrite(d.ForwardPin, forwardLevel); err != nil {
+		return err
+	}
+
+	return d.connection.DigitalWrite(d.BackwardPin, backwardLevel)
 }
 
-func (m *MotorDriver) isDigital() bool {
-	return m.CurrentMode == "digital"
+func (d *MotorDriver) isDigital() bool {
+	return d.CurrentMode == "digital"
 }
 
-func (m *MotorDriver) changeState(state byte) (err error) {
-	m.CurrentState = state
+func (d *MotorDriver) changeState(state byte) error {
+	d.CurrentState = state
 	if state == 1 {
-		m.CurrentSpeed = 255
+		d.CurrentSpeed = 255
 	} else {
-		m.CurrentSpeed = 0
-	}
-	if m.ForwardPin != "" {
-		if state == 1 {
-			err = m.Direction(m.CurrentDirection)
-			if err != nil {
-				return
-			}
-			if m.SpeedPin != "" {
-				err = m.Speed(m.CurrentSpeed)
-				if err != nil {
-					return
-				}
-			}
-		} else {
-			err = m.Direction("none")
-		}
-	} else {
-		err = m.connection.DigitalWrite(m.SpeedPin, state)
+		d.CurrentSpeed = 0
 	}
 
-	return
+	if d.ForwardPin == "" {
+		return d.connection.DigitalWrite(d.SpeedPin, state)
+	}
+
+	if state != 1 {
+		return d.Direction("none")
+	}
+
+	if err := d.Direction(d.CurrentDirection); err != nil {
+		return err
+	}
+	if d.SpeedPin != "" {
+		if err := d.Speed(d.CurrentSpeed); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

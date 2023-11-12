@@ -7,15 +7,16 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
 var _ gobot.Driver = (*JHD1313M1Driver)(nil)
 
 // --------- HELPERS
-func initTestJHD1313M1Driver() (driver *JHD1313M1Driver) {
-	driver, _ = initTestJHD1313M1DriverWithStubbedAdaptor()
-	return
+func initTestJHD1313M1Driver() *JHD1313M1Driver {
+	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
+	return d
 }
 
 func initTestJHD1313M1DriverWithStubbedAdaptor() (*JHD1313M1Driver, *i2cTestAdaptor) {

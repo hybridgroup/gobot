@@ -37,7 +37,7 @@ func main() {
 	robot.Start()
 }
 
-func adafruitStepperMotorRunner(a *i2c.Adafruit2348Driver, motor int) (err error) {
+func adafruitStepperMotorRunner(a *i2c.Adafruit2348Driver, motor int) error {
 	log.Printf("Stepper Motor Run Loop...\n")
 	// set the speed state:
 	speed := 30 // rpm
@@ -46,13 +46,13 @@ func adafruitStepperMotorRunner(a *i2c.Adafruit2348Driver, motor int) (err error
 
 	a.SetStepperMotorSpeed(motor, speed)
 
-	if err = a.Step(motor, steps, i2c.Adafruit2348Forward, style); err != nil {
+	if err := a.Step(motor, steps, i2c.Adafruit2348Forward, style); err != nil {
 		log.Printf(err.Error())
-		return
+		return err
 	}
-	if err = a.Step(motor, steps, i2c.Adafruit2348Backward, style); err != nil {
+	if err := a.Step(motor, steps, i2c.Adafruit2348Backward, style); err != nil {
 		log.Printf(err.Error())
-		return
+		return err
 	}
-	return
+	return nil
 }

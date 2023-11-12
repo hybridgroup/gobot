@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -14,7 +15,7 @@ var _ gobot.Adaptor = (*Adaptor)(nil)
 
 func initTestBebopAdaptor() *Adaptor {
 	a := NewAdaptor()
-	a.connect = func(b *Adaptor) (err error) {
+	a.connect = func(b *Adaptor) error {
 		b.drone = &testDrone{}
 		return nil
 	}

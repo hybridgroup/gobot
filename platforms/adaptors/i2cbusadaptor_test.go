@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2/drivers/i2c"
 	"gobot.io/x/gobot/v2/system"
 )
@@ -94,7 +95,7 @@ func TestI2cFinalize(t *testing.T) {
 	_, _ = con.Write([]byte{0xbf})
 	fs.WithCloseError = true
 	err := a.Finalize()
-	assert.Contains(t, err.Error(), "close error")
+	require.ErrorContains(t, err, "close error")
 }
 
 func TestI2cReConnect(t *testing.T) {

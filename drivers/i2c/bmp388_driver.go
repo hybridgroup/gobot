@@ -63,7 +63,7 @@ const (
 	bmp388CMDReserved        = 0x00 // reserved, no command
 	bmp388CMDExtModeEnMiddle = 0x34
 	bmp388CMDFifoFlush       = 0xB0 // clears all data in the FIFO, does not change FIFO_CONFIG registers
-	bmp388CMDSoftReset       = 0xB6 // triggers a reset, all user configuration settings are overwritten with their default state
+	bmp388CMDSoftReset       = 0xB6 // triggers a reset, all user configuration settings are overwritten with defaults
 
 	bmp388SeaLevelPressure = 1013.25
 )
@@ -132,66 +132,71 @@ func WithBMP388IIRFilter(val BMP388IIRFilter) func(Config) {
 }
 
 // Temperature returns the current temperature, in celsius degrees.
-func (d *BMP388Driver) Temperature(accuracy BMP388Accuracy) (temp float32, err error) {
+func (d *BMP388Driver) Temperature(accuracy BMP388Accuracy) (float32, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	var rawT int32
-
 	mode := d.ctrlPwrMode<<4 | bmp388PWRCTRLPressEnableBit | bmp388PWRCTRLTempEnableBit
-	if err = d.connection.WriteByteData(bmp388RegPWRCTRL, mode); err != nil {
+	if err := d.connection.WriteByteData(bmp388RegPWRCTRL, mode); err != nil {
 		return 0, err
 	}
 
 	// Set Accuracy for temperature
-	if err = d.connection.WriteByteData(bmp388RegOSR, uint8(accuracy<<3)); err != nil {
+	if err := d.connection.WriteByteData(bmp388RegOSR, uint8(accuracy<<3)); err != nil {
 		return 0, err
 	}
 
-	if rawT, err = d.rawTemp(); err != nil {
+	rawT, err := d.rawTemp()
+	if err != nil {
 		return 0.0, err
 	}
-	temp = d.calculateTemp(rawT)
-	return
+
+	temp := d.calculateTemp(rawT)
+
+	return temp, nil
 }
 
 // Pressure returns the current barometric pressure, in Pa
-func (d *BMP388Driver) Pressure(accuracy BMP388Accuracy) (press float32, err error) {
+func (d *BMP388Driver) Pressure(accuracy BMP388Accuracy) (float32, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	var rawT, rawP int32
-
 	mode := d.ctrlPwrMode<<4 | bmp388PWRCTRLPressEnableBit | bmp388PWRCTRLTempEnableBit
-	if err = d.connection.WriteByteData(bmp388RegPWRCTRL, mode); err != nil {
+	if err := d.connection.WriteByteData(bmp388RegPWRCTRL, mode); err != nil {
 		return 0, err
 	}
 
 	// Set Standard Accuracy for pressure
-	if err = d.connection.WriteByteData(bmp388RegOSR, uint8(accuracy)); err != nil {
+	if err := d.connection.WriteByteData(bmp388RegOSR, uint8(accuracy)); err != nil {
 		return 0, err
 	}
 
-	if rawT, err = d.rawTemp(); err != nil {
+	rawT, err := d.rawTemp()
+	if err != nil {
 		return 0.0, err
 	}
 
-	if rawP, err = d.rawPressure(); err != nil {
+	rawP, err := d.rawPressure()
+	if err != nil {
 		return 0.0, err
 	}
 	tLin := d.calculateTemp(rawT)
+
 	return d.calculatePress(rawP, float64(tLin)), nil
 }
 
 // Altitude returns the current altitude in meters based on the
 // current barometric pressure and estimated pressure at sea level.
 // https://www.weather.gov/media/epz/wxcalc/pressureAltitude.pdf
-func (d *BMP388Driver) Altitude(accuracy BMP388Accuracy) (alt float32, err error) {
-	atmP, _ := d.Pressure(accuracy)
+func (d *BMP388Driver) Altitude(accuracy BMP388Accuracy) (float32, error) {
+	atmP, err := d.Pressure(accuracy)
+	if err != nil {
+		return 0, err
+	}
 	atmP /= 100.0
-	alt = float32(44307.0 * (1.0 - math.Pow(float64(atmP/bmp388SeaLevelPressure), 0.190284)))
+	alt := float32(44307.0 * (1.0 - math.Pow(float64(atmP/bmp388SeaLevelPressure), 0.190284)))
 
-	return
+	return alt, nil
 }
 
 // initialization reads the calibration coefficients.

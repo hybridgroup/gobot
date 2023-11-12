@@ -13,7 +13,7 @@ const systemDebug = false
 type File interface {
 	Write(b []byte) (n int, err error)
 	WriteString(s string) (ret int, err error)
-	Sync() (err error)
+	Sync() error
 	Read(b []byte) (n int, err error)
 	ReadAt(b []byte, off int64) (n int, err error)
 	Seek(offset int64, whence int) (ret int64, err error)

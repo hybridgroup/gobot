@@ -91,6 +91,7 @@ func (d *EasyDriver) SetDirection(direction string) error {
 		writeVal = 1 // high is backward
 	}
 
+	//nolint:forcetypeassert // type safe by constructor
 	if err := d.connection.(DigitalWriter).DigitalWrite(d.dirPin, writeVal); err != nil {
 		return err
 	}
@@ -111,6 +112,7 @@ func (d *EasyDriver) Enable() error {
 	}
 
 	// enPin is active low
+	//nolint:forcetypeassert // type safe by constructor
 	if err := d.connection.(DigitalWriter).DigitalWrite(d.enPin, 0); err != nil {
 		return err
 	}
@@ -128,6 +130,7 @@ func (d *EasyDriver) Disable() error {
 	_ = d.stopIfRunning() // drop step errors
 
 	// enPin is active low
+	//nolint:forcetypeassert // type safe by constructor
 	if err := d.connection.(DigitalWriter).DigitalWrite(d.enPin, 1); err != nil {
 		return err
 	}
@@ -148,6 +151,7 @@ func (d *EasyDriver) Wake() error {
 	}
 
 	// sleepPin is active low
+	//nolint:forcetypeassert // type safe by constructor
 	if err := d.connection.(DigitalWriter).DigitalWrite(d.sleepPin, 1); err != nil {
 		return err
 	}
@@ -171,11 +175,13 @@ func (d *EasyDriver) onePinStepping() error {
 	defer d.valueMutex.Unlock()
 
 	// a valid steps occurs for a low to high transition
+	//nolint:forcetypeassert // type safe by constructor
 	if err := d.connection.(DigitalWriter).DigitalWrite(d.stepPin, 0); err != nil {
 		return err
 	}
 
 	time.Sleep(d.getDelayPerStep())
+	//nolint:forcetypeassert // type safe by constructor
 	if err := d.connection.(DigitalWriter).DigitalWrite(d.stepPin, 1); err != nil {
 		return err
 	}
@@ -198,6 +204,7 @@ func (d *EasyDriver) sleepWithSleepPin() error {
 	_ = d.stopIfRunning() // drop step errors
 
 	// sleepPin is active low
+	//nolint:forcetypeassert // type safe by constructor
 	if err := d.connection.(DigitalWriter).DigitalWrite(d.sleepPin, 0); err != nil {
 		return err
 	}

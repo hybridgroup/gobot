@@ -6,15 +6,16 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
 var _ gobot.Driver = (*TM1638Driver)(nil)
 
 // --------- HELPERS
-func initTestTM1638Driver() (driver *TM1638Driver) {
-	driver, _ = initTestTM1638DriverWithStubbedAdaptor()
-	return
+func initTestTM1638Driver() *TM1638Driver {
+	d, _ := initTestTM1638DriverWithStubbedAdaptor()
+	return d
 }
 
 func initTestTM1638DriverWithStubbedAdaptor() (*TM1638Driver, *gpioTestAdaptor) {

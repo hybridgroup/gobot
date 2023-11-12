@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -13,9 +14,9 @@ var (
 	_ gobot.Driver = (*GroveAccelerometerDriver)(nil)
 )
 
-func initTestGroveLcdDriver() (driver *GroveLcdDriver) {
-	driver, _ = initGroveLcdDriverWithStubbedAdaptor()
-	return
+func initTestGroveLcdDriver() *GroveLcdDriver {
+	d, _ := initGroveLcdDriverWithStubbedAdaptor()
+	return d
 }
 
 func initGroveLcdDriverWithStubbedAdaptor() (*GroveLcdDriver, *i2cTestAdaptor) {
@@ -23,9 +24,9 @@ func initGroveLcdDriverWithStubbedAdaptor() (*GroveLcdDriver, *i2cTestAdaptor) {
 	return NewGroveLcdDriver(adaptor), adaptor
 }
 
-func initTestGroveAccelerometerDriver() (driver *GroveAccelerometerDriver) {
-	driver, _ = initGroveAccelerometerDriverWithStubbedAdaptor()
-	return
+func initTestGroveAccelerometerDriver() *GroveAccelerometerDriver {
+	d, _ := initGroveAccelerometerDriverWithStubbedAdaptor()
+	return d
 }
 
 func initGroveAccelerometerDriverWithStubbedAdaptor() (*GroveAccelerometerDriver, *i2cTestAdaptor) {

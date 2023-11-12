@@ -108,7 +108,7 @@ func NewNetworkFrame(buf []byte) NetworkFrame {
 }
 
 func networkFrameGenerator() func(*bytes.Buffer, byte, byte) *bytes.Buffer {
-	//func networkFrameGenerator() func(*bytes.Buffer, byte, byte) NetworkFrame {
+	// func networkFrameGenerator() func(*bytes.Buffer, byte, byte) NetworkFrame {
 	//
 	// ARNETWORKAL_Frame_t
 	//

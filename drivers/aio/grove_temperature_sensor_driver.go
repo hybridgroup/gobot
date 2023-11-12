@@ -39,6 +39,6 @@ func NewGroveTemperatureSensorDriver(a AnalogReader, pin string, v ...time.Durat
 }
 
 // Temperature returns the last read temperature from the sensor.
-func (t *TemperatureSensorDriver) Temperature() (val float64) {
+func (t *TemperatureSensorDriver) Temperature() float64 {
 	return t.Value()
 }

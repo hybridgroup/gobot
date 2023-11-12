@@ -1,3 +1,4 @@
+//nolint:forcetypeassert // ok here
 package aio
 
 import (
@@ -42,9 +43,8 @@ func TestTemperatureSensorDriverNtcScaling(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			a.analogReadFunc = func() (val int, err error) {
-				val = tt.input
-				return
+			a.analogReadFunc = func() (int, error) {
+				return tt.input, nil
 			}
 			// act
 			got, err := d.Read()
@@ -77,9 +77,8 @@ func TestTemperatureSensorDriverLinearScaling(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			a.analogReadFunc = func() (val int, err error) {
-				val = tt.input
-				return
+			a.analogReadFunc = func() (int, error) {
+				return tt.input, nil
 			}
 			// act
 			got, err := d.Read()
@@ -97,9 +96,8 @@ func TestTempSensorPublishesTemperatureInCelsius(t *testing.T) {
 	ntc := TemperatureSensorNtcConf{TC0: 25, R0: 10000.0, B: 3975} // Ohm, R25=10k
 	d.SetNtcScaler(1023, 10000, false, ntc)                        // Ohm, reference value: 1023, series R: 10k
 
-	a.analogReadFunc = func() (val int, err error) {
-		val = 585
-		return
+	a.analogReadFunc = func() (int, error) {
+		return 585, nil
 	}
 	_ = d.Once(d.Event(Value), func(data interface{}) {
 		assert.Equal(t, "31.62", fmt.Sprintf("%.2f", data.(float64)))
@@ -122,9 +120,8 @@ func TestTempSensorPublishesError(t *testing.T) {
 	d := NewTemperatureSensorDriver(a, "1")
 
 	// send error
-	a.analogReadFunc = func() (val int, err error) {
-		err = errors.New("read error")
-		return
+	a.analogReadFunc = func() (int, error) {
+		return 0, errors.New("read error")
 	}
 
 	require.NoError(t, d.Start())
@@ -195,11 +192,15 @@ func TestTempDriver_initialize(t *testing.T) {
 		},
 		"T1_low": {
 			input: TemperatureSensorNtcConf{TC0: 25, R0: 2500.0, TC1: -13, R1: 10000},
-			want:  TemperatureSensorNtcConf{TC0: 25, R0: 2500.0, TC1: -13, R1: 10000, B: 2829.6355560320544, t0: 298.15, r: 9.490644159087891},
+			want: TemperatureSensorNtcConf{
+				TC0: 25, R0: 2500.0, TC1: -13, R1: 10000, B: 2829.6355560320544, t0: 298.15, r: 9.490644159087891,
+			},
 		},
 		"T1_high": {
 			input: TemperatureSensorNtcConf{TC0: 25, R0: 2500.0, TC1: 100, R1: 371},
-			want:  TemperatureSensorNtcConf{TC0: 25, R0: 2500.0, TC1: 100, R1: 371, B: 2830.087381913779, t0: 298.15, r: 9.49215959052081},
+			want: TemperatureSensorNtcConf{
+				TC0: 25, R0: 2500.0, TC1: 100, R1: 371, B: 2830.087381913779, t0: 298.15, r: 9.49215959052081,
+			},
 		},
 	}
 	for name, tt := range tests {

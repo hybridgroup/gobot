@@ -41,13 +41,13 @@ func (t *i2cTestAdaptor) Testi2cWriteImpl(f func([]byte) (int, error)) {
 	t.i2cWriteImpl = f
 }
 
-func (t *i2cTestAdaptor) Read(b []byte) (count int, err error) {
+func (t *i2cTestAdaptor) Read(b []byte) (int, error) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 	return t.i2cReadImpl(b)
 }
 
-func (t *i2cTestAdaptor) Write(b []byte) (count int, err error) {
+func (t *i2cTestAdaptor) Write(b []byte) (int, error) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 	t.written = append(t.written, b...)
@@ -58,36 +58,36 @@ func (t *i2cTestAdaptor) Close() error {
 	return nil
 }
 
-func (t *i2cTestAdaptor) ReadByte() (val byte, err error) {
+func (t *i2cTestAdaptor) ReadByte() (byte, error) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 	bytes := []byte{0}
-	if err = t.readBytes(bytes); err != nil {
-		return
+	if err := t.readBytes(bytes); err != nil {
+		return 0, err
 	}
-	val = bytes[0]
-	return
+	val := bytes[0]
+	return val, nil
 }
 
-func (t *i2cTestAdaptor) ReadByteData(reg uint8) (val uint8, err error) {
+func (t *i2cTestAdaptor) ReadByteData(reg uint8) (uint8, error) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
-	if err = t.writeBytes([]byte{reg}); err != nil {
-		return
+	if err := t.writeBytes([]byte{reg}); err != nil {
+		return 0, err
 	}
 	bytes := []byte{0}
-	if err = t.readBytes(bytes); err != nil {
-		return
+	if err := t.readBytes(bytes); err != nil {
+		return 0, err
 	}
-	val = bytes[0]
-	return
+	val := bytes[0]
+	return val, nil
 }
 
-func (t *i2cTestAdaptor) ReadWordData(reg uint8) (val uint16, err error) {
+func (t *i2cTestAdaptor) ReadWordData(reg uint8) (uint16, error) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
-	if err = t.writeBytes([]byte{reg}); err != nil {
-		return
+	if err := t.writeBytes([]byte{reg}); err != nil {
+		return 0, err
 	}
 	bytes := []byte{0, 0}
 	bytesRead, err := t.i2cReadImpl(bytes)
@@ -98,14 +98,14 @@ func (t *i2cTestAdaptor) ReadWordData(reg uint8) (val uint16, err error) {
 		return 0, fmt.Errorf("Buffer underrun")
 	}
 	low, high := bytes[0], bytes[1]
-	return (uint16(high) << 8) | uint16(low), err
+	return (uint16(high) << 8) | uint16(low), nil
 }
 
-func (t *i2cTestAdaptor) ReadBlockData(reg uint8, b []byte) (err error) {
+func (t *i2cTestAdaptor) ReadBlockData(reg uint8, b []byte) error {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
-	if err = t.writeBytes([]byte{reg}); err != nil {
-		return
+	if err := t.writeBytes([]byte{reg}); err != nil {
+		return err
 	}
 	return t.readBytes(b)
 }
@@ -116,7 +116,7 @@ func (t *i2cTestAdaptor) WriteByte(val byte) error {
 	return t.writeBytes([]byte{val})
 }
 
-func (t *i2cTestAdaptor) WriteByteData(reg uint8, val uint8) (err error) {
+func (t *i2cTestAdaptor) WriteByteData(reg uint8, val uint8) error {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 	bytes := []byte{reg, val}
@@ -156,7 +156,7 @@ func (t *i2cTestAdaptor) WriteBytes(b []byte) error {
 	return t.writeBytes(b)
 }
 
-func (t *i2cTestAdaptor) GetI2cConnection(address int, bus int) (connection Connection, err error) {
+func (t *i2cTestAdaptor) GetI2cConnection(address int, bus int) (Connection, error) {
 	if t.i2cConnectErr {
 		return nil, errors.New("Invalid i2c connection")
 	}
@@ -169,10 +169,10 @@ func (t *i2cTestAdaptor) DefaultI2cBus() int {
 	return 0
 }
 
-func (t *i2cTestAdaptor) Name() string          { return t.name }
-func (t *i2cTestAdaptor) SetName(n string)      { t.name = n }
-func (t *i2cTestAdaptor) Connect() (err error)  { return }
-func (t *i2cTestAdaptor) Finalize() (err error) { return }
+func (t *i2cTestAdaptor) Name() string     { return t.name }
+func (t *i2cTestAdaptor) SetName(n string) { t.name = n }
+func (t *i2cTestAdaptor) Connect() error   { return nil }
+func (t *i2cTestAdaptor) Finalize() error  { return nil }
 
 func newI2cTestAdaptor() *i2cTestAdaptor {
 	return &i2cTestAdaptor{

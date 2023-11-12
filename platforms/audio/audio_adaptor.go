@@ -41,7 +41,7 @@ func (a *Adaptor) Sound(fileName string) []error {
 
 	if fileName == "" {
 		log.Println("Requires filename for audio file.")
-		errorsList = append(errorsList, errors.New("Requires filename for audio file."))
+		errorsList = append(errorsList, errors.New("requires filename for audio file"))
 		return errorsList
 	}
 
@@ -74,14 +74,15 @@ func (a *Adaptor) Sound(fileName string) []error {
 // CommandName defines the playback command for a sound and accepts:
 //
 //	string: The filename of the audio that needs playback
-func CommandName(fileName string) (commandName string, err error) {
+func CommandName(fileName string) (string, error) {
 	fileType := path.Ext(fileName)
-	if fileType == ".mp3" {
+	switch fileType {
+	case ".mp3":
 		return "mpg123", nil
-	} else if fileType == ".wav" {
+	case ".wav":
 		return "aplay", nil
-	} else {
-		return "", errors.New("Unknown filetype for audio file.")
+	default:
+		return "", errors.New("unknown filetype for audio file")
 	}
 }
 

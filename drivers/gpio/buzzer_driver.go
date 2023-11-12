@@ -1,6 +1,7 @@
 package gpio
 
 import (
+	"log"
 	"time"
 
 	"gobot.io/x/gobot/v2"
@@ -152,76 +153,79 @@ func NewBuzzerDriver(a DigitalWriter, pin string) *BuzzerDriver {
 }
 
 // Start implements the Driver interface
-func (l *BuzzerDriver) Start() (err error) { return }
+func (d *BuzzerDriver) Start() error { return nil }
 
 // Halt implements the Driver interface
-func (l *BuzzerDriver) Halt() (err error) { return }
+func (d *BuzzerDriver) Halt() error { return nil }
 
 // Name returns the BuzzerDrivers name
-func (l *BuzzerDriver) Name() string { return l.name }
+func (d *BuzzerDriver) Name() string { return d.name }
 
 // SetName sets the BuzzerDrivers name
-func (l *BuzzerDriver) SetName(n string) { l.name = n }
+func (d *BuzzerDriver) SetName(n string) { d.name = n }
 
 // Pin returns the BuzzerDrivers name
-func (l *BuzzerDriver) Pin() string { return l.pin }
+func (d *BuzzerDriver) Pin() string { return d.pin }
 
 // Connection returns the BuzzerDrivers Connection
-func (l *BuzzerDriver) Connection() gobot.Connection {
-	return l.connection.(gobot.Connection)
+func (d *BuzzerDriver) Connection() gobot.Connection {
+	if conn, ok := d.connection.(gobot.Connection); ok {
+		return conn
+	}
+
+	log.Printf("%s has no gobot connection\n", d.name)
+	return nil
 }
 
 // State return true if the buzzer is On and false if the led is Off
-func (l *BuzzerDriver) State() bool {
-	return l.high
+func (d *BuzzerDriver) State() bool {
+	return d.high
 }
 
 // On sets the buzzer to a high state.
-func (l *BuzzerDriver) On() (err error) {
-	if err = l.connection.DigitalWrite(l.Pin(), 1); err != nil {
-		return
+func (d *BuzzerDriver) On() error {
+	if err := d.connection.DigitalWrite(d.Pin(), 1); err != nil {
+		return err
 	}
-	l.high = true
-	return
+	d.high = true
+	return nil
 }
 
 // Off sets the buzzer to a low state.
-func (l *BuzzerDriver) Off() (err error) {
-	if err = l.connection.DigitalWrite(l.Pin(), 0); err != nil {
-		return
+func (d *BuzzerDriver) Off() error {
+	if err := d.connection.DigitalWrite(d.Pin(), 0); err != nil {
+		return err
 	}
-	l.high = false
-	return
+	d.high = false
+	return nil
 }
 
 // Toggle sets the buzzer to the opposite of it's current state
-func (l *BuzzerDriver) Toggle() (err error) {
-	if l.State() {
-		err = l.Off()
-	} else {
-		err = l.On()
+func (d *BuzzerDriver) Toggle() error {
+	if d.State() {
+		return d.Off()
 	}
-	return
+	return d.On()
 }
 
 // Tone is to make a sound with the given frequency
-func (l *BuzzerDriver) Tone(hz, duration float64) (err error) {
+func (d *BuzzerDriver) Tone(hz, duration float64) error {
 	// calculation based off https://www.arduino.cc/en/Tutorial/Melody
 	tone := (1.0 / (2.0 * hz)) * 1000000.0
 
-	tempo := ((60 / l.BPM) * (duration * 1000))
+	tempo := ((60 / d.BPM) * (duration * 1000))
 
 	for i := 0.0; i < tempo*1000; i += tone * 2.0 {
-		if err = l.On(); err != nil {
-			return
+		if err := d.On(); err != nil {
+			return err
 		}
 		time.Sleep(time.Duration(tone) * time.Microsecond)
 
-		if err = l.Off(); err != nil {
-			return
+		if err := d.Off(); err != nil {
+			return err
 		}
 		time.Sleep(time.Duration(tone) * time.Microsecond)
 	}
 
-	return
+	return nil
 }

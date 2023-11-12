@@ -241,41 +241,44 @@ func (d *TSL2561Driver) SetGain(gain TSL2561Gain) error {
 
 // GetLuminocity gets the broadband and IR only values from the TSL2561,
 // adjusting gain if auto-gain is enabled
-func (d *TSL2561Driver) GetLuminocity() (broadband uint16, ir uint16, err error) {
+func (d *TSL2561Driver) GetLuminocity() (uint16, uint16, error) {
 	// if auto gain disabled get a single reading and continue
 	if !d.autoGain {
-		broadband, ir, err = d.getData()
-		return
+		return d.getData()
 	}
 
 	agcCheck := false
 	hi, lo := d.getHiLo()
 
 	// Read data until we find a valid range
+	var broadband uint16
+	var ir uint16
+	var err error
 	valid := false
 	for {
 		broadband, ir, err = d.getData()
 		if err != nil {
-			return
+			return broadband, ir, err
 		}
 
 		// Run an auto-gain check if we haven't already done so
 		if !agcCheck {
-			if (broadband < lo) && (d.gain == TSL2561Gain1X) {
+			switch {
+			case (broadband < lo) && (d.gain == TSL2561Gain1X):
 				// increase gain and try again
 				err = d.SetGain(TSL2561Gain16X)
 				if err != nil {
-					return
+					return broadband, ir, err
 				}
 				agcCheck = true
-			} else if (broadband > hi) && (d.gain == TSL2561Gain16X) {
+			case (broadband > hi) && (d.gain == TSL2561Gain16X):
 				// drop gain and try again
 				err = d.SetGain(TSL2561Gain1X)
 				if err != nil {
-					return
+					return broadband, ir, err
 				}
 				agcCheck = true
-			} else {
+			default:
 				// Reading is either valid, or we're already at the chips
 				// limits
 				valid = true
@@ -292,12 +295,12 @@ func (d *TSL2561Driver) GetLuminocity() (broadband uint16, ir uint16, err error)
 		}
 	}
 
-	return
+	return broadband, ir, err
 }
 
 // CalculateLux converts raw sensor values to the standard SI Lux equivalent.
 // Returns 65536 if the sensor is saturated.
-func (d *TSL2561Driver) CalculateLux(broadband uint16, ir uint16) (lux uint32) {
+func (d *TSL2561Driver) CalculateLux(broadband uint16, ir uint16) uint32 {
 	var channel1 uint32
 	var channel0 uint32
 
@@ -336,45 +339,44 @@ func (d *TSL2561Driver) CalculateLux(broadband uint16, ir uint16) (lux uint32) {
 	temp += (1 << (tsl2561LuxLuxScale - 1))
 
 	// Strip off fractional portion
-	lux = temp >> tsl2561LuxLuxScale
+	lux := temp >> tsl2561LuxLuxScale
 
 	return lux
 }
 
-func (d *TSL2561Driver) enable() (err error) {
-	err = d.connection.WriteByteData(uint8(tsl2561CommandBit|tsl2561RegisterControl), tsl2561ControlPowerOn)
-	return err
+func (d *TSL2561Driver) enable() error {
+	return d.connection.WriteByteData(uint8(tsl2561CommandBit|tsl2561RegisterControl), tsl2561ControlPowerOn)
 }
 
-func (d *TSL2561Driver) disable() (err error) {
-	err = d.connection.WriteByteData(uint8(tsl2561CommandBit|tsl2561RegisterControl), tsl2561ControlPowerOff)
-	return err
+func (d *TSL2561Driver) disable() error {
+	return d.connection.WriteByteData(uint8(tsl2561CommandBit|tsl2561RegisterControl), tsl2561ControlPowerOff)
 }
 
-func (d *TSL2561Driver) getData() (broadband uint16, ir uint16, err error) {
-	if err = d.enable(); err != nil {
-		return
+func (d *TSL2561Driver) getData() (uint16, uint16, error) {
+	if err := d.enable(); err != nil {
+		return 0, 0, err
 	}
 
 	d.waitForADC()
 
 	// Reads a two byte value from channel 0 (visible + infrared)
-	broadband, err = d.connection.ReadWordData(tsl2561CommandBit | tsl2561WordBit | tsl2561RegisterChan0Low)
+	broadband, err := d.connection.ReadWordData(tsl2561CommandBit | tsl2561WordBit | tsl2561RegisterChan0Low)
 	if err != nil {
-		return
+		return 0, 0, err
 	}
 
 	// Reads a two byte value from channel 1 (infrared)
-	ir, err = d.connection.ReadWordData(tsl2561CommandBit | tsl2561WordBit | tsl2561RegisterChan1Low)
+	ir, err := d.connection.ReadWordData(tsl2561CommandBit | tsl2561WordBit | tsl2561RegisterChan1Low)
 	if err != nil {
-		return
+		return 0, 0, err
 	}
 
 	err = d.disable()
 
-	return
+	return broadband, ir, err
 }
 
+//nolint:nonamedreturns // is sufficient here
 func (d *TSL2561Driver) getHiLo() (hi, lo uint16) {
 	switch d.integrationTime {
 	case TSL2561IntegrationTime13MS:
@@ -390,6 +392,7 @@ func (d *TSL2561Driver) getHiLo() (hi, lo uint16) {
 	return
 }
 
+//nolint:nonamedreturns // is sufficient here
 func (d *TSL2561Driver) getClipScaling() (clipThreshold uint16, chScale uint32) {
 	switch d.integrationTime {
 	case TSL2561IntegrationTime13MS:
@@ -405,6 +408,7 @@ func (d *TSL2561Driver) getClipScaling() (clipThreshold uint16, chScale uint32) 
 	return
 }
 
+//nolint:nonamedreturns // is sufficient here
 func (d *TSL2561Driver) getBM(ratio uint32) (b uint32, m uint32) {
 	switch {
 	case ratio <= tsl2561LuxK1T:

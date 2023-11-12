@@ -38,14 +38,13 @@ func AllowRequestsFrom(allowedOrigins ...string) http.HandlerFunc {
 }
 
 // isOriginAllowed returns true if origin matches an allowed origin pattern.
-func (c *CORS) isOriginAllowed(origin string) (allowed bool) {
+func (c *CORS) isOriginAllowed(origin string) bool {
 	for _, allowedOriginPattern := range c.allowOriginPatterns {
-		allowed, _ = regexp.MatchString(allowedOriginPattern, origin)
-		if allowed {
-			return
+		if allowed, _ := regexp.MatchString(allowedOriginPattern, origin); allowed {
+			return true
 		}
 	}
-	return
+	return false
 }
 
 // generatePatterns generates regex expression for AllowOrigins
@@ -53,8 +52,8 @@ func (c *CORS) generatePatterns() {
 	if c.AllowOrigins != nil {
 		for _, origin := range c.AllowOrigins {
 			pattern := regexp.QuoteMeta(origin)
-			pattern = strings.Replace(pattern, "\\*", ".*", -1)
-			pattern = strings.Replace(pattern, "\\?", ".", -1)
+			pattern = strings.ReplaceAll(pattern, "\\*", ".*")
+			pattern = strings.ReplaceAll(pattern, "\\?", ".")
 			c.allowOriginPatterns = append(c.allowOriginPatterns, "^"+pattern+"$")
 		}
 	}

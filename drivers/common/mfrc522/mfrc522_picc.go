@@ -1,3 +1,4 @@
+//nolint:lll // ok here
 package mfrc522
 
 import (
@@ -117,14 +118,14 @@ func (d *MFRC522Common) ReadText() (string, error) {
 		content = append(content, blockData...)
 	}
 	if piccDebug {
-		fmt.Println("content:", string(content[:]), content)
+		fmt.Println("content:", string(content), content)
 	}
 
 	if err := d.piccHalt(); err != nil {
 		return "", err
 	}
 
-	return string(content[:]), d.stopCrypto1()
+	return string(content), d.stopCrypto1()
 }
 
 // WriteText writes the given string to the card. All old values will be overwritten.

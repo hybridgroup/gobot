@@ -95,7 +95,15 @@ type HD44780Driver struct {
 // pinRS: register select pin
 // pinEN: clock enable pin
 // pinDataBits: databit pins
-func NewHD44780Driver(a gobot.Connection, cols int, rows int, busMode HD44780BusMode, pinRS string, pinEN string, pinDataBits HD44780DataPin) *HD44780Driver {
+func NewHD44780Driver(
+	a gobot.Connection,
+	cols int,
+	rows int,
+	busMode HD44780BusMode,
+	pinRS string,
+	pinEN string,
+	pinDataBits HD44780DataPin,
+) *HD44780Driver {
 	h := &HD44780Driver{
 		name:       "HD44780Driver",
 		cols:       cols,
@@ -157,7 +165,7 @@ func (h *HD44780Driver) Connection() gobot.Connection {
 
 // Start initializes the HD44780 LCD controller
 // refer to page 45/46 of Hitachi HD44780 datasheet
-func (h *HD44780Driver) Start() (err error) {
+func (h *HD44780Driver) Start() error {
 	h.mutex.Lock()
 	defer h.mutex.Unlock()
 
@@ -252,7 +260,7 @@ func (h *HD44780Driver) Halt() error {
 }
 
 // Write output text to the display
-func (h *HD44780Driver) Write(message string) (err error) {
+func (h *HD44780Driver) Write(message string) error {
 	h.mutex.Lock()
 	defer h.mutex.Unlock()
 
@@ -279,7 +287,7 @@ func (h *HD44780Driver) Write(message string) (err error) {
 }
 
 // Clear clear the display
-func (h *HD44780Driver) Clear() (err error) {
+func (h *HD44780Driver) Clear() error {
 	h.mutex.Lock()
 	defer h.mutex.Unlock()
 
@@ -287,7 +295,7 @@ func (h *HD44780Driver) Clear() (err error) {
 }
 
 // Home return cursor to home
-func (h *HD44780Driver) Home() (err error) {
+func (h *HD44780Driver) Home() error {
 	h.mutex.Lock()
 	defer h.mutex.Unlock()
 
@@ -300,7 +308,7 @@ func (h *HD44780Driver) Home() (err error) {
 }
 
 // SetCursor move the cursor to the specified position
-func (h *HD44780Driver) SetCursor(col int, row int) (err error) {
+func (h *HD44780Driver) SetCursor(col int, row int) error {
 	h.mutex.Lock()
 	defer h.mutex.Unlock()
 
@@ -308,7 +316,7 @@ func (h *HD44780Driver) SetCursor(col int, row int) (err error) {
 }
 
 // Display turn the display on and off
-func (h *HD44780Driver) Display(on bool) (err error) {
+func (h *HD44780Driver) Display(on bool) error {
 	h.mutex.Lock()
 	defer h.mutex.Unlock()
 
@@ -322,7 +330,7 @@ func (h *HD44780Driver) Display(on bool) (err error) {
 }
 
 // Cursor turn the cursor on and off
-func (h *HD44780Driver) Cursor(on bool) (err error) {
+func (h *HD44780Driver) Cursor(on bool) error {
 	h.mutex.Lock()
 	defer h.mutex.Unlock()
 
@@ -336,7 +344,7 @@ func (h *HD44780Driver) Cursor(on bool) (err error) {
 }
 
 // Blink turn the blink on and off
-func (h *HD44780Driver) Blink(on bool) (err error) {
+func (h *HD44780Driver) Blink(on bool) error {
 	h.mutex.Lock()
 	defer h.mutex.Unlock()
 
@@ -350,7 +358,7 @@ func (h *HD44780Driver) Blink(on bool) (err error) {
 }
 
 // ScrollLeft scroll text left
-func (h *HD44780Driver) ScrollLeft() (err error) {
+func (h *HD44780Driver) ScrollLeft() error {
 	h.mutex.Lock()
 	defer h.mutex.Unlock()
 
@@ -358,7 +366,7 @@ func (h *HD44780Driver) ScrollLeft() (err error) {
 }
 
 // ScrollRight scroll text right
-func (h *HD44780Driver) ScrollRight() (err error) {
+func (h *HD44780Driver) ScrollRight() error {
 	h.mutex.Lock()
 	defer h.mutex.Unlock()
 
@@ -366,7 +374,7 @@ func (h *HD44780Driver) ScrollRight() (err error) {
 }
 
 // LeftToRight display text from left to right
-func (h *HD44780Driver) LeftToRight() (err error) {
+func (h *HD44780Driver) LeftToRight() error {
 	h.mutex.Lock()
 	defer h.mutex.Unlock()
 
@@ -375,7 +383,7 @@ func (h *HD44780Driver) LeftToRight() (err error) {
 }
 
 // RightToLeft display text from right to left
-func (h *HD44780Driver) RightToLeft() (err error) {
+func (h *HD44780Driver) RightToLeft() error {
 	h.mutex.Lock()
 	defer h.mutex.Unlock()
 
@@ -384,7 +392,7 @@ func (h *HD44780Driver) RightToLeft() (err error) {
 }
 
 // SendCommand send control command
-func (h *HD44780Driver) SendCommand(data int) (err error) {
+func (h *HD44780Driver) SendCommand(data int) error {
 	h.mutex.Lock()
 	defer h.mutex.Unlock()
 
@@ -392,7 +400,7 @@ func (h *HD44780Driver) SendCommand(data int) (err error) {
 }
 
 // WriteChar output a character to the display
-func (h *HD44780Driver) WriteChar(data int) (err error) {
+func (h *HD44780Driver) WriteChar(data int) error {
 	h.mutex.Lock()
 	defer h.mutex.Unlock()
 
@@ -400,7 +408,7 @@ func (h *HD44780Driver) WriteChar(data int) (err error) {
 }
 
 // CreateChar create custom character
-func (h *HD44780Driver) CreateChar(pos int, charMap [8]byte) (err error) {
+func (h *HD44780Driver) CreateChar(pos int, charMap [8]byte) error {
 	h.mutex.Lock()
 	defer h.mutex.Unlock()
 
@@ -421,7 +429,7 @@ func (h *HD44780Driver) CreateChar(pos int, charMap [8]byte) (err error) {
 	return nil
 }
 
-func (h *HD44780Driver) sendCommand(data int) (err error) {
+func (h *HD44780Driver) sendCommand(data int) error {
 	if err := h.activateWriteMode(); err != nil {
 		return err
 	}
@@ -437,7 +445,7 @@ func (h *HD44780Driver) sendCommand(data int) (err error) {
 	return h.writeDataPins(data)
 }
 
-func (h *HD44780Driver) writeChar(data int) (err error) {
+func (h *HD44780Driver) writeChar(data int) error {
 	if err := h.activateWriteMode(); err != nil {
 		return err
 	}
@@ -454,7 +462,7 @@ func (h *HD44780Driver) writeChar(data int) (err error) {
 	return h.writeDataPins(data)
 }
 
-func (h *HD44780Driver) clear() (err error) {
+func (h *HD44780Driver) clear() error {
 	if err := h.sendCommand(HD44780_CLEARDISPLAY); err != nil {
 		return err
 	}
@@ -466,7 +474,7 @@ func (h *HD44780Driver) clear() (err error) {
 	return nil
 }
 
-func (h *HD44780Driver) setCursor(col int, row int) (err error) {
+func (h *HD44780Driver) setCursor(col int, row int) error {
 	if col < 0 || row < 0 || col >= h.cols || row >= h.rows {
 		return fmt.Errorf("Invalid position value (%d, %d), range (%d, %d)", col, row, h.cols-1, h.rows-1)
 	}
@@ -474,7 +482,7 @@ func (h *HD44780Driver) setCursor(col int, row int) (err error) {
 	return h.sendCommand(HD44780_SETDDRAMADDR | col + h.rowOffsets[row])
 }
 
-func (h *HD44780Driver) writeDataPins(data int) (err error) {
+func (h *HD44780Driver) writeDataPins(data int) error {
 	for i, pin := range h.pinDataBits {
 		if ((data >> i) & 0x01) == 0x01 {
 			if err := pin.On(); err != nil {
@@ -490,7 +498,7 @@ func (h *HD44780Driver) writeDataPins(data int) (err error) {
 }
 
 // fallingEdge creates falling edge to trigger data transmission
-func (h *HD44780Driver) fallingEdge() (err error) {
+func (h *HD44780Driver) fallingEdge() error {
 	if err := h.pinEN.On(); err != nil {
 		return err
 	}
@@ -505,9 +513,9 @@ func (h *HD44780Driver) fallingEdge() (err error) {
 	return nil
 }
 
-func (h *HD44780Driver) activateWriteMode() (err error) {
+func (h *HD44780Driver) activateWriteMode() error {
 	if h.pinRW == nil {
-		return
+		return nil
 	}
 	return h.pinRW.Off()
 }

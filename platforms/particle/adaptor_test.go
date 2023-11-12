@@ -11,6 +11,7 @@ import (
 	"github.com/donovanhide/eventsource"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -20,7 +21,9 @@ func createTestServer(handler func(w http.ResponseWriter, r *http.Request)) *htt
 	return httptest.NewServer(http.HandlerFunc(handler))
 }
 
-func getDummyResponseForPath(path string, dummyResponse string, t *testing.T) *httptest.Server {
+func getDummyResponseForPath(t *testing.T, path string, dummyResponse string) *httptest.Server {
+	t.Helper()
+
 	dummyData := []byte(dummyResponse)
 
 	return createTestServer(func(w http.ResponseWriter, r *http.Request) {
@@ -32,7 +35,14 @@ func getDummyResponseForPath(path string, dummyResponse string, t *testing.T) *h
 	})
 }
 
-func getDummyResponseForPathWithParams(path string, params []string, dummyResponse string, t *testing.T) *httptest.Server {
+func getDummyResponseForPathWithParams(
+	t *testing.T,
+	path string,
+	params []string,
+	dummyResponse string,
+) *httptest.Server {
+	t.Helper()
+
 	dummyData := []byte(dummyResponse)
 
 	return createTestServer(func(w http.ResponseWriter, r *http.Request) {
@@ -104,7 +114,7 @@ func TestAdaptorAnalogRead(t *testing.T) {
 	params := []string{"A1"}
 
 	a := initTestAdaptor()
-	testServer := getDummyResponseForPathWithParams("/"+a.DeviceID+"/analogread", params, response, t)
+	testServer := getDummyResponseForPathWithParams(t, "/"+a.DeviceID+"/analogread", params, response)
 
 	a.setAPIServer(testServer.URL)
 	defer testServer.Close()
@@ -131,7 +141,7 @@ func TestAdaptorPwmWrite(t *testing.T) {
 	params := []string{"A1,1"}
 
 	a := initTestAdaptor()
-	testServer := getDummyResponseForPathWithParams("/"+a.DeviceID+"/analogwrite", params, response, t)
+	testServer := getDummyResponseForPathWithParams(t, "/"+a.DeviceID+"/analogwrite", params, response)
 	defer testServer.Close()
 
 	a.setAPIServer(testServer.URL)
@@ -143,7 +153,7 @@ func TestAdaptorAnalogWrite(t *testing.T) {
 	params := []string{"A1,1"}
 
 	a := initTestAdaptor()
-	testServer := getDummyResponseForPathWithParams("/"+a.DeviceID+"/analogwrite", params, response, t)
+	testServer := getDummyResponseForPathWithParams(t, "/"+a.DeviceID+"/analogwrite", params, response)
 	defer testServer.Close()
 
 	a.setAPIServer(testServer.URL)
@@ -156,7 +166,7 @@ func TestAdaptorDigitalWrite(t *testing.T) {
 	params := []string{"D7,HIGH"}
 
 	a := initTestAdaptor()
-	testServer := getDummyResponseForPathWithParams("/"+a.DeviceID+"/digitalwrite", params, response, t)
+	testServer := getDummyResponseForPathWithParams(t, "/"+a.DeviceID+"/digitalwrite", params, response)
 
 	a.setAPIServer(testServer.URL)
 	_ = a.DigitalWrite("D7", 1)
@@ -165,7 +175,7 @@ func TestAdaptorDigitalWrite(t *testing.T) {
 	// When LOW
 	params = []string{"D7,LOW"}
 
-	testServer = getDummyResponseForPathWithParams("/"+a.DeviceID+"/digitalwrite", params, response, t)
+	testServer = getDummyResponseForPathWithParams(t, "/"+a.DeviceID+"/digitalwrite", params, response)
 	defer testServer.Close()
 
 	a.setAPIServer(testServer.URL)
@@ -177,7 +187,7 @@ func TestAdaptorServoOpen(t *testing.T) {
 	params := []string{"1"}
 
 	a := initTestAdaptor()
-	testServer := getDummyResponseForPathWithParams("/"+a.DeviceID+"/servoOpen", params, response, t)
+	testServer := getDummyResponseForPathWithParams(t, "/"+a.DeviceID+"/servoOpen", params, response)
 	defer testServer.Close()
 
 	a.setAPIServer(testServer.URL)
@@ -189,7 +199,7 @@ func TestAdaptorServoWrite(t *testing.T) {
 	params := []string{"1,128"}
 
 	a := initTestAdaptorWithServo()
-	testServer := getDummyResponseForPathWithParams("/"+a.DeviceID+"/servoSet", params, response, t)
+	testServer := getDummyResponseForPathWithParams(t, "/"+a.DeviceID+"/servoSet", params, response)
 	defer testServer.Close()
 
 	a.setAPIServer(testServer.URL)
@@ -202,7 +212,7 @@ func TestAdaptorDigitalRead(t *testing.T) {
 	params := []string{"D7"}
 
 	a := initTestAdaptor()
-	testServer := getDummyResponseForPathWithParams("/"+a.DeviceID+"/digitalread", params, response, t)
+	testServer := getDummyResponseForPathWithParams(t, "/"+a.DeviceID+"/digitalread", params, response)
 
 	a.setAPIServer(testServer.URL)
 
@@ -213,7 +223,7 @@ func TestAdaptorDigitalRead(t *testing.T) {
 	// When LOW
 	response = `{"return_value": 0}`
 
-	testServer = getDummyResponseForPathWithParams("/"+a.DeviceID+"/digitalread", params, response, t)
+	testServer = getDummyResponseForPathWithParams(t, "/"+a.DeviceID+"/digitalread", params, response)
 
 	a.setAPIServer(testServer.URL)
 	defer testServer.Close()
@@ -240,7 +250,7 @@ func TestAdaptorFunction(t *testing.T) {
 	response := `{"return_value": 1}`
 
 	a := initTestAdaptor()
-	testServer := getDummyResponseForPath("/"+a.DeviceID+"/hello", response, t)
+	testServer := getDummyResponseForPath(t, "/"+a.DeviceID+"/hello", response)
 
 	a.setAPIServer(testServer.URL)
 
@@ -250,7 +260,7 @@ func TestAdaptorFunction(t *testing.T) {
 
 	// When not existent
 	response = `{"ok": false, "error": "timeout"}`
-	testServer = getDummyResponseForPath("/"+a.DeviceID+"/hello", response, t)
+	testServer = getDummyResponseForPath(t, "/"+a.DeviceID+"/hello", response)
 
 	a.setAPIServer(testServer.URL)
 
@@ -265,7 +275,7 @@ func TestAdaptorVariable(t *testing.T) {
 	response := `{"result": "1"}`
 
 	a := initTestAdaptor()
-	testServer := getDummyResponseForPath("/"+a.DeviceID+"/variable_name", response, t)
+	testServer := getDummyResponseForPath(t, "/"+a.DeviceID+"/variable_name", response)
 
 	a.setAPIServer(testServer.URL)
 
@@ -275,7 +285,7 @@ func TestAdaptorVariable(t *testing.T) {
 
 	// When float
 	response = `{"result": 1.1}`
-	testServer = getDummyResponseForPath("/"+a.DeviceID+"/variable_name", response, t)
+	testServer = getDummyResponseForPath(t, "/"+a.DeviceID+"/variable_name", response)
 
 	a.setAPIServer(testServer.URL)
 
@@ -285,7 +295,7 @@ func TestAdaptorVariable(t *testing.T) {
 
 	// When int
 	response = `{"result": 1}`
-	testServer = getDummyResponseForPath("/"+a.DeviceID+"/variable_name", response, t)
+	testServer = getDummyResponseForPath(t, "/"+a.DeviceID+"/variable_name", response)
 
 	a.setAPIServer(testServer.URL)
 
@@ -295,7 +305,7 @@ func TestAdaptorVariable(t *testing.T) {
 
 	// When bool
 	response = `{"result": true}`
-	testServer = getDummyResponseForPath("/"+a.DeviceID+"/variable_name", response, t)
+	testServer = getDummyResponseForPath(t, "/"+a.DeviceID+"/variable_name", response)
 
 	a.setAPIServer(testServer.URL)
 
@@ -305,7 +315,7 @@ func TestAdaptorVariable(t *testing.T) {
 
 	// When not existent
 	response = `{"ok": false, "error": "Variable not found"}`
-	testServer = getDummyResponseForPath("/"+a.DeviceID+"/not_existent", response, t)
+	testServer = getDummyResponseForPath(t, "/"+a.DeviceID+"/not_existent", response)
 
 	a.setAPIServer(testServer.URL)
 

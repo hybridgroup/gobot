@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const semPublishWait = 10 * time.Millisecond
+const semPublishWait = 20 * time.Millisecond
 
 type readWriteCloser struct {
 	id string

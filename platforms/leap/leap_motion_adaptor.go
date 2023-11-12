@@ -3,9 +3,9 @@ package leap
 import (
 	"io"
 
-	"gobot.io/x/gobot/v2"
-
 	"golang.org/x/net/websocket"
+
+	"gobot.io/x/gobot/v2"
 )
 
 // Adaptor is the Gobot Adaptor connection to the Leap Motion
@@ -38,15 +38,15 @@ func (l *Adaptor) SetName(n string) { l.name = n }
 func (l *Adaptor) Port() string { return l.port }
 
 // Connect returns true if connection to leap motion is established successfully
-func (l *Adaptor) Connect() (err error) {
-	ws, e := l.connect(l.Port())
-	if e != nil {
-		return e
+func (l *Adaptor) Connect() error {
+	ws, err := l.connect(l.Port())
+	if err != nil {
+		return err
 	}
 
 	l.ws = ws
-	return
+	return nil
 }
 
 // Finalize ends connection to leap motion
-func (l *Adaptor) Finalize() (err error) { return }
+func (l *Adaptor) Finalize() error { return nil }

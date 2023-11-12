@@ -9,6 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -73,7 +74,9 @@ func TestBMP388Measurements(t *testing.T) {
 			_ = binary.Write(buf, binary.LittleEndian, uint8(0x50))
 		case bmp388RegCalib00:
 			// Values produced by dumping data from actual sensor
-			buf.Write([]byte{36, 107, 156, 73, 246, 104, 255, 189, 245, 35, 0, 151, 101, 184, 122, 243, 246, 211, 64, 14, 196, 0, 0, 0})
+			buf.Write([]byte{
+				36, 107, 156, 73, 246, 104, 255, 189, 245, 35, 0, 151, 101, 184, 122, 243, 246, 211, 64, 14, 196, 0, 0, 0,
+			})
 		case bmp388RegTempData:
 			buf.Write([]byte{0, 28, 127})
 		case bmp388RegPressureData:
@@ -163,7 +166,9 @@ func TestBMP388_initialization(t *testing.T) {
 		wantConfRegVal    = uint8(0x00) // no filter
 	)
 	// Values produced by dumping data from actual sensor
-	returnRead := []byte{36, 107, 156, 73, 246, 104, 255, 189, 245, 35, 0, 151, 101, 184, 122, 243, 246, 211, 64, 14, 196, 0, 0, 0}
+	returnRead := []byte{
+		36, 107, 156, 73, 246, 104, 255, 189, 245, 35, 0, 151, 101, 184, 122, 243, 246, 211, 64, 14, 196, 0, 0, 0,
+	}
 	numCallsRead := 0
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		numCallsRead++

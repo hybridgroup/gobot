@@ -1,3 +1,4 @@
+//nolint:forcetypeassert // ok here
 package gpio
 
 import (
@@ -9,6 +10,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -86,9 +88,8 @@ func TestDriverPublishesError(t *testing.T) {
 	for _, driver := range drivers {
 		sem := make(chan struct{}, 1)
 		// send error
-		returnErr := func(string) (val int, err error) {
-			err = errors.New("read error")
-			return
+		returnErr := func(string) (int, error) {
+			return 0, errors.New("read error")
 		}
 		testAdaptor.digitalReadFunc = returnErr
 

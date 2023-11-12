@@ -47,7 +47,7 @@ type RobotWork struct {
 	id         uuid.UUID
 	kind       string
 	tickCount  int
-	ctx        context.Context
+	ctx        context.Context //nolint:containedctx // done by intention
 	cancelFunc context.CancelFunc
 	function   func()
 	ticker     *time.Ticker
