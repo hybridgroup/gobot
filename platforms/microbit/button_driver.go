@@ -52,6 +52,7 @@ func (b *ButtonDriver) SetName(n string) { b.name = n }
 
 // adaptor returns BLE adaptor
 func (b *ButtonDriver) adaptor() ble.BLEConnector {
+	//nolint:forcetypeassert // ok here
 	return b.Connection().(ble.BLEConnector)
 }
 

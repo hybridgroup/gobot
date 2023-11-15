@@ -34,10 +34,11 @@ run:
 linters:
   # currently active linters:
   #
-  #INFO [lintersdb] Active 49 linters: [asasalint asciicheck bidichk contextcheck decorder depguard dupword durationcheck errcheck exportloopref
-  # gocheckcompilerdirectives gochecknoinits gochecksumtype gofmt gofumpt goimports gomoddirectives gomodguard goprintffuncname gosec gosimple govet grouper
-  # inamedparam ineffassign makezero mirror misspell musttag nilerr nilnil nolintlint nosprintfhostport perfsprint prealloc protogetter reassign revive
-  # sloglint staticcheck tagalign tenv testableexamples testifylint tparallel unconvert unparam unused wastedassign]
+  # INFO [lintersdb] Active 64 linters: [asasalint asciicheck bidichk bodyclose containedctx contextcheck decorder depguard dogsled dupword durationcheck
+  # errcheck errchkjson errorlint exportloopref forcetypeassert gci gocheckcompilerdirectives gochecknoinits gochecksumtype gocritic gofmt gofumpt goimports
+  # gomoddirectives gomodguard goprintffuncname gosec gosimple govet grouper inamedparam ineffassign lll makezero mirror misspell musttag nakedret nilerr nilnil
+  # noctx nolintlint nonamedreturns nosprintfhostport perfsprint prealloc predeclared protogetter reassign revive sloglint staticcheck tagalign tenv
+  # testableexamples testifylint thelper tparallel unconvert unparam unused usestdlibvars wastedassign]
 
   enable-all: true
 
@@ -75,39 +76,23 @@ linters:
     - testpackage # not needed, we use the same name for test package to have access to unexposed items
     - wrapcheck # not needed (we allow errors from interface methods)
     - zerologlint # not needed (related to zerolog package)
-    # important to have
-    - errorlint # useful (reduce bugs), but suppress the "Use `%w` to format errors" check
-    - forcetypeassert # useful (reduce bugs)
-    - nakedret # very useful together with "nonamedreturns" (reduce bugs)
-    - nonamedreturns # very useful (reduce bugs)
     # useful for the future
-    - bodyclose # maybe useful (reduce bugs), exclusions for tests needed
-    - containedctx # useful (structs are not for context wrapping)
     - cyclop # useful with some tweeks (better understandable code), see also gocyclo
-    - dogsled # useful with some tweeks (e.g. exclude tests)
     - dupl # useful with some tweeks (reduce bugs and lines of code)
-    - errchkjson # useful (reduce bugs)
     - errname # useful for common style
     - exhaustruct # useful with some exclusions for existing code (e.g. mavlink/common/common.go)
     - funlen # useful with some tweeks (reduce bugs, simplify code, better understandable code)
-    - gci # useful (improve readability)
     - gocognit # useful with some tweeks (better understandable code)
     - goconst # useful (reduce bugs)
-    - gocritic # useful with some exclusions for existing code (e.g. mavlink/common/common.go)
     - gocyclo # useful with some tweeks (better understandable code)
     - goheader # useful, if we introduce a common header (e.g. for copyright)
     - gomnd # useful with some exclusions for existing code (e.g. mavlink.go)
     - interfacebloat # useful with some exclusions at usage of external packages
-    - lll # useful with some exclusions for existing code (e.g. mavlink/common/common.go)
     - maintidx # useful with some tweeks (better understandable code), maybe use instead "gocyclo", "gocognit" , "cyclop"
     - nestif # useful (reduce bugs, simplify code, better understandable code)
     - nlreturn # more common style, but could become annoying
-    - noctx # maybe good (show used context explicit)
-    - predeclared # useful (reduce bugs)
     - stylecheck # useful with some tweaking (e.g. underscores in names should be allowed - we use it for constants retrieved from C/C++)
     - tagliatelle # maybe useful with some tweaking or excluding
-    - thelper # useful
-    - usestdlibvars # useful
     - varnamelen # maybe useful with some tweaking, but many findings
     - whitespace # more common style, but could become annoying
     - wsl # more common style, but could become annoying
@@ -144,6 +129,36 @@ linters-settings:
       - "the"
       - "and"
       - "a"
+
+  errorlint:
+    # Default: true
+    # %v should be used by default over %w, see https://github.com/uber-go/guide/blob/master/style.md#error-wrapping
+    errorf: false
+    # Permit more than 1 %w verb, valid per Go 1.20 (Requires errorf:true)
+    # Default: true
+    errorf-multi: false
+
+  gci:
+    # Section configuration to compare against.
+    # Section names are case-insensitive and may contain parameters in ().
+    # The default order of sections is `standard > default > custom > blank > dot`,
+    # If `custom-order` is `true`, it follows the order of `sections` option.
+    # Default: ["standard", "default"]
+    sections:
+      - standard # Standard section: captures all standard packages.
+      - default # Default section: contains all imports that could not be matched to another section type.
+      - prefix(gobot.io/x/gobot/) # Custom section: groups all imports with the specified Prefix.
+      #- blank # Blank section: contains all blank imports. This section is not present unless explicitly enabled.
+      #- dot # Dot section: contains all dot imports. This section is not present unless explicitly enabled.
+    # Enable custom order of sections.
+    # If `true`, make the section order the same as the order of `sections`.
+    # Default: false
+    custom-order: true
+
+  gocritic:
+    disabled-checks:
+      - assignOp # very opinionated
+      - appendAssign # mostly used by intention
 
   nolintlint:
     # Enable to require an explanation of nonzero length after each nolint directive.

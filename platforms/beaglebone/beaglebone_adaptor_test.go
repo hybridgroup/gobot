@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/aio"
 	"gobot.io/x/gobot/v2/drivers/gpio"
@@ -172,7 +173,7 @@ func TestAnalogReadFileError(t *testing.T) {
 	a, _ := initTestAdaptorWithMockedFilesystem(mockPaths)
 
 	_, err := a.AnalogRead("P9_40")
-	assert.Contains(t, err.Error(), "/sys/bus/iio/devices/iio:device0/in_voltage1_raw: no such file")
+	require.ErrorContains(t, err, "/sys/bus/iio/devices/iio:device0/in_voltage1_raw: no such file")
 }
 
 func TestDigitalPinDirectionFileError(t *testing.T) {
@@ -185,7 +186,7 @@ func TestDigitalPinDirectionFileError(t *testing.T) {
 	a, _ := initTestAdaptorWithMockedFilesystem(mockPaths)
 
 	err := a.DigitalWrite("P9_12", 1)
-	assert.Contains(t, err.Error(), "/sys/class/gpio/gpio60/direction: no such file")
+	require.ErrorContains(t, err, "/sys/class/gpio/gpio60/direction: no such file")
 
 	// no pin added after previous problem, so no pin to unexport in finalize
 	err = a.Finalize()
@@ -206,7 +207,7 @@ func TestDigitalPinFinalizeFileError(t *testing.T) {
 	require.NoError(t, err)
 
 	err = a.Finalize()
-	assert.Contains(t, err.Error(), "/sys/class/gpio/unexport: no such file")
+	require.ErrorContains(t, err, "/sys/class/gpio/unexport: no such file")
 }
 
 func TestPocketName(t *testing.T) {
@@ -243,7 +244,7 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	// act
 	err = a.Finalize()
 	// assert
-	assert.Contains(t, err.Error(), "close error")
+	require.ErrorContains(t, err, "close error")
 }
 
 func Test_validateSpiBusNumber(t *testing.T) {

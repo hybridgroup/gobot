@@ -203,6 +203,8 @@ func WithHMC5883LGain(val int) func(Config) {
 }
 
 // Read reads the values X, Y, Z in Gauss
+//
+//nolint:nonamedreturns // is sufficient here
 func (h *HMC5883LDriver) Read() (x float64, y float64, z float64, err error) {
 	h.mutex.Lock()
 	defer h.mutex.Unlock()
@@ -215,26 +217,27 @@ func (h *HMC5883LDriver) Read() (x float64, y float64, z float64, err error) {
 }
 
 // Heading returns the current heading in radians
-func (h *HMC5883LDriver) Heading() (heading float64, err error) {
+func (h *HMC5883LDriver) Heading() (float64, error) {
 	h.mutex.Lock()
 	defer h.mutex.Unlock()
 
-	var x, y int16
-	x, y, _, err = h.readRawData()
+	x, y, _, err := h.readRawData()
 	if err != nil {
-		return
+		return 0, err
 	}
-	heading = math.Atan2(float64(y), float64(x))
+	heading := math.Atan2(float64(y), float64(x))
 	if heading > 2*math.Pi {
 		heading -= 2 * math.Pi
 	}
 	if heading < 0 {
 		heading += 2 * math.Pi
 	}
-	return
+	return heading, nil
 }
 
 // readRawData reads the raw values from the X, Y, and Z registers
+//
+//nolint:nonamedreturns // sufficient here
 func (h *HMC5883LDriver) readRawData() (x int16, y int16, z int16, err error) {
 	// read the data, starting from the initial register
 	data := make([]byte, 6)
@@ -249,7 +252,7 @@ func (h *HMC5883LDriver) readRawData() (x int16, y int16, z int16, err error) {
 	return twosComplement16Bit(unsignedX), twosComplement16Bit(unsignedY), twosComplement16Bit(unsignedZ), nil
 }
 
-func (h *HMC5883LDriver) initialize() (err error) {
+func (h *HMC5883LDriver) initialize() error {
 	regA := hmc5883lMeasurementFlowBits[h.applyBias]
 	regA |= hmc5883lOutputRateBits[h.outputRate] << 2
 	regA |= hmc5883lSamplesAvgBits[h.samplesAvg] << 5
@@ -260,15 +263,13 @@ func (h *HMC5883LDriver) initialize() (err error) {
 	if err := h.connection.WriteByteData(hmc5883lRegB, uint8(regB)); err != nil {
 		return err
 	}
-	if err := h.connection.WriteByteData(hmc5883lRegMode, uint8(h.measurementMode)); err != nil {
-		return err
-	}
-	return
+
+	return h.connection.WriteByteData(hmc5883lRegMode, uint8(h.measurementMode))
 }
 
-func hmc5883lValidateSamplesAveraged(samplesAvg int) (err error) {
+func hmc5883lValidateSamplesAveraged(samplesAvg int) error {
 	if _, ok := hmc5883lSamplesAvgBits[uint8(samplesAvg)]; ok {
-		return
+		return nil
 	}
 
 	keys := []int{}
@@ -276,13 +277,13 @@ func hmc5883lValidateSamplesAveraged(samplesAvg int) (err error) {
 		keys = append(keys, int(k))
 	}
 	sort.Ints(keys)
-	err = fmt.Errorf("Samples averaged must be one of: %d", keys)
-	return
+
+	return fmt.Errorf("Samples averaged must be one of: %d", keys)
 }
 
-func hmc5883lValidateOutputRate(outputRate int) (err error) {
+func hmc5883lValidateOutputRate(outputRate int) error {
 	if _, ok := hmc5883lOutputRateBits[uint32(outputRate)]; ok {
-		return
+		return nil
 	}
 
 	keys := []int{}
@@ -290,13 +291,13 @@ func hmc5883lValidateOutputRate(outputRate int) (err error) {
 		keys = append(keys, int(k))
 	}
 	sort.Ints(keys)
-	err = fmt.Errorf("Data output rate must be one of: %d", keys)
-	return
+
+	return fmt.Errorf("Data output rate must be one of: %d", keys)
 }
 
-func hmc5883lValidateApplyBias(applyBias int) (err error) {
+func hmc5883lValidateApplyBias(applyBias int) error {
 	if _, ok := hmc5883lMeasurementFlowBits[int8(applyBias)]; ok {
-		return
+		return nil
 	}
 
 	keys := []int{}
@@ -304,13 +305,13 @@ func hmc5883lValidateApplyBias(applyBias int) (err error) {
 		keys = append(keys, int(k))
 	}
 	sort.Ints(keys)
-	err = fmt.Errorf("Apply measurement bias must be one of: %d", keys)
-	return
+
+	return fmt.Errorf("Apply measurement bias must be one of: %d", keys)
 }
 
-func hmc5883lValidateGain(gain int) (err error) {
+func hmc5883lValidateGain(gain int) error {
 	if _, ok := hmc5883lGainBits[float64(gain)]; ok {
-		return
+		return nil
 	}
 
 	keys := []int{}
@@ -318,6 +319,6 @@ func hmc5883lValidateGain(gain int) (err error) {
 		keys = append(keys, int(k))
 	}
 	sort.Ints(keys)
-	err = fmt.Errorf("Gain must be one of: %d", keys)
-	return
+
+	return fmt.Errorf("Gain must be one of: %d", keys)
 }

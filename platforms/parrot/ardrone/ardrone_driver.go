@@ -42,17 +42,18 @@ func (a *Driver) Connection() gobot.Connection { return a.connection }
 
 // adaptor returns ardrone adaptor
 func (a *Driver) adaptor() *Adaptor {
+	//nolint:forcetypeassert // ok here
 	return a.Connection().(*Adaptor)
 }
 
 // Start starts the Driver
-func (a *Driver) Start() (err error) {
-	return
+func (a *Driver) Start() error {
+	return nil
 }
 
 // Halt halts the Driver
-func (a *Driver) Halt() (err error) {
-	return
+func (a *Driver) Halt() error {
+	return nil
 }
 
 // TakeOff makes the drone start flying, and publishes `flying` event

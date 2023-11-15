@@ -1,3 +1,4 @@
+//nolint:nonamedreturns // ok for tests
 package adaptors
 
 import (
@@ -10,6 +11,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/gpio"
 	"gobot.io/x/gobot/v2/system"
@@ -101,7 +103,7 @@ func TestDigitalPinsFinalize(t *testing.T) {
 	require.NoError(t, a.DigitalWrite("3", 2))
 	delete(fs.Files, "/sys/class/gpio/unexport")
 	err = a.Finalize()
-	assert.Contains(t, err.Error(), "/sys/class/gpio/unexport: no such file")
+	require.ErrorContains(t, err, "/sys/class/gpio/unexport: no such file")
 }
 
 func TestDigitalPinsReConnect(t *testing.T) {

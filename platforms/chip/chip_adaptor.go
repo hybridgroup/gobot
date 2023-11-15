@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	multierror "github.com/hashicorp/go-multierror"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/platforms/adaptors"
 	"gobot.io/x/gobot/v2/system"
@@ -108,14 +109,14 @@ func (c *Adaptor) Finalize() error {
 	return err
 }
 
-func getXIOBase() (baseAddr int, err error) {
+func getXIOBase() (int, error) {
 	// Default to original base from 4.3 kernel
-	baseAddr = 408
+	baseAddr := 408
 	const expanderID = "pcf8574a"
 
 	labels, err := filepath.Glob("/sys/class/gpio/*/label")
 	if err != nil {
-		return
+		return baseAddr, err
 	}
 
 	for _, labelPath := range labels {

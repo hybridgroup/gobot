@@ -1,3 +1,4 @@
+//nolint:usestdlibvars,noctx // ok here
 package api
 
 import (

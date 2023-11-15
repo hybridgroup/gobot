@@ -186,7 +186,7 @@ func WithYL40OutputScaler(scaler func(input float64) (value int)) func(Config) {
 }
 
 // Start initializes the driver
-func (y *YL40Driver) Start() (err error) {
+func (y *YL40Driver) Start() error {
 	// must be the first one
 	if err := y.PCF8591Driver.Start(); err != nil {
 		return err
@@ -210,7 +210,7 @@ func (y *YL40Driver) Start() (err error) {
 }
 
 // Halt stops the driver
-func (y *YL40Driver) Halt() (err error) {
+func (y *YL40Driver) Halt() error {
 	// we try halt on each device, not stopping on the first error
 	var errors []string
 	if err := y.aBri.Halt(); err != nil {
@@ -240,7 +240,7 @@ func (y *YL40Driver) Halt() (err error) {
 
 // Read returns the current reading from the given pin of the driver
 // For the analog output pin the last written value is returned
-func (y *YL40Driver) Read(pin YL40Pin) (val float64, err error) {
+func (y *YL40Driver) Read(pin YL40Pin) (float64, error) {
 	switch pin {
 	case YL40Bri:
 		return y.aBri.Read()
@@ -258,27 +258,27 @@ func (y *YL40Driver) Read(pin YL40Pin) (val float64, err error) {
 }
 
 // ReadBrightness returns the current reading from brightness pin of the driver
-func (y *YL40Driver) ReadBrightness() (val float64, err error) {
+func (y *YL40Driver) ReadBrightness() (float64, error) {
 	return y.Read(YL40Bri)
 }
 
 // ReadTemperature returns the current reading from temperature pin of the driver
-func (y *YL40Driver) ReadTemperature() (val float64, err error) {
+func (y *YL40Driver) ReadTemperature() (float64, error) {
 	return y.Read(YL40Temp)
 }
 
 // ReadAIN2 returns the current reading from analog input pin 2 pin of the driver
-func (y *YL40Driver) ReadAIN2() (val float64, err error) {
+func (y *YL40Driver) ReadAIN2() (float64, error) {
 	return y.Read(YL40AIN2)
 }
 
 // ReadPotentiometer returns the current reading from potentiometer pin of the driver
-func (y *YL40Driver) ReadPotentiometer() (val float64, err error) {
+func (y *YL40Driver) ReadPotentiometer() (float64, error) {
 	return y.Read(YL40Poti)
 }
 
 // Value returns the last read or written value from the given pin of the driver
-func (y *YL40Driver) Value(pin YL40Pin) (val float64, err error) {
+func (y *YL40Driver) Value(pin YL40Pin) (float64, error) {
 	switch pin {
 	case YL40Bri:
 		return y.aBri.Value(), nil
@@ -296,31 +296,31 @@ func (y *YL40Driver) Value(pin YL40Pin) (val float64, err error) {
 }
 
 // Brightness returns the last read brightness of the driver
-func (y *YL40Driver) Brightness() (val float64, err error) {
+func (y *YL40Driver) Brightness() (float64, error) {
 	return y.Value(YL40Bri)
 }
 
 // Temperature returns the last read temperature of the driver
-func (y *YL40Driver) Temperature() (val float64, err error) {
+func (y *YL40Driver) Temperature() (float64, error) {
 	return y.Value(YL40Temp)
 }
 
 // AIN2 returns the last read analog input value of the driver
-func (y *YL40Driver) AIN2() (val float64, err error) {
+func (y *YL40Driver) AIN2() (float64, error) {
 	return y.Value(YL40AIN2)
 }
 
 // Potentiometer returns the last read potentiometer value of the driver
-func (y *YL40Driver) Potentiometer() (val float64, err error) {
+func (y *YL40Driver) Potentiometer() (float64, error) {
 	return y.Value(YL40Poti)
 }
 
 // AOUT returns the last written value of the driver
-func (y *YL40Driver) AOUT() (val float64, err error) {
+func (y *YL40Driver) AOUT() (float64, error) {
 	return y.Value(YL40AOUT)
 }
 
 // Write writes the given value to the analog output
-func (y *YL40Driver) Write(val float64) (err error) {
+func (y *YL40Driver) Write(val float64) error {
 	return y.aOut.Write(val)
 }

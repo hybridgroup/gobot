@@ -186,39 +186,30 @@ func WithADXL345FullScaleRange(val ADXL345FsRangeConfig) func(Config) {
 }
 
 // UseLowPower change the current rate of the sensor
-func (d *ADXL345Driver) UseLowPower(lowPower bool) (err error) {
+func (d *ADXL345Driver) UseLowPower(lowPower bool) error {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
 	d.bwRate.lowPower = lowPower
-	if err := d.connection.WriteByteData(adxl345Reg_BW_RATE, d.bwRate.toByte()); err != nil {
-		return err
-	}
-	return
+	return d.connection.WriteByteData(adxl345Reg_BW_RATE, d.bwRate.toByte())
 }
 
 // SetRate change the current rate of the sensor immediately
-func (d *ADXL345Driver) SetRate(rate ADXL345RateConfig) (err error) {
+func (d *ADXL345Driver) SetRate(rate ADXL345RateConfig) error {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
 	d.bwRate.rate = rate
-	if err := d.connection.WriteByteData(adxl345Reg_BW_RATE, d.bwRate.toByte()); err != nil {
-		return err
-	}
-	return
+	return d.connection.WriteByteData(adxl345Reg_BW_RATE, d.bwRate.toByte())
 }
 
 // SetRange change the current range of the sensor immediately
-func (d *ADXL345Driver) SetRange(fullScaleRange ADXL345FsRangeConfig) (err error) {
+func (d *ADXL345Driver) SetRange(fullScaleRange ADXL345FsRangeConfig) error {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
 	d.dataFormat.fullScaleRange = fullScaleRange
-	if err := d.connection.WriteByteData(adxl345Reg_DATA_FORMAT, d.dataFormat.toByte()); err != nil {
-		return err
-	}
-	return
+	return d.connection.WriteByteData(adxl345Reg_DATA_FORMAT, d.dataFormat.toByte())
 }
 
 // XYZ returns the adjusted x, y and z axis, unit [g]

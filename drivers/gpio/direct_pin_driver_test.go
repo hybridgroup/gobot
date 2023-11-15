@@ -1,3 +1,4 @@
+//nolint:forcetypeassert // ok here
 package gpio
 
 import (
@@ -7,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -14,17 +16,16 @@ var _ gobot.Driver = (*DirectPinDriver)(nil)
 
 func initTestDirectPinDriver() *DirectPinDriver {
 	a := newGpioTestAdaptor()
-	a.digitalReadFunc = func(string) (val int, err error) {
-		val = 1
-		return
+	a.digitalReadFunc = func(string) (int, error) {
+		return 1, nil
 	}
-	a.digitalWriteFunc = func(string, byte) (err error) {
+	a.digitalWriteFunc = func(string, byte) error {
 		return errors.New("write error")
 	}
-	a.pwmWriteFunc = func(string, byte) (err error) {
+	a.pwmWriteFunc = func(string, byte) error {
 		return errors.New("write error")
 	}
-	a.servoWriteFunc = func(string, byte) (err error) {
+	a.servoWriteFunc = func(string, byte) error {
 		return errors.New("write error")
 	}
 	return NewDirectPinDriver(a, "1")

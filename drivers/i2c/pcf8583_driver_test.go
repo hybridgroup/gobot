@@ -1,3 +1,4 @@
+//nolint:forcetypeassert // ok here
 package i2c
 
 import (
@@ -7,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -248,7 +250,7 @@ func TestPCF8583WriteTimeNoTimeModeFails(t *testing.T) {
 	err := d.WriteTime(time.Now())
 	// assert
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "wrong mode 0x30")
+	require.ErrorContains(t, err, "wrong mode 0x30")
 	assert.Len(t, a.written, 1)
 	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[0])
 	assert.Equal(t, 1, numCallsRead)
@@ -320,7 +322,7 @@ func TestPCF8583ReadTimeNoTimeModeFails(t *testing.T) {
 	got, err := d.ReadTime()
 	// assert
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "wrong mode 0x20")
+	require.ErrorContains(t, err, "wrong mode 0x20")
 	assert.Equal(t, time.Time{}, got)
 	assert.Len(t, a.written, 1)
 	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[0])
@@ -391,7 +393,7 @@ func TestPCF8583WriteCounterNoCounterModeFails(t *testing.T) {
 	err := d.WriteCounter(123)
 	// assert
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "wrong mode 0x10")
+	require.ErrorContains(t, err, "wrong mode 0x10")
 	assert.Len(t, a.written, 1)
 	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[0])
 	assert.Equal(t, 1, numCallsRead)
@@ -458,7 +460,7 @@ func TestPCF8583ReadCounterNoCounterModeFails(t *testing.T) {
 	got, err := d.ReadCounter()
 	// assert
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "wrong mode 0x30")
+	require.ErrorContains(t, err, "wrong mode 0x30")
 	assert.Equal(t, int32(0), got)
 	assert.Len(t, a.written, 1)
 	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[0])
@@ -495,7 +497,7 @@ func TestPCF8583WriteRamAddressOverflowFails(t *testing.T) {
 	err := d.WriteRAM(uint8(0xF0), 15)
 	// assert
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "overflow 256")
+	require.ErrorContains(t, err, "overflow 256")
 	assert.Empty(t, a.written)
 }
 
@@ -547,7 +549,7 @@ func TestPCF8583ReadRamAddressOverflowFails(t *testing.T) {
 	got, err := d.ReadRAM(uint8(0xF0))
 	// assert
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "overflow 256")
+	require.ErrorContains(t, err, "overflow 256")
 	assert.Equal(t, uint8(0), got)
 	assert.Empty(t, a.written)
 	assert.Equal(t, 0, numCallsRead)

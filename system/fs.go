@@ -10,7 +10,7 @@ import (
 type nativeFilesystem struct{}
 
 // openFile calls os.OpenFile().
-func (fs *nativeFilesystem) openFile(name string, flag int, perm os.FileMode) (file File, err error) {
+func (fs *nativeFilesystem) openFile(name string, flag int, perm os.FileMode) (File, error) {
 	return os.OpenFile(name, flag, perm)
 }
 

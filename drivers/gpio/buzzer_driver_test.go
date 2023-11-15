@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -54,7 +55,7 @@ func TestBuzzerDriverTone(t *testing.T) {
 func TestBuzzerDriverOnError(t *testing.T) {
 	a := newGpioTestAdaptor()
 	d := initTestBuzzerDriver(a)
-	a.digitalWriteFunc = func(string, byte) (err error) {
+	a.digitalWriteFunc = func(string, byte) error {
 		return errors.New("write error")
 	}
 
@@ -64,7 +65,7 @@ func TestBuzzerDriverOnError(t *testing.T) {
 func TestBuzzerDriverOffError(t *testing.T) {
 	a := newGpioTestAdaptor()
 	d := initTestBuzzerDriver(a)
-	a.digitalWriteFunc = func(string, byte) (err error) {
+	a.digitalWriteFunc = func(string, byte) error {
 		return errors.New("write error")
 	}
 
@@ -74,7 +75,7 @@ func TestBuzzerDriverOffError(t *testing.T) {
 func TestBuzzerDriverToneError(t *testing.T) {
 	a := newGpioTestAdaptor()
 	d := initTestBuzzerDriver(a)
-	a.digitalWriteFunc = func(string, byte) (err error) {
+	a.digitalWriteFunc = func(string, byte) error {
 		return errors.New("write error")
 	}
 

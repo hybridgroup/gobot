@@ -56,10 +56,10 @@ func TestYL40DriverWithYL40Interval(t *testing.T) {
 func TestYL40DriverWithYL40InputScaler(t *testing.T) {
 	// arrange
 	yl := NewYL40Driver(newI2cTestAdaptor())
-	f1 := func(input int) (value float64) { return 0.1 }
-	f2 := func(input int) (value float64) { return 0.2 }
-	f3 := func(input int) (value float64) { return 0.3 }
-	f4 := func(input int) (value float64) { return 0.4 }
+	f1 := func(input int) float64 { return 0.1 }
+	f2 := func(input int) float64 { return 0.2 }
+	f3 := func(input int) float64 { return 0.3 }
+	f4 := func(input int) float64 { return 0.4 }
 	// act
 	WithYL40InputScaler(YL40Bri, f1)(yl)
 	WithYL40InputScaler(YL40Temp, f2)(yl)
@@ -75,7 +75,7 @@ func TestYL40DriverWithYL40InputScaler(t *testing.T) {
 func TestYL40DriverWithYL40WithYL40OutputScaler(t *testing.T) {
 	// arrange
 	yl := NewYL40Driver(newI2cTestAdaptor())
-	fo := func(input float64) (value int) { return 123 }
+	fo := func(input float64) int { return 123 }
 	// act
 	WithYL40OutputScaler(fo)(yl)
 	// assert

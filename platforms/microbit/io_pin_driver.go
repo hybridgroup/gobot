@@ -58,6 +58,7 @@ func (b *IOPinDriver) SetName(n string) { b.name = n }
 
 // adaptor returns BLE adaptor
 func (b *IOPinDriver) adaptor() ble.BLEConnector {
+	//nolint:forcetypeassert // ok here
 	return b.Connection().(ble.BLEConnector)
 }
 
@@ -74,7 +75,7 @@ func (b *IOPinDriver) Start() error {
 func (b *IOPinDriver) Halt() error { return nil }
 
 // ReadAllPinData reads and returns the pin data for all pins
-func (b *IOPinDriver) ReadAllPinData() (pins []PinData) {
+func (b *IOPinDriver) ReadAllPinData() []PinData {
 	c, _ := b.adaptor().ReadCharacteristic(pinDataCharacteristic)
 	buf := bytes.NewBuffer(c)
 	pinsData := make([]PinData, buf.Len()/2)

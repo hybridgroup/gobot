@@ -1,3 +1,4 @@
+//nolint:dupl,gocritic,lll // seems to be useful here
 package mavlink
 
 //

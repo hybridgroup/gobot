@@ -9,6 +9,7 @@ import (
 	"github.com/nats-io/nats.go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -92,7 +93,8 @@ func TestNatsAdapterSetsClientCerts(t *testing.T) {
 }
 
 func TestNatsAdapterSetsClientCertsWithUserInfo(t *testing.T) {
-	a := initTestNatsAdaptorTLS(nats.ClientCert("test_certs/client-cert.pem", "test_certs/client-key.pem"), nats.UserInfo("test", "testwd"))
+	a := initTestNatsAdaptorTLS(nats.ClientCert("test_certs/client-cert.pem", "test_certs/client-key.pem"),
+		nats.UserInfo("test", "testwd"))
 	assert.Equal(t, "tls://localhost:4242", a.Host)
 	_ = a.Connect()
 	cert, err := a.client.Opts.TLSCertCB()

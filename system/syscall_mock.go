@@ -17,6 +17,8 @@ type mockSyscall struct {
 }
 
 // Syscall calls the user defined implementation, used for tests, implements the SystemCaller interface
+//
+//nolint:nonamedreturns // useful here
 func (sys *mockSyscall) syscall(
 	trap uintptr,
 	f File,

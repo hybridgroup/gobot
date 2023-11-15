@@ -3,7 +3,7 @@ package digispark
 //#cgo pkg-config: libusb
 //#include "littleWire.h"
 //#include "littleWire_servo.h"
-//typedef usb_dev_handle littleWire;
+// typedef usb_dev_handle littleWire;
 import "C"
 
 import (

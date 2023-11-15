@@ -10,6 +10,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/gpio"
 	"gobot.io/x/gobot/v2/drivers/i2c"
@@ -173,7 +174,7 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	// act
 	err = a.Finalize()
 	// assert
-	assert.Contains(t, err.Error(), "close error")
+	require.ErrorContains(t, err, "close error")
 }
 
 func Test_validateSpiBusNumber(t *testing.T) {

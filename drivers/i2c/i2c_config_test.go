@@ -1,3 +1,4 @@
+//nolint:forcetypeassert // ok here
 package i2c
 
 import (

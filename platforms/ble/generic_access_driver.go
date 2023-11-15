@@ -37,6 +37,7 @@ func (b *GenericAccessDriver) SetName(n string) { b.name = n }
 
 // adaptor returns BLE adaptor for this device
 func (b *GenericAccessDriver) adaptor() BLEConnector {
+	//nolint:forcetypeassert // ok here
 	return b.Connection().(BLEConnector)
 }
 

@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/gpio"
 	"gobot.io/x/gobot/v2/drivers/i2c"
@@ -156,7 +157,7 @@ func TestPwmPinExportError(t *testing.T) {
 	delete(fs.Files, "/sys/class/pwm/pwmchip0/export")
 
 	err := a.PwmWrite("J12_26", 100)
-	assert.Contains(t, err.Error(), "/sys/class/pwm/pwmchip0/export: no such file")
+	require.ErrorContains(t, err, "/sys/class/pwm/pwmchip0/export: no such file")
 }
 
 func TestPwmPinEnableError(t *testing.T) {
@@ -164,7 +165,7 @@ func TestPwmPinEnableError(t *testing.T) {
 	delete(fs.Files, "/sys/class/pwm/pwmchip0/pwm0/enable")
 
 	err := a.PwmWrite("J12_26", 100)
-	assert.Contains(t, err.Error(), "/sys/class/pwm/pwmchip0/pwm0/enable: no such file")
+	require.ErrorContains(t, err, "/sys/class/pwm/pwmchip0/pwm0/enable: no such file")
 }
 
 func TestI2cDefaultBus(t *testing.T) {
@@ -186,7 +187,7 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	// act
 	err = a.Finalize()
 	// assert
-	assert.Contains(t, err.Error(), "close error")
+	require.ErrorContains(t, err, "close error")
 }
 
 func Test_validateI2cBusNumber(t *testing.T) {

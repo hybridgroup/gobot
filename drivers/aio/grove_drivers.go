@@ -63,7 +63,11 @@ type GrovePiezoVibrationSensorDriver struct {
 // Adds the following API Commands:
 //
 //	"Read" - See AnalogSensor.Read
-func NewGrovePiezoVibrationSensorDriver(a AnalogReader, pin string, v ...time.Duration) *GrovePiezoVibrationSensorDriver {
+func NewGrovePiezoVibrationSensorDriver(
+	a AnalogReader,
+	pin string,
+	v ...time.Duration,
+) *GrovePiezoVibrationSensorDriver {
 	sensor := &GrovePiezoVibrationSensorDriver{
 		AnalogSensorDriver: NewAnalogSensorDriver(a, pin, v...),
 	}
@@ -71,7 +75,7 @@ func NewGrovePiezoVibrationSensorDriver(a AnalogReader, pin string, v ...time.Du
 	sensor.AddEvent(Vibration)
 
 	if err := sensor.On(sensor.Event(Data), func(data interface{}) {
-		if data.(int) > 1000 {
+		if data.(int) > 1000 { //nolint:forcetypeassert // no error return value, so there is no better way
 			sensor.Publish(sensor.Event(Vibration), data)
 		}
 	}); err != nil {

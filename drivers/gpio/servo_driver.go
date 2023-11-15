@@ -1,6 +1,10 @@
 package gpio
 
-import "gobot.io/x/gobot/v2"
+import (
+	"log"
+
+	"gobot.io/x/gobot/v2"
+)
 
 // ServoDriver Represents a Servo
 type ServoDriver struct {
@@ -20,7 +24,7 @@ type ServoDriver struct {
 //		"Center" - See ServoDriver.Center
 //		"Max" - See ServoDriver.Max
 func NewServoDriver(a ServoWriter, pin string) *ServoDriver {
-	s := &ServoDriver{
+	d := &ServoDriver{
 		name:         gobot.DefaultName("Servo"),
 		connection:   a,
 		pin:          pin,
@@ -28,61 +32,68 @@ func NewServoDriver(a ServoWriter, pin string) *ServoDriver {
 		CurrentAngle: 0,
 	}
 
-	s.AddCommand("Move", func(params map[string]interface{}) interface{} {
-		angle := byte(params["angle"].(float64))
-		return s.Move(angle)
+	d.AddCommand("Move", func(params map[string]interface{}) interface{} {
+		angle := byte(params["angle"].(float64)) //nolint:forcetypeassert // ok here
+		return d.Move(angle)
 	})
-	s.AddCommand("Min", func(params map[string]interface{}) interface{} {
-		return s.Min()
+	d.AddCommand("Min", func(params map[string]interface{}) interface{} {
+		return d.Min()
 	})
-	s.AddCommand("Center", func(params map[string]interface{}) interface{} {
-		return s.Center()
+	d.AddCommand("Center", func(params map[string]interface{}) interface{} {
+		return d.Center()
 	})
-	s.AddCommand("Max", func(params map[string]interface{}) interface{} {
-		return s.Max()
+	d.AddCommand("Max", func(params map[string]interface{}) interface{} {
+		return d.Max()
 	})
 
-	return s
+	return d
 }
 
 // Name returns the ServoDrivers name
-func (s *ServoDriver) Name() string { return s.name }
+func (d *ServoDriver) Name() string { return d.name }
 
 // SetName sets the ServoDrivers name
-func (s *ServoDriver) SetName(n string) { s.name = n }
+func (d *ServoDriver) SetName(n string) { d.name = n }
 
 // Pin returns the ServoDrivers pin
-func (s *ServoDriver) Pin() string { return s.pin }
+func (d *ServoDriver) Pin() string { return d.pin }
 
 // Connection returns the ServoDrivers connection
-func (s *ServoDriver) Connection() gobot.Connection { return s.connection.(gobot.Connection) }
+func (d *ServoDriver) Connection() gobot.Connection {
+	if conn, ok := d.connection.(gobot.Connection); ok {
+		return conn
+	}
+
+	log.Printf("%s has no gobot connection\n", d.name)
+	return nil
+}
 
 // Start implements the Driver interface
-func (s *ServoDriver) Start() (err error) { return }
+func (d *ServoDriver) Start() error { return nil }
 
 // Halt implements the Driver interface
-func (s *ServoDriver) Halt() (err error) { return }
+func (d *ServoDriver) Halt() error { return nil }
 
 // Move sets the servo to the specified angle. Acceptable angles are 0-180
-func (s *ServoDriver) Move(angle uint8) (err error) {
+func (d *ServoDriver) Move(angle uint8) error {
 	if angle > 180 {
 		return ErrServoOutOfRange
 	}
-	s.CurrentAngle = angle
-	return s.connection.ServoWrite(s.Pin(), angle)
+	d.CurrentAngle = angle
+	return d.connection.ServoWrite(d.Pin(), angle)
 }
 
 // Min sets the servo to it's minimum position
-func (s *ServoDriver) Min() (err error) {
-	return s.Move(0)
+func (d *ServoDriver) Min() error {
+	return d.Move(0)
 }
 
 // Center sets the servo to it's center position
-func (s *ServoDriver) Center() (err error) {
-	return s.Move(90)
+func (d *ServoDriver) Center() error {
+	return d.Move(90)
 }
 
 // Max sets the servo to its maximum position
-func (s *ServoDriver) Max() (err error) {
-	return s.Move(180)
+func (d *ServoDriver) Max() error {
+	return d.Move(180)
 }

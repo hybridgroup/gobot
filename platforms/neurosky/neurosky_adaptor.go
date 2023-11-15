@@ -47,7 +47,6 @@ func (n *Adaptor) Connect() error {
 }
 
 // Finalize returns true if device finalization is successful
-func (n *Adaptor) Finalize() (err error) {
-	err = n.sp.Close()
-	return
+func (n *Adaptor) Finalize() error {
+	return n.sp.Close()
 }

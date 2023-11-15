@@ -8,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/aio"
 	"gobot.io/x/gobot/v2/drivers/gpio"
@@ -142,7 +143,7 @@ func TestGrovePiSomeRead(t *testing.T) {
 			_ = g.Start()
 			a.written = []byte{} // reset writes of former test and start
 			numCallsRead := 0
-			a.i2cReadImpl = func(bytes []byte) (i int, e error) {
+			a.i2cReadImpl = func(bytes []byte) (int, error) {
 				numCallsRead++
 				copy(bytes, tc.simResponse[numCallsRead-1])
 				return len(tc.simResponse[numCallsRead-1]), nil
@@ -205,7 +206,7 @@ func TestGrovePiSomeWrite(t *testing.T) {
 			g, a := initGrovePiDriverWithStubbedAdaptor()
 			_ = g.Start()
 			a.written = []byte{} // reset writes of former test and start
-			a.i2cReadImpl = func(bytes []byte) (i int, e error) {
+			a.i2cReadImpl = func(bytes []byte) (int, error) {
 				copy(bytes, tc.simResponse)
 				return len(bytes), nil
 			}

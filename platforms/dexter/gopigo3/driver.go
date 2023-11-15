@@ -8,10 +8,12 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"log"
 	"math"
 	"time"
 
 	"github.com/hashicorp/go-multierror"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/spi"
 )
@@ -66,15 +68,22 @@ const (
 )
 
 const (
-	WHEEL_BASE_WIDTH           = 117                                                       // distance (mm) from left wheel to right wheel. This works with the initial GPG3 prototype. Will need to be adjusted.
-	WHEEL_DIAMETER             = 66.5                                                      // wheel diameter (mm)
-	WHEEL_BASE_CIRCUMFERENCE   = WHEEL_BASE_WIDTH * math.Pi                                // circumference of the circle the wheels will trace while turning (mm)
-	WHEEL_CIRCUMFERENCE        = WHEEL_DIAMETER * math.Pi                                  // circumference of the wheels (mm)
-	MOTOR_GEAR_RATIO           = 120                                                       // motor gear ratio
-	ENCODER_TICKS_PER_ROTATION = 6                                                         // encoder ticks per motor rotation (number of magnet positions)
-	MOTOR_TICKS_PER_DEGREE     = ((MOTOR_GEAR_RATIO * ENCODER_TICKS_PER_ROTATION) / 360.0) // encoder ticks per output shaft rotation degree
-	GROVE_I2C_LENGTH_LIMIT     = 16
-	MOTOR_FLOAT                = -128
+	// distance (mm) from left wheel to right wheel. This works with the initial GPG3 prototype. Will need to be adjusted.
+	WHEEL_BASE_WIDTH = 117
+	// wheel diameter (mm)
+	WHEEL_DIAMETER = 66.5
+	// circumference of the circle the wheels will trace while turning (mm)
+	WHEEL_BASE_CIRCUMFERENCE = WHEEL_BASE_WIDTH * math.Pi
+	// circumference of the wheels (mm)
+	WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * math.Pi
+	// motor gear ratio
+	MOTOR_GEAR_RATIO = 120
+	// encoder ticks per motor rotation (number of magnet positions)
+	ENCODER_TICKS_PER_ROTATION = 6
+	// encoder ticks per output shaft rotation degree
+	MOTOR_TICKS_PER_DEGREE = ((MOTOR_GEAR_RATIO * ENCODER_TICKS_PER_ROTATION) / 360.0)
+	GROVE_I2C_LENGTH_LIMIT = 16
+	MOTOR_FLOAT            = -128
 )
 
 // GroveMode sets the mode of AD pins on the gopigo3.
@@ -182,55 +191,62 @@ func NewDriver(a spi.Connector, options ...func(spi.Config)) *Driver {
 	// use /dev/spidev0.1
 	spiConfig.SetBusNumber(0)
 	spiConfig.SetChipNumber(1)
-	g := &Driver{
+	d := &Driver{
 		name:      gobot.DefaultName("GoPiGo3"),
 		connector: a,
 		Config:    spiConfig,
 	}
 	for _, option := range options {
-		option(g)
+		option(d)
 	}
-	return g
+	return d
 }
 
 // Name returns the name of the device.
-func (g *Driver) Name() string { return g.name }
+func (d *Driver) Name() string { return d.name }
 
 // SetName sets the name of the device.
-func (g *Driver) SetName(n string) { g.name = n }
+func (d *Driver) SetName(n string) { d.name = n }
 
 // Connection returns the Connection of the device.
-func (g *Driver) Connection() gobot.Connection { return g.connection.(gobot.Connection) }
+func (d *Driver) Connection() gobot.Connection {
+	if conn, ok := d.connection.(gobot.Connection); ok {
+		return conn
+	}
+
+	log.Printf("%s has no gobot connection\n", d.name)
+	return nil
+}
 
 // Halt stops the driver.
-func (g *Driver) Halt() error {
-	err := g.resetAll()
+func (d *Driver) Halt() error {
+	err := d.resetAll()
 	time.Sleep(10 * time.Millisecond)
 	return err
 }
 
 // Start initializes the GoPiGo3
-func (g *Driver) Start() error {
-	bus := g.GetBusNumberOrDefault(g.connector.SpiDefaultBusNumber())
-	chip := g.GetChipNumberOrDefault(g.connector.SpiDefaultChipNumber())
-	mode := g.GetModeOrDefault(g.connector.SpiDefaultMode())
-	bits := g.GetBitCountOrDefault(g.connector.SpiDefaultBitCount())
-	maxSpeed := g.GetSpeedOrDefault(g.connector.SpiDefaultMaxSpeed())
+func (d *Driver) Start() error {
+	bus := d.GetBusNumberOrDefault(d.connector.SpiDefaultBusNumber())
+	chip := d.GetChipNumberOrDefault(d.connector.SpiDefaultChipNumber())
+	mode := d.GetModeOrDefault(d.connector.SpiDefaultMode())
+	bits := d.GetBitCountOrDefault(d.connector.SpiDefaultBitCount())
+	maxSpeed := d.GetSpeedOrDefault(d.connector.SpiDefaultMaxSpeed())
 
 	var err error
-	g.connection, err = g.connector.GetSpiConnection(bus, chip, mode, bits, maxSpeed)
+	d.connection, err = d.connector.GetSpiConnection(bus, chip, mode, bits, maxSpeed)
 	return err
 }
 
 // GetManufacturerName returns the manufacturer from the firmware.
-func (g *Driver) GetManufacturerName() (mName string, err error) {
+func (d *Driver) GetManufacturerName() (string, error) {
 	// read 24 bytes to get manufacturer name
-	response, err := g.readBytes(goPiGo3Address, GET_MANUFACTURER, 24)
+	response, err := d.readBytes(goPiGo3Address, GET_MANUFACTURER, 24)
 	if err != nil {
-		return mName, err
+		return "", err
 	}
-	if err := g.responseValid(response); err != nil {
-		return mName, err
+	if err := d.responseValid(response); err != nil {
+		return "", err
 	}
 	mf := response[4:23]
 	mf = bytes.Trim(mf, "\x00")
@@ -238,14 +254,14 @@ func (g *Driver) GetManufacturerName() (mName string, err error) {
 }
 
 // GetBoardName returns the board name from the firmware.
-func (g *Driver) GetBoardName() (bName string, err error) {
+func (d *Driver) GetBoardName() (string, error) {
 	// read 24 bytes to get board name
-	response, err := g.readBytes(goPiGo3Address, GET_NAME, 24)
+	response, err := d.readBytes(goPiGo3Address, GET_NAME, 24)
 	if err != nil {
-		return bName, err
+		return "", err
 	}
-	if err := g.responseValid(response); err != nil {
-		return bName, err
+	if err := d.responseValid(response); err != nil {
+		return "", err
 	}
 	mf := response[4:23]
 	mf = bytes.Trim(mf, "\x00")
@@ -253,10 +269,10 @@ func (g *Driver) GetBoardName() (bName string, err error) {
 }
 
 // GetHardwareVersion returns the hardware version from the firmware.
-func (g *Driver) GetHardwareVersion() (hVer string, err error) {
-	response, err := g.readUint32(goPiGo3Address, GET_HARDWARE_VERSION)
+func (d *Driver) GetHardwareVersion() (string, error) {
+	response, err := d.readUint32(goPiGo3Address, GET_HARDWARE_VERSION)
 	if err != nil {
-		return hVer, err
+		return "", err
 	}
 	major := response / 1000000
 	minor := response / 1000 % 1000
@@ -265,10 +281,10 @@ func (g *Driver) GetHardwareVersion() (hVer string, err error) {
 }
 
 // GetFirmwareVersion returns the current firmware version.
-func (g *Driver) GetFirmwareVersion() (fVer string, err error) {
-	response, err := g.readUint32(goPiGo3Address, GET_FIRMWARE_VERSION)
+func (d *Driver) GetFirmwareVersion() (string, error) {
+	response, err := d.readUint32(goPiGo3Address, GET_FIRMWARE_VERSION)
 	if err != nil {
-		return fVer, err
+		return "", err
 	}
 	major := response / 1000000
 	minor := response / 1000 % 1000
@@ -277,33 +293,35 @@ func (g *Driver) GetFirmwareVersion() (fVer string, err error) {
 }
 
 // GetSerialNumber returns the 128-bit hardware serial number of the board.
-func (g *Driver) GetSerialNumber() (sNum string, err error) {
+func (d *Driver) GetSerialNumber() (string, error) {
 	// read 20 bytes to get the serial number
-	response, err := g.readBytes(goPiGo3Address, GET_ID, 20)
+	response, err := d.readBytes(goPiGo3Address, GET_ID, 20)
 	if err != nil {
-		return sNum, err
+		return "", err
 	}
-	if err := g.responseValid(response); err != nil {
-		return sNum, err
+	if err := d.responseValid(response); err != nil {
+		return "", err
 	}
-	return fmt.Sprintf("%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X", response[4], response[5], response[6], response[7], response[8], response[9], response[10], response[11], response[12], response[13], response[14], response[15], response[16], response[17], response[18], response[19]), nil
+	return fmt.Sprintf("%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X", response[4], response[5],
+		response[6], response[7], response[8], response[9], response[10], response[11], response[12], response[13],
+		response[14], response[15], response[16], response[17], response[18], response[19]), nil
 }
 
 // Get5vVoltage returns the current voltage on the 5v line.
-func (g *Driver) Get5vVoltage() (voltage float32, err error) {
-	val, err := g.readUint16(goPiGo3Address, GET_VOLTAGE_5V)
+func (d *Driver) Get5vVoltage() (float32, error) {
+	val, err := d.readUint16(goPiGo3Address, GET_VOLTAGE_5V)
 	return (float32(val) / 1000.0), err
 }
 
 // GetBatteryVoltage gets the battery voltage from the main battery pack (7v-12v).
-func (g *Driver) GetBatteryVoltage() (voltage float32, err error) {
-	val, err := g.readUint16(goPiGo3Address, GET_VOLTAGE_VCC)
+func (d *Driver) GetBatteryVoltage() (float32, error) {
+	val, err := d.readUint16(goPiGo3Address, GET_VOLTAGE_VCC)
 	return (float32(val) / 1000.0), err
 }
 
 // SetLED sets rgb values from 0 to 255.
-func (g *Driver) SetLED(led Led, red, green, blue uint8) error {
-	return g.writeBytes([]byte{
+func (d *Driver) SetLED(led Led, red, green, blue uint8) error {
+	return d.writeBytes([]byte{
 		goPiGo3Address,
 		SET_LED,
 		byte(led),
@@ -314,8 +332,8 @@ func (g *Driver) SetLED(led Led, red, green, blue uint8) error {
 }
 
 // SetServo sets a servo's position in microseconds (0-16666).
-func (g *Driver) SetServo(srvo Servo, us uint16) error {
-	return g.writeBytes([]byte{
+func (d *Driver) SetServo(srvo Servo, us uint16) error {
+	return d.writeBytes([]byte{
 		goPiGo3Address,
 		SET_SERVO,
 		byte(srvo),
@@ -326,7 +344,7 @@ func (g *Driver) SetServo(srvo Servo, us uint16) error {
 
 // ServoWrite writes an angle (0-180) to the given servo (servo 1 or servo 2).
 // Must implement the ServoWriter interface of gpio package.
-func (g *Driver) ServoWrite(port string, angle byte) error {
+func (d *Driver) ServoWrite(port string, angle byte) error {
 	srvo := SERVO_1 // default for unknown ports
 	if port == "2" || port == "SERVO_2" {
 		srvo = SERVO_2
@@ -337,12 +355,12 @@ func (g *Driver) ServoWrite(port string, angle byte) error {
 		angle = 180
 	}
 	pulseWidth := ((1500 - (pulseWidthRange / 2)) + ((pulseWidthRange / 180) * int(angle)))
-	return g.SetServo(srvo, uint16(pulseWidth))
+	return d.SetServo(srvo, uint16(pulseWidth))
 }
 
 // SetMotorPower sets a motor's power from -128 to 127.
-func (g *Driver) SetMotorPower(motor Motor, power int8) error {
-	return g.writeBytes([]byte{
+func (d *Driver) SetMotorPower(motor Motor, power int8) error {
+	return d.writeBytes([]byte{
 		goPiGo3Address,
 		SET_MOTOR_PWM,
 		byte(motor),
@@ -351,9 +369,9 @@ func (g *Driver) SetMotorPower(motor Motor, power int8) error {
 }
 
 // SetMotorPosition sets the motor's position in degrees.
-func (g *Driver) SetMotorPosition(motor Motor, position int) error {
+func (d *Driver) SetMotorPosition(motor Motor, position int) error {
 	positionRaw := position * MOTOR_TICKS_PER_DEGREE
-	return g.writeBytes([]byte{
+	return d.writeBytes([]byte{
 		goPiGo3Address,
 		SET_MOTOR_POSITION,
 		byte(motor),
@@ -365,21 +383,21 @@ func (g *Driver) SetMotorPosition(motor Motor, position int) error {
 }
 
 // SetMotorDps sets the motor target speed in degrees per second.
-func (g *Driver) SetMotorDps(motor Motor, dps int) error {
-	d := dps * MOTOR_TICKS_PER_DEGREE
-	return g.writeBytes([]byte{
+func (d *Driver) SetMotorDps(motor Motor, dps int) error {
+	mdps := dps * MOTOR_TICKS_PER_DEGREE
+	return d.writeBytes([]byte{
 		goPiGo3Address,
 		SET_MOTOR_DPS,
 		byte(motor),
-		byte((d >> 8) & 0xFF),
-		byte(d & 0xFF),
+		byte((mdps >> 8) & 0xFF),
+		byte(mdps & 0xFF),
 	})
 }
 
 // SetMotorLimits sets the speed limits for a motor.
-func (g *Driver) SetMotorLimits(motor Motor, power int8, dps int) error {
+func (d *Driver) SetMotorLimits(motor Motor, power int8, dps int) error {
 	dpsUint := dps * MOTOR_TICKS_PER_DEGREE
-	return g.writeBytes([]byte{
+	return d.writeBytes([]byte{
 		goPiGo3Address,
 		SET_MOTOR_LIMITS,
 		byte(motor),
@@ -390,16 +408,18 @@ func (g *Driver) SetMotorLimits(motor Motor, power int8, dps int) error {
 }
 
 // GetMotorStatus returns the status for the given motor.
-func (g *Driver) GetMotorStatus(motor Motor) (flags uint8, power uint16, encoder, dps int, err error) {
+//
+//nolint:nonamedreturns // sufficient here
+func (d *Driver) GetMotorStatus(motor Motor) (flags uint8, power uint16, encoder, dps int, err error) {
 	message := GET_MOTOR_STATUS_RIGHT
 	if motor == MOTOR_LEFT {
 		message = GET_MOTOR_STATUS_LEFT
 	}
-	response, err := g.readBytes(goPiGo3Address, message, 12)
+	response, err := d.readBytes(goPiGo3Address, message, 12)
 	if err != nil {
 		return flags, power, encoder, dps, err
 	}
-	if err := g.responseValid(response); err != nil {
+	if err := d.responseValid(response); err != nil {
 		return flags, power, encoder, dps, err
 	}
 	// get flags
@@ -421,10 +441,10 @@ func (g *Driver) GetMotorStatus(motor Motor) (flags uint8, power uint16, encoder
 		encoder = int(uint64(e) - 0x100000000)
 	}
 	// get dps
-	d := make([]byte, 4)
-	d[1] = response[10]
-	d[0] = response[11]
-	ds := binary.LittleEndian.Uint32(d)
+	dpsRaw := make([]byte, 4)
+	dpsRaw[1] = response[10]
+	dpsRaw[0] = response[11]
+	ds := binary.LittleEndian.Uint32(dpsRaw)
 	dps = int(ds)
 	if ds&0x8000 == 0x8000 {
 		dps = int(ds - 0x10000)
@@ -433,16 +453,16 @@ func (g *Driver) GetMotorStatus(motor Motor) (flags uint8, power uint16, encoder
 }
 
 // GetMotorEncoder reads a motor's encoder in degrees.
-func (g *Driver) GetMotorEncoder(motor Motor) (encoder int64, err error) {
+func (d *Driver) GetMotorEncoder(motor Motor) (int64, error) {
 	message := GET_MOTOR_ENCODER_RIGHT
 	if motor == MOTOR_LEFT {
 		message = GET_MOTOR_ENCODER_LEFT
 	}
-	response, err := g.readUint32(goPiGo3Address, message)
+	response, err := d.readUint32(goPiGo3Address, message)
 	if err != nil {
-		return encoder, err
+		return 0, err
 	}
-	encoder = int64(response)
+	encoder := int64(response)
 	if response&0x80000000 != 0 {
 		encoder = encoder - 0x100000000
 	}
@@ -451,9 +471,9 @@ func (g *Driver) GetMotorEncoder(motor Motor) (encoder int64, err error) {
 }
 
 // OffsetMotorEncoder offsets a motor's encoder for calibration purposes.
-func (g *Driver) OffsetMotorEncoder(motor Motor, offset float64) error {
+func (d *Driver) OffsetMotorEncoder(motor Motor, offset float64) error {
 	offsetUint := math.Float64bits(offset * MOTOR_TICKS_PER_DEGREE)
-	return g.writeBytes([]byte{
+	return d.writeBytes([]byte{
 		goPiGo3Address,
 		OFFSET_MOTOR_ENCODER,
 		byte(motor),
@@ -465,8 +485,8 @@ func (g *Driver) OffsetMotorEncoder(motor Motor, offset float64) error {
 }
 
 // SetGroveType sets the given port to a grove device type.
-func (g *Driver) SetGroveType(port Grove, gType GroveType) error {
-	return g.writeBytes([]byte{
+func (d *Driver) SetGroveType(port Grove, gType GroveType) error {
+	return d.writeBytes([]byte{
 		goPiGo3Address,
 		SET_GROVE_TYPE,
 		byte(port),
@@ -475,8 +495,8 @@ func (g *Driver) SetGroveType(port Grove, gType GroveType) error {
 }
 
 // SetGroveMode sets the mode a given pin/port of the grove connector.
-func (g *Driver) SetGroveMode(port Grove, mode GroveMode) error {
-	return g.writeBytes([]byte{
+func (d *Driver) SetGroveMode(port Grove, mode GroveMode) error {
+	return d.writeBytes([]byte{
 		goPiGo3Address,
 		SET_GROVE_MODE,
 		byte(port),
@@ -485,12 +505,12 @@ func (g *Driver) SetGroveMode(port Grove, mode GroveMode) error {
 }
 
 // SetPWMDuty sets the pwm duty cycle for the given pin/port.
-func (g *Driver) SetPWMDuty(port Grove, duty uint16) error {
+func (d *Driver) SetPWMDuty(port Grove, duty uint16) error {
 	if duty > 100 {
 		duty = 100
 	}
 	duty = duty * 10
-	return g.writeBytes([]byte{
+	return d.writeBytes([]byte{
 		goPiGo3Address,
 		SET_GROVE_PWM_DUTY,
 		byte(port),
@@ -500,14 +520,14 @@ func (g *Driver) SetPWMDuty(port Grove, duty uint16) error {
 }
 
 // SetPWMFreq setst the pwm frequency for the given pin/port.
-func (g *Driver) SetPWMFreq(port Grove, freq uint16) error {
+func (d *Driver) SetPWMFreq(port Grove, freq uint16) error {
 	if freq < 3 {
 		freq = 3
 	}
 	if freq > 48000 {
 		freq = 48000
 	}
-	return g.writeBytes([]byte{
+	return d.writeBytes([]byte{
 		goPiGo3Address,
 		SET_GROVE_PWM_FREQUENCY,
 		byte(port),
@@ -517,7 +537,7 @@ func (g *Driver) SetPWMFreq(port Grove, freq uint16) error {
 }
 
 // PwmWrite implents the pwm interface for the gopigo3.
-func (g *Driver) PwmWrite(pin string, val byte) error {
+func (d *Driver) PwmWrite(pin string, val byte) error {
 	var (
 		grovePin, grovePort Grove
 		err                 error
@@ -525,49 +545,45 @@ func (g *Driver) PwmWrite(pin string, val byte) error {
 	if grovePin, grovePort, _, _, err = getGroveAddresses(pin); err != nil {
 		return err
 	}
-	if err := g.SetGroveType(grovePort, CUSTOM); err != nil {
+	if err := d.SetGroveType(grovePort, CUSTOM); err != nil {
 		return err
 	}
 	time.Sleep(10 * time.Millisecond)
-	if err = g.SetGroveMode(grovePin, GROVE_OUTPUT_PWM); err != nil {
+	if err = d.SetGroveMode(grovePin, GROVE_OUTPUT_PWM); err != nil {
 		return err
 	}
 	time.Sleep(10 * time.Millisecond)
-	if err = g.SetPWMFreq(grovePin, 24000); err != nil {
+	if err = d.SetPWMFreq(grovePin, 24000); err != nil {
 		return err
 	}
 	val64 := math.Float64frombits(uint64(val))
 	dutyCycle := uint16(math.Float64bits((100.0 / 255.0) * val64))
-	return g.SetPWMDuty(grovePin, dutyCycle)
+	return d.SetPWMDuty(grovePin, dutyCycle)
 }
 
 // AnalogRead returns the analog value of the given pin.
-func (g *Driver) AnalogRead(pin string) (value int, err error) {
-	var (
-		grovePin, grovePort Grove
-		analogCmd           byte
-	)
-	grovePin, grovePort, analogCmd, _, err = getGroveAddresses(pin)
+func (d *Driver) AnalogRead(pin string) (int, error) {
+	grovePin, grovePort, analogCmd, _, err := getGroveAddresses(pin)
 	if err != nil {
-		return value, err
+		return 0, err
 	}
-	if err := g.SetGroveType(grovePort, CUSTOM); err != nil {
-		return value, err
+	if err := d.SetGroveType(grovePort, CUSTOM); err != nil {
+		return 0, err
 	}
 	time.Sleep(10 * time.Millisecond)
-	if err := g.SetGroveMode(grovePin, GROVE_INPUT_ANALOG); err != nil {
-		return value, err
+	if err := d.SetGroveMode(grovePin, GROVE_INPUT_ANALOG); err != nil {
+		return 0, err
 	}
 	time.Sleep(10 * time.Millisecond)
-	response, err := g.readBytes(goPiGo3Address, analogCmd, 7)
+	response, err := d.readBytes(goPiGo3Address, analogCmd, 7)
 	if err != nil {
-		return value, err
+		return 0, err
 	}
-	if err := g.responseValid(response); err != nil {
-		return value, err
+	if err := d.responseValid(response); err != nil {
+		return 0, err
 	}
-	if err := g.valueValid(response); err != nil {
-		return value, err
+	if err := d.valueValid(response); err != nil {
+		return 0, err
 	}
 	highBytes := uint16(response[5])
 	lowBytes := uint16(response[6])
@@ -575,7 +591,7 @@ func (g *Driver) AnalogRead(pin string) (value int, err error) {
 }
 
 // DigitalWrite writes a 0/1 value to the given pin.
-func (g *Driver) DigitalWrite(pin string, val byte) error {
+func (d *Driver) DigitalWrite(pin string, val byte) error {
 	var (
 		grovePin, grovePort Grove
 		err                 error
@@ -584,15 +600,15 @@ func (g *Driver) DigitalWrite(pin string, val byte) error {
 	if err != nil {
 		return err
 	}
-	if err := g.SetGroveType(grovePort, CUSTOM); err != nil {
+	if err := d.SetGroveType(grovePort, CUSTOM); err != nil {
 		return err
 	}
 	time.Sleep(10 * time.Millisecond)
-	if err := g.SetGroveMode(grovePin, GROVE_OUTPUT_DIGITAL); err != nil {
+	if err := d.SetGroveMode(grovePin, GROVE_OUTPUT_DIGITAL); err != nil {
 		return err
 	}
 	time.Sleep(10 * time.Millisecond)
-	return g.writeBytes([]byte{
+	return d.writeBytes([]byte{
 		goPiGo3Address,
 		SET_GROVE_STATE,
 		byte(grovePin),
@@ -601,38 +617,35 @@ func (g *Driver) DigitalWrite(pin string, val byte) error {
 }
 
 // DigitalRead reads the 0/1 value from the given pin.
-func (g *Driver) DigitalRead(pin string) (value int, err error) {
-	var (
-		grovePin, grovePort Grove
-		stateCmd            byte
-	)
-	grovePin, grovePort, _, stateCmd, err = getGroveAddresses(pin)
+func (d *Driver) DigitalRead(pin string) (int, error) {
+	grovePin, grovePort, _, stateCmd, err := getGroveAddresses(pin)
 	if err != nil {
-		return value, err
+		return 0, err
 	}
-	err = g.SetGroveType(grovePort, CUSTOM)
+	err = d.SetGroveType(grovePort, CUSTOM)
 	if err != nil {
-		return value, err
+		return 0, err
 	}
 	time.Sleep(10 * time.Millisecond)
-	err = g.SetGroveMode(grovePin, GROVE_INPUT_DIGITAL)
+	err = d.SetGroveMode(grovePin, GROVE_INPUT_DIGITAL)
 	if err != nil {
-		return value, err
+		return 0, err
 	}
 	time.Sleep(10 * time.Millisecond)
-	response, err := g.readBytes(goPiGo3Address, stateCmd, 6)
+	response, err := d.readBytes(goPiGo3Address, stateCmd, 6)
 	if err != nil {
-		return value, err
+		return 0, err
 	}
-	if err := g.responseValid(response); err != nil {
-		return value, err
+	if err := d.responseValid(response); err != nil {
+		return 0, err
 	}
-	if err := g.valueValid(response); err != nil {
-		return value, err
+	if err := d.valueValid(response); err != nil {
+		return 0, err
 	}
 	return int(response[5]), nil
 }
 
+//nolint:nonamedreturns // sufficient here
 func getGroveAddresses(pin string) (gPin, gPort Grove, analog, state byte, err error) {
 	switch pin {
 	case "AD_1_1":
@@ -661,75 +674,74 @@ func getGroveAddresses(pin string) (gPin, gPort Grove, analog, state byte, err e
 	return gPin, gPort, analog, state, err
 }
 
-func (g *Driver) responseValid(response []byte) error {
+func (d *Driver) responseValid(response []byte) error {
 	if response[3] != 0xA5 {
 		return fmt.Errorf("No SPI response, response not valid")
 	}
 	return nil
 }
 
-func (g *Driver) valueValid(value []byte) error {
+func (d *Driver) valueValid(value []byte) error {
 	if value[4] != byte(VALID_DATA) {
 		return fmt.Errorf("Invalid value")
 	}
 	return nil
 }
 
-func (g *Driver) readBytes(address byte, msg byte, numBytes int) (val []byte, err error) {
+func (d *Driver) readBytes(address byte, msg byte, numBytes int) ([]byte, error) {
 	w := make([]byte, numBytes)
 	w[0] = address
 	w[1] = msg
 	r := make([]byte, len(w))
-	err = g.connection.ReadCommandData(w, r)
-	if err != nil {
-		return val, err
+	if err := d.connection.ReadCommandData(w, r); err != nil {
+		return nil, err
 	}
 	return r, nil
 }
 
-func (g *Driver) readUint16(address, msg byte) (val uint16, err error) {
-	r, err := g.readBytes(address, msg, 8)
+func (d *Driver) readUint16(address, msg byte) (uint16, error) {
+	r, err := d.readBytes(address, msg, 8)
 	if err != nil {
-		return val, err
+		return 0, err
 	}
-	if err := g.responseValid(r); err != nil {
-		return val, err
+	if err := d.responseValid(r); err != nil {
+		return 0, err
 	}
 	return uint16(r[4])<<8 | uint16(r[5]), nil
 }
 
-func (g *Driver) readUint32(address, msg byte) (val uint32, err error) {
-	r, err := g.readBytes(address, msg, 8)
+func (d *Driver) readUint32(address, msg byte) (uint32, error) {
+	r, err := d.readBytes(address, msg, 8)
 	if err != nil {
-		return val, err
+		return 0, err
 	}
-	if err := g.responseValid(r); err != nil {
-		return val, err
+	if err := d.responseValid(r); err != nil {
+		return 0, err
 	}
 	return uint32(r[4])<<24 | uint32(r[5])<<16 | uint32(r[6])<<8 | uint32(r[7]), nil
 }
 
-func (g *Driver) writeBytes(w []byte) error {
-	return g.connection.WriteBytes(w)
+func (d *Driver) writeBytes(w []byte) error {
+	return d.connection.WriteBytes(w)
 }
 
-func (g *Driver) resetAll() error {
-	err := g.SetGroveType(AD_1_G+AD_2_G, CUSTOM)
+func (d *Driver) resetAll() error {
+	err := d.SetGroveType(AD_1_G+AD_2_G, CUSTOM)
 	time.Sleep(10 * time.Millisecond)
-	if e := g.SetGroveMode(AD_1_G+AD_2_G, GROVE_INPUT_DIGITAL); e != nil {
+	if e := d.SetGroveMode(AD_1_G+AD_2_G, GROVE_INPUT_DIGITAL); e != nil {
 		err = multierror.Append(err, e)
 	}
 	time.Sleep(10 * time.Millisecond)
-	if e := g.SetMotorPower(MOTOR_LEFT+MOTOR_RIGHT, 0.0); e != nil {
+	if e := d.SetMotorPower(MOTOR_LEFT+MOTOR_RIGHT, 0.0); e != nil {
 		err = multierror.Append(err, e)
 	}
-	if e := g.SetMotorLimits(MOTOR_LEFT+MOTOR_RIGHT, 0, 0); e != nil {
+	if e := d.SetMotorLimits(MOTOR_LEFT+MOTOR_RIGHT, 0, 0); e != nil {
 		err = multierror.Append(err, e)
 	}
-	if e := g.SetServo(SERVO_1+SERVO_2, 0); e != nil {
+	if e := d.SetServo(SERVO_1+SERVO_2, 0); e != nil {
 		err = multierror.Append(err, e)
 	}
-	if e := g.SetLED(LED_EYE_LEFT+LED_EYE_RIGHT+LED_BLINKER_LEFT+LED_BLINKER_RIGHT, 0, 0, 0); e != nil {
+	if e := d.SetLED(LED_EYE_LEFT+LED_EYE_RIGHT+LED_BLINKER_LEFT+LED_BLINKER_RIGHT, 0, 0, 0); e != nil {
 		err = multierror.Append(err, e)
 	}
 

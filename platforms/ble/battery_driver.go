@@ -36,27 +36,25 @@ func (b *BatteryDriver) SetName(n string) { b.name = n }
 
 // adaptor returns BLE adaptor
 func (b *BatteryDriver) adaptor() BLEConnector {
+	//nolint:forcetypeassert // ok here
 	return b.Connection().(BLEConnector)
 }
 
 // Start tells driver to get ready to do work
-func (b *BatteryDriver) Start() (err error) {
-	return
-}
+func (b *BatteryDriver) Start() error { return nil }
 
 // Halt stops battery driver (void)
-func (b *BatteryDriver) Halt() (err error) { return }
+func (b *BatteryDriver) Halt() error { return nil }
 
 // GetBatteryLevel reads and returns the current battery level
-func (b *BatteryDriver) GetBatteryLevel() (level uint8) {
-	var l uint8
+func (b *BatteryDriver) GetBatteryLevel() uint8 {
 	c, err := b.adaptor().ReadCharacteristic("2a19")
 	if err != nil {
 		log.Println(err)
-		return
+		return 0
 	}
 	buf := bytes.NewBuffer(c)
 	val, _ := buf.ReadByte()
-	l = val
-	return l
+	level := val
+	return level
 }

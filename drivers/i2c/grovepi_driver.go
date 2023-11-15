@@ -70,7 +70,7 @@ func (d *GrovePiDriver) Finalize() error {
 }
 
 // AnalogRead returns value from analog pin implementing the AnalogReader interface.
-func (d *GrovePiDriver) AnalogRead(pin string) (value int, err error) {
+func (d *GrovePiDriver) AnalogRead(pin string) (int, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
@@ -171,6 +171,8 @@ func (d *GrovePiDriver) FirmwareVersionRead() (string, error) {
 // DHTRead performs a read temperature and humidity sensors with duration >=2 millisecond.
 // DHT11 (blue): sensorType=0
 // DHT22 (white): sensorTyp=1
+//
+//nolint:nonamedreturns // is sufficient here
 func (d *GrovePiDriver) DHTRead(pin string, sensorType byte, duration int) (temp float32, hum float32, err error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
@@ -186,13 +188,13 @@ func (d *GrovePiDriver) DHTRead(pin string, sensorType byte, duration int) (temp
 
 	buf := []byte{commandReadDHT, byte(pinNum), sensorType, 0}
 	if _, err = d.connection.Write(buf); err != nil {
-		return
+		return 0, 0, err
 	}
 	time.Sleep(time.Duration(duration) * time.Millisecond)
 
 	data := make([]byte, 9)
 	if err = d.readForCommand(commandReadDHT, data); err != nil {
-		return
+		return 0, 0, err
 	}
 
 	temp = float32Of4BytesLittleEndian(data[1:5])
@@ -211,7 +213,7 @@ func (d *GrovePiDriver) DHTRead(pin string, sensorType byte, duration int) (temp
 		hum = 0
 	}
 
-	return
+	return temp, hum, err
 }
 
 // DigitalWrite writes a value to a specific digital pin implementing the DigitalWriter interface.

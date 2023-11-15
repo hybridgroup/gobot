@@ -1,6 +1,10 @@
 package gpio
 
-import "gobot.io/x/gobot/v2"
+import (
+	"log"
+
+	"gobot.io/x/gobot/v2"
+)
 
 // LedDriver represents a digital Led
 type LedDriver struct {
@@ -20,7 +24,7 @@ type LedDriver struct {
 //	"On" - See LedDriver.On
 //	"Off" - See LedDriver.Off
 func NewLedDriver(a DigitalWriter, pin string) *LedDriver {
-	l := &LedDriver{
+	d := &LedDriver{
 		name:       gobot.DefaultName("LED"),
 		pin:        pin,
 		connection: a,
@@ -28,83 +32,86 @@ func NewLedDriver(a DigitalWriter, pin string) *LedDriver {
 		Commander:  gobot.NewCommander(),
 	}
 
-	l.AddCommand("Brightness", func(params map[string]interface{}) interface{} {
-		level := byte(params["level"].(float64))
-		return l.Brightness(level)
+	d.AddCommand("Brightness", func(params map[string]interface{}) interface{} {
+		level := byte(params["level"].(float64)) //nolint:forcetypeassert // ok here
+		return d.Brightness(level)
 	})
 
-	l.AddCommand("Toggle", func(params map[string]interface{}) interface{} {
-		return l.Toggle()
+	d.AddCommand("Toggle", func(params map[string]interface{}) interface{} {
+		return d.Toggle()
 	})
 
-	l.AddCommand("On", func(params map[string]interface{}) interface{} {
-		return l.On()
+	d.AddCommand("On", func(params map[string]interface{}) interface{} {
+		return d.On()
 	})
 
-	l.AddCommand("Off", func(params map[string]interface{}) interface{} {
-		return l.Off()
+	d.AddCommand("Off", func(params map[string]interface{}) interface{} {
+		return d.Off()
 	})
 
-	return l
+	return d
 }
 
 // Start implements the Driver interface
-func (l *LedDriver) Start() (err error) { return }
+func (d *LedDriver) Start() error { return nil }
 
 // Halt implements the Driver interface
-func (l *LedDriver) Halt() (err error) { return }
+func (d *LedDriver) Halt() error { return nil }
 
 // Name returns the LedDrivers name
-func (l *LedDriver) Name() string { return l.name }
+func (d *LedDriver) Name() string { return d.name }
 
 // SetName sets the LedDrivers name
-func (l *LedDriver) SetName(n string) { l.name = n }
+func (d *LedDriver) SetName(n string) { d.name = n }
 
 // Pin returns the LedDrivers name
-func (l *LedDriver) Pin() string { return l.pin }
+func (d *LedDriver) Pin() string { return d.pin }
 
 // Connection returns the LedDrivers Connection
-func (l *LedDriver) Connection() gobot.Connection {
-	return l.connection.(gobot.Connection)
+func (d *LedDriver) Connection() gobot.Connection {
+	if conn, ok := d.connection.(gobot.Connection); ok {
+		return conn
+	}
+
+	log.Printf("%s has no gobot connection\n", d.name)
+	return nil
 }
 
 // State return true if the led is On and false if the led is Off
-func (l *LedDriver) State() bool {
-	return l.high
+func (d *LedDriver) State() bool {
+	return d.high
 }
 
 // On sets the led to a high state.
-func (l *LedDriver) On() (err error) {
-	if err = l.connection.DigitalWrite(l.Pin(), 1); err != nil {
-		return
+func (d *LedDriver) On() error {
+	if err := d.connection.DigitalWrite(d.Pin(), 1); err != nil {
+		return err
 	}
-	l.high = true
-	return
+	d.high = true
+	return nil
 }
 
 // Off sets the led to a low state.
-func (l *LedDriver) Off() (err error) {
-	if err = l.connection.DigitalWrite(l.Pin(), 0); err != nil {
-		return
+func (d *LedDriver) Off() error {
+	if err := d.connection.DigitalWrite(d.Pin(), 0); err != nil {
+		return err
 	}
-	l.high = false
-	return
+	d.high = false
+	return nil
 }
 
 // Toggle sets the led to the opposite of it's current state
-func (l *LedDriver) Toggle() (err error) {
-	if l.State() {
-		err = l.Off()
-	} else {
-		err = l.On()
+func (d *LedDriver) Toggle() error {
+	if d.State() {
+		return d.Off()
 	}
-	return
+	return d.On()
 }
 
 // Brightness sets the led to the specified level of brightness
-func (l *LedDriver) Brightness(level byte) (err error) {
-	if writer, ok := l.connection.(PwmWriter); ok {
-		return writer.PwmWrite(l.Pin(), level)
+func (d *LedDriver) Brightness(level byte) error {
+	if writer, ok := d.connection.(PwmWriter); ok {
+		return writer.PwmWrite(d.Pin(), level)
 	}
 	return ErrPwmWriteUnsupported
 }

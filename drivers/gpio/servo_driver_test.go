@@ -1,3 +1,4 @@
+//nolint:forcetypeassert // ok here
 package gpio
 
 import (
@@ -7,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -25,7 +27,7 @@ func TestServoDriver(t *testing.T) {
 	assert.Equal(t, "1", d.Pin())
 	assert.NotNil(t, d.Connection())
 
-	a.servoWriteFunc = func(string, byte) (err error) {
+	a.servoWriteFunc = func(string, byte) error {
 		return errors.New("pwm error")
 	}
 

@@ -89,9 +89,9 @@ func (d *digitalPinSysfs) Unexport() error {
 
 	err = writeFile(unexport, []byte(d.pin))
 	if err != nil {
-		// If EINVAL then the pin is reserved in the system and can't be unexported
-		e, ok := err.(*os.PathError)
-		if !ok || e.Err != Syscall_EINVAL {
+		// If EINVAL then the pin is reserved in the system and can't be unexported, we suppress the error
+		var pathError *os.PathError
+		if !(errors.As(err, &pathError) && errors.Is(err, Syscall_EINVAL)) {
 			return err
 		}
 	}
@@ -123,9 +123,9 @@ func (d *digitalPinSysfs) reconfigure() error {
 
 	err = writeFile(exportFile, []byte(d.pin))
 	if err != nil {
-		// If EBUSY then the pin has already been exported
-		e, ok := err.(*os.PathError)
-		if !ok || e.Err != Syscall_EBUSY {
+		// If EBUSY then the pin has already been exported, we suppress the error
+		var pathError *os.PathError
+		if !(errors.As(err, &pathError) && errors.Is(err, Syscall_EBUSY)) {
 			return err
 		}
 	}
@@ -196,11 +196,9 @@ func (d *digitalPinSysfs) reconfigure() error {
 				err = startEdgePolling(d.label, d.Read, d.pollInterval, d.edge, d.edgeEventHandler, d.pollQuitChan)
 			}
 		}
-	} else {
+	} else if d.drive != digitalPinDrivePushPull && systemSysfsDebug {
 		// configure drive (unsupported)
-		if d.drive != digitalPinDrivePushPull && systemSysfsDebug {
-			log.Printf("drive options (%d) are not supported by sysfs\n", d.drive)
-		}
+		log.Printf("drive options (%d) are not supported by sysfs\n", d.drive)
 	}
 
 	if err != nil {

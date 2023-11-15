@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -74,14 +75,14 @@ func TestMqttAdaptorConnectError(t *testing.T) {
 	a := NewAdaptor("tcp://localhost:1884", "client")
 
 	err := a.Connect()
-	assert.Contains(t, err.Error(), "connection refused")
+	require.ErrorContains(t, err, "connection refused")
 }
 
 func TestMqttAdaptorConnectSSLError(t *testing.T) {
 	a := NewAdaptor("tcp://localhost:1884", "client")
 	a.SetUseSSL(true)
 	err := a.Connect()
-	assert.Contains(t, err.Error(), "connection refused")
+	require.ErrorContains(t, err, "connection refused")
 }
 
 func TestMqttAdaptorConnectWithAuthError(t *testing.T) {

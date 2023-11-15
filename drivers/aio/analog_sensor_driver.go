@@ -1,6 +1,7 @@
 package aio
 
 import (
+	"log"
 	"sync"
 	"time"
 
@@ -44,7 +45,7 @@ func NewAnalogSensorDriver(a AnalogReader, pin string, v ...time.Duration) *Anal
 		Commander:  gobot.NewCommander(),
 		interval:   10 * time.Millisecond,
 		halt:       make(chan bool),
-		scale:      func(input int) (value float64) { return float64(input) },
+		scale:      func(input int) float64 { return float64(input) },
 		mutex:      &sync.Mutex{},
 	}
 
@@ -75,10 +76,10 @@ func NewAnalogSensorDriver(a AnalogReader, pin string, v ...time.Duration) *Anal
 //	Data int - Event is emitted on change and represents the current raw reading from the sensor.
 //	Value float64 - Event is emitted on change and represents the current reading from the sensor.
 //	Error error - Event is emitted on error reading from the sensor.
-func (a *AnalogSensorDriver) Start() (err error) {
+func (a *AnalogSensorDriver) Start() error {
 	if a.interval == 0 {
 		// cyclic reading deactivated
-		return
+		return nil
 	}
 	oldRawValue := 0
 	oldValue := 0.0
@@ -109,17 +110,17 @@ func (a *AnalogSensorDriver) Start() (err error) {
 			}
 		}
 	}()
-	return
+	return nil
 }
 
 // Halt stops polling the analog sensor for new information
-func (a *AnalogSensorDriver) Halt() (err error) {
+func (a *AnalogSensorDriver) Halt() error {
 	if a.interval == 0 {
 		// cyclic reading deactivated
-		return
+		return nil
 	}
 	a.halt <- true
-	return
+	return nil
 }
 
 // Name returns the AnalogSensorDrivers name
@@ -132,7 +133,14 @@ func (a *AnalogSensorDriver) SetName(n string) { a.name = n }
 func (a *AnalogSensorDriver) Pin() string { return a.pin }
 
 // Connection returns the AnalogSensorDrivers Connection
-func (a *AnalogSensorDriver) Connection() gobot.Connection { return a.connection.(gobot.Connection) }
+func (a *AnalogSensorDriver) Connection() gobot.Connection {
+	if conn, ok := a.connection.(gobot.Connection); ok {
+		return conn
+	}
+
+	log.Printf("%s has no gobot connection\n", a.name)
+	return nil
+}
 
 // Read returns the current reading from the sensor, scaled by the current scaler
 func (a *AnalogSensorDriver) Read() (float64, error) {

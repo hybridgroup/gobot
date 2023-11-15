@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -257,7 +258,7 @@ func TestWriteGpiod(t *testing.T) {
 			// assert
 			if tc.wantErr != nil {
 				for _, want := range tc.wantErr {
-					assert.Contains(t, err.Error(), want)
+					require.ErrorContains(t, err, want)
 				}
 			} else {
 				require.NoError(t, err)
@@ -292,7 +293,7 @@ func TestReadGpiod(t *testing.T) {
 			// assert
 			if tc.wantErr != nil {
 				for _, want := range tc.wantErr {
-					assert.Contains(t, err.Error(), want)
+					require.ErrorContains(t, err, want)
 				}
 			} else {
 				require.NoError(t, err)

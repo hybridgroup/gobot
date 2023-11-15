@@ -61,7 +61,7 @@ func (d *Driver) SetName(n string) { d.name = n }
 func (d *Driver) Connection() gobot.Connection { return nil }
 
 // Start starts the driver.
-func (d *Driver) Start() (err error) {
+func (d *Driver) Start() error {
 	tc, terr := net.Dial("tcp", d.tcpaddress)
 	if terr != nil {
 		return terr
@@ -74,13 +74,13 @@ func (d *Driver) Start() (err error) {
 	d.udpconn = uc
 	d.tcpconn = tc
 
-	return
+	return nil
 }
 
 // Halt stops the driver.
-func (d *Driver) Halt() (err error) {
+func (d *Driver) Halt() error {
 	d.stop()
-	return
+	return nil
 }
 
 func (d *Driver) stop() {

@@ -1,3 +1,4 @@
+//nolint:lll // ok here
 package mfrc522
 
 // Page 0: Command and status

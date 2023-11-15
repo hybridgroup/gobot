@@ -117,6 +117,7 @@ func (b *Driver) SetName(n string) { b.name = n }
 
 // adaptor returns BLE adaptor
 func (b *Driver) adaptor() ble.BLEConnector {
+	//nolint:forcetypeassert // ok here
 	return b.Connection().(ble.BLEConnector)
 }
 
@@ -426,25 +427,21 @@ func (b *Driver) handleLocatorDetected(data []uint8) {
 }
 
 func (b *Driver) handleCollisionDetected(data []uint8) {
-	if len(data) == ResponsePacketMaxSize {
+	switch len(data) {
+	case ResponsePacketMaxSize:
 		// Check if this is the header of collision response. (i.e. first part of data)
 		// Collision response is 22 bytes long. (individual packet size is maxed at 20)
-		switch data[1] {
-		case 0xFE:
-			if data[2] == 0x07 {
-				// response code 7 is for a detected collision
-				if len(b.collisionResponse) == 0 {
-					b.collisionResponse = append(b.collisionResponse, data...)
-				}
-			}
+		if data[1] == 0xFE && data[2] == 0x07 && len(b.collisionResponse) == 0 {
+			// response code 7 is for a detected collision
+			b.collisionResponse = append(b.collisionResponse, data...)
 		}
-	} else if len(data) == CollisionResponseSize-ResponsePacketMaxSize {
+	case CollisionResponseSize - ResponsePacketMaxSize:
 		// if this is the remaining part of the collision response,
 		// then make sure the header and first part of data is already received
 		if len(b.collisionResponse) == ResponsePacketMaxSize {
 			b.collisionResponse = append(b.collisionResponse, data...)
 		}
-	} else {
+	default:
 		return // not collision event
 	}
 

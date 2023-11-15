@@ -59,6 +59,7 @@ func (m *Driver) SetName(n string)             { m.name = n }
 
 // adaptor returns driver associated adaptor
 func (m *Driver) adaptor() BaseAdaptor {
+	//nolint:forcetypeassert // ok here
 	return m.Connection().(BaseAdaptor)
 }
 
@@ -86,10 +87,10 @@ func (m *Driver) Start() error {
 }
 
 // Halt returns true if device is halted successfully
-func (m *Driver) Halt() (err error) { return }
+func (m *Driver) Halt() error { return nil }
 
 // SendPacket sends a packet to mavlink device
-func (m *Driver) SendPacket(packet *common.MAVLinkPacket) (err error) {
-	_, err = m.adaptor().Write(packet.Pack())
+func (m *Driver) SendPacket(packet *common.MAVLinkPacket) error {
+	_, err := m.adaptor().Write(packet.Pack())
 	return err
 }

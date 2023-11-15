@@ -8,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -387,7 +388,9 @@ func TestDigitalPinSysfs(t *testing.T) {
 	}
 
 	err = pin.Unexport()
-	require.ErrorContains(t, err.(*os.PathError).Err, "write error")
+	var pathError *os.PathError
+	require.ErrorAs(t, err, &pathError)
+	require.ErrorContains(t, err, "write error")
 }
 
 func TestDigitalPinUnexportErrorSysfs(t *testing.T) {

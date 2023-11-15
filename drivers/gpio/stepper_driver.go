@@ -89,6 +89,7 @@ func NewStepperDriver(a DigitalWriter, pins [4]string, phase phase, stepsPerRev 
 	if stepsPerRev <= 0 {
 		panic("steps per revolution needs to be greater than zero")
 	}
+	//nolint:forcetypeassert // no error return value, so there is no better way
 	d := &StepperDriver{
 		Driver:         NewDriver(a.(gobot.Connection), "Stepper"),
 		pins:           pins,
@@ -150,7 +151,7 @@ func (d *StepperDriver) Move(stepsToMove int) error {
 	return err
 }
 
-// MoveDeg moves the motor given number of degrees at current speed. Negative values cause to move in backward direction.
+// MoveDeg moves the motor given number of degrees at current speed. Negative values cause to move backward.
 func (d *StepperDriver) MoveDeg(degs int) error {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
@@ -421,8 +422,8 @@ func (d *StepperDriver) getDelayPerStep() time.Duration {
 	return time.Duration(60*1000*1000/(d.stepsPerRev*float32(d.speedRpm))) * time.Microsecond
 }
 
-// phasedStepping moves the motor one step with the configured speed and direction. The speed can be adjusted by SetSpeed()
-// and the direction can be changed by SetDirection() asynchronously.
+// phasedStepping moves the motor one step with the configured speed and direction. The speed can be adjusted
+// by SetSpeed() and the direction can be changed by SetDirection() asynchronously.
 func (d *StepperDriver) phasedStepping() error {
 	// ensure that read and write of variables (direction, stepNum) can not interfere
 	d.valueMutex.Lock()
@@ -445,6 +446,7 @@ func (d *StepperDriver) phasedStepping() error {
 	r := int(math.Abs(float64(d.stepNum))) % len(d.phase)
 
 	for i, v := range d.phase[r] {
+		//nolint:forcetypeassert // type safe by constructor
 		if err := d.connection.(DigitalWriter).DigitalWrite(d.pins[i], v); err != nil {
 			d.stepNum = oldStepNum
 			return err
@@ -459,6 +461,7 @@ func (d *StepperDriver) phasedStepping() error {
 
 func (d *StepperDriver) sleepOuputs() error {
 	for _, pin := range d.pins {
+		//nolint:forcetypeassert // type safe by constructor
 		if err := d.connection.(DigitalWriter).DigitalWrite(pin, 0); err != nil {
 			return err
 		}

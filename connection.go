@@ -40,8 +40,9 @@ func (c *Connections) Each(f func(Connection)) {
 }
 
 // Start calls Connect on each Connection in c
-func (c *Connections) Start() (err error) {
+func (c *Connections) Start() error {
 	log.Println("Starting connections...")
+	var err error
 	for _, connection := range *c {
 		info := "Starting connection " + connection.Name()
 
@@ -59,7 +60,8 @@ func (c *Connections) Start() (err error) {
 }
 
 // Finalize calls Finalize on each Connection in c
-func (c *Connections) Finalize() (err error) {
+func (c *Connections) Finalize() error {
+	var err error
 	for _, connection := range *c {
 		if cerr := connection.Finalize(); cerr != nil {
 			err = multierror.Append(err, cerr)

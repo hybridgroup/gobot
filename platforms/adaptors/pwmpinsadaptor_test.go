@@ -1,16 +1,16 @@
+//nolint:nonamedreturns // ok for tests
 package adaptors
 
 import (
 	"fmt"
-	"log"
 	"runtime"
 	"strconv"
-	"strings"
 	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/gpio"
 	"gobot.io/x/gobot/v2/system"
@@ -151,13 +151,13 @@ func TestPWMPinsFinalize(t *testing.T) {
 	require.NoError(t, a.PwmWrite("33", 2))
 	delete(fs.Files, pwmUnexportPath)
 	err = a.Finalize()
-	assert.Contains(t, err.Error(), pwmUnexportPath+": no such file")
+	require.ErrorContains(t, err, pwmUnexportPath+": no such file")
 	// arrange write error
 	require.NoError(t, a.Connect())
 	require.NoError(t, a.PwmWrite("33", 2))
 	fs.WithWriteError = true
 	err = a.Finalize()
-	assert.Contains(t, err.Error(), "write error")
+	require.ErrorContains(t, err, "write error")
 }
 
 func TestPWMPinsReConnect(t *testing.T) {
@@ -191,12 +191,12 @@ func TestPwmWrite(t *testing.T) {
 
 	fs.WithWriteError = true
 	err = a.PwmWrite("33", 100)
-	assert.Contains(t, err.Error(), "write error")
+	require.ErrorContains(t, err, "write error")
 	fs.WithWriteError = false
 
 	fs.WithReadError = true
 	err = a.PwmWrite("33", 100)
-	assert.Contains(t, err.Error(), "read error")
+	require.ErrorContains(t, err, "read error")
 }
 
 func TestServoWrite(t *testing.T) {
@@ -219,12 +219,12 @@ func TestServoWrite(t *testing.T) {
 
 	fs.WithWriteError = true
 	err = a.ServoWrite("33", 100)
-	assert.Contains(t, err.Error(), "write error")
+	require.ErrorContains(t, err, "write error")
 	fs.WithWriteError = false
 
 	fs.WithReadError = true
 	err = a.ServoWrite("33", 100)
-	assert.Contains(t, err.Error(), "read error")
+	require.ErrorContains(t, err, "read error")
 }
 
 func TestSetPeriod(t *testing.T) {
@@ -292,14 +292,16 @@ func Test_PWMPin(t *testing.T) {
 			mockPaths: []string{},
 			translate: translator,
 			pin:       "33",
-			wantErr:   "Export() failed for id 44 with  : /sys/devices/platform/ff680020.pwm/pwm/pwmchip3/export: no such file",
+			wantErr: "Export() failed for id 44 with  : " +
+				"/sys/devices/platform/ff680020.pwm/pwm/pwmchip3/export: no such file",
 		},
 		"init_setenabled_error": {
 			mockPaths: []string{pwmExportPath, pwmPeriodPath},
 			period:    "1000",
 			translate: translator,
 			pin:       "33",
-			wantErr:   "SetEnabled(false) failed for id 44 with  : /sys/devices/platform/ff680020.pwm/pwm/pwmchip3/pwm44/enable: no such file",
+			wantErr: "SetEnabled(false) failed for id 44 with  : " +
+				"/sys/devices/platform/ff680020.pwm/pwm/pwmchip3/pwm44/enable: no such file",
 		},
 		"init_setperiod_dutycycle_no_error": {
 			mockPaths: []string{pwmExportPath, pwmEnablePath, pwmPeriodPath, pwmDutyCyclePath, pwmPolarityPath},
@@ -313,7 +315,8 @@ func Test_PWMPin(t *testing.T) {
 			dutyCycle: "0",
 			translate: translator,
 			pin:       "33",
-			wantErr:   "SetPeriod(10000000) failed for id 44 with  : /sys/devices/platform/ff680020.pwm/pwm/pwmchip3/pwm44/period: no such file",
+			wantErr: "SetPeriod(10000000) failed for id 44 with  : " +
+				"/sys/devices/platform/ff680020.pwm/pwm/pwmchip3/pwm44/period: no such file",
 		},
 		"init_setpolarity_error": {
 			mockPaths: []string{pwmExportPath, pwmEnablePath, pwmPeriodPath, pwmDutyCyclePath},
@@ -321,7 +324,8 @@ func Test_PWMPin(t *testing.T) {
 			dutyCycle: "0",
 			translate: translator,
 			pin:       "33",
-			wantErr:   "SetPolarity(normal) failed for id 44 with  : /sys/devices/platform/ff680020.pwm/pwm/pwmchip3/pwm44/polarity: no such file",
+			wantErr: "SetPolarity(normal) failed for id 44 with  : " +
+				"/sys/devices/platform/ff680020.pwm/pwm/pwmchip3/pwm44/polarity: no such file",
 		},
 		"translate_error": {
 			translate: func(string) (string, int, error) { return "", -1, fmt.Errorf(translateErr) },
@@ -350,10 +354,7 @@ func Test_PWMPin(t *testing.T) {
 				require.NoError(t, err)
 				assert.NotNil(t, got)
 			} else {
-				if !strings.Contains(err.Error(), tc.wantErr) {
-					log.Println(err.Error())
-				}
-				assert.Contains(t, err.Error(), tc.wantErr)
+				require.ErrorContains(t, err, tc.wantErr)
 				assert.Nil(t, got)
 			}
 		})

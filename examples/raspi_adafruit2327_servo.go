@@ -51,7 +51,7 @@ func main() {
 	robot.Start()
 }
 
-func adafruitServoMotorRunner(a *i2c.Adafruit2327Driver) (err error) {
+func adafruitServoMotorRunner(a *i2c.Adafruit2327Driver) error {
 	log.Printf("Servo Motor Run Loop...\n")
 
 	var channel byte = 1
@@ -59,30 +59,30 @@ func adafruitServoMotorRunner(a *i2c.Adafruit2327Driver) (err error) {
 
 	// Do not need to set this every run loop
 	freq := 60.0
-	if err = a.SetServoMotorFreq(freq); err != nil {
+	if err := a.SetServoMotorFreq(freq); err != nil {
 		log.Printf("%s", err.Error())
-		return
+		return err
 	}
 	// start in the middle of the 180-deg range
 	pulse := degree2pulse(deg)
-	if err = a.SetServoMotorPulse(channel, 0, pulse); err != nil {
+	if err := a.SetServoMotorPulse(channel, 0, pulse); err != nil {
 		log.Printf(err.Error())
-		return
+		return err
 	}
 	// INCR
 	pulse = degree2pulse(deg + degIncrease)
-	if err = a.SetServoMotorPulse(channel, 0, pulse); err != nil {
+	if err := a.SetServoMotorPulse(channel, 0, pulse); err != nil {
 		log.Printf(err.Error())
-		return
+		return err
 	}
 	time.Sleep(2000 * time.Millisecond)
 	// DECR
 	pulse = degree2pulse(deg - degIncrease)
-	if err = a.SetServoMotorPulse(channel, 0, pulse); err != nil {
+	if err := a.SetServoMotorPulse(channel, 0, pulse); err != nil {
 		log.Printf(err.Error())
-		return
+		return err
 	}
-	return
+	return nil
 }
 
 func degree2pulse(deg int) int32 {

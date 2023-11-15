@@ -1,3 +1,4 @@
+//nolint:forcetypeassert // ok here
 package system
 
 import (

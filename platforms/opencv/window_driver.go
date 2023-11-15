@@ -37,13 +37,13 @@ func (w *WindowDriver) SetName(n string) { w.name = n }
 func (w *WindowDriver) Connection() gobot.Connection { return nil }
 
 // Start starts window thread and driver
-func (w *WindowDriver) Start() (err error) {
+func (w *WindowDriver) Start() error {
 	w.start(w)
 	return
 }
 
 // Halt returns true if camera is halted successfully
-func (w *WindowDriver) Halt() (err error) { return }
+func (w *WindowDriver) Halt() error { return }
 
 // ShowImage displays image in window
 func (w *WindowDriver) ShowImage(img gocv.Mat) {

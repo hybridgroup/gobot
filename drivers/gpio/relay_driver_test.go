@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -16,10 +17,10 @@ func (l *RelayDriver) High() bool { return l.high }
 
 func initTestRelayDriver() (*RelayDriver, *gpioTestAdaptor) {
 	a := newGpioTestAdaptor()
-	a.digitalWriteFunc = func(string, byte) (err error) {
+	a.digitalWriteFunc = func(string, byte) error {
 		return nil
 	}
-	a.pwmWriteFunc = func(string, byte) (err error) {
+	a.pwmWriteFunc = func(string, byte) error {
 		return nil
 	}
 	return NewRelayDriver(a, "1"), a

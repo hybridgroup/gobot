@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -14,9 +15,9 @@ import (
 // and tests all implementations, so no further tests needed here for gobot.Driver interface
 var _ gobot.Driver = (*HMC6352Driver)(nil)
 
-func initL3GD20HDriver() (driver *L3GD20HDriver) {
-	driver, _ = initL3GD20HWithStubbedAdaptor()
-	return
+func initL3GD20HDriver() *L3GD20HDriver {
+	d, _ := initL3GD20HWithStubbedAdaptor()
+	return d
 }
 
 func initL3GD20HWithStubbedAdaptor() (*L3GD20HDriver, *i2cTestAdaptor) {
@@ -214,8 +215,11 @@ func TestL3GD20HMeasurementError(t *testing.T) {
 	}
 
 	_ = d.Start()
-	_, _, _, err := d.XYZ()
+	x, y, z, err := d.XYZ()
 	require.ErrorContains(t, err, "read error")
+	assert.InDelta(t, 0.0, x, 0.0)
+	assert.InDelta(t, 0.0, y, 0.0)
+	assert.InDelta(t, 0.0, z, 0.0)
 }
 
 func TestL3GD20HMeasurementWriteError(t *testing.T) {
@@ -223,8 +227,11 @@ func TestL3GD20HMeasurementWriteError(t *testing.T) {
 	a.i2cWriteImpl = func(b []byte) (int, error) {
 		return 0, errors.New("write error")
 	}
-	_, _, _, err := d.XYZ()
+	x, y, z, err := d.XYZ()
 	require.ErrorContains(t, err, "write error")
+	assert.InDelta(t, 0.0, x, 0.0)
+	assert.InDelta(t, 0.0, y, 0.0)
+	assert.InDelta(t, 0.0, z, 0.0)
 }
 
 func TestL3GD20H_initialize(t *testing.T) {

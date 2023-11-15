@@ -28,5 +28,5 @@ type AnalogReader interface {
 // AnalogWriter interface represents an Adaptor which has AnalogWrite capabilities
 type AnalogWriter interface {
 	// gobot.Adaptor
-	AnalogWrite(pin string, val int) (err error)
+	AnalogWrite(pin string, val int) error
 }

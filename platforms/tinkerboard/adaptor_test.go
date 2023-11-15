@@ -8,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/gpio"
 	"gobot.io/x/gobot/v2/drivers/i2c"
@@ -188,7 +189,7 @@ func TestFinalizeErrorAfterGPIO(t *testing.T) {
 	fs.WithWriteError = true
 
 	err := a.Finalize()
-	assert.Contains(t, err.Error(), "write error")
+	require.ErrorContains(t, err, "write error")
 }
 
 func TestFinalizeErrorAfterPWM(t *testing.T) {
@@ -200,7 +201,7 @@ func TestFinalizeErrorAfterPWM(t *testing.T) {
 	fs.WithWriteError = true
 
 	err := a.Finalize()
-	assert.Contains(t, err.Error(), "write error")
+	require.ErrorContains(t, err, "write error")
 }
 
 func TestSpiDefaultValues(t *testing.T) {
@@ -232,7 +233,7 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	// act
 	err = a.Finalize()
 	// assert
-	assert.Contains(t, err.Error(), "close error")
+	require.ErrorContains(t, err, "close error")
 }
 
 func Test_validateSpiBusNumber(t *testing.T) {

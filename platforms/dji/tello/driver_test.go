@@ -10,6 +10,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -17,7 +19,7 @@ var _ gobot.Driver = (*Driver)(nil)
 
 type WriteCloserDoNothing struct{}
 
-func (w *WriteCloserDoNothing) Write(p []byte) (n int, err error) {
+func (w *WriteCloserDoNothing) Write(p []byte) (int, error) {
 	return 0, nil
 }
 
@@ -113,9 +115,7 @@ func Test_handleResponse(t *testing.T) {
 			d := NewDriver("8888")
 			events := d.Subscribe()
 			err := d.handleResponse(bytes.NewReader(tc.msg))
-			if tc.err != err {
-				t.Errorf("expected '%v' error, got: %v", tc.err, err)
-			}
+			require.ErrorIs(t, tc.err, err)
 			if tc.wantEvent != "" {
 				select {
 				case ev, ok := <-events:

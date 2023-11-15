@@ -24,7 +24,8 @@ type ButtonDriver struct {
 //
 //	time.Duration: Interval at which the ButtonDriver is polled for new information
 func NewButtonDriver(a DigitalReader, pin string, v ...time.Duration) *ButtonDriver {
-	b := &ButtonDriver{
+	//nolint:forcetypeassert // no error return value, so there is no better way
+	d := &ButtonDriver{
 		Driver:       NewDriver(a.(gobot.Connection), "Button"),
 		Eventer:      gobot.NewEventer(),
 		pin:          pin,
@@ -33,39 +34,39 @@ func NewButtonDriver(a DigitalReader, pin string, v ...time.Duration) *ButtonDri
 		interval:     10 * time.Millisecond,
 		halt:         make(chan bool),
 	}
-	b.afterStart = b.initialize
-	b.beforeHalt = b.shutdown
+	d.afterStart = d.initialize
+	d.beforeHalt = d.shutdown
 
 	if len(v) > 0 {
-		b.interval = v[0]
+		d.interval = v[0]
 	}
 
-	b.AddEvent(ButtonPush)
-	b.AddEvent(ButtonRelease)
-	b.AddEvent(Error)
+	d.AddEvent(ButtonPush)
+	d.AddEvent(ButtonRelease)
+	d.AddEvent(Error)
 
-	return b
+	return d
 }
 
 // Pin returns the ButtonDrivers pin
-func (b *ButtonDriver) Pin() string { return b.pin }
+func (d *ButtonDriver) Pin() string { return d.pin }
 
 // Active gets the current state
-func (b *ButtonDriver) Active() bool {
+func (d *ButtonDriver) Active() bool {
 	// ensure that read and write can not interfere
-	b.mutex.Lock()
-	defer b.mutex.Unlock()
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
 
-	return b.active
+	return d.active
 }
 
 // SetDefaultState for the next start.
-func (b *ButtonDriver) SetDefaultState(s int) {
+func (d *ButtonDriver) SetDefaultState(s int) {
 	// ensure that read and write can not interfere
-	b.mutex.Lock()
-	defer b.mutex.Unlock()
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
 
-	b.defaultState = s
+	d.defaultState = s
 }
 
 // initialize the ButtonDriver and polls the state of the button at the given interval.
@@ -75,20 +76,20 @@ func (b *ButtonDriver) SetDefaultState(s int) {
 //	Push int - On button push
 //	Release int - On button release
 //	Error error - On button error
-func (b *ButtonDriver) initialize() error {
-	state := b.defaultState
+func (d *ButtonDriver) initialize() error {
+	state := d.defaultState
 	go func() {
 		for {
-			newValue, err := b.connection.(DigitalReader).DigitalRead(b.Pin())
+			newValue, err := d.connection.(DigitalReader).DigitalRead(d.Pin())
 			if err != nil {
-				b.Publish(Error, err)
+				d.Publish(Error, err)
 			} else if newValue != state && newValue != -1 {
 				state = newValue
-				b.update(newValue)
+				d.update(newValue)
 			}
 			select {
-			case <-time.After(b.interval):
-			case <-b.halt:
+			case <-time.After(d.interval):
+			case <-d.halt:
 				return
 			}
 		}
@@ -96,21 +97,21 @@ func (b *ButtonDriver) initialize() error {
 	return nil
 }
 
-func (b *ButtonDriver) shutdown() error {
-	b.halt <- true
+func (d *ButtonDriver) shutdown() error {
+	d.halt <- true
 	return nil
 }
 
-func (b *ButtonDriver) update(newValue int) {
+func (d *ButtonDriver) update(newValue int) {
 	// ensure that read and write can not interfere
-	b.mutex.Lock()
-	defer b.mutex.Unlock()
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
 
-	if newValue != b.defaultState {
-		b.active = true
-		b.Publish(ButtonPush, newValue)
+	if newValue != d.defaultState {
+		d.active = true
+		d.Publish(ButtonPush, newValue)
 	} else {
-		b.active = false
-		b.Publish(ButtonRelease, newValue)
+		d.active = false
+		d.Publish(ButtonRelease, newValue)
 	}
 }

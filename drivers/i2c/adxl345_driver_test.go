@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -204,9 +205,12 @@ func TestADXL345RawXYZError(t *testing.T) {
 		return 0, errors.New("read error")
 	}
 	// act
-	_, _, _, err := d.RawXYZ()
+	x, y, z, err := d.RawXYZ()
 	// assert
 	require.ErrorContains(t, err, "read error")
+	assert.Equal(t, int16(0), x)
+	assert.Equal(t, int16(0), y)
+	assert.Equal(t, int16(0), z)
 }
 
 func TestADXL345XYZ(t *testing.T) {
@@ -268,9 +272,12 @@ func TestADXL345XYZError(t *testing.T) {
 		return 0, errors.New("read error")
 	}
 	// act
-	_, _, _, err := d.XYZ()
+	x, y, z, err := d.XYZ()
 	// assert
 	require.ErrorContains(t, err, "read error")
+	assert.InDelta(t, 0.0, x, 0.0)
+	assert.InDelta(t, 0.0, y, 0.0)
+	assert.InDelta(t, 0.0, z, 0.0)
 }
 
 func TestADXL345_initialize(t *testing.T) {

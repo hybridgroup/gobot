@@ -95,28 +95,28 @@ func WithBMP180OversamplingMode(val BMP180OversamplingMode) func(Config) {
 }
 
 // Temperature returns the current temperature, in celsius degrees.
-func (d *BMP180Driver) Temperature() (temp float32, err error) {
+func (d *BMP180Driver) Temperature() (float32, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	var rawTemp int16
-	if rawTemp, err = d.rawTemp(); err != nil {
+	rawTemp, err := d.rawTemp()
+	if err != nil {
 		return 0, err
 	}
 	return d.calculateTemp(rawTemp), nil
 }
 
 // Pressure returns the current pressure, in pascals.
-func (d *BMP180Driver) Pressure() (pressure float32, err error) {
+func (d *BMP180Driver) Pressure() (float32, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	var rawTemp int16
-	var rawPressure int32
-	if rawTemp, err = d.rawTemp(); err != nil {
+	rawTemp, err := d.rawTemp()
+	if err != nil {
 		return 0, err
 	}
-	if rawPressure, err = d.rawPressure(d.oversampling); err != nil {
+	rawPressure, err := d.rawPressure(d.oversampling)
+	if err != nil {
 		return 0, err
 	}
 	return d.calculatePressure(rawTemp, rawPressure, d.oversampling), nil
@@ -192,20 +192,24 @@ func (d *BMP180Driver) calculateB5(rawTemp int16) int32 {
 	return x1 + x2
 }
 
-func (d *BMP180Driver) rawPressure(oversampling BMP180OversamplingMode) (rawPressure int32, err error) {
-	if _, err = d.connection.Write([]byte{bmp180RegisterCtl, bmp180CtlPressure + byte(oversampling<<6)}); err != nil {
+func (d *BMP180Driver) rawPressure(oversampling BMP180OversamplingMode) (int32, error) {
+	if _, err := d.connection.Write([]byte{bmp180RegisterCtl, bmp180CtlPressure + byte(oversampling<<6)}); err != nil {
 		return 0, err
 	}
 	time.Sleep(bmp180PauseForReading(oversampling))
 	ret := make([]byte, 3)
-	if err = d.connection.ReadBlockData(bmp180RegisterDataMSB, ret); err != nil {
+	if err := d.connection.ReadBlockData(bmp180RegisterDataMSB, ret); err != nil {
 		return 0, err
 	}
-	rawPressure = (int32(ret[0])<<16 + int32(ret[1])<<8 + int32(ret[2])) >> (8 - uint(oversampling))
+	rawPressure := (int32(ret[0])<<16 + int32(ret[1])<<8 + int32(ret[2])) >> (8 - uint(oversampling))
 	return rawPressure, nil
 }
 
-func (d *BMP180Driver) calculatePressure(rawTemp int16, rawPressure int32, oversampling BMP180OversamplingMode) float32 {
+func (d *BMP180Driver) calculatePressure(
+	rawTemp int16,
+	rawPressure int32,
+	oversampling BMP180OversamplingMode,
+) float32 {
 	b5 := d.calculateB5(rawTemp)
 	b6 := b5 - 4000
 	x1 := (int32(d.calCoeffs.b2) * (b6 * b6 >> 12)) >> 11

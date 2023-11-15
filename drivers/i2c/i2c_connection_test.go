@@ -9,6 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/system"
 )
@@ -21,6 +22,7 @@ func getSyscallFuncImpl(
 	// bit 0: error on function query
 	// bit 1: error on set address
 	// bit 2: error on command
+	//nolint:nonamedreturns // is sufficient here
 	return func(trap, a1, a2 uintptr, a3 unsafe.Pointer) (r1, r2 uintptr, err system.SyscallErrno) {
 		// function query
 		if (trap == system.Syscall_SYS_IOCTL) && (a2 == system.I2C_FUNCS) {

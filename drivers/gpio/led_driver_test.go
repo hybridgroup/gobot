@@ -1,3 +1,4 @@
+//nolint:forcetypeassert // ok here
 package gpio
 
 import (
@@ -7,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -14,10 +16,10 @@ var _ gobot.Driver = (*LedDriver)(nil)
 
 func initTestLedDriver() *LedDriver {
 	a := newGpioTestAdaptor()
-	a.digitalWriteFunc = func(string, byte) (err error) {
+	a.digitalWriteFunc = func(string, byte) error {
 		return nil
 	}
-	a.pwmWriteFunc = func(string, byte) (err error) {
+	a.pwmWriteFunc = func(string, byte) error {
 		return nil
 	}
 	return NewLedDriver(a, "1")
@@ -31,10 +33,10 @@ func TestLedDriver(t *testing.T) {
 	assert.Equal(t, "1", d.Pin())
 	assert.NotNil(t, d.Connection())
 
-	a.digitalWriteFunc = func(string, byte) (err error) {
+	a.digitalWriteFunc = func(string, byte) error {
 		return errors.New("write error")
 	}
-	a.pwmWriteFunc = func(string, byte) (err error) {
+	a.pwmWriteFunc = func(string, byte) error {
 		return errors.New("pwm error")
 	}
 
@@ -73,9 +75,8 @@ func TestLedDriverToggle(t *testing.T) {
 func TestLedDriverBrightness(t *testing.T) {
 	a := newGpioTestAdaptor()
 	d := NewLedDriver(a, "1")
-	a.pwmWriteFunc = func(string, byte) (err error) {
-		err = errors.New("pwm error")
-		return
+	a.pwmWriteFunc = func(string, byte) error {
+		return errors.New("pwm error")
 	}
 	require.ErrorContains(t, d.Brightness(150), "pwm error")
 }

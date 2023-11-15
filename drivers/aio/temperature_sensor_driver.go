@@ -68,9 +68,14 @@ func (t *TemperatureSensorDriver) SetLinearScaler(fromMin, fromMax int, toMin, t
 // If the thermistor is connected to ground, the reverse flag must be set to true.
 // This means the voltage decreases when temperature gets higher.
 // Currently no negative values for voltage are supported.
-func TemperatureSensorNtcScaler(vRef uint, rOhm uint, reverse bool, ntc TemperatureSensorNtcConf) func(input int) (value float64) {
+func TemperatureSensorNtcScaler(
+	vRef uint,
+	rOhm uint,
+	reverse bool,
+	ntc TemperatureSensorNtcConf,
+) func(input int) (value float64) {
 	ntc.initialize()
-	return (func(input int) (value float64) {
+	return (func(input int) float64 {
 		if input < 0 {
 			input = 0
 		}

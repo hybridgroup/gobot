@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	multierror "github.com/hashicorp/go-multierror"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/system"
 )
@@ -90,10 +91,11 @@ func (a *PWMPinsAdaptor) Connect() error {
 }
 
 // Finalize closes connection to PWM pins.
-func (a *PWMPinsAdaptor) Finalize() (err error) {
+func (a *PWMPinsAdaptor) Finalize() error {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
+	var err error
 	for _, pin := range a.pins {
 		if pin != nil {
 			if errs := pin.SetEnabled(false); errs != nil {
@@ -109,13 +111,13 @@ func (a *PWMPinsAdaptor) Finalize() (err error) {
 }
 
 // PwmWrite writes a PWM signal to the specified pin.
-func (a *PWMPinsAdaptor) PwmWrite(id string, val byte) (err error) {
+func (a *PWMPinsAdaptor) PwmWrite(id string, val byte) error {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
 	pin, err := a.pwmPin(id)
 	if err != nil {
-		return
+		return err
 	}
 	period, err := pin.Period()
 	if err != nil {
@@ -126,13 +128,13 @@ func (a *PWMPinsAdaptor) PwmWrite(id string, val byte) (err error) {
 }
 
 // ServoWrite writes a servo signal to the specified pin.
-func (a *PWMPinsAdaptor) ServoWrite(id string, angle byte) (err error) {
+func (a *PWMPinsAdaptor) ServoWrite(id string, angle byte) error {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
 	pin, err := a.pwmPin(id)
 	if err != nil {
-		return
+		return err
 	}
 	period, err := pin.Period()
 	if err != nil {

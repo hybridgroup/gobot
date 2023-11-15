@@ -2,6 +2,7 @@ package system
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -47,9 +48,9 @@ func newPWMPinSysfs(fs filesystem, path string, pin int, polNormIdent string, po
 func (p *pwmPinSysFs) Export() error {
 	_, err := p.write(p.fs, p.pwmExportPath(), []byte(p.pin))
 	if err != nil {
-		// If EBUSY then the pin has already been exported
-		e, ok := err.(*os.PathError)
-		if !ok || e.Err != Syscall_EBUSY {
+		// If EBUSY then the pin has already been exported, we suppress the error
+		var pathError *os.PathError
+		if !(errors.As(err, &pathError) && errors.Is(err, Syscall_EBUSY)) {
 			return fmt.Errorf(pwmPinErrorPattern, "Export", p.pin, err)
 		}
 	}

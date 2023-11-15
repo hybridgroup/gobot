@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	multierror "github.com/hashicorp/go-multierror"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/platforms/adaptors"
 	"gobot.io/x/gobot/v2/system"
@@ -104,7 +105,8 @@ func (c *Adaptor) Connect() error {
 }
 
 // Finalize releases all i2c devices and exported analog, digital, pwm pins.
-func (c *Adaptor) Finalize() (err error) {
+func (c *Adaptor) Finalize() error {
+	var err error
 	if c.tristate != nil {
 		if errs := c.tristate.Unexport(); errs != nil {
 			err = multierror.Append(err, errs)
@@ -129,23 +131,23 @@ func (c *Adaptor) Finalize() (err error) {
 		err = multierror.Append(err, e)
 	}
 	c.arduinoI2cInitialized = false
-	return
+	return err
 }
 
 // DigitalRead reads digital value from pin
-func (c *Adaptor) DigitalRead(pin string) (i int, err error) {
+func (c *Adaptor) DigitalRead(pin string) (int, error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
 	sysPin, err := c.digitalPin(pin, system.WithPinDirectionInput())
 	if err != nil {
-		return
+		return 0, err
 	}
 	return sysPin.Read()
 }
 
 // DigitalWrite writes a value to the pin. Acceptable values are 1 or 0.
-func (c *Adaptor) DigitalWrite(pin string, val byte) (err error) {
+func (c *Adaptor) DigitalWrite(pin string, val byte) error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -162,13 +164,13 @@ func (c *Adaptor) DigitalPin(id string) (gobot.DigitalPinner, error) {
 }
 
 // AnalogRead returns value from analog reading of specified pin
-func (c *Adaptor) AnalogRead(pin string) (val int, err error) {
+func (c *Adaptor) AnalogRead(pin string) (int, error) {
 	buf, err := c.readFile("/sys/bus/iio/devices/iio:device1/in_voltage" + pin + "_raw")
 	if err != nil {
-		return
+		return 0, err
 	}
 
-	val, err = strconv.Atoi(string(buf[0 : len(buf)-1]))
+	val, err := strconv.Atoi(string(buf[0 : len(buf)-1]))
 
 	return val / 4, err
 }
@@ -370,7 +372,10 @@ func (c *Adaptor) newUnexportedDigitalPin(i int, o ...func(gobot.DigitalPinOptio
 	return io.Unexport()
 }
 
-func (c *Adaptor) newExportedDigitalPin(pin int, o ...func(gobot.DigitalPinOptioner) bool) (gobot.DigitalPinner, error) {
+func (c *Adaptor) newExportedDigitalPin(
+	pin int,
+	o ...func(gobot.DigitalPinOptioner) bool,
+) (gobot.DigitalPinner, error) {
 	sysPin := c.sys.NewDigitalPin("", pin, o...)
 	err := sysPin.Export()
 	return sysPin, err
@@ -387,10 +392,10 @@ func (c *Adaptor) changePinMode(pin, mode string) error {
 	return err
 }
 
-func (c *Adaptor) digitalWrite(pin string, val byte) (err error) {
+func (c *Adaptor) digitalWrite(pin string, val byte) error {
 	sysPin, err := c.digitalPin(pin, system.WithPinDirectionOutput(int(val)))
 	if err != nil {
-		return
+		return err
 	}
 	return sysPin.Write(int(val))
 }

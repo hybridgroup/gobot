@@ -46,10 +46,10 @@ type Eventer interface {
 	Unsubscribe(events eventChannel)
 
 	// Event handler
-	On(name string, f func(s interface{})) (err error)
+	On(name string, f func(s interface{})) error
 
 	// Event handler, only executes one time
-	Once(name string, f func(s interface{})) (err error)
+	Once(name string, f func(s interface{})) error
 }
 
 // NewEventer returns a new Eventer.
@@ -119,7 +119,7 @@ func (e *eventer) Unsubscribe(events eventChannel) {
 }
 
 // On executes the event handler f when e is Published to.
-func (e *eventer) On(n string, f func(s interface{})) (err error) {
+func (e *eventer) On(n string, f func(s interface{})) error {
 	out := e.Subscribe()
 	go func() {
 		for {
@@ -130,11 +130,11 @@ func (e *eventer) On(n string, f func(s interface{})) (err error) {
 		}
 	}()
 
-	return
+	return nil
 }
 
 // Once is similar to On except that it only executes f one time.
-func (e *eventer) Once(n string, f func(s interface{})) (err error) {
+func (e *eventer) Once(n string, f func(s interface{})) error {
 	out := e.Subscribe()
 	go func() {
 	ProcessEvents:
@@ -147,5 +147,5 @@ func (e *eventer) Once(n string, f func(s interface{})) (err error) {
 		}
 	}()
 
-	return
+	return nil
 }

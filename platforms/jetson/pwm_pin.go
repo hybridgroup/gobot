@@ -73,7 +73,7 @@ func (p *PWMPin) SetPolarity(bool) error {
 }
 
 // Period returns the cached PWM period for pin
-func (p *PWMPin) Period() (period uint32, err error) {
+func (p *PWMPin) Period() (uint32, error) {
 	if p.period == 0 {
 		return p.period, errors.New("Jetson PWM pin period not set")
 	}

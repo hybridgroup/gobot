@@ -1,3 +1,4 @@
+//nolint:forcetypeassert // ok here
 package digispark
 
 import (
@@ -6,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2/drivers/i2c"
 )
 
@@ -31,7 +33,7 @@ type i2cMock struct {
 
 func initTestAdaptorI2c() *Adaptor {
 	a := NewAdaptor()
-	a.connect = func(a *Adaptor) (err error) { return nil }
+	a.connect = func(a *Adaptor) error { return nil }
 	a.littleWire = new(i2cMock)
 	return a
 }

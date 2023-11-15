@@ -111,7 +111,7 @@ func (d *i2cDevice) ReadByte(address int) (byte, error) {
 }
 
 // ReadByteData reads a byte from the given register of an i2c device.
-func (d *i2cDevice) ReadByteData(address int, reg uint8) (val uint8, err error) {
+func (d *i2cDevice) ReadByteData(address int, reg uint8) (uint8, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
@@ -120,12 +120,12 @@ func (d *i2cDevice) ReadByteData(address int, reg uint8) (val uint8, err error) 
 	}
 
 	var data uint8 = 0xFD // set value for debugging purposes
-	err = d.smbusAccess(address, I2C_SMBUS_READ, reg, I2C_SMBUS_BYTE_DATA, unsafe.Pointer(&data))
+	err := d.smbusAccess(address, I2C_SMBUS_READ, reg, I2C_SMBUS_BYTE_DATA, unsafe.Pointer(&data))
 	return data, err
 }
 
 // ReadWordData reads a 16 bit value starting from the given register of an i2c device.
-func (d *i2cDevice) ReadWordData(address int, reg uint8) (val uint16, err error) {
+func (d *i2cDevice) ReadWordData(address int, reg uint8) (uint16, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
@@ -134,7 +134,7 @@ func (d *i2cDevice) ReadWordData(address int, reg uint8) (val uint16, err error)
 	}
 
 	var data uint16 = 0xFFFE // set value for debugging purposes
-	err = d.smbusAccess(address, I2C_SMBUS_READ, reg, I2C_SMBUS_WORD_DATA, unsafe.Pointer(&data))
+	err := d.smbusAccess(address, I2C_SMBUS_READ, reg, I2C_SMBUS_WORD_DATA, unsafe.Pointer(&data))
 	return data, err
 }
 
@@ -241,7 +241,7 @@ func (d *i2cDevice) WriteBytes(address int, data []byte) error {
 }
 
 // Read implements direct I2C read operations.
-func (d *i2cDevice) Read(address int, b []byte) (n int, err error) {
+func (d *i2cDevice) Read(address int, b []byte) (int, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
@@ -249,7 +249,7 @@ func (d *i2cDevice) Read(address int, b []byte) (n int, err error) {
 }
 
 // Write implements the io.ReadWriteCloser method by direct I2C write operations.
-func (d *i2cDevice) Write(address int, b []byte) (n int, err error) {
+func (d *i2cDevice) Write(address int, b []byte) (int, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
@@ -288,8 +288,8 @@ func (d *i2cDevice) writeBytes(address int, data []byte) error {
 	return nil
 }
 
-func (d *i2cDevice) write(address int, b []byte) (n int, err error) {
-	if err = d.setAddress(address); err != nil {
+func (d *i2cDevice) write(address int, b []byte) (int, error) {
+	if err := d.setAddress(address); err != nil {
 		return 0, err
 	}
 	if err := d.openFileLazy("Write"); err != nil {
@@ -309,8 +309,8 @@ func (d *i2cDevice) readAndCheckCount(address int, data []byte) error {
 	return nil
 }
 
-func (d *i2cDevice) read(address int, b []byte) (n int, err error) {
-	if err = d.setAddress(address); err != nil {
+func (d *i2cDevice) read(address int, b []byte) (int, error) {
+	if err := d.setAddress(address); err != nil {
 		return 0, err
 	}
 	if err := d.openFileLazy("Read"); err != nil {
@@ -378,7 +378,7 @@ func (d *i2cDevice) setAddress(address int) error {
 	return nil
 }
 
-func (d *i2cDevice) syscallIoctl(signal uintptr, payload unsafe.Pointer, address int, sender string) (err error) {
+func (d *i2cDevice) syscallIoctl(signal uintptr, payload unsafe.Pointer, address int, sender string) error {
 	if err := d.openFileLazy(sender); err != nil {
 		return err
 	}
@@ -389,12 +389,13 @@ func (d *i2cDevice) syscallIoctl(signal uintptr, payload unsafe.Pointer, address
 	return nil
 }
 
-func (d *i2cDevice) openFileLazy(sender string) (err error) { //nolint:unparam // useful for debugging
+func (d *i2cDevice) openFileLazy(sender string) error { //nolint:unparam // useful for debugging
 	// lazy initialization
 	// note: "os.ModeExclusive" is undefined without create the file. This means for the existing character device,
 	// a second open will not return an error e.g. due to a busy resource, so most likely "os.ModeExclusive" is not really
 	// helpful and we drop it to the default "0" used by normal Open().
 	if d.file == nil {
+		var err error
 		if d.file, err = d.fs.openFile(d.location, os.O_RDWR, 0); err != nil {
 			return err
 		}

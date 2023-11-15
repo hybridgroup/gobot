@@ -71,7 +71,11 @@ func (r *Robots) Len() int {
 func (r *Robots) Start(args ...interface{}) error {
 	autoRun := true
 	if args[0] != nil {
-		autoRun = args[0].(bool)
+		var ok bool
+		if autoRun, ok = args[0].(bool); !ok {
+			// we treat this as false
+			autoRun = false
+		}
 	}
 	for _, robot := range *r {
 		if err := robot.Start(autoRun); err != nil {
@@ -122,23 +126,23 @@ func NewRobot(v ...interface{}) *Robot {
 	}
 
 	for i := range v {
-		switch v[i].(type) {
+		switch val := v[i].(type) {
 		case string:
-			r.Name = v[i].(string)
+			r.Name = val
 		case []Connection:
 			log.Println("Initializing connections...")
-			for _, connection := range v[i].([]Connection) {
+			for _, connection := range val {
 				c := r.AddConnection(connection)
 				log.Println("Initializing connection", c.Name(), "...")
 			}
 		case []Device:
 			log.Println("Initializing devices...")
-			for _, device := range v[i].([]Device) {
+			for _, device := range val {
 				d := r.AddDevice(device)
 				log.Println("Initializing device", d.Name(), "...")
 			}
 		case func():
-			r.Work = v[i].(func())
+			r.Work = val
 		}
 	}
 
@@ -158,7 +162,11 @@ func NewRobot(v ...interface{}) *Robot {
 // connections and devices on first error.
 func (r *Robot) Start(args ...interface{}) error {
 	if len(args) > 0 && args[0] != nil {
-		r.AutoRun = args[0].(bool)
+		var ok bool
+		if r.AutoRun, ok = args[0].(bool); !ok {
+			// we treat this as false
+			r.AutoRun = false
+		}
 	}
 	log.Println("Starting Robot", r.Name, "...")
 	if err := r.Connections().Start(); err != nil {
@@ -216,7 +224,7 @@ func (r *Robot) Stop() error {
 
 // Running returns if the Robot is currently started or not
 func (r *Robot) Running() bool {
-	return r.running.Load().(bool)
+	return r.running.Load().(bool) //nolint:forcetypeassert // no error return value, so there is no better way
 }
 
 // Devices returns all devices associated with this Robot.

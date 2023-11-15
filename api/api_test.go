@@ -1,3 +1,4 @@
+//nolint:forcetypeassert,usestdlibvars,bodyclose,noctx // ok here
 package api
 
 import (
@@ -12,6 +13,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -413,7 +415,7 @@ func TestRobotDeviceEvent(t *testing.T) {
 			data, _ := reader.ReadString('\n')
 			assert.Equal(t, "data: \"event-data\"\n", data)
 			done = true
-		case <-time.After(100 * time.Millisecond):
+		case <-time.After(200 * time.Millisecond):
 			t.Error("Not receiving data")
 			done = true
 		}

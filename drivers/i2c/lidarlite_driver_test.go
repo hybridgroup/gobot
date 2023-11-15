@@ -8,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -15,9 +16,9 @@ import (
 // and tests all implementations, so no further tests needed here for gobot.Driver interface
 var _ gobot.Driver = (*LIDARLiteDriver)(nil)
 
-func initTestLIDARLiteDriver() (driver *LIDARLiteDriver) {
-	driver, _ = initTestLIDARLiteDriverWithStubbedAdaptor()
-	return
+func initTestLIDARLiteDriver() *LIDARLiteDriver {
+	d, _ := initTestLIDARLiteDriverWithStubbedAdaptor()
+	return d
 }
 
 func initTestLIDARLiteDriverWithStubbedAdaptor() (*LIDARLiteDriver, *i2cTestAdaptor) {

@@ -10,6 +10,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -49,7 +50,8 @@ func TestBMP180Measurements(t *testing.T) {
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
 		// Values from the datasheet example.
-		if adaptor.written[len(adaptor.written)-1] == bmp180RegisterAC1MSB {
+		switch {
+		case adaptor.written[len(adaptor.written)-1] == bmp180RegisterAC1MSB:
 			_ = binary.Write(buf, binary.BigEndian, int16(408))
 			_ = binary.Write(buf, binary.BigEndian, int16(-72))
 			_ = binary.Write(buf, binary.BigEndian, int16(-14383))
@@ -61,9 +63,11 @@ func TestBMP180Measurements(t *testing.T) {
 			_ = binary.Write(buf, binary.BigEndian, int16(-32768))
 			_ = binary.Write(buf, binary.BigEndian, int16(-8711))
 			_ = binary.Write(buf, binary.BigEndian, int16(2868))
-		} else if adaptor.written[len(adaptor.written)-2] == bmp180CtlTemp && adaptor.written[len(adaptor.written)-1] == bmp180RegisterDataMSB {
+		case adaptor.written[len(adaptor.written)-2] == bmp180CtlTemp &&
+			adaptor.written[len(adaptor.written)-1] == bmp180RegisterDataMSB:
 			_ = binary.Write(buf, binary.BigEndian, int16(27898))
-		} else if adaptor.written[len(adaptor.written)-2] == bmp180CtlPressure && adaptor.written[len(adaptor.written)-1] == bmp180RegisterDataMSB {
+		case adaptor.written[len(adaptor.written)-2] == bmp180CtlPressure &&
+			adaptor.written[len(adaptor.written)-1] == bmp180RegisterDataMSB:
 			_ = binary.Write(buf, binary.BigEndian, int16(23843))
 			// XLSB, not used in this test.
 			buf.WriteByte(0)
@@ -85,7 +89,8 @@ func TestBMP180TemperatureError(t *testing.T) {
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
 		// Values from the datasheet example.
-		if adaptor.written[len(adaptor.written)-1] == bmp180RegisterAC1MSB {
+		switch {
+		case adaptor.written[len(adaptor.written)-1] == bmp180RegisterAC1MSB:
 			_ = binary.Write(buf, binary.BigEndian, int16(408))
 			_ = binary.Write(buf, binary.BigEndian, int16(-72))
 			_ = binary.Write(buf, binary.BigEndian, int16(-14383))
@@ -97,9 +102,11 @@ func TestBMP180TemperatureError(t *testing.T) {
 			_ = binary.Write(buf, binary.BigEndian, int16(-32768))
 			_ = binary.Write(buf, binary.BigEndian, int16(-8711))
 			_ = binary.Write(buf, binary.BigEndian, int16(2868))
-		} else if adaptor.written[len(adaptor.written)-2] == bmp180CtlTemp && adaptor.written[len(adaptor.written)-1] == bmp180RegisterDataMSB {
+		case adaptor.written[len(adaptor.written)-2] == bmp180CtlTemp &&
+			adaptor.written[len(adaptor.written)-1] == bmp180RegisterDataMSB:
 			return 0, errors.New("temp error")
-		} else if adaptor.written[len(adaptor.written)-2] == bmp180CtlPressure && adaptor.written[len(adaptor.written)-1] == bmp180RegisterDataMSB {
+		case adaptor.written[len(adaptor.written)-2] == bmp180CtlPressure &&
+			adaptor.written[len(adaptor.written)-1] == bmp180RegisterDataMSB:
 			_ = binary.Write(buf, binary.BigEndian, int16(23843))
 			// XLSB, not used in this test.
 			buf.WriteByte(0)
@@ -117,7 +124,8 @@ func TestBMP180PressureError(t *testing.T) {
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
 		// Values from the datasheet example.
-		if adaptor.written[len(adaptor.written)-1] == bmp180RegisterAC1MSB {
+		switch {
+		case adaptor.written[len(adaptor.written)-1] == bmp180RegisterAC1MSB:
 			_ = binary.Write(buf, binary.BigEndian, int16(408))
 			_ = binary.Write(buf, binary.BigEndian, int16(-72))
 			_ = binary.Write(buf, binary.BigEndian, int16(-14383))
@@ -129,9 +137,11 @@ func TestBMP180PressureError(t *testing.T) {
 			_ = binary.Write(buf, binary.BigEndian, int16(-32768))
 			_ = binary.Write(buf, binary.BigEndian, int16(-8711))
 			_ = binary.Write(buf, binary.BigEndian, int16(2868))
-		} else if adaptor.written[len(adaptor.written)-2] == bmp180CtlTemp && adaptor.written[len(adaptor.written)-1] == bmp180RegisterDataMSB {
+		case adaptor.written[len(adaptor.written)-2] == bmp180CtlTemp &&
+			adaptor.written[len(adaptor.written)-1] == bmp180RegisterDataMSB:
 			_ = binary.Write(buf, binary.BigEndian, int16(27898))
-		} else if adaptor.written[len(adaptor.written)-2] == bmp180CtlPressure && adaptor.written[len(adaptor.written)-1] == bmp180RegisterDataMSB {
+		case adaptor.written[len(adaptor.written)-2] == bmp180CtlPressure &&
+			adaptor.written[len(adaptor.written)-1] == bmp180RegisterDataMSB:
 			return 0, errors.New("press error")
 		}
 		copy(b, buf.Bytes())

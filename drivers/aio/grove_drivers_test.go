@@ -1,3 +1,4 @@
+//nolint:forcetypeassert // ok here
 package aio
 
 import (
@@ -9,6 +10,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -85,9 +87,8 @@ func TestDriverPublishesError(t *testing.T) {
 	for _, driver := range drivers {
 		sem := make(chan struct{}, 1)
 		// send error
-		testAdaptor.analogReadFunc = func() (val int, err error) {
-			err = errors.New("read error")
-			return
+		testAdaptor.analogReadFunc = func() (int, error) {
+			return 0, errors.New("read error")
 		}
 
 		require.NoError(t, driver.Start())

@@ -8,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -57,15 +58,18 @@ func TestBME280Measurements(t *testing.T) {
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
 		// Values produced by dumping data from actual sensor
-		if adaptor.written[len(adaptor.written)-1] == bmp280RegCalib00 {
-			buf.Write([]byte{126, 109, 214, 102, 50, 0, 54, 149, 220, 213, 208, 11, 64, 30, 166, 255, 249, 255, 172, 38, 10, 216, 189, 16})
-		} else if adaptor.written[len(adaptor.written)-1] == bme280RegCalibDigH1 {
+		switch {
+		case adaptor.written[len(adaptor.written)-1] == bmp280RegCalib00:
+			buf.Write([]byte{
+				126, 109, 214, 102, 50, 0, 54, 149, 220, 213, 208, 11, 64, 30, 166, 255, 249, 255, 172, 38, 10, 216, 189, 16,
+			})
+		case adaptor.written[len(adaptor.written)-1] == bme280RegCalibDigH1:
 			buf.Write([]byte{75})
-		} else if adaptor.written[len(adaptor.written)-1] == bmp280RegTempData {
+		case adaptor.written[len(adaptor.written)-1] == bmp280RegTempData:
 			buf.Write([]byte{129, 0, 0})
-		} else if adaptor.written[len(adaptor.written)-1] == bme280RegCalibDigH2LSB {
+		case adaptor.written[len(adaptor.written)-1] == bme280RegCalibDigH2LSB:
 			buf.Write([]byte{112, 1, 0, 19, 1, 0, 30})
-		} else if adaptor.written[len(adaptor.written)-1] == bme280RegHumidityMSB {
+		case adaptor.written[len(adaptor.written)-1] == bme280RegHumidityMSB:
 			buf.Write([]byte{111, 83})
 		}
 		copy(b, buf.Bytes())
@@ -82,11 +86,14 @@ func TestBME280InitH1Error(t *testing.T) {
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
 		// Values produced by dumping data from actual sensor
-		if adaptor.written[len(adaptor.written)-1] == bmp280RegCalib00 {
-			buf.Write([]byte{126, 109, 214, 102, 50, 0, 54, 149, 220, 213, 208, 11, 64, 30, 166, 255, 249, 255, 172, 38, 10, 216, 189, 16})
-		} else if adaptor.written[len(adaptor.written)-1] == bme280RegCalibDigH1 {
+		switch {
+		case adaptor.written[len(adaptor.written)-1] == bmp280RegCalib00:
+			buf.Write([]byte{
+				126, 109, 214, 102, 50, 0, 54, 149, 220, 213, 208, 11, 64, 30, 166, 255, 249, 255, 172, 38, 10, 216, 189, 16,
+			})
+		case adaptor.written[len(adaptor.written)-1] == bme280RegCalibDigH1:
 			return 0, errors.New("h1 read error")
-		} else if adaptor.written[len(adaptor.written)-1] == bme280RegCalibDigH2LSB {
+		case adaptor.written[len(adaptor.written)-1] == bme280RegCalibDigH2LSB:
 			buf.Write([]byte{112, 1, 0, 19, 1, 0, 30})
 		}
 		copy(b, buf.Bytes())
@@ -101,11 +108,14 @@ func TestBME280InitH2Error(t *testing.T) {
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
 		// Values produced by dumping data from actual sensor
-		if adaptor.written[len(adaptor.written)-1] == bmp280RegCalib00 {
-			buf.Write([]byte{126, 109, 214, 102, 50, 0, 54, 149, 220, 213, 208, 11, 64, 30, 166, 255, 249, 255, 172, 38, 10, 216, 189, 16})
-		} else if adaptor.written[len(adaptor.written)-1] == bme280RegCalibDigH1 {
+		switch {
+		case adaptor.written[len(adaptor.written)-1] == bmp280RegCalib00:
+			buf.Write([]byte{
+				126, 109, 214, 102, 50, 0, 54, 149, 220, 213, 208, 11, 64, 30, 166, 255, 249, 255, 172, 38, 10, 216, 189, 16,
+			})
+		case adaptor.written[len(adaptor.written)-1] == bme280RegCalibDigH1:
 			buf.Write([]byte{75})
-		} else if adaptor.written[len(adaptor.written)-1] == bme280RegCalibDigH2LSB {
+		case adaptor.written[len(adaptor.written)-1] == bme280RegCalibDigH2LSB:
 			return 0, errors.New("h2 read error")
 		}
 		copy(b, buf.Bytes())
@@ -144,15 +154,18 @@ func TestBME280HumidityNotEnabled(t *testing.T) {
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
 		// Values produced by dumping data from actual sensor
-		if adaptor.written[len(adaptor.written)-1] == bmp280RegCalib00 {
-			buf.Write([]byte{126, 109, 214, 102, 50, 0, 54, 149, 220, 213, 208, 11, 64, 30, 166, 255, 249, 255, 172, 38, 10, 216, 189, 16})
-		} else if adaptor.written[len(adaptor.written)-1] == bme280RegCalibDigH1 {
+		switch {
+		case adaptor.written[len(adaptor.written)-1] == bmp280RegCalib00:
+			buf.Write([]byte{
+				126, 109, 214, 102, 50, 0, 54, 149, 220, 213, 208, 11, 64, 30, 166, 255, 249, 255, 172, 38, 10, 216, 189, 16,
+			})
+		case adaptor.written[len(adaptor.written)-1] == bme280RegCalibDigH1:
 			buf.Write([]byte{75})
-		} else if adaptor.written[len(adaptor.written)-1] == bmp280RegTempData {
+		case adaptor.written[len(adaptor.written)-1] == bmp280RegTempData:
 			buf.Write([]byte{129, 0, 0})
-		} else if adaptor.written[len(adaptor.written)-1] == bme280RegCalibDigH2LSB {
+		case adaptor.written[len(adaptor.written)-1] == bme280RegCalibDigH2LSB:
 			buf.Write([]byte{112, 1, 0, 19, 1, 0, 30})
-		} else if adaptor.written[len(adaptor.written)-1] == bme280RegHumidityMSB {
+		case adaptor.written[len(adaptor.written)-1] == bme280RegHumidityMSB:
 			buf.Write([]byte{0x80, 0x00})
 		}
 		copy(b, buf.Bytes())

@@ -20,13 +20,15 @@ type port struct {
 	IPOL    uint8 // input polarity register: 0=normal polarity / 1=inversed
 	GPINTEN uint8 // interrupt on change control register: 0=disabled / 1=enabled
 	DEFVAL  uint8 // default compare register for interrupt on change
-	INTCON  uint8 // interrupt control register: bit set to 0= use defval bit value to compare pin value/ bit set to 1= pin value compared to previous pin value
-	IOCON   uint8 // configuration register
-	GPPU    uint8 // pull-up resistor configuration register: 0=enabled / 1=disabled
-	INTF    uint8 // interrupt flag register: 0=no interrupt / 1=pin caused interrupt
-	INTCAP  uint8 // interrupt capture register, captures pin values during interrupt: 0=logic low / 1=logic high
-	GPIO    uint8 // port register, reading from this register reads the port
-	OLAT    uint8 // output latch register, write modifies the pins: 0=logic low / 1=logic high
+	// interrupt control register: bit set to 0= use defval bit value to compare pin value/ bit set to 1= pin value
+	// compared to previous pin value
+	INTCON uint8
+	IOCON  uint8 // configuration register
+	GPPU   uint8 // pull-up resistor configuration register: 0=enabled / 1=disabled
+	INTF   uint8 // interrupt flag register: 0=no interrupt / 1=pin caused interrupt
+	INTCAP uint8 // interrupt capture register, captures pin values during interrupt: 0=logic low / 1=logic high
+	GPIO   uint8 // port register, reading from this register reads the port
+	OLAT   uint8 // output latch register, write modifies the pins: 0=logic low / 1=logic high
 }
 
 // A bank is made up of PortA and PortB pins.
@@ -89,6 +91,7 @@ func NewMCP23017Driver(c Connector, options ...func(Config)) *MCP23017Driver {
 		option(d)
 	}
 
+	//nolint:forcetypeassert // ok here
 	d.AddCommand("WriteGPIO", func(params map[string]interface{}) interface{} {
 		pin := params["pin"].(uint8)
 		port := params["port"].(string)
@@ -97,6 +100,7 @@ func NewMCP23017Driver(c Connector, options ...func(Config)) *MCP23017Driver {
 		return map[string]interface{}{"err": err}
 	})
 
+	//nolint:forcetypeassert // ok here
 	d.AddCommand("ReadGPIO", func(params map[string]interface{}) interface{} {
 		pin := params["pin"].(uint8)
 		port := params["port"].(string)
@@ -228,16 +232,13 @@ func WithMCP23017AutoIODirOff(val uint8) func(Config) {
 // SetPinMode set pin mode of a given pin immediately, based on the value:
 // val = 0 output
 // val = 1 input
-func (m *MCP23017Driver) SetPinMode(pin uint8, portStr string, val uint8) (err error) {
+func (m *MCP23017Driver) SetPinMode(pin uint8, portStr string, val uint8) error {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 
 	selectedPort := m.getPort(portStr)
 	// Set IODIR register bit for given pin to an output/input.
-	if err = m.write(selectedPort.IODIR, pin, bitState(val)); err != nil {
-		return
-	}
-	return
+	return m.write(selectedPort.IODIR, pin, bitState(val))
 }
 
 // SetPullUp sets the pull up state of a given pin immediately, based on the value:
@@ -254,7 +255,7 @@ func (m *MCP23017Driver) SetPullUp(pin uint8, portStr string, val uint8) error {
 // SetGPIOPolarity will change a given pin's polarity immediately, based on the value:
 // val = 1 opposite logic state of the input pin.
 // val = 0 same logic state of the input pin.
-func (m *MCP23017Driver) SetGPIOPolarity(pin uint8, portStr string, val uint8) (err error) {
+func (m *MCP23017Driver) SetGPIOPolarity(pin uint8, portStr string, val uint8) error {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 
@@ -263,7 +264,7 @@ func (m *MCP23017Driver) SetGPIOPolarity(pin uint8, portStr string, val uint8) (
 }
 
 // WriteGPIO writes a value to a gpio pin (0-7) and a port (A or B).
-func (m *MCP23017Driver) WriteGPIO(pin uint8, portStr string, val uint8) (err error) {
+func (m *MCP23017Driver) WriteGPIO(pin uint8, portStr string, val uint8) error {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 
@@ -271,20 +272,16 @@ func (m *MCP23017Driver) WriteGPIO(pin uint8, portStr string, val uint8) (err er
 	if !m.mcpBehav.autoIODirOff {
 		// Set IODIR register bit for given pin to an output by clearing bit.
 		// can't call SetPinMode() because mutex will cause deadlock
-		if err = m.write(selectedPort.IODIR, pin, clear); err != nil {
+		if err := m.write(selectedPort.IODIR, pin, clear); err != nil {
 			return err
 		}
 	}
 	// write value to OLAT register bit
-	err = m.write(selectedPort.OLAT, pin, bitState(val))
-	if err != nil {
-		return err
-	}
-	return nil
+	return m.write(selectedPort.OLAT, pin, bitState(val))
 }
 
 // ReadGPIO reads a value from a given gpio pin (0-7) and a port (A or B).
-func (m *MCP23017Driver) ReadGPIO(pin uint8, portStr string) (val uint8, err error) {
+func (m *MCP23017Driver) ReadGPIO(pin uint8, portStr string) (uint8, error) {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 
@@ -292,11 +289,11 @@ func (m *MCP23017Driver) ReadGPIO(pin uint8, portStr string) (val uint8, err err
 	if !m.mcpBehav.autoIODirOff {
 		// Set IODIR register bit for given pin to an input by set bit.
 		// can't call SetPinMode() because mutex will cause deadlock
-		if err = m.write(selectedPort.IODIR, pin, set); err != nil {
+		if err := m.write(selectedPort.IODIR, pin, set); err != nil {
 			return 0, err
 		}
 	}
-	val, err = m.read(selectedPort.GPIO)
+	val, err := m.read(selectedPort.GPIO)
 	if err != nil {
 		return val, err
 	}
@@ -307,19 +304,18 @@ func (m *MCP23017Driver) ReadGPIO(pin uint8, portStr string) (val uint8, err err
 	return val, nil
 }
 
-func (m *MCP23017Driver) initialize() (err error) {
+func (m *MCP23017Driver) initialize() error {
 	// Set IOCON register with MCP23017 configuration.
 	ioconReg := m.getPort("A").IOCON // IOCON address is the same for Port A or B.
 	ioconVal := m.mcpConf.getUint8Value()
-	if _, err := m.connection.Write([]uint8{ioconReg, ioconVal}); err != nil {
-		return err
-	}
-	return
+
+	_, err := m.connection.Write([]uint8{ioconReg, ioconVal})
+	return err
 }
 
 // write gets the value of the passed in register, and then sets the bit specified
 // by the pin to the given state.
-func (m *MCP23017Driver) write(reg uint8, pin uint8, state bitState) (err error) {
+func (m *MCP23017Driver) write(reg uint8, pin uint8, state bitState) error {
 	valOrg, err := m.read(reg)
 	if err != nil {
 		return fmt.Errorf("MCP write-read: %v", err)
@@ -337,22 +333,20 @@ func (m *MCP23017Driver) write(reg uint8, pin uint8, state bitState) (err error)
 			log.Printf("write done: MCP forceRefresh: %t, address: 0x%X, register: 0x%X, name: %s, value: 0x%X\n",
 				m.mcpBehav.forceRefresh, m.GetAddressOrDefault(mcp23017DefaultAddress), reg, m.getRegName(reg), val)
 		}
-		if err = m.connection.WriteByteData(reg, val); err != nil {
+		if err := m.connection.WriteByteData(reg, val); err != nil {
 			return fmt.Errorf("MCP write-WriteByteData(reg=%d,val=%d): %v", reg, val, err)
 		}
-	} else {
-		if mcp23017Debug {
-			log.Printf("write skipped: MCP forceRefresh: %t, address: 0x%X, register: 0x%X, name: %s, value: 0x%X\n",
-				m.mcpBehav.forceRefresh, m.GetAddressOrDefault(mcp23017DefaultAddress), reg, m.getRegName(reg), val)
-		}
+	} else if mcp23017Debug {
+		log.Printf("write skipped: MCP forceRefresh: %t, address: 0x%X, register: 0x%X, name: %s, value: 0x%X\n",
+			m.mcpBehav.forceRefresh, m.GetAddressOrDefault(mcp23017DefaultAddress), reg, m.getRegName(reg), val)
 	}
 	return nil
 }
 
 // read get the data from a given register
 // it is mainly a wrapper to create additional debug messages, when activated
-func (m *MCP23017Driver) read(reg uint8) (val uint8, err error) {
-	val, err = m.connection.ReadByteData(reg)
+func (m *MCP23017Driver) read(reg uint8) (uint8, error) {
+	val, err := m.connection.ReadByteData(reg)
 	if err != nil {
 		return val, fmt.Errorf("MCP write-ReadByteData(reg=%d): %v", reg, err)
 	}
@@ -365,7 +359,7 @@ func (m *MCP23017Driver) read(reg uint8) (val uint8, err error) {
 
 // getPort return the port (A or B) given a string and the bank.
 // Port A is the default if an incorrect or no port is specified.
-func (m *MCP23017Driver) getPort(portStr string) (selectedPort port) {
+func (m *MCP23017Driver) getPort(portStr string) port {
 	portStr = strings.ToUpper(portStr)
 	switch {
 	case portStr == "A":
@@ -429,7 +423,13 @@ func (m *MCP23017Driver) getRegName(reg uint8) string {
 // mcp23017GetBank returns a bank's PortA and PortB registers given a bank number (0/1).
 func mcp23017GetBank(bnk uint8) bank {
 	if bnk == 0 {
-		return bank{portA: port{0x00, 0x02, 0x04, 0x06, 0x08, 0x0A, 0x0C, 0x0E, 0x10, 0x12, 0x14}, portB: port{0x01, 0x03, 0x05, 0x07, 0x09, 0x0B, 0x0D, 0x0F, 0x11, 0x13, 0x15}}
+		return bank{
+			portA: port{0x00, 0x02, 0x04, 0x06, 0x08, 0x0A, 0x0C, 0x0E, 0x10, 0x12, 0x14},
+			portB: port{0x01, 0x03, 0x05, 0x07, 0x09, 0x0B, 0x0D, 0x0F, 0x11, 0x13, 0x15},
+		}
 	}
-	return bank{portA: port{0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A}, portB: port{0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A}}
+	return bank{
+		portA: port{0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A},
+		portB: port{0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A},
+	}
 }

@@ -27,10 +27,11 @@ type BLEAdaptor struct {
 // NewBLEAdaptor opens and uses a BLE connection to a
 // microcontroller running FirmataBLE
 func NewBLEAdaptor(args ...interface{}) *BLEAdaptor {
-	address := args[0].(string)
+	address := args[0].(string) //nolint:forcetypeassert // ok here
 	rid := ReceiveID
 	wid := TransmitID
 
+	//nolint:forcetypeassert // ok here
 	if len(args) >= 3 {
 		rid = args[1].(string)
 		wid = args[2].(string)

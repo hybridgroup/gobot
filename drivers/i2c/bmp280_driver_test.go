@@ -8,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -77,11 +78,14 @@ func TestBMP280Measurements(t *testing.T) {
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
 		// Values produced by dumping data from actual sensor
-		if adaptor.written[len(adaptor.written)-1] == bmp280RegCalib00 {
-			buf.Write([]byte{126, 109, 214, 102, 50, 0, 54, 149, 220, 213, 208, 11, 64, 30, 166, 255, 249, 255, 172, 38, 10, 216, 189, 16})
-		} else if adaptor.written[len(adaptor.written)-1] == bmp280RegTempData {
+		switch {
+		case adaptor.written[len(adaptor.written)-1] == bmp280RegCalib00:
+			buf.Write([]byte{
+				126, 109, 214, 102, 50, 0, 54, 149, 220, 213, 208, 11, 64, 30, 166, 255, 249, 255, 172, 38, 10, 216, 189, 16,
+			})
+		case adaptor.written[len(adaptor.written)-1] == bmp280RegTempData:
 			buf.Write([]byte{128, 243, 0})
-		} else if adaptor.written[len(adaptor.written)-1] == bmp280RegPressureData {
+		case adaptor.written[len(adaptor.written)-1] == bmp280RegPressureData:
 			buf.Write([]byte{77, 23, 48})
 		}
 		copy(b, buf.Bytes())

@@ -1,9 +1,11 @@
 // Copyright 2014-2018 The Hybrid Group. All rights reserved.
 
 /*
-Package gobot is the primary entrypoint for Gobot (http://gobot.io), a framework for robotics, physical computing, and the Internet of Things written using the Go programming language .
+Package gobot is the primary entrypoint for Gobot (http://gobot.io), a framework for robotics, physical computing, and
+the Internet of Things written using the Go programming language .
 
-It provides a simple, yet powerful way to create solutions that incorporate multiple, different hardware devices at the same time.
+It provides a simple, yet powerful way to create solutions that incorporate multiple, different hardware devices at the
+same time.
 
 # Classic Gobot
 
@@ -40,7 +42,8 @@ Here is a "Classic Gobot" program that blinks an LED using an Arduino:
 
 # Metal Gobot
 
-You can also use Metal Gobot and pick and choose from the various Gobot packages to control hardware with nothing but pure idiomatic Golang code. For example:
+You can also use Metal Gobot and pick and choose from the various Gobot packages to control hardware with nothing but
+pure idiomatic Golang code. For example:
 
 	package main
 

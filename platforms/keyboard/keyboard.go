@@ -148,7 +148,7 @@ func Parse(input bytes) KeyEvent {
 }
 
 // fetches original state, sets up TTY for raw (unbuffered) input
-func configure() (err error) {
+func configure() error {
 	state, err := stty("-g")
 	if err != nil {
 		return err
@@ -158,24 +158,20 @@ func configure() (err error) {
 
 	// -echo: terminal doesn't echo typed characters back to the terminal
 	// -icanon: terminal doesn't interpret special characters (like backspace)
-	if _, err := stty("-echo", "-icanon"); err != nil {
-		return err
-	}
+	_, err = stty("-echo", "-icanon")
 
-	return
+	return err
 }
 
 // restores the TTY to the original state
-func restore() (err error) {
-	if _, err = stty("echo"); err != nil {
-		return
+func restore() error {
+	if _, err := stty("echo"); err != nil {
+		return err
 	}
 
-	if _, err = stty(originalState); err != nil {
-		return
-	}
+	_, err := stty(originalState)
 
-	return
+	return err
 }
 
 func stty(args ...string) (string, error) {

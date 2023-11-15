@@ -54,11 +54,15 @@ func NewMMA7660Driver(c Connector, options ...func(Config)) *MMA7660Driver {
 }
 
 // Acceleration returns the acceleration of the provided x, y, z
+//
+//nolint:nonamedreturns // is sufficient here
 func (d *MMA7660Driver) Acceleration(x, y, z float64) (ax, ay, az float64) {
 	return x / 21.0, y / 21.0, z / 21.0
 }
 
 // XYZ returns the raw x,y and z axis from the mma7660
+//
+//nolint:nonamedreturns // is sufficient here
 func (d *MMA7660Driver) XYZ() (x float64, y float64, z float64, err error) {
 	buf := []byte{0, 0, 0}
 	bytesRead, err := d.connection.Read(buf)

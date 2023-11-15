@@ -9,7 +9,8 @@ import (
 // CCS811DriveMode type
 type CCS811DriveMode uint8
 
-// Operating modes which dictate how often measurements are being made. If 0x00 is used as an operating mode, measurements will be disabled
+// Operating modes which dictate how often measurements are being made. If 0x00 is used as an operating mode,
+// measurements will be disabled
 const (
 	CCS811DriveModeIdle  CCS811DriveMode = 0x00
 	CCS811DriveMode1Sec  CCS811DriveMode = 0x01
@@ -24,11 +25,13 @@ const (
 	ccs811DefaultAddress = 0x5A
 
 	// Registers, all definitions have been taken from the datasheet
-	// Single byte read only register which indicates if a device is active, if new data is available or if an error occurred.
+	// Single byte read only register which indicates if a device is active, if new data is available or if an error
+	// occurred.
 	ccs811RegStatus = 0x00
 	// This is Single byte register, which is used to enable sensor drive mode and interrupts.
 	ccs811RegMeasMode = 0x01
-	// This multi-byte read only register contains the calculated eCO2 (ppm) and eTVOC (ppb) values followed by the STATUS register, ERROR_ID register and the RAW_DATA register.
+	// This multi-byte read only register contains the calculated eCO2 (ppm) and eTVOC (ppb) values followed by the
+	// STATUS register, ERROR_ID register and the RAW_DATA register.
 	ccs811RegAlgResultData = 0x02
 	// Two byte read only register which contains the latest readings from the sensor.
 	// ccs811RegRawData = 0x03
@@ -42,11 +45,14 @@ const (
 	ccs811RegHwID = 0x20
 	// Single byte read only register that contains the hardware version. The value is 0x1X
 	ccs811RegHwVersion = 0x21
-	// Two byte read only register which contain the version of the firmware bootloader stored in the CCS811 in the format Major.Minor.Trivial
+	// Two byte read only register which contain the version of the firmware bootloader stored in the CCS811 in the
+	// format Major.Minor.Trivial
 	ccs811RegFwBootVersion = 0x23
-	// Two byte read only register which contain the version of the firmware application stored in the CCS811 in the format Major.Minor.Trivial
+	// Two byte read only register which contain the version of the firmware application stored in the CCS811 in the
+	// format Major.Minor.Trivial
 	ccs811RegFwAppVersion = 0x24
-	// To change the mode of the CCS811 from Boot mode to running the application, a single byte write of 0xF4 is required.
+	// To change the mode of the CCS811 from Boot mode to running the application, a single byte write of 0xF4
+	// is required.
 	ccs811RegAppStart = 0xF4
 
 	// Constants
@@ -58,7 +64,8 @@ const (
 var ccs811SwResetSequence = []byte{0x11, 0xE5, 0x72, 0x8A}
 
 // CCS811Status represents the current status of the device defined by the ccs811RegStatus.
-// The following definitions were taken from https://ams.com/documents/20143/36005/CCS811_DS000459_6-00.pdf/c7091525-c7e5-37ac-eedb-b6c6828b0dcf#page=15
+// The following definitions were taken from
+// https://ams.com/documents/20143/36005/CCS811_DS000459_6-00.pdf/c7091525-c7e5-37ac-eedb-b6c6828b0dcf#page=15
 type CCS811Status struct {
 	// There is some sort of error on the i2c bus or there is an error with the internal sensor
 	HasError byte
@@ -93,7 +100,7 @@ type CCS811MeasMode struct {
 	driveMode CCS811DriveMode
 }
 
-// NewCCS811MeasMode returns a new instance of the package ccs811 measurement mode configuration. This represents the desired initial
+// NewCCS811MeasMode returns a new instance of the measurement mode configuration. This represents the desired initial
 // state of the measurement mode register.
 func NewCCS811MeasMode() *CCS811MeasMode {
 	return &CCS811MeasMode{
@@ -240,7 +247,8 @@ func (d *CCS811Driver) GetGasData() (uint16, uint16, error) {
 		return 0, 0, err
 	}
 
-	// Bit masks defined by https://ams.com/documents/20143/36005/CCS811_AN000369_2-00.pdf/25d0db9a-92b9-fa7f-362c-a7a4d1e292be#page=14
+	// Bit masks defined by
+	// https://ams.com/documents/20143/36005/CCS811_AN000369_2-00.pdf/25d0db9a-92b9-fa7f-362c-a7a4d1e292be#page=14
 	eco2 := (uint16(data[0]) << 8) | uint16(data[1])
 	tvoC := (uint16(data[2]) << 8) | uint16(data[3])
 

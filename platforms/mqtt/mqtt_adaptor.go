@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"os"
 
-	"gobot.io/x/gobot/v2"
-
 	paho "github.com/eclipse/paho.mqtt.golang"
+
+	"gobot.io/x/gobot/v2"
 )
 
 // ErrNilClient is returned when a client action can't be taken because the struct has no client
@@ -78,7 +78,8 @@ func (a *Adaptor) SetAutoReconnect(val bool) { a.autoReconnect = val }
 // CleanSession returns the MQTT CleanSession setting
 func (a *Adaptor) CleanSession() bool { return a.cleanSession }
 
-// SetCleanSession sets the MQTT CleanSession setting. Should be false if reconnect is enabled. Otherwise all subscriptions will be lost
+// SetCleanSession sets the MQTT CleanSession setting. Should be false if reconnect is enabled.
+// Otherwise all subscriptions will be lost
 func (a *Adaptor) SetCleanSession(val bool) { a.cleanSession = val }
 
 // UseSSL returns the MQTT server SSL preference

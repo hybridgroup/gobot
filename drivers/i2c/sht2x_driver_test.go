@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -87,11 +88,12 @@ func TestSHT2xAccuracy(t *testing.T) {
 	d, a := initTestSHT2xDriverWithStubbedAdaptor()
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
-		if a.written[len(a.written)-1] == SHT2xReadUserReg {
+		switch {
+		case a.written[len(a.written)-1] == SHT2xReadUserReg:
 			buf.Write([]byte{0x3a})
-		} else if a.written[len(a.written)-2] == SHT2xWriteUserReg {
+		case a.written[len(a.written)-2] == SHT2xWriteUserReg:
 			buf.Write([]byte{a.written[len(a.written)-1]})
-		} else {
+		default:
 			return 0, nil
 		}
 		copy(b, buf.Bytes())

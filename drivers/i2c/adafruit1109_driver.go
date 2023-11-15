@@ -45,7 +45,7 @@ type Adafruit1109Driver struct {
 
 // NewAdafruit1109Driver creates is a new driver for the 2x16 LCD display with RGB backlit and 5 keys.
 //
-// Because HD44780 and MCP23017 are already implemented in gobot, we creates a wrapper for using existing implementation.
+// Because HD44780 and MCP23017 are already implemented in gobot, this is a wrapper for using existing implementation.
 // So, for the documentation of the parameters, have a look at this drivers.
 //
 // Tests are done with a Tinkerboard.

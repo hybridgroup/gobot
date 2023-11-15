@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	multierror "github.com/hashicorp/go-multierror"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/platforms/adaptors"
 	"gobot.io/x/gobot/v2/system"
@@ -121,7 +122,7 @@ func (c *Adaptor) PWMPin(pin string) (gobot.PWMPinner, error) {
 }
 
 // PwmWrite writes a PWM signal to the specified pin
-func (c *Adaptor) PwmWrite(pin string, val byte) (err error) {
+func (c *Adaptor) PwmWrite(pin string, val byte) error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -135,7 +136,7 @@ func (c *Adaptor) PwmWrite(pin string, val byte) (err error) {
 }
 
 // ServoWrite writes a servo signal to the specified pin
-func (c *Adaptor) ServoWrite(pin string, angle byte) (err error) {
+func (c *Adaptor) ServoWrite(pin string, angle byte) error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -200,7 +201,7 @@ func (c *Adaptor) translateDigitalPin(id string) (string, int, error) {
 	return "", -1, fmt.Errorf("'%s' is not a valid id for a digital pin", id)
 }
 
-func (c *Adaptor) translatePwmPin(pin string) (fn string, err error) {
+func (c *Adaptor) translatePwmPin(pin string) (string, error) {
 	if fn, ok := pwmPins[pin]; ok {
 		return fn, nil
 	}

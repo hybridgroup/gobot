@@ -1,3 +1,4 @@
+//nolint:forcetypeassert // ok here
 package aio
 
 import (
@@ -8,6 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -41,9 +43,8 @@ func TestGroveTemperatureSensorDriverScaling(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			a.analogReadFunc = func() (val int, err error) {
-				val = tt.input
-				return
+			a.analogReadFunc = func() (int, error) {
+				return tt.input, nil
 			}
 			// act
 			got, err := d.Read()
@@ -59,9 +60,8 @@ func TestGroveTempSensorPublishesTemperatureInCelsius(t *testing.T) {
 	a := newAioTestAdaptor()
 	d := NewGroveTemperatureSensorDriver(a, "1")
 
-	a.analogReadFunc = func() (val int, err error) {
-		val = 585
-		return
+	a.analogReadFunc = func() (int, error) {
+		return 585, nil
 	}
 	_ = d.Once(d.Event(Value), func(data interface{}) {
 		assert.Equal(t, "31.62", fmt.Sprintf("%.2f", data.(float64)))

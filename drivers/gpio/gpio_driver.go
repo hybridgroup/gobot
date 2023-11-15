@@ -2,6 +2,7 @@ package gpio
 
 import (
 	"errors"
+	"log"
 	"sync"
 
 	"gobot.io/x/gobot/v2"
@@ -47,17 +48,17 @@ const (
 
 // PwmWriter interface represents an Adaptor which has Pwm capabilities
 type PwmWriter interface {
-	PwmWrite(pin string, val byte) (err error)
+	PwmWrite(pin string, val byte) error
 }
 
 // ServoWriter interface represents an Adaptor which has Servo capabilities
 type ServoWriter interface {
-	ServoWrite(pin string, val byte) (err error)
+	ServoWrite(pin string, val byte) error
 }
 
 // DigitalWriter interface represents an Adaptor which has DigitalWrite capabilities
 type DigitalWriter interface {
-	DigitalWrite(pin string, val byte) (err error)
+	DigitalWrite(pin string, val byte) error
 }
 
 // DigitalReader interface represents an Adaptor which has DigitalRead capabilities
@@ -101,7 +102,12 @@ func (d *Driver) SetName(name string) {
 
 // Connection returns the connection of the gpio device.
 func (d *Driver) Connection() gobot.Connection {
-	return d.connection.(gobot.Connection)
+	if conn, ok := d.connection.(gobot.Connection); ok {
+		return conn
+	}
+
+	log.Printf("%s has no gobot connection\n", d.name)
+	return nil
 }
 
 // Start initializes the gpio device.

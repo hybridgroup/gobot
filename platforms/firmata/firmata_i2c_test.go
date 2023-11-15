@@ -1,6 +1,7 @@
 //go:build !windows
 // +build !windows
 
+//nolint:forcetypeassert // ok here
 package firmata
 
 import (
@@ -10,6 +11,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/i2c"
 	"gobot.io/x/gobot/v2/platforms/firmata/client"
