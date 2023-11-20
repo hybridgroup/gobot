@@ -127,20 +127,20 @@ func NewYL40Driver(a Connector, options ...func(Config)) *YL40Driver {
 	}
 
 	// initialize analog drivers
-	y.aBri = aio.NewAnalogSensorDriver(pcf, yl40Pins[YL40Bri], y.conf.sensors[YL40Bri].interval)
-	y.aTemp = aio.NewTemperatureSensorDriver(pcf, yl40Pins[YL40Temp], y.conf.sensors[YL40Temp].interval)
-	y.aAIN2 = aio.NewAnalogSensorDriver(pcf, yl40Pins[YL40AIN2], y.conf.sensors[YL40AIN2].interval)
-	y.aPoti = aio.NewAnalogSensorDriver(pcf, yl40Pins[YL40Poti], y.conf.sensors[YL40Poti].interval)
-	y.aOut = aio.NewAnalogActuatorDriver(pcf, yl40Pins[YL40AOUT])
-
-	// set input scalers
-	y.aBri.SetScaler(y.conf.sensors[YL40Bri].scaler)
-	y.aTemp.SetScaler(y.conf.sensors[YL40Temp].scaler)
-	y.aAIN2.SetScaler(y.conf.sensors[YL40AIN2].scaler)
-	y.aPoti.SetScaler(y.conf.sensors[YL40Poti].scaler)
-
-	// set output scaler
-	y.aOut.SetScaler(y.conf.aOutScaler)
+	y.aBri = aio.NewAnalogSensorDriver(pcf, yl40Pins[YL40Bri],
+		aio.WithSensorCyclicRead(y.conf.sensors[YL40Bri].interval),
+		aio.WithSensorScaler(y.conf.sensors[YL40Bri].scaler))
+	y.aTemp = aio.NewTemperatureSensorDriver(pcf, yl40Pins[YL40Temp],
+		aio.WithSensorCyclicRead(y.conf.sensors[YL40Temp].interval),
+		aio.WithSensorScaler(y.conf.sensors[YL40Temp].scaler))
+	y.aAIN2 = aio.NewAnalogSensorDriver(pcf, yl40Pins[YL40AIN2],
+		aio.WithSensorCyclicRead(y.conf.sensors[YL40AIN2].interval),
+		aio.WithSensorScaler(y.conf.sensors[YL40AIN2].scaler))
+	y.aPoti = aio.NewAnalogSensorDriver(pcf, yl40Pins[YL40Poti],
+		aio.WithSensorCyclicRead(y.conf.sensors[YL40Poti].interval),
+		aio.WithSensorScaler(y.conf.sensors[YL40Poti].scaler))
+	y.aOut = aio.NewAnalogActuatorDriver(pcf, yl40Pins[YL40AOUT],
+		aio.WithActuatorScaler(y.conf.aOutScaler))
 
 	return y
 }

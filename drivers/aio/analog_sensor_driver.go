@@ -1,56 +1,79 @@
 package aio
 
 import (
-	"log"
-	"sync"
+	"fmt"
 	"time"
 
 	"gobot.io/x/gobot/v2"
 )
 
-// AnalogSensorDriver represents an Analog Sensor
-type AnalogSensorDriver struct {
-	name       string
-	pin        string
-	halt       chan bool
-	interval   time.Duration
-	connection AnalogReader
-	gobot.Eventer
-	gobot.Commander
-	rawValue int
-	value    float64
-	scale    func(input int) (value float64)
-	mutex    *sync.Mutex // to prevent data race between cyclic and single shot write/read to values and scaler
+// sensorOptionApplier needs to be implemented by each configurable option type
+type sensorOptionApplier interface {
+	apply(cfg *sensorConfiguration)
 }
 
-// NewAnalogSensorDriver returns a new AnalogSensorDriver with a polling interval of
-// 10 Milliseconds given an AnalogReader and pin.
-// The driver supports customizable scaling from read int value to returned float64.
+// sensorConfiguration contains all changeable attributes of the driver.
+type sensorConfiguration struct {
+	readInterval time.Duration
+	scale        func(input int) (value float64)
+}
+
+// sensorReadIntervalOption is the type for applying another read interval to the configuration
+type sensorReadIntervalOption time.Duration
+
+// sensorScaleOption is the type for applying another scaler to the configuration
+type sensorScaleOption struct {
+	scaler func(input int) (value float64)
+}
+
+// AnalogSensorDriver represents an Analog Sensor
+type AnalogSensorDriver struct {
+	*driver
+	sensorCfg *sensorConfiguration
+	pin       string
+	halt      chan bool
+	gobot.Eventer
+	lastRawValue int
+	lastValue    float64
+}
+
+// NewAnalogSensorDriver returns a new driver for analog sensors, given an AnalogReader and pin.
+// The driver supports cyclic reading and customizable scaling from read int value to returned float64.
 // The default scaling is 1:1. An adjustable linear scaler is provided by the driver.
 //
-// Optionally accepts:
+// Supported options:
 //
-//	time.Duration: Interval at which the AnalogSensor is polled for new information
+//	"WithName"
+//	"WithSensorCyclicRead"
+//	"WithSensorScaler"
 //
 // Adds the following API Commands:
 //
 //	"Read"    - See AnalogDriverSensor.Read
 //	"ReadRaw" - See AnalogDriverSensor.ReadRaw
-func NewAnalogSensorDriver(a AnalogReader, pin string, v ...time.Duration) *AnalogSensorDriver {
+func NewAnalogSensorDriver(a AnalogReader, pin string, opts ...interface{}) *AnalogSensorDriver {
 	d := &AnalogSensorDriver{
-		name:       gobot.DefaultName("AnalogSensor"),
-		connection: a,
-		pin:        pin,
-		Eventer:    gobot.NewEventer(),
-		Commander:  gobot.NewCommander(),
-		interval:   10 * time.Millisecond,
-		halt:       make(chan bool),
-		scale:      func(input int) float64 { return float64(input) },
-		mutex:      &sync.Mutex{},
+		driver:    newDriver(a, "AnalogSensor"),
+		sensorCfg: &sensorConfiguration{scale: func(input int) float64 { return float64(input) }},
+		pin:       pin,
+		Eventer:   gobot.NewEventer(),
+		halt:      make(chan bool),
 	}
+	d.afterStart = d.initialize
+	d.beforeHalt = d.shutdown
 
-	if len(v) > 0 {
-		d.interval = v[0]
+	for _, opt := range opts {
+		switch o := opt.(type) {
+		case optionApplier:
+			o.apply(d.driverCfg)
+		case sensorOptionApplier:
+			o.apply(d.sensorCfg)
+		case time.Duration:
+			// TODO this is only for backward compatibility and will be removed after version 2.x
+			d.sensorCfg.readInterval = o
+		default:
+			panic(fmt.Sprintf("'%s' can not be applied on '%s'", opt, d.driverCfg.name))
+		}
 	}
 
 	d.AddEvent(Data)
@@ -70,21 +93,40 @@ func NewAnalogSensorDriver(a AnalogReader, pin string, v ...time.Duration) *Anal
 	return d
 }
 
-// Start starts the AnalogSensorDriver and reads the sensor at the given interval.
+// WithSensorCyclicRead add a asynchronous cyclic reading functionality to the sensor with the given read interval.
+func WithSensorCyclicRead(interval time.Duration) sensorOptionApplier {
+	return sensorReadIntervalOption(interval)
+}
+
+// WithSensorScaler substitute the default 1:1 return value function by a new scaling function
+func WithSensorScaler(scaler func(input int) (value float64)) sensorOptionApplier {
+	return sensorScaleOption{scaler: scaler}
+}
+
+// SetScaler substitute the default 1:1 return value function by a new scaling function
+// If the scaler is not changed after initialization, prefer to use [aio.WithSensorScaler] instead.
+func (a *AnalogSensorDriver) SetScaler(scaler func(int) float64) {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
+
+	WithSensorScaler(scaler).apply(a.sensorCfg)
+}
+
+// initialize the AnalogSensorDriver and if the cyclic reading is active, reads the sensor at the given interval.
 // Emits the Events:
 //
 //	Data int - Event is emitted on change and represents the current raw reading from the sensor.
 //	Value float64 - Event is emitted on change and represents the current reading from the sensor.
 //	Error error - Event is emitted on error reading from the sensor.
-func (a *AnalogSensorDriver) Start() error {
-	if a.interval == 0 {
+func (a *AnalogSensorDriver) initialize() error {
+	if a.sensorCfg.readInterval == 0 {
 		// cyclic reading deactivated
 		return nil
 	}
 	oldRawValue := 0
 	oldValue := 0.0
 	go func() {
-		timer := time.NewTimer(a.interval)
+		timer := time.NewTimer(a.sensorCfg.readInterval)
 		timer.Stop()
 		for {
 			rawValue, value, err := a.analogRead()
@@ -101,7 +143,7 @@ func (a *AnalogSensorDriver) Start() error {
 				}
 			}
 
-			timer.Reset(a.interval)
+			timer.Reset(a.sensorCfg.readInterval)
 			select {
 			case <-timer.C:
 			case <-a.halt:
@@ -113,9 +155,9 @@ func (a *AnalogSensorDriver) Start() error {
 	return nil
 }
 
-// Halt stops polling the analog sensor for new information
-func (a *AnalogSensorDriver) Halt() error {
-	if a.interval == 0 {
+// shutdown stops polling the analog sensor for new information
+func (a *AnalogSensorDriver) shutdown() error {
+	if a.sensorCfg.readInterval == 0 {
 		// cyclic reading deactivated
 		return nil
 	}
@@ -123,24 +165,8 @@ func (a *AnalogSensorDriver) Halt() error {
 	return nil
 }
 
-// Name returns the AnalogSensorDrivers name
-func (a *AnalogSensorDriver) Name() string { return a.name }
-
-// SetName sets the AnalogSensorDrivers name
-func (a *AnalogSensorDriver) SetName(n string) { a.name = n }
-
 // Pin returns the AnalogSensorDrivers pin
 func (a *AnalogSensorDriver) Pin() string { return a.pin }
-
-// Connection returns the AnalogSensorDrivers Connection
-func (a *AnalogSensorDriver) Connection() gobot.Connection {
-	if conn, ok := a.connection.(gobot.Connection); ok {
-		return conn
-	}
-
-	log.Printf("%s has no gobot connection\n", a.name)
-	return nil
-}
 
 // Read returns the current reading from the sensor, scaled by the current scaler
 func (a *AnalogSensorDriver) Read() (float64, error) {
@@ -154,20 +180,12 @@ func (a *AnalogSensorDriver) ReadRaw() (int, error) {
 	return rawValue, err
 }
 
-// SetScaler substitute the default 1:1 return value function by a new scaling function
-func (a *AnalogSensorDriver) SetScaler(scaler func(int) float64) {
-	a.mutex.Lock()
-	defer a.mutex.Unlock()
-
-	a.scale = scaler
-}
-
 // Value returns the last read value from the sensor
 func (a *AnalogSensorDriver) Value() float64 {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
-	return a.value
+	return a.lastValue
 }
 
 // RawValue returns the last read raw value from the sensor
@@ -175,7 +193,7 @@ func (a *AnalogSensorDriver) RawValue() int {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
-	return a.rawValue
+	return a.lastRawValue
 }
 
 // analogRead performs an reading from the sensor and sets the internal attributes and returns the raw and scaled value
@@ -183,14 +201,35 @@ func (a *AnalogSensorDriver) analogRead() (int, float64, error) {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
-	rawValue, err := a.connection.AnalogRead(a.Pin())
+	reader, ok := a.connection.(AnalogReader)
+	if !ok {
+		return 0, 0, fmt.Errorf("AnalogRead is not supported by the platform '%s'", a.Connection().Name())
+	}
+
+	rawValue, err := reader.AnalogRead(a.Pin())
 	if err != nil {
 		return 0, 0, err
 	}
 
-	a.rawValue = rawValue
-	a.value = a.scale(a.rawValue)
-	return a.rawValue, a.value, nil
+	a.lastRawValue = rawValue
+	a.lastValue = a.sensorCfg.scale(a.lastRawValue)
+	return a.lastRawValue, a.lastValue, nil
+}
+
+func (o sensorReadIntervalOption) String() string {
+	return "read interval option for analog sensors"
+}
+
+func (o sensorScaleOption) String() string {
+	return "scaler option for analog sensors"
+}
+
+func (o sensorReadIntervalOption) apply(cfg *sensorConfiguration) {
+	cfg.readInterval = time.Duration(o)
+}
+
+func (o sensorScaleOption) apply(cfg *sensorConfiguration) {
+	cfg.scale = o.scaler
 }
 
 // AnalogSensorLinearScaler creates a linear scaler function from the given values.

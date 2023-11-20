@@ -253,13 +253,13 @@ func TestADS1015_rawRead(t *testing.T) {
 	// arrange
 	channel := 0
 	channelOffset := 1
-	for name, tt := range tests {
+	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			a.written = []byte{} // reset writes of Start() and former test
 			// arrange reads
 			conversion := []uint8{0x00, 0x00}   // a conversion is in progress
 			noConversion := []uint8{0x80, 0x00} // no conversion in progress
-			returnRead := [3][]uint8{conversion, noConversion, tt.input}
+			returnRead := [3][]uint8{conversion, noConversion, tc.input}
 			numCallsRead := 0
 			a.i2cReadImpl = func(b []byte) (int, error) {
 				numCallsRead++
@@ -268,15 +268,15 @@ func TestADS1015_rawRead(t *testing.T) {
 				return len(b), nil
 			}
 			// act
-			got, err := d.rawRead(channel, channelOffset, tt.gain, tt.dataRate)
+			got, err := d.rawRead(channel, channelOffset, tc.gain, tc.dataRate)
 			// assert
 			require.NoError(t, err)
-			assert.Equal(t, tt.want, got)
+			assert.Equal(t, tc.want, got)
 			assert.Equal(t, 3, numCallsRead)
 			assert.Len(t, a.written, 6)
 			assert.Equal(t, uint8(ads1x15PointerConfig), a.written[0])
-			assert.Equal(t, tt.wantConfig[0], a.written[1])            // MSByte: OS, MUX, PGA, MODE
-			assert.Equal(t, tt.wantConfig[1], a.written[2])            // LSByte: DR, COMP_*
+			assert.Equal(t, tc.wantConfig[0], a.written[1])            // MSByte: OS, MUX, PGA, MODE
+			assert.Equal(t, tc.wantConfig[1], a.written[2])            // LSByte: DR, COMP_*
 			assert.Equal(t, uint8(ads1x15PointerConfig), a.written[3]) // first check for no conversion
 			assert.Equal(t, uint8(ads1x15PointerConfig), a.written[4]) // second check for no conversion
 			assert.Equal(t, uint8(ads1x15PointerConversion), a.written[5])

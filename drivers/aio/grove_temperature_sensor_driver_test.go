@@ -15,15 +15,54 @@ import (
 
 var _ gobot.Driver = (*GroveTemperatureSensorDriver)(nil)
 
-func TestGroveTemperatureSensorDriver(t *testing.T) {
-	testAdaptor := newAioTestAdaptor()
-	d := NewGroveTemperatureSensorDriver(testAdaptor, "123")
-	assert.Equal(t, testAdaptor, d.Connection())
-	assert.Equal(t, "123", d.Pin())
-	assert.Equal(t, 10*time.Millisecond, d.interval)
+func TestNewGroveTemperatureSensorDriver(t *testing.T) {
+	// arrange
+	const pin = "123"
+	a := newAioTestAdaptor()
+	// act
+	d := NewGroveTemperatureSensorDriver(a, pin)
+	// assert: driver attributes
+	assert.IsType(t, &GroveTemperatureSensorDriver{}, d)
+	assert.NotNil(t, d.driverCfg)
+	assert.True(t, strings.HasPrefix(d.Name(), "GroveTemperatureSensor"))
+	assert.Equal(t, a, d.Connection())
+	require.NoError(t, d.afterStart())
+	require.NoError(t, d.beforeHalt())
+	assert.NotNil(t, d.Commander)
+	assert.NotNil(t, d.mutex)
+	// assert: sensor attributes
+	assert.Equal(t, pin, d.Pin())
+	assert.InDelta(t, 0.0, d.lastValue, 0, 0)
+	assert.Equal(t, 0, d.lastRawValue)
+	assert.NotNil(t, d.halt)
+	assert.NotNil(t, d.Eventer)
+	require.NotNil(t, d.sensorCfg)
+	assert.Equal(t, time.Duration(0), d.sensorCfg.readInterval)
+	assert.NotNil(t, d.sensorCfg.scale)
 }
 
-func TestGroveTemperatureSensorDriverScaling(t *testing.T) {
+func TestNewGroveTemperatureSensorDriver_options(t *testing.T) {
+	// This is a general test, that options are applied in constructor by using the common WithName() option, least one
+	// option of this driver and one of another driver (which should lead to panic). Further tests for options can also
+	// be done by call of "WithOption(val).apply(cfg)".
+	// arrange
+	const (
+		myName     = "inlet temperature"
+		cycReadDur = 10 * time.Millisecond
+	)
+	panicFunc := func() {
+		NewGroveTemperatureSensorDriver(newAioTestAdaptor(), "1", WithName("crazy"),
+			WithActuatorScaler(func(float64) int { return 0 }))
+	}
+	// act
+	d := NewGroveTemperatureSensorDriver(newAioTestAdaptor(), "1", WithName(myName), WithSensorCyclicRead(cycReadDur))
+	// assert
+	assert.Equal(t, cycReadDur, d.sensorCfg.readInterval)
+	assert.Equal(t, myName, d.Name())
+	assert.PanicsWithValue(t, "'scaler option for analog actuators' can not be applied on 'crazy'", panicFunc)
+}
+
+func TestGroveTemperatureSensorRead_scaler(t *testing.T) {
 	tests := map[string]struct {
 		input int
 		want  float64
@@ -40,25 +79,26 @@ func TestGroveTemperatureSensorDriverScaling(t *testing.T) {
 	}
 	a := newAioTestAdaptor()
 	d := NewGroveTemperatureSensorDriver(a, "54")
-	for name, tt := range tests {
+	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
 			a.analogReadFunc = func() (int, error) {
-				return tt.input, nil
+				return tc.input, nil
 			}
 			// act
 			got, err := d.Read()
 			// assert
 			require.NoError(t, err)
-			assert.InDelta(t, tt.want, got, 0.0)
+			assert.InDelta(t, tc.want, got, 0.0)
 		})
 	}
 }
 
-func TestGroveTempSensorPublishesTemperatureInCelsius(t *testing.T) {
-	sem := make(chan bool, 1)
+func TestGroveTemperatureSensor_publishesTemperatureInCelsius(t *testing.T) {
+	// arrange
+	sem := make(chan bool)
 	a := newAioTestAdaptor()
-	d := NewGroveTemperatureSensorDriver(a, "1")
+	d := NewGroveTemperatureSensorDriver(a, "1", WithSensorCyclicRead(10*time.Millisecond))
 
 	a.analogReadFunc = func() (int, error) {
 		return 585, nil
@@ -67,18 +107,16 @@ func TestGroveTempSensorPublishesTemperatureInCelsius(t *testing.T) {
 		assert.Equal(t, "31.62", fmt.Sprintf("%.2f", data.(float64)))
 		sem <- true
 	})
+
+	// act: start cyclic reading
 	require.NoError(t, d.Start())
 
+	// assert: value was published
 	select {
 	case <-sem:
 	case <-time.After(1 * time.Second):
-		t.Errorf("Grove Temperature Sensor Event \"Data\" was not published")
+		t.Errorf("Grove Temperature Sensor Event \"Value\" was not published")
 	}
 
 	assert.InDelta(t, 31.61532462352477, d.Temperature(), 0.0)
-}
-
-func TestGroveTempDriverDefaultName(t *testing.T) {
-	d := NewGroveTemperatureSensorDriver(newAioTestAdaptor(), "1")
-	assert.True(t, strings.HasPrefix(d.Name(), "GroveTemperatureSensor"))
 }

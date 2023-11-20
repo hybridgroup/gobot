@@ -32,16 +32,16 @@ func TestServoDriver(t *testing.T) {
 	}
 
 	err = d.Command("Min")(nil)
-	require.ErrorContains(t, err.(error), "pwm error")
+	require.EqualError(t, err.(error), "pwm error")
 
 	err = d.Command("Center")(nil)
-	require.ErrorContains(t, err.(error), "pwm error")
+	require.EqualError(t, err.(error), "pwm error")
 
 	err = d.Command("Max")(nil)
-	require.ErrorContains(t, err.(error), "pwm error")
+	require.EqualError(t, err.(error), "pwm error")
 
 	err = d.Command("Move")(map[string]interface{}{"angle": 100.0})
-	require.ErrorContains(t, err.(error), "pwm error")
+	require.EqualError(t, err.(error), "pwm error")
 }
 
 func TestServoDriverStart(t *testing.T) {
