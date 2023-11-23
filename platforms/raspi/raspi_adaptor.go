@@ -24,6 +24,13 @@ const (
 	defaultSpiMaxSpeed   = 500000
 )
 
+type analogPinDefinition struct {
+	path   string
+	r      bool // readable
+	w      bool // writable
+	bufLen uint16
+}
+
 // Adaptor is the Gobot Adaptor for the Raspberry Pi
 type Adaptor struct {
 	name     string
@@ -31,6 +38,7 @@ type Adaptor struct {
 	sys      *system.Accesser
 	revision string
 	pwmPins  map[string]gobot.PWMPinner
+	*adaptors.AnalogPinsAdaptor
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.I2cBusAdaptor
 	*adaptors.SpiBusAdaptor
@@ -41,13 +49,13 @@ type Adaptor struct {
 //
 // Optional parameters:
 //
-//			adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs (still used by default)
-//			adaptors.WithSpiGpioAccess(sclk, nss, mosi, miso):	use GPIO's instead of /dev/spidev#.#
-//	   adaptors.WithGpiosActiveLow(pin's): invert the pin behavior
-//	   adaptors.WithGpiosPullUp/Down(pin's): sets the internal pull resistor
-//	   adaptors.WithGpiosOpenDrain/Source(pin's): sets the output behavior
-//	   adaptors.WithGpioDebounce(pin, period): sets the input debouncer
-//	   adaptors.WithGpioEventOnFallingEdge/RaisingEdge/BothEdges(pin, handler): activate edge detection
+//	adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs (still used by default)
+//	adaptors.WithSpiGpioAccess(sclk, nss, mosi, miso):	use GPIO's instead of /dev/spidev#.#
+//	adaptors.WithGpiosActiveLow(pin's): invert the pin behavior
+//	adaptors.WithGpiosPullUp/Down(pin's): sets the internal pull resistor
+//	adaptors.WithGpiosOpenDrain/Source(pin's): sets the output behavior
+//	adaptors.WithGpioDebounce(pin, period): sets the input debouncer
+//	adaptors.WithGpioEventOnFallingEdge/RaisingEdge/BothEdges(pin, handler): activate edge detection
 func NewAdaptor(opts ...func(adaptors.Optioner)) *Adaptor {
 	sys := system.NewAccesser(system.WithDigitalPinGpiodAccess())
 	c := &Adaptor{
@@ -55,6 +63,7 @@ func NewAdaptor(opts ...func(adaptors.Optioner)) *Adaptor {
 		sys:             sys,
 		PiBlasterPeriod: 10000000,
 	}
+	c.AnalogPinsAdaptor = adaptors.NewAnalogPinsAdaptor(sys, c.translateAnalogPin)
 	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.getPinTranslatorFunction(), opts...)
 	c.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, c.validateI2cBusNumber, 1)
 	c.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, c.validateSpiBusNumber, defaultSpiBusNumber, defaultSpiChipNumber,
@@ -91,6 +100,10 @@ func (c *Adaptor) Connect() error {
 		return err
 	}
 
+	if err := c.AnalogPinsAdaptor.Connect(); err != nil {
+		return err
+	}
+
 	c.pwmPins = make(map[string]gobot.PWMPinner)
 	return c.DigitalPinsAdaptor.Connect()
 }
@@ -110,6 +123,10 @@ func (c *Adaptor) Finalize() error {
 		}
 	}
 	c.pwmPins = nil
+
+	if e := c.AnalogPinsAdaptor.Finalize(); e != nil {
+		err = multierror.Append(err, e)
+	}
 
 	if e := c.I2cBusAdaptor.Finalize(); e != nil {
 		err = multierror.Append(err, e)
@@ -182,6 +199,24 @@ func (c *Adaptor) validateI2cBusNumber(busNr int) error {
 		return fmt.Errorf("Bus number %d out of range", busNr)
 	}
 	return nil
+}
+
+func (c *Adaptor) translateAnalogPin(id string) (string, bool, bool, uint16, error) {
+	pinInfo, ok := analogPinDefinitions[id]
+	if !ok {
+		return "", false, false, 0, fmt.Errorf("'%s' is not a valid id for a analog pin", id)
+	}
+
+	path := pinInfo.path
+	info, err := c.sys.Stat(path)
+	if err != nil {
+		return "", false, false, 0, fmt.Errorf("Error (%v) on access '%s'", err, path)
+	}
+	if info.IsDir() {
+		return "", false, false, 0, fmt.Errorf("The item '%s' is a directory, which is not expected", path)
+	}
+
+	return path, pinInfo.r, pinInfo.w, pinInfo.bufLen, nil
 }
 
 func (c *Adaptor) getPinTranslatorFunction() func(string) (string, int, error) {

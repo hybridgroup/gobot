@@ -298,12 +298,15 @@ Support for many devices that use Analog Input/Output (AIO) have
 a shared set of drivers provided using the `gobot/drivers/aio` package:
 
 - [AIO](https://en.wikipedia.org/wiki/Analog-to-digital_converter) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/aio)
+  - Analog Actuator
   - Analog Sensor
   - Grove Light Sensor
   - Grove Piezo Vibration Sensor
   - Grove Rotary Dial
   - Grove Sound Sensor
   - Grove Temperature Sensor
+  - Temperature Sensor (supports linear and NTC thermistor in normal and inverse mode)
+  - Thermal Zone Temperature Sensor
 
 Support for devices that use Inter-Integrated Circuit (I2C) have a shared set of
 drivers provided using the `gobot/drivers/i2c` package:

@@ -23,3 +23,8 @@ var neoPwmPins = map[string]pwmPinDefinition{
 	// UART_RXD0, GPIOA5, PWM
 	"PWM": {dir: "/sys/devices/platform/soc/1c21400.pwm/pwm/", dirRegexp: "pwmchip[0]$", channel: 0},
 }
+
+var analogPinDefinitions = map[string]analogPinDefinition{
+	// +/-273.200 °C need >=7 characters to read: +/-273200 millidegree Celsius
+	"thermal_zone0": {path: "/sys/class/thermal/thermal_zone0/temp", r: true, w: false, bufLen: 7},
+}

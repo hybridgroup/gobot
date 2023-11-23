@@ -128,7 +128,7 @@ func TestTemperatureSensorDriver_LinearScaler(t *testing.T) {
 	}
 }
 
-func TestTemperatureSensorPublishesTemperatureInCelsius(t *testing.T) {
+func TestTemperatureSensorWithSensorCyclicRead_PublishesTemperatureInCelsius(t *testing.T) {
 	// arrange
 	sem := make(chan bool)
 	a := newAioTestAdaptor()
@@ -155,7 +155,7 @@ func TestTemperatureSensorPublishesTemperatureInCelsius(t *testing.T) {
 	assert.InDelta(t, 31.61532462352477, d.Value(), 0.0)
 }
 
-func TestTemperatureSensorWithSensorCyclicReadPublishesError(t *testing.T) {
+func TestTemperatureSensorWithSensorCyclicRead_PublishesError(t *testing.T) {
 	// arrange
 	sem := make(chan bool)
 	a := newAioTestAdaptor()
