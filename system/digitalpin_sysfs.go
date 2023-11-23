@@ -3,7 +3,6 @@ package system
 import (
 	"errors"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"strconv"
@@ -24,21 +23,25 @@ var errNotExported = errors.New("pin has not been exported")
 type digitalPinSysfs struct {
 	pin string
 	*digitalPinConfig
-	fs filesystem
+	sfa *sysfsFileAccess
 
-	dirFile       File
-	valFile       File
-	activeLowFile File
+	dirFile       *sysfsFile
+	valFile       *sysfsFile
+	activeLowFile *sysfsFile
 }
 
 // newDigitalPinSysfs returns a digital pin using for the given number. The name of the sysfs file will prepend "gpio"
 // to the pin number, eg. a pin number of 10 will have a name of "gpio10". The pin is handled by the sysfs Kernel ABI.
-func newDigitalPinSysfs(fs filesystem, pin string, options ...func(gobot.DigitalPinOptioner) bool) *digitalPinSysfs {
+func newDigitalPinSysfs(
+	sfa *sysfsFileAccess,
+	pin string,
+	options ...func(gobot.DigitalPinOptioner) bool,
+) *digitalPinSysfs {
 	cfg := newDigitalPinConfig("gpio"+pin, options...)
 	d := &digitalPinSysfs{
 		pin:              pin,
 		digitalPinConfig: cfg,
-		fs:               fs,
+		sfa:              sfa,
 	}
 	return d
 }
@@ -68,26 +71,26 @@ func (d *digitalPinSysfs) Export() error {
 
 // Unexport release the pin
 func (d *digitalPinSysfs) Unexport() error {
-	unexport, err := d.fs.openFile(gpioPath+"/unexport", os.O_WRONLY, 0o644)
+	unexport, err := d.sfa.openWrite(gpioPath + "/unexport")
 	if err != nil {
 		return err
 	}
-	defer unexport.Close()
+	defer unexport.close()
 
 	if d.dirFile != nil {
-		d.dirFile.Close()
+		d.dirFile.close()
 		d.dirFile = nil
 	}
 	if d.valFile != nil {
-		d.valFile.Close()
+		d.valFile.close()
 		d.valFile = nil
 	}
 	if d.activeLowFile != nil {
-		d.activeLowFile.Close()
+		d.activeLowFile.close()
 		d.activeLowFile = nil
 	}
 
-	err = writeFile(unexport, []byte(d.pin))
+	err = unexport.write([]byte(d.pin))
 	if err != nil {
 		// If EINVAL then the pin is reserved in the system and can't be unexported, we suppress the error
 		var pathError *os.PathError
@@ -101,13 +104,19 @@ func (d *digitalPinSysfs) Unexport() error {
 
 // Write writes the given value to the character device
 func (d *digitalPinSysfs) Write(b int) error {
-	err := writeFile(d.valFile, []byte(strconv.Itoa(b)))
+	if d.valFile == nil {
+		return errNotExported
+	}
+	err := d.valFile.write([]byte(strconv.Itoa(b)))
 	return err
 }
 
-// Read reads the given value from character device
+// Read reads a value from character device
 func (d *digitalPinSysfs) Read() (int, error) {
-	buf, err := readFile(d.valFile)
+	if d.valFile == nil {
+		return 0, errNotExported
+	}
+	buf, err := d.valFile.read()
 	if err != nil {
 		return 0, err
 	}
@@ -115,13 +124,13 @@ func (d *digitalPinSysfs) Read() (int, error) {
 }
 
 func (d *digitalPinSysfs) reconfigure() error {
-	exportFile, err := d.fs.openFile(gpioPath+"/export", os.O_WRONLY, 0o644)
+	exportFile, err := d.sfa.openWrite(gpioPath + "/export")
 	if err != nil {
 		return err
 	}
-	defer exportFile.Close()
+	defer exportFile.close()
 
-	err = writeFile(exportFile, []byte(d.pin))
+	err = exportFile.write([]byte(d.pin))
 	if err != nil {
 		// If EBUSY then the pin has already been exported, we suppress the error
 		var pathError *os.PathError
@@ -131,13 +140,13 @@ func (d *digitalPinSysfs) reconfigure() error {
 	}
 
 	if d.dirFile != nil {
-		d.dirFile.Close()
+		d.dirFile.close()
 	}
 
 	attempt := 0
 	for {
 		attempt++
-		d.dirFile, err = d.fs.openFile(fmt.Sprintf("%s/%s/direction", gpioPath, d.label), os.O_RDWR, 0o644)
+		d.dirFile, err = d.sfa.openReadWrite(fmt.Sprintf("%s/%s/direction", gpioPath, d.label))
 		if err == nil {
 			break
 		}
@@ -148,10 +157,10 @@ func (d *digitalPinSysfs) reconfigure() error {
 	}
 
 	if d.valFile != nil {
-		d.valFile.Close()
+		d.valFile.close()
 	}
 	if err == nil {
-		d.valFile, err = d.fs.openFile(fmt.Sprintf("%s/%s/value", gpioPath, d.label), os.O_RDWR, 0o644)
+		d.valFile, err = d.sfa.openReadWrite(fmt.Sprintf("%s/%s/value", gpioPath, d.label))
 	}
 
 	// configure direction
@@ -162,9 +171,9 @@ func (d *digitalPinSysfs) reconfigure() error {
 	// configure inverse logic
 	if err == nil {
 		if d.activeLow {
-			d.activeLowFile, err = d.fs.openFile(fmt.Sprintf("%s/%s/active_low", gpioPath, d.label), os.O_RDWR, 0o644)
+			d.activeLowFile, err = d.sfa.openReadWrite(fmt.Sprintf("%s/%s/active_low", gpioPath, d.label))
 			if err == nil {
-				err = writeFile(d.activeLowFile, []byte("1"))
+				err = d.activeLowFile.write([]byte("1"))
 			}
 		}
 	}
@@ -211,48 +220,16 @@ func (d *digitalPinSysfs) reconfigure() error {
 }
 
 func (d *digitalPinSysfs) writeDirectionWithInitialOutput() error {
-	if err := writeFile(d.dirFile, []byte(d.direction)); err != nil || d.direction == IN {
+	if d.dirFile == nil {
+		return errNotExported
+	}
+	if err := d.dirFile.write([]byte(d.direction)); err != nil || d.direction == IN {
 		return err
 	}
-	err := writeFile(d.valFile, []byte(strconv.Itoa(d.outInitialState)))
-	return err
-}
 
-// Linux sysfs / GPIO specific sysfs docs.
-//  https://www.kernel.org/doc/Documentation/filesystems/sysfs.txt
-//  https://www.kernel.org/doc/Documentation/gpio/sysfs.txt
-
-var writeFile = func(f File, data []byte) error {
-	if f == nil {
+	if d.valFile == nil {
 		return errNotExported
 	}
 
-	// sysfs docs say:
-	// > When writing sysfs files, userspace processes should first read the
-	// > entire file, modify the values it wishes to change, then write the
-	// > entire buffer back.
-	// however, this seems outdated/inaccurate (docs are from back in the Kernel BitKeeper days).
-
-	// Write() returns already a non-nil error when n != len(b).
-	_, err := f.Write(data)
-	return err
-}
-
-var readFile = func(f File) ([]byte, error) {
-	if f == nil {
-		return nil, errNotExported
-	}
-
-	// sysfs docs say:
-	// > If userspace seeks back to zero or does a pread(2) with an offset of '0' the [..] method will
-	// > be called again, rearmed, to fill the buffer.
-
-	// TODO: Examine if seek is needed if full buffer is read from sysfs file.
-
-	buf := make([]byte, 2)
-	_, err := f.Seek(0, io.SeekStart)
-	if err == nil {
-		_, err = f.Read(buf)
-	}
-	return buf, err
+	return d.valFile.write([]byte(strconv.Itoa(d.outInitialState)))
 }

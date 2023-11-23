@@ -82,7 +82,7 @@ func TestNewAccesser_IsSysfsDigitalPinAccess(t *testing.T) {
 				assert.True(t, got)
 				dpaSys := a.digitalPinAccess.(*sysfsDigitalPinAccess)
 				assert.NotNil(t, dpaSys)
-				assert.Equal(t, a.fs.(*nativeFilesystem), dpaSys.fs)
+				assert.Equal(t, a.fs.(*nativeFilesystem), dpaSys.sfa.fs)
 			} else {
 				assert.False(t, got)
 				dpaGpiod := a.digitalPinAccess.(*gpiodDigitalPinAccess)

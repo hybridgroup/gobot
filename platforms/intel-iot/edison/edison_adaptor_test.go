@@ -364,7 +364,7 @@ func TestFinalize(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 
 	_ = a.DigitalWrite("3", 1)
-	_ = a.PwmWrite("5", 100)
+	require.NoError(t, a.PwmWrite("5", 100))
 
 	_, _ = a.GetI2cConnection(0xff, 6)
 	require.NoError(t, a.Finalize())
@@ -373,7 +373,7 @@ func TestFinalize(t *testing.T) {
 	require.NoError(t, a.Finalize())
 
 	// assert that re-connect is working
-	_ = a.Connect()
+	require.NoError(t, a.Connect())
 	// remove one file to force Finalize error
 	delete(fs.Files, "/sys/class/gpio/unexport")
 	err := a.Finalize()
@@ -384,7 +384,7 @@ func TestFinalize(t *testing.T) {
 func TestFinalizeError(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 
-	_ = a.PwmWrite("5", 100)
+	require.NoError(t, a.PwmWrite("5", 100))
 
 	fs.WithWriteError = true
 	err := a.Finalize()
@@ -397,10 +397,10 @@ func TestFinalizeError(t *testing.T) {
 func TestDigitalIO(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 
-	_ = a.DigitalWrite("13", 1)
+	require.NoError(t, a.DigitalWrite("13", 1))
 	assert.Equal(t, "1", fs.Files["/sys/class/gpio/gpio40/value"].Contents)
 
-	_ = a.DigitalWrite("2", 0)
+	require.NoError(t, a.DigitalWrite("2", 0))
 	i, err := a.DigitalRead("2")
 	require.NoError(t, err)
 	assert.Equal(t, 0, i)
@@ -411,7 +411,7 @@ func TestDigitalPinInFileError(t *testing.T) {
 	fs := a.sys.UseMockFilesystem(pwmMockPathsMux40)
 	delete(fs.Files, "/sys/class/gpio/gpio40/value")
 	delete(fs.Files, "/sys/class/gpio/gpio40/direction")
-	_ = a.Connect()
+	_ = a.Connect() // we drop this error
 
 	_, err := a.DigitalPin("13")
 	require.ErrorContains(t, err, "no such file")
@@ -422,7 +422,7 @@ func TestDigitalPinInResistorFileError(t *testing.T) {
 	fs := a.sys.UseMockFilesystem(pwmMockPathsMux40)
 	delete(fs.Files, "/sys/class/gpio/gpio229/value")
 	delete(fs.Files, "/sys/class/gpio/gpio229/direction")
-	_ = a.Connect()
+	_ = a.Connect() // we drop this error
 
 	_, err := a.DigitalPin("13")
 	require.ErrorContains(t, err, "no such file")
@@ -433,7 +433,7 @@ func TestDigitalPinInLevelShifterFileError(t *testing.T) {
 	fs := a.sys.UseMockFilesystem(pwmMockPathsMux40)
 	delete(fs.Files, "/sys/class/gpio/gpio261/value")
 	delete(fs.Files, "/sys/class/gpio/gpio261/direction")
-	_ = a.Connect()
+	_ = a.Connect() // we drop this error
 
 	_, err := a.DigitalPin("13")
 	require.ErrorContains(t, err, "no such file")
@@ -444,7 +444,7 @@ func TestDigitalPinInMuxFileError(t *testing.T) {
 	fs := a.sys.UseMockFilesystem(pwmMockPathsMux40)
 	delete(fs.Files, "/sys/class/gpio/gpio243/value")
 	delete(fs.Files, "/sys/class/gpio/gpio243/direction")
-	_ = a.Connect()
+	_ = a.Connect() // we drop this error
 
 	_, err := a.DigitalPin("13")
 	require.ErrorContains(t, err, "no such file")
@@ -492,7 +492,7 @@ func TestPwmEnableError(t *testing.T) {
 	a := NewAdaptor()
 	fs := a.sys.UseMockFilesystem(pwmMockPathsMux13)
 	delete(fs.Files, "/sys/class/pwm/pwmchip0/pwm1/enable")
-	_ = a.Connect()
+	_ = a.Connect() // we drop this error
 
 	err := a.PwmWrite("5", 100)
 	require.ErrorContains(t, err, "/sys/class/pwm/pwmchip0/pwm1/enable: no such file")
@@ -526,7 +526,8 @@ func TestAnalog(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 	fs.Files["/sys/bus/iio/devices/iio:device1/in_voltage0_raw"].Contents = "1000\n"
 
-	i, _ := a.AnalogRead("0")
+	i, err := a.AnalogRead("0")
+	require.NoError(t, err)
 	assert.Equal(t, 250, i)
 }
 

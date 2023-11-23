@@ -72,7 +72,7 @@ func NewAccesser(options ...func(Optioner)) *Accesser {
 		fs:  &nativeFilesystem{},
 	}
 	s.spiAccess = &periphioSpiAccess{fs: s.fs}
-	s.digitalPinAccess = &sysfsDigitalPinAccess{fs: s.fs}
+	s.digitalPinAccess = &sysfsDigitalPinAccess{sfa: &sysfsFileAccess{fs: s.fs, readBufLen: 2}}
 	for _, option := range options {
 		option(s)
 	}
@@ -85,7 +85,7 @@ func (a *Accesser) UseDigitalPinAccessWithMockFs(digitalPinAccess string, files 
 	var dph digitalPinAccesser
 	switch digitalPinAccess {
 	case "sysfs":
-		dph = &sysfsDigitalPinAccess{fs: fs}
+		dph = &sysfsDigitalPinAccess{sfa: &sysfsFileAccess{fs: fs, readBufLen: 2}}
 	case "cdev":
 		dph = &gpiodDigitalPinAccess{fs: fs}
 	default:
@@ -135,7 +135,15 @@ func (a *Accesser) IsSysfsDigitalPinAccess() bool {
 
 // NewPWMPin returns a new system PWM pin, according to the given pin number.
 func (a *Accesser) NewPWMPin(path string, pin int, polNormIdent string, polInvIdent string) gobot.PWMPinner {
-	return newPWMPinSysfs(a.fs, path, pin, polNormIdent, polInvIdent)
+	sfa := &sysfsFileAccess{fs: a.fs, readBufLen: 200}
+	return newPWMPinSysfs(sfa, path, pin, polNormIdent, polInvIdent)
+}
+
+func (a *Accesser) NewAnalogPin(path string, r, w bool, readBufLen uint16) gobot.AnalogPinner {
+	if readBufLen == 0 {
+		readBufLen = 32 // max. count of characters for int value is 20
+	}
+	return newAnalogPinSysfs(&sysfsFileAccess{fs: a.fs, readBufLen: readBufLen}, path, r, w)
 }
 
 // NewSpiDevice returns a new connection to SPI with the given parameters.

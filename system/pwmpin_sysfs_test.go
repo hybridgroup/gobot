@@ -19,7 +19,8 @@ const (
 
 func initTestPWMPinSysFsWithMockedFilesystem(mockPaths []string) (*pwmPinSysFs, *MockFilesystem) {
 	fs := newMockFilesystem(mockPaths)
-	pin := newPWMPinSysfs(fs, "/sys/class/pwm/pwmchip0", 10, normal, inverted)
+	sfa := &sysfsFileAccess{fs: fs, readBufLen: 200}
+	pin := newPWMPinSysfs(sfa, "/sys/class/pwm/pwmchip0", 10, normal, inverted)
 	return pin, fs
 }
 
@@ -76,6 +77,7 @@ func TestPwmPin(t *testing.T) {
 }
 
 func TestPwmPinAlreadyExported(t *testing.T) {
+	// arrange
 	mockedPaths := []string{
 		"/sys/class/pwm/pwmchip0/export",
 		"/sys/class/pwm/pwmchip0/unexport",
@@ -83,17 +85,14 @@ func TestPwmPinAlreadyExported(t *testing.T) {
 		"/sys/class/pwm/pwmchip0/pwm10/period",
 		"/sys/class/pwm/pwmchip0/pwm10/duty_cycle",
 	}
-	pin, _ := initTestPWMPinSysFsWithMockedFilesystem(mockedPaths)
-
-	pin.write = func(filesystem, string, []byte) (int, error) {
-		return 0, &os.PathError{Err: Syscall_EBUSY}
-	}
-
-	// no error indicates that the pin was already exported
+	pin, fs := initTestPWMPinSysFsWithMockedFilesystem(mockedPaths)
+	fs.Files["/sys/class/pwm/pwmchip0/export"].simulateWriteError = &os.PathError{Err: Syscall_EBUSY}
+	// act & assert: no error indicates that the pin was already exported
 	require.NoError(t, pin.Export())
 }
 
 func TestPwmPinExportError(t *testing.T) {
+	// arrange
 	mockedPaths := []string{
 		"/sys/class/pwm/pwmchip0/export",
 		"/sys/class/pwm/pwmchip0/unexport",
@@ -101,18 +100,16 @@ func TestPwmPinExportError(t *testing.T) {
 		"/sys/class/pwm/pwmchip0/pwm10/period",
 		"/sys/class/pwm/pwmchip0/pwm10/duty_cycle",
 	}
-	pin, _ := initTestPWMPinSysFsWithMockedFilesystem(mockedPaths)
-
-	pin.write = func(filesystem, string, []byte) (int, error) {
-		return 0, &os.PathError{Err: Syscall_EFAULT}
-	}
-
-	// no error indicates that the pin was already exported
+	pin, fs := initTestPWMPinSysFsWithMockedFilesystem(mockedPaths)
+	fs.Files["/sys/class/pwm/pwmchip0/export"].simulateWriteError = &os.PathError{Err: Syscall_EFAULT}
+	// act
 	err := pin.Export()
+	// assert
 	require.ErrorContains(t, err, "Export() failed for id 10 with  : bad address")
 }
 
 func TestPwmPinUnxportError(t *testing.T) {
+	// arrange
 	mockedPaths := []string{
 		"/sys/class/pwm/pwmchip0/export",
 		"/sys/class/pwm/pwmchip0/unexport",
@@ -120,17 +117,16 @@ func TestPwmPinUnxportError(t *testing.T) {
 		"/sys/class/pwm/pwmchip0/pwm10/period",
 		"/sys/class/pwm/pwmchip0/pwm10/duty_cycle",
 	}
-	pin, _ := initTestPWMPinSysFsWithMockedFilesystem(mockedPaths)
-
-	pin.write = func(filesystem, string, []byte) (int, error) {
-		return 0, &os.PathError{Err: Syscall_EBUSY}
-	}
-
+	pin, fs := initTestPWMPinSysFsWithMockedFilesystem(mockedPaths)
+	fs.Files["/sys/class/pwm/pwmchip0/unexport"].simulateWriteError = &os.PathError{Err: Syscall_EBUSY}
+	// act
 	err := pin.Unexport()
+	// assert
 	require.ErrorContains(t, err, "Unexport() failed for id 10 with  : device or resource busy")
 }
 
 func TestPwmPinPeriodError(t *testing.T) {
+	// arrange
 	mockedPaths := []string{
 		"/sys/class/pwm/pwmchip0/export",
 		"/sys/class/pwm/pwmchip0/unexport",
@@ -138,35 +134,34 @@ func TestPwmPinPeriodError(t *testing.T) {
 		"/sys/class/pwm/pwmchip0/pwm10/period",
 		"/sys/class/pwm/pwmchip0/pwm10/duty_cycle",
 	}
-	pin, _ := initTestPWMPinSysFsWithMockedFilesystem(mockedPaths)
-
-	pin.read = func(filesystem, string) ([]byte, error) {
-		return nil, &os.PathError{Err: Syscall_EBUSY}
-	}
-
+	pin, fs := initTestPWMPinSysFsWithMockedFilesystem(mockedPaths)
+	fs.Files["/sys/class/pwm/pwmchip0/pwm10/period"].simulateReadError = &os.PathError{Err: Syscall_EBUSY}
+	// act
 	_, err := pin.Period()
+	// assert
 	require.ErrorContains(t, err, "Period() failed for id 10 with  : device or resource busy")
 }
 
 func TestPwmPinPolarityError(t *testing.T) {
+	// arrange
 	mockedPaths := []string{
 		"/sys/class/pwm/pwmchip0/export",
 		"/sys/class/pwm/pwmchip0/unexport",
 		"/sys/class/pwm/pwmchip0/pwm10/enable",
 		"/sys/class/pwm/pwmchip0/pwm10/period",
 		"/sys/class/pwm/pwmchip0/pwm10/duty_cycle",
+		"/sys/class/pwm/pwmchip0/pwm10/polarity",
 	}
-	pin, _ := initTestPWMPinSysFsWithMockedFilesystem(mockedPaths)
-
-	pin.read = func(filesystem, string) ([]byte, error) {
-		return nil, &os.PathError{Err: Syscall_EBUSY}
-	}
-
+	pin, fs := initTestPWMPinSysFsWithMockedFilesystem(mockedPaths)
+	fs.Files["/sys/class/pwm/pwmchip0/pwm10/polarity"].simulateReadError = &os.PathError{Err: Syscall_EBUSY}
+	// act
 	_, err := pin.Polarity()
+	// assert
 	require.ErrorContains(t, err, "Polarity() failed for id 10 with  : device or resource busy")
 }
 
 func TestPwmPinDutyCycleError(t *testing.T) {
+	// arrange
 	mockedPaths := []string{
 		"/sys/class/pwm/pwmchip0/export",
 		"/sys/class/pwm/pwmchip0/unexport",
@@ -174,12 +169,10 @@ func TestPwmPinDutyCycleError(t *testing.T) {
 		"/sys/class/pwm/pwmchip0/pwm10/period",
 		"/sys/class/pwm/pwmchip0/pwm10/duty_cycle",
 	}
-	pin, _ := initTestPWMPinSysFsWithMockedFilesystem(mockedPaths)
-
-	pin.read = func(filesystem, string) ([]byte, error) {
-		return nil, &os.PathError{Err: Syscall_EBUSY}
-	}
-
+	pin, fs := initTestPWMPinSysFsWithMockedFilesystem(mockedPaths)
+	fs.Files["/sys/class/pwm/pwmchip0/pwm10/duty_cycle"].simulateReadError = &os.PathError{Err: Syscall_EBUSY}
+	// act
 	_, err := pin.DutyCycle()
+	// assert
 	require.ErrorContains(t, err, "DutyCycle() failed for id 10 with  : device or resource busy")
 }

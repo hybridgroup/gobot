@@ -40,6 +40,7 @@ type Adaptor struct {
 	pinmap      map[string]sysfsPin
 	tristate    gobot.DigitalPinner
 	digitalPins map[int]gobot.DigitalPinner
+	*adaptors.AnalogPinsAdaptor
 	*adaptors.PWMPinsAdaptor
 	*adaptors.I2cBusAdaptor
 	arduinoI2cInitialized bool
@@ -58,6 +59,7 @@ func NewAdaptor(boardType ...string) *Adaptor {
 	if len(boardType) > 0 && boardType[0] != "" {
 		c.board = boardType[0]
 	}
+	c.AnalogPinsAdaptor = adaptors.NewAnalogPinsAdaptor(sys, c.translateAnalogPin)
 	c.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, c.translateAndMuxPWMPin,
 		adaptors.WithPWMPinInitializer(pwmPinInitializer))
 	defI2cBusNr := defaultI2cBusNumber
@@ -79,6 +81,10 @@ func (c *Adaptor) Connect() error {
 	c.digitalPins = make(map[int]gobot.DigitalPinner)
 
 	if err := c.I2cBusAdaptor.Connect(); err != nil {
+		return err
+	}
+
+	if err := c.AnalogPinsAdaptor.Connect(); err != nil {
 		return err
 	}
 
@@ -127,6 +133,10 @@ func (c *Adaptor) Finalize() error {
 		err = multierror.Append(err, e)
 	}
 
+	if e := c.AnalogPinsAdaptor.Finalize(); e != nil {
+		err = multierror.Append(err, e)
+	}
+
 	if e := c.I2cBusAdaptor.Finalize(); e != nil {
 		err = multierror.Append(err, e)
 	}
@@ -165,14 +175,12 @@ func (c *Adaptor) DigitalPin(id string) (gobot.DigitalPinner, error) {
 
 // AnalogRead returns value from analog reading of specified pin
 func (c *Adaptor) AnalogRead(pin string) (int, error) {
-	buf, err := c.readFile("/sys/bus/iio/devices/iio:device1/in_voltage" + pin + "_raw")
+	rawRead, err := c.AnalogPinsAdaptor.AnalogRead(pin)
 	if err != nil {
 		return 0, err
 	}
 
-	val, err := strconv.Atoi(string(buf[0 : len(buf)-1]))
-
-	return val / 4, err
+	return rawRead / 4, err
 }
 
 func (c *Adaptor) validateAndSetupI2cBusNumber(busNr int) error {
@@ -263,22 +271,6 @@ func (c *Adaptor) arduinoI2CSetup() error {
 	return c.tristate.Write(system.HIGH)
 }
 
-func (c *Adaptor) readFile(path string) ([]byte, error) {
-	file, err := c.sys.OpenFile(path, os.O_RDONLY, 0o644)
-	defer file.Close() //nolint:staticcheck // for historical reasons
-	if err != nil {
-		return make([]byte, 0), err
-	}
-
-	buf := make([]byte, 200)
-	var i int
-	i, err = file.Read(buf)
-	if i == 0 {
-		return buf, err
-	}
-	return buf[:i], err
-}
-
 func (c *Adaptor) digitalPin(id string, o ...func(gobot.DigitalPinOptioner) bool) (gobot.DigitalPinner, error) {
 	i := c.pinmap[id]
 
@@ -345,6 +337,16 @@ func pwmPinInitializer(pin gobot.PWMPinner) error {
 		return err
 	}
 	return pin.SetEnabled(true)
+}
+
+func (c *Adaptor) translateAnalogPin(pin string) (string, bool, bool, uint16, error) {
+	path := fmt.Sprintf("/sys/bus/iio/devices/iio:device1/in_voltage%s_raw", pin)
+	const (
+		read       = true
+		write      = false
+		readBufLen = 200
+	)
+	return path, read, write, readBufLen, nil
 }
 
 func (c *Adaptor) translateAndMuxPWMPin(id string) (string, int, error) {

@@ -14,10 +14,17 @@ import (
 	"gobot.io/x/gobot/v2/system"
 )
 
-type pwmPinData struct {
+type pwmPinDefinition struct {
 	channel   int
 	dir       string
 	dirRegexp string
+}
+
+type analogPinDefinition struct {
+	path   string
+	r      bool // readable
+	w      bool // writable
+	bufLen uint16
 }
 
 const (
@@ -37,15 +44,15 @@ type Adaptor struct {
 	name  string
 	sys   *system.Accesser
 	mutex sync.Mutex
+	*adaptors.AnalogPinsAdaptor
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.PWMPinsAdaptor
 	*adaptors.I2cBusAdaptor
 	*adaptors.SpiBusAdaptor
 	usrLed       string
-	analogPath   string
 	pinMap       map[string]int
-	pwmPinMap    map[string]pwmPinData
-	analogPinMap map[string]string
+	pwmPinMap    map[string]pwmPinDefinition
+	analogPinMap map[string]analogPinDefinition
 }
 
 // NewAdaptor returns a new Beaglebone Black/Green Adaptor
@@ -63,9 +70,8 @@ func NewAdaptor(opts ...func(adaptors.Optioner)) *Adaptor {
 		pwmPinMap:    bbbPwmPinMap,
 		analogPinMap: bbbAnalogPinMap,
 		usrLed:       "/sys/class/leds/beaglebone:green:",
-		analogPath:   "/sys/bus/iio/devices/iio:device0",
 	}
-
+	c.AnalogPinsAdaptor = adaptors.NewAnalogPinsAdaptor(sys, c.translateAnalogPin)
 	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.translateAndMuxDigitalPin, opts...)
 	c.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, c.translateAndMuxPWMPin,
 		adaptors.WithPWMPinDefaultPeriod(pwmPeriodDefault))
@@ -94,6 +100,10 @@ func (c *Adaptor) Connect() error {
 		return err
 	}
 
+	if err := c.AnalogPinsAdaptor.Connect(); err != nil {
+		return err
+	}
+
 	if err := c.PWMPinsAdaptor.Connect(); err != nil {
 		return err
 	}
@@ -108,6 +118,10 @@ func (c *Adaptor) Finalize() error {
 	err := c.DigitalPinsAdaptor.Finalize()
 
 	if e := c.PWMPinsAdaptor.Finalize(); e != nil {
+		err = multierror.Append(err, e)
+	}
+
+	if e := c.AnalogPinsAdaptor.Finalize(); e != nil {
 		err = multierror.Append(err, e)
 	}
 
@@ -140,29 +154,6 @@ func (c *Adaptor) DigitalWrite(id string, val byte) error {
 	return c.DigitalPinsAdaptor.DigitalWrite(id, val)
 }
 
-// AnalogRead returns an analog value from specified pin
-func (c *Adaptor) AnalogRead(pin string) (int, error) {
-	analogPin, err := c.translateAnalogPin(pin)
-	if err != nil {
-		return 0, err
-	}
-	fi, err := c.sys.OpenFile(fmt.Sprintf("%v/%v", c.analogPath, analogPin), os.O_RDONLY, 0o644)
-	defer fi.Close() //nolint:staticcheck // for historical reasons
-
-	if err != nil {
-		return 0, err
-	}
-
-	buf := make([]byte, 1024)
-	_, err = fi.Read(buf)
-	if err != nil {
-		return 0, err
-	}
-
-	val, _ := strconv.Atoi(strings.Split(string(buf), "\n")[0])
-	return val, nil
-}
-
 func (c *Adaptor) validateSpiBusNumber(busNr int) error {
 	// Valid bus numbers are [0,1] which corresponds to /dev/spidev0.x through /dev/spidev1.x.
 	// x is the chip number <255
@@ -181,11 +172,13 @@ func (c *Adaptor) validateI2cBusNumber(busNr int) error {
 }
 
 // translateAnalogPin converts analog pin name to pin position
-func (c *Adaptor) translateAnalogPin(pin string) (string, error) {
-	if val, ok := c.analogPinMap[pin]; ok {
-		return val, nil
+func (c *Adaptor) translateAnalogPin(pin string) (string, bool, bool, uint16, error) {
+	pinInfo, ok := c.analogPinMap[pin]
+	if !ok {
+		return "", false, false, 0, fmt.Errorf("Not a valid analog pin")
 	}
-	return "", fmt.Errorf("Not a valid analog pin")
+
+	return pinInfo.path, pinInfo.r, pinInfo.w, pinInfo.bufLen, nil
 }
 
 // translatePin converts digital pin name to pin position
@@ -219,7 +212,7 @@ func (c *Adaptor) translateAndMuxPWMPin(id string) (string, int, error) {
 	return path, pinInfo.channel, nil
 }
 
-func (p pwmPinData) findPWMDir(sys *system.Accesser) (string, error) {
+func (p pwmPinDefinition) findPWMDir(sys *system.Accesser) (string, error) {
 	items, _ := sys.Find(p.dir, p.dirRegexp)
 	if len(items) == 0 {
 		return "", fmt.Errorf("No path found for PWM directory pattern, '%s' in path '%s'", p.dirRegexp, p.dir)

@@ -21,19 +21,21 @@ var (
 
 func initTestDigitalPinSysfsWithMockedFilesystem(mockPaths []string) (*digitalPinSysfs, *MockFilesystem) {
 	fs := newMockFilesystem(mockPaths)
-	pin := newDigitalPinSysfs(fs, "10")
+	sfa := sysfsFileAccess{fs: fs, readBufLen: 2}
+	pin := newDigitalPinSysfs(&sfa, "10")
 	return pin, fs
 }
 
 func Test_newDigitalPinSysfs(t *testing.T) {
 	// arrange
 	m := &MockFilesystem{}
+	sfa := sysfsFileAccess{fs: m, readBufLen: 2}
 	const pinID = "1"
 	// act
-	pin := newDigitalPinSysfs(m, pinID, WithPinOpenDrain())
+	pin := newDigitalPinSysfs(&sfa, pinID, WithPinOpenDrain())
 	// assert
 	assert.Equal(t, pinID, pin.pin)
-	assert.Equal(t, m, pin.fs)
+	assert.Equal(t, &sfa, pin.sfa)
 	assert.Equal(t, "gpio"+pinID, pin.label)
 	assert.Equal(t, "in", pin.direction)
 	assert.Equal(t, 1, pin.drive)
@@ -134,7 +136,7 @@ func TestDigitalPinExportSysfs(t *testing.T) {
 		changeDebouncePeriod  time.Duration
 		changeEdge            int
 		changePollInterval    time.Duration
-		simEbusyOnWrite       int
+		simEbusyOnPath        string
 		wantWrites            int
 		wantExport            string
 		wantUnexport          string
@@ -225,11 +227,11 @@ func TestDigitalPinExportSysfs(t *testing.T) {
 			wantValue:       "0",
 		},
 		"ok_already_exported": {
-			mockPaths:       allMockPaths,
-			wantWrites:      2,
-			wantExport:      "10",
-			wantDirection:   "in",
-			simEbusyOnWrite: 1, // just means "already exported"
+			mockPaths:      allMockPaths,
+			wantWrites:     2,
+			wantExport:     "10",
+			wantDirection:  "in",
+			simEbusyOnPath: exportPath, // just means "already exported"
 		},
 		"error_no_eventhandler_for_polling": { // this only tests the call of function, all other is tested separately
 			mockPaths:          allMockPaths,
@@ -250,11 +252,11 @@ func TestDigitalPinExportSysfs(t *testing.T) {
 			wantErr:      "gpio10/direction: no such file",
 		},
 		"error_write_direction_file": {
-			mockPaths:       allMockPaths,
-			wantWrites:      3,
-			wantUnexport:    "10",
-			simEbusyOnWrite: 2,
-			wantErr:         "device or resource busy",
+			mockPaths:      allMockPaths,
+			wantWrites:     3,
+			wantUnexport:   "10",
+			simEbusyOnPath: dirPath,
+			wantErr:        "device or resource busy",
 		},
 		"error_no_value_file": {
 			mockPaths:    []string{exportPath, dirPath, unexportPath},
@@ -281,7 +283,8 @@ func TestDigitalPinExportSysfs(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// arrange
 			fs := newMockFilesystem(tc.mockPaths)
-			pin := newDigitalPinSysfs(fs, "10")
+			sfa := sysfsFileAccess{fs: fs, readBufLen: 2}
+			pin := newDigitalPinSysfs(&sfa, "10")
 			if tc.changeDirection != "" {
 				pin.direction = tc.changeDirection
 			}
@@ -307,17 +310,9 @@ func TestDigitalPinExportSysfs(t *testing.T) {
 				pin.pollInterval = tc.changePollInterval
 			}
 			// arrange write function
-			oldWriteFunc := writeFile
-			numCallsWrite := 0
-			writeFile = func(f File, data []byte) error {
-				numCallsWrite++
-				require.NoError(t, oldWriteFunc(f, data))
-				if numCallsWrite == tc.simEbusyOnWrite {
-					return &os.PathError{Err: Syscall_EBUSY}
-				}
-				return nil
+			if tc.simEbusyOnPath != "" {
+				fs.Files[tc.simEbusyOnPath].simulateWriteError = &os.PathError{Err: Syscall_EBUSY}
 			}
-			defer func() { writeFile = oldWriteFunc }()
 			// act
 			err := pin.Export()
 			// assert
@@ -333,7 +328,7 @@ func TestDigitalPinExportSysfs(t *testing.T) {
 				assert.Equal(t, tc.wantInverse, fs.Files[inversePath].Contents)
 			}
 			assert.Equal(t, tc.wantUnexport, fs.Files[unexportPath].Contents)
-			assert.Equal(t, tc.wantWrites, numCallsWrite)
+			assert.Equal(t, tc.wantWrites, fs.numCallsWrite)
 		})
 	}
 }
@@ -368,7 +363,8 @@ func TestDigitalPinSysfs(t *testing.T) {
 	data, _ := pin.Read()
 	assert.Equal(t, 1, data)
 
-	pin2 := newDigitalPinSysfs(fs, "30")
+	sfa := sysfsFileAccess{fs: fs, readBufLen: 2}
+	pin2 := newDigitalPinSysfs(&sfa, "30")
 	err = pin2.Write(1)
 	require.ErrorContains(t, err, "pin has not been exported")
 
@@ -376,33 +372,47 @@ func TestDigitalPinSysfs(t *testing.T) {
 	require.ErrorContains(t, err, "pin has not been exported")
 	assert.Equal(t, 0, data)
 
-	writeFile = func(File, []byte) error {
-		return &os.PathError{Err: Syscall_EINVAL}
-	}
-
+	// arrange: unexport general write error, the error is not suppressed
+	fs.Files["/sys/class/gpio/unexport"].simulateWriteError = &os.PathError{Err: errors.New("write error")}
+	// act: unexport
 	err = pin.Unexport()
-	require.NoError(t, err)
-
-	writeFile = func(File, []byte) error {
-		return &os.PathError{Err: errors.New("write error")}
-	}
-
-	err = pin.Unexport()
+	// assert: the error is not suppressed
 	var pathError *os.PathError
 	require.ErrorAs(t, err, &pathError)
 	require.ErrorContains(t, err, "write error")
 }
 
 func TestDigitalPinUnexportErrorSysfs(t *testing.T) {
-	mockPaths := []string{
-		"/sys/class/gpio/unexport",
+	tests := map[string]struct {
+		simulateError error
+		wantErr       string
+	}{
+		"reserved_pin": {
+			// simulation of reserved pin, the internal error is suppressed
+			simulateError: &os.PathError{Err: Syscall_EINVAL},
+			wantErr:       "",
+		},
+		"error_busy": {
+			simulateError: &os.PathError{Err: Syscall_EBUSY},
+			wantErr:       " : device or resource busy",
+		},
 	}
-	pin, _ := initTestDigitalPinSysfsWithMockedFilesystem(mockPaths)
-
-	writeFile = func(File, []byte) error {
-		return &os.PathError{Err: Syscall_EBUSY}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			mockPaths := []string{
+				"/sys/class/gpio/unexport",
+			}
+			pin, fs := initTestDigitalPinSysfsWithMockedFilesystem(mockPaths)
+			fs.Files["/sys/class/gpio/unexport"].simulateWriteError = tc.simulateError
+			// act
+			err := pin.Unexport()
+			// assert
+			if tc.wantErr != "" {
+				require.ErrorContains(t, err, tc.wantErr)
+			} else {
+				require.NoError(t, err)
+			}
+		})
 	}
-
-	err := pin.Unexport()
-	require.ErrorContains(t, err, " : device or resource busy")
 }
