@@ -1,6 +1,7 @@
 package aio
 
 import (
+	"fmt"
 	"math"
 	"time"
 
@@ -25,24 +26,28 @@ type TemperatureSensorDriver struct {
 	*AnalogSensorDriver
 }
 
-// NewTemperatureSensorDriver is a gobot driver for analog temperature sensors
-// with a polling interval 10 Milliseconds given an AnalogReader and pin.
-// For further details please refer to AnalogSensorDriver.
+// NewTemperatureSensorDriver is a driver for analog temperature sensors, given an AnalogReader and pin.
 // Linear scaling and NTC scaling is supported.
 //
-// Optionally accepts:
-//
-//	time.Duration: Interval at which the sensor is polled for new information (given 0 switch the polling off)
-//
-// Adds the following API Commands:
-//
-//	"Read"      - See AnalogDriverSensor.Read
-//	"ReadValue" - See AnalogDriverSensor.ReadValue
-func NewTemperatureSensorDriver(a AnalogReader, pin string, v ...time.Duration) *TemperatureSensorDriver {
-	ad := NewAnalogSensorDriver(a, pin, v...)
+// Supported options: see [aio.NewAnalogSensorDriver]
+// Adds the following API Commands: see [aio.NewAnalogSensorDriver]
+func NewTemperatureSensorDriver(a AnalogReader, pin string, opts ...interface{}) *TemperatureSensorDriver {
+	d := &TemperatureSensorDriver{AnalogSensorDriver: NewAnalogSensorDriver(a, pin)}
+	d.driverCfg.name = gobot.DefaultName("TemperatureSensor")
 
-	d := &TemperatureSensorDriver{AnalogSensorDriver: ad}
-	d.SetName(gobot.DefaultName("TemperatureSensor"))
+	for _, opt := range opts {
+		switch o := opt.(type) {
+		case optionApplier:
+			o.apply(d.driverCfg)
+		case sensorOptionApplier:
+			o.apply(d.sensorCfg)
+		case time.Duration:
+			// TODO this is only for backward compatibility and will be removed after version 2.x
+			d.sensorCfg.readInterval = o
+		default:
+			panic(fmt.Sprintf("'%s' can not be applied on '%s'", opt, d.driverCfg.name))
+		}
+	}
 
 	return d
 }
@@ -52,6 +57,7 @@ func NewTemperatureSensorDriver(a AnalogReader, pin string, v ...time.Duration) 
 // If the thermistor is connected to ground, the reverse flag must be set to true.
 // This means the voltage decreases when temperature gets higher.
 // Currently no negative values for voltage are supported.
+// If the scaler is not changed after initialization, prefer to use [aio.WithSensorScaler] instead.
 func (t *TemperatureSensorDriver) SetNtcScaler(vRef uint, rOhm uint, reverse bool, ntc TemperatureSensorNtcConf) {
 	t.SetScaler(TemperatureSensorNtcScaler(vRef, rOhm, reverse, ntc))
 }
@@ -59,6 +65,7 @@ func (t *TemperatureSensorDriver) SetNtcScaler(vRef uint, rOhm uint, reverse boo
 // SetLinearScaler sets a function for linear scaling the read value.
 // This can be applied for some silicon based PTC sensors or e.g. PT100,
 // and in a small temperature range also for NTC.
+// If the scaler is not changed after initialization, prefer to use [aio.WithSensorScaler] instead.
 func (t *TemperatureSensorDriver) SetLinearScaler(fromMin, fromMax int, toMin, toMax float64) {
 	t.SetScaler(AnalogSensorLinearScaler(fromMin, fromMax, toMin, toMax))
 }

@@ -16,6 +16,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/aio"
@@ -25,7 +26,7 @@ import (
 
 func main() {
 	firmataAdaptor := firmata.NewAdaptor(os.Args[1])
-	sensor := aio.NewAnalogSensorDriver(firmataAdaptor, "0")
+	sensor := aio.NewAnalogSensorDriver(firmataAdaptor, "0", aio.WithSensorCyclicRead(500*time.Millisecond))
 	led := gpio.NewLedDriver(firmataAdaptor, "3")
 
 	work := func() {

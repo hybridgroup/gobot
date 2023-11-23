@@ -1,39 +1,63 @@
 package aio
 
 import (
-	"log"
+	"fmt"
 	"strconv"
-
-	"gobot.io/x/gobot/v2"
 )
+
+// actuatorOptionApplier needs to be implemented by each configurable option type
+type actuatorOptionApplier interface {
+	apply(cfg *actuatorConfiguration)
+}
+
+// actuatorConfiguration contains all changeable attributes of the driver.
+type actuatorConfiguration struct {
+	scale func(input float64) (value int)
+}
+
+// actuatorScaleOption is the type for applying another scaler to the configuration
+type actuatorScaleOption struct {
+	scaler func(input float64) (value int)
+}
 
 // AnalogActuatorDriver represents an analog actuator
 type AnalogActuatorDriver struct {
-	name       string
-	pin        string
-	connection AnalogWriter
-	gobot.Eventer
-	gobot.Commander
-	scale        func(input float64) (value int)
+	*driver
+	pin          string
+	actuatorCfg  *actuatorConfiguration
 	lastValue    float64
 	lastRawValue int
 }
 
-// NewAnalogActuatorDriver returns a new AnalogActuatorDriver given by an AnalogWriter and pin.
+// NewAnalogActuatorDriver returns a new driver for analog actuator, given by an AnalogWriter and pin.
 // The driver supports customizable scaling from given float64 value to written int.
 // The default scaling is 1:1. An adjustable linear scaler is provided by the driver.
+//
+// Supported options:
+//
+//	"WithName"
+//	"WithActuatorScaler"
 //
 // Adds the following API Commands:
 //
 //	"Write"    - See AnalogActuator.Write
-//	"RawWrite" - See AnalogActuator.RawWrite
-func NewAnalogActuatorDriver(a AnalogWriter, pin string) *AnalogActuatorDriver {
+//	"WriteRaw" - See AnalogActuator.WriteRaw
+func NewAnalogActuatorDriver(a AnalogWriter, pin string, opts ...interface{}) *AnalogActuatorDriver {
 	d := &AnalogActuatorDriver{
-		name:       gobot.DefaultName("AnalogActuator"),
-		connection: a,
-		pin:        pin,
-		Commander:  gobot.NewCommander(),
-		scale:      func(input float64) int { return int(input) },
+		driver:      newDriver(a, "AnalogActuator"),
+		pin:         pin,
+		actuatorCfg: &actuatorConfiguration{scale: func(input float64) int { return int(input) }},
+	}
+
+	for _, opt := range opts {
+		switch o := opt.(type) {
+		case optionApplier:
+			o.apply(d.driverCfg)
+		case actuatorOptionApplier:
+			o.apply(d.actuatorCfg)
+		default:
+			panic(fmt.Sprintf("'%s' can not be applied on '%s'", opt, d.driverCfg.name))
+		}
 	}
 
 	d.AddCommand("Write", func(params map[string]interface{}) interface{} {
@@ -44,55 +68,66 @@ func NewAnalogActuatorDriver(a AnalogWriter, pin string) *AnalogActuatorDriver {
 		return d.Write(val)
 	})
 
-	d.AddCommand("RawWrite", func(params map[string]interface{}) interface{} {
+	d.AddCommand("WriteRaw", func(params map[string]interface{}) interface{} {
 		val, _ := strconv.Atoi(params["val"].(string))
-		return d.RawWrite(val)
+		return d.WriteRaw(val)
 	})
 
 	return d
 }
 
-// Start starts driver
-func (a *AnalogActuatorDriver) Start() error { return nil }
+// WithActuatorScaler substitute the default 1:1 return value function by a new scaling function
+func WithActuatorScaler(scaler func(input float64) (value int)) actuatorOptionApplier {
+	return actuatorScaleOption{scaler: scaler}
+}
 
-// Halt is for halt
-func (a *AnalogActuatorDriver) Halt() error { return nil }
+// SetScaler substitute the default 1:1 return value function by a new scaling function
+// If the scaler is not changed after initialization, prefer to use [aio.WithActuatorScaler] instead.
+func (a *AnalogActuatorDriver) SetScaler(scaler func(float64) int) {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
 
-// Name returns the drivers name
-func (a *AnalogActuatorDriver) Name() string { return a.name }
-
-// SetName sets the drivers name
-func (a *AnalogActuatorDriver) SetName(n string) { a.name = n }
+	WithActuatorScaler(scaler).apply(a.actuatorCfg)
+}
 
 // Pin returns the drivers pin
 func (a *AnalogActuatorDriver) Pin() string { return a.pin }
 
-// Connection returns the drivers Connection
-func (a *AnalogActuatorDriver) Connection() gobot.Connection {
-	if conn, ok := a.connection.(gobot.Connection); ok {
-		return conn
-	}
+// Write writes the given value to the actuator
+func (a *AnalogActuatorDriver) Write(val float64) error {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
 
-	log.Printf("%s has no gobot connection\n", a.name)
+	rawValue := a.actuatorCfg.scale(val)
+	if err := a.WriteRaw(rawValue); err != nil {
+		return err
+	}
+	a.lastValue = val
 	return nil
 }
 
 // RawWrite write the given raw value to the actuator
+// Deprecated: Please use [aio.WriteRaw] instead.
 func (a *AnalogActuatorDriver) RawWrite(val int) error {
+	return a.WriteRaw(val)
+}
+
+// WriteRaw write the given raw value to the actuator
+func (a *AnalogActuatorDriver) WriteRaw(val int) error {
+	writer, ok := a.connection.(AnalogWriter)
+	if !ok {
+		return fmt.Errorf("AnalogWrite is not supported by the platform '%s'", a.Connection().Name())
+	}
+	if err := writer.AnalogWrite(a.Pin(), val); err != nil {
+		return err
+	}
 	a.lastRawValue = val
-	return a.connection.AnalogWrite(a.Pin(), val)
+	return nil
 }
 
-// SetScaler substitute the default 1:1 return value function by a new scaling function
-func (a *AnalogActuatorDriver) SetScaler(scaler func(float64) int) {
-	a.scale = scaler
-}
-
-// Write writes the given value to the actuator
-func (a *AnalogActuatorDriver) Write(val float64) error {
-	a.lastValue = val
-	rawValue := a.scale(val)
-	return a.RawWrite(rawValue)
+// Value returns the last written value
+func (a *AnalogActuatorDriver) Value() float64 {
+	return a.lastValue
 }
 
 // RawValue returns the last written raw value
@@ -100,9 +135,12 @@ func (a *AnalogActuatorDriver) RawValue() int {
 	return a.lastRawValue
 }
 
-// Value returns the last written value
-func (a *AnalogActuatorDriver) Value() float64 {
-	return a.lastValue
+func (o actuatorScaleOption) String() string {
+	return "scaler option for analog actuators"
+}
+
+func (o actuatorScaleOption) apply(cfg *actuatorConfiguration) {
+	cfg.scale = o.scaler
 }
 
 // AnalogActuatorLinearScaler creates a linear scaler function from the given values.

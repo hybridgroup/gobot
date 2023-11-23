@@ -17,7 +17,7 @@ import (
 
 func main() {
 	board := edison.NewAdaptor()
-	sensor := aio.NewGroveTemperatureSensorDriver(board, "0")
+	sensor := aio.NewGroveTemperatureSensorDriver(board, "0", aio.WithSensorCyclicRead(500*time.Millisecond))
 
 	work := func() {
 		gobot.Every(500*time.Millisecond, func() {

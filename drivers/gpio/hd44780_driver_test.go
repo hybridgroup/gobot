@@ -94,7 +94,7 @@ func TestHD44780DriverStartError(t *testing.T) {
 		D7: "",
 	}
 	d = NewHD44780Driver(a, 2, 16, HD44780_4BITMODE, "13", "15", pins)
-	require.ErrorContains(t, d.Start(), "Initialization error")
+	require.EqualError(t, d.Start(), "Initialization error")
 
 	pins = HD44780DataPin{
 		D0: "31",
@@ -107,7 +107,7 @@ func TestHD44780DriverStartError(t *testing.T) {
 		D7: "",
 	}
 	d = NewHD44780Driver(a, 2, 16, HD44780_8BITMODE, "13", "15", pins)
-	require.ErrorContains(t, d.Start(), "Initialization error")
+	require.EqualError(t, d.Start(), "Initialization error")
 }
 
 func TestHD44780DriverWrite(t *testing.T) {
@@ -131,14 +131,14 @@ func TestHD44780DriverWriteError(t *testing.T) {
 		return errors.New("write error")
 	}
 	_ = d.Start()
-	require.ErrorContains(t, d.Write("hello gobot"), "write error")
+	require.EqualError(t, d.Write("hello gobot"), "write error")
 
 	d, a = initTestHD44780Driver8BitModeWithStubbedAdaptor()
 	a.digitalWriteFunc = func(string, byte) error {
 		return errors.New("write error")
 	}
 	_ = d.Start()
-	require.ErrorContains(t, d.Write("hello gobot"), "write error")
+	require.EqualError(t, d.Write("hello gobot"), "write error")
 }
 
 func TestHD44780DriverClear(t *testing.T) {
@@ -159,10 +159,10 @@ func TestHD44780DriverSetCursor(t *testing.T) {
 func TestHD44780DriverSetCursorInvalid(t *testing.T) {
 	d := initTestHD44780Driver()
 
-	require.ErrorContains(t, d.SetCursor(-1, 3), "Invalid position value (-1, 3), range (1, 15)")
-	require.ErrorContains(t, d.SetCursor(2, 3), "Invalid position value (2, 3), range (1, 15)")
-	require.ErrorContains(t, d.SetCursor(0, -1), "Invalid position value (0, -1), range (1, 15)")
-	require.ErrorContains(t, d.SetCursor(0, 16), "Invalid position value (0, 16), range (1, 15)")
+	require.EqualError(t, d.SetCursor(-1, 3), "Invalid position value (-1, 3), range (1, 15)")
+	require.EqualError(t, d.SetCursor(2, 3), "Invalid position value (2, 3), range (1, 15)")
+	require.EqualError(t, d.SetCursor(0, -1), "Invalid position value (0, -1), range (1, 15)")
+	require.EqualError(t, d.SetCursor(0, 16), "Invalid position value (0, 16), range (1, 15)")
 }
 
 func TestHD44780DriverDisplayOn(t *testing.T) {
@@ -234,5 +234,5 @@ func TestHD44780DriverCreateChar(t *testing.T) {
 func TestHD44780DriverCreateCharError(t *testing.T) {
 	d := initTestHD44780Driver()
 	charMap := [8]byte{1, 2, 3, 4, 5, 6, 7, 8}
-	require.ErrorContains(t, d.CreateChar(8, charMap), "can't set a custom character at a position greater than 7")
+	require.EqualError(t, d.CreateChar(8, charMap), "can't set a custom character at a position greater than 7")
 }

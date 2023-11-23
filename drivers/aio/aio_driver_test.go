@@ -1,7 +1,8 @@
-package gpio
+package aio
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -10,48 +11,39 @@ import (
 	"gobot.io/x/gobot/v2"
 )
 
-var _ gobot.Driver = (*Driver)(nil)
+var _ gobot.Driver = (*driver)(nil)
 
-func initTestDriverWithStubbedAdaptor() (*Driver, *gpioTestAdaptor) {
-	a := newGpioTestAdaptor()
-	d := NewDriver(a, "GPIO_BASIC")
-	return d, a
-}
-
-func initTestDriver() *Driver {
-	d, _ := initTestDriverWithStubbedAdaptor()
+func initTestDriver() *driver {
+	a := newAioTestAdaptor()
+	d := newDriver(a, "AIO_BASIC")
 	return d
 }
 
-func TestNewDriver(t *testing.T) {
+func Test_newDriver(t *testing.T) {
 	// arrange
-	a := newGpioTestAdaptor()
+	const name = "mybot"
+	a := newAioTestAdaptor()
 	// act
-	d := NewDriver(a, "GPIO_BASIC")
+	d := newDriver(a, name)
 	// assert
-	assert.IsType(t, &Driver{}, d)
-	assert.Contains(t, d.name, "GPIO_BASIC")
-	assert.Equal(t, a, d.connection)
+	assert.IsType(t, &driver{}, d)
+	assert.NotNil(t, d.driverCfg)
+	assert.True(t, strings.HasPrefix(d.Name(), name))
+	assert.Equal(t, a, d.Connection())
 	require.NoError(t, d.afterStart())
 	require.NoError(t, d.beforeHalt())
 	assert.NotNil(t, d.Commander)
 	assert.NotNil(t, d.mutex)
 }
 
-func TestSetName(t *testing.T) {
+func Test_applyWithName(t *testing.T) {
 	// arrange
-	d := initTestDriver()
+	const name = "mybot"
+	cfg := configuration{name: "oldname"}
 	// act
-	d.SetName("TESTME")
+	WithName(name).apply(&cfg)
 	// assert
-	assert.Equal(t, "TESTME", d.Name())
-}
-
-func TestConnection(t *testing.T) {
-	// arrange
-	d, a := initTestDriverWithStubbedAdaptor()
-	// act, assert
-	assert.Equal(t, a, d.Connection())
+	assert.Equal(t, name, cfg.name)
 }
 
 func TestStart(t *testing.T) {

@@ -1,12 +1,11 @@
 package aio
 
 import (
+	"fmt"
 	"time"
 
 	"gobot.io/x/gobot/v2"
 )
-
-var _ gobot.Driver = (*GroveTemperatureSensorDriver)(nil)
 
 // GroveTemperatureSensorDriver represents a temperature sensor
 // The temperature is reported in degree Celsius
@@ -14,26 +13,33 @@ type GroveTemperatureSensorDriver struct {
 	*TemperatureSensorDriver
 }
 
-// NewGroveTemperatureSensorDriver returns a new GroveTemperatureSensorDriver with a polling interval of
-// 10 Milliseconds given an AnalogReader and pin.
+// NewGroveTemperatureSensorDriver returns a new driver for grove temperature sensor, given an AnalogReader and pin.
 //
-// Optionally accepts:
-//
-//	time.Duration: Interval at which the sensor is polled for new information (given 0 switch the polling off)
-//
-// Adds the following API Commands:
-//
-//	"Read"      - See AnalogDriverSensor.Read
-//	"ReadValue" - See AnalogDriverSensor.ReadValue
-func NewGroveTemperatureSensorDriver(a AnalogReader, pin string, v ...time.Duration) *GroveTemperatureSensorDriver {
-	t := NewTemperatureSensorDriver(a, pin, v...)
+// Supported options: see [aio.NewAnalogSensorDriver]
+// Adds the following API Commands: see [aio.NewAnalogSensorDriver]
+func NewGroveTemperatureSensorDriver(a AnalogReader, pin string, opts ...interface{}) *GroveTemperatureSensorDriver {
+	t := NewTemperatureSensorDriver(a, pin, opts...)
 	ntc := TemperatureSensorNtcConf{TC0: 25, R0: 10000.0, B: 3975} // Ohm, R25=10k
 	t.SetNtcScaler(1023, 10000, false, ntc)                        // Ohm, reference value: 1023, series R: 10k
 
 	d := &GroveTemperatureSensorDriver{
 		TemperatureSensorDriver: t,
 	}
-	d.SetName(gobot.DefaultName("GroveTemperatureSensor"))
+	d.driverCfg.name = gobot.DefaultName("GroveTemperatureSensor")
+
+	for _, opt := range opts {
+		switch o := opt.(type) {
+		case optionApplier:
+			o.apply(d.driverCfg)
+		case sensorOptionApplier:
+			o.apply(d.sensorCfg)
+		case time.Duration:
+			// TODO this is only for backward compatibility and will be removed after version 2.x
+			d.sensorCfg.readInterval = o
+		default:
+			panic(fmt.Sprintf("'%s' can not be applied on '%s'", opt, d.driverCfg.name))
+		}
+	}
 
 	return d
 }

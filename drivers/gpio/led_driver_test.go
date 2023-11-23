@@ -41,16 +41,16 @@ func TestLedDriver(t *testing.T) {
 	}
 
 	err = d.Command("Toggle")(nil)
-	require.ErrorContains(t, err.(error), "write error")
+	require.EqualError(t, err.(error), "write error")
 
 	err = d.Command("On")(nil)
-	require.ErrorContains(t, err.(error), "write error")
+	require.EqualError(t, err.(error), "write error")
 
 	err = d.Command("Off")(nil)
-	require.ErrorContains(t, err.(error), "write error")
+	require.EqualError(t, err.(error), "write error")
 
 	err = d.Command("Brightness")(map[string]interface{}{"level": 100.0})
-	require.ErrorContains(t, err.(error), "pwm error")
+	require.EqualError(t, err.(error), "pwm error")
 }
 
 func TestLedDriverStart(t *testing.T) {
@@ -78,7 +78,7 @@ func TestLedDriverBrightness(t *testing.T) {
 	a.pwmWriteFunc = func(string, byte) error {
 		return errors.New("pwm error")
 	}
-	require.ErrorContains(t, d.Brightness(150), "pwm error")
+	require.EqualError(t, d.Brightness(150), "pwm error")
 }
 
 func TestLEDDriverDefaultName(t *testing.T) {

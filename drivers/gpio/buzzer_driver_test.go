@@ -59,7 +59,7 @@ func TestBuzzerDriverOnError(t *testing.T) {
 		return errors.New("write error")
 	}
 
-	require.ErrorContains(t, d.On(), "write error")
+	require.EqualError(t, d.On(), "write error")
 }
 
 func TestBuzzerDriverOffError(t *testing.T) {
@@ -69,7 +69,7 @@ func TestBuzzerDriverOffError(t *testing.T) {
 		return errors.New("write error")
 	}
 
-	require.ErrorContains(t, d.Off(), "write error")
+	require.EqualError(t, d.Off(), "write error")
 }
 
 func TestBuzzerDriverToneError(t *testing.T) {
@@ -79,5 +79,5 @@ func TestBuzzerDriverToneError(t *testing.T) {
 		return errors.New("write error")
 	}
 
-	require.ErrorContains(t, d.Tone(100, 0.01), "write error")
+	require.EqualError(t, d.Tone(100, 0.01), "write error")
 }
