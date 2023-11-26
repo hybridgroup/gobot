@@ -8,7 +8,7 @@ import (
 
 // sysfsDitalPinHandler represents the sysfs implementation
 type sysfsDigitalPinAccess struct {
-	fs filesystem
+	sfa *sysfsFileAccess
 }
 
 // gpiodDigitalPinAccess represents the character device implementation
@@ -25,11 +25,11 @@ func (h *sysfsDigitalPinAccess) isSupported() bool {
 func (h *sysfsDigitalPinAccess) createPin(chip string, pin int,
 	o ...func(gobot.DigitalPinOptioner) bool,
 ) gobot.DigitalPinner {
-	return newDigitalPinSysfs(h.fs, strconv.Itoa(pin), o...)
+	return newDigitalPinSysfs(h.sfa, strconv.Itoa(pin), o...)
 }
 
 func (h *sysfsDigitalPinAccess) setFs(fs filesystem) {
-	h.fs = fs
+	h.sfa = &sysfsFileAccess{fs: fs, readBufLen: 2}
 }
 
 func (h *gpiodDigitalPinAccess) isSupported() bool {

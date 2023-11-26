@@ -24,30 +24,25 @@ type pwmPinSysFs struct {
 	polarityNormalIdentifier   string
 	polarityInvertedIdentifier string
 
-	write func(fs filesystem, path string, data []byte) (i int, err error)
-	read  func(fs filesystem, path string) ([]byte, error)
-	fs    filesystem
+	sfa *sysfsFileAccess
 }
 
 // newPWMPinSysfs returns a new pwmPin, working with sysfs file access.
-func newPWMPinSysfs(fs filesystem, path string, pin int, polNormIdent string, polInvIdent string) *pwmPinSysFs {
+func newPWMPinSysfs(sfa *sysfsFileAccess, path string, pin int, polNormIdent string, polInvIdent string) *pwmPinSysFs {
 	p := &pwmPinSysFs{
 		path:                       path,
 		pin:                        strconv.Itoa(pin),
 		polarityNormalIdentifier:   polNormIdent,
 		polarityInvertedIdentifier: polInvIdent,
 
-		read:  readPwmFile,
-		write: writePwmFile,
-		fs:    fs,
+		sfa: sfa,
 	}
 	return p
 }
 
 // Export exports the pin for use by the operating system by writing the pin to the "Export" path
 func (p *pwmPinSysFs) Export() error {
-	_, err := p.write(p.fs, p.pwmExportPath(), []byte(p.pin))
-	if err != nil {
+	if err := p.sfa.write(p.pwmExportPath(), []byte(p.pin)); err != nil {
 		// If EBUSY then the pin has already been exported, we suppress the error
 		var pathError *os.PathError
 		if !(errors.As(err, &pathError) && errors.Is(err, Syscall_EBUSY)) {
@@ -65,7 +60,7 @@ func (p *pwmPinSysFs) Export() error {
 
 // Unexport releases the pin from the operating system by writing the pin to the "Unexport" path
 func (p *pwmPinSysFs) Unexport() error {
-	if _, err := p.write(p.fs, p.pwmUnexportPath(), []byte(p.pin)); err != nil {
+	if err := p.sfa.write(p.pwmUnexportPath(), []byte(p.pin)); err != nil {
 		return fmt.Errorf(pwmPinErrorPattern, "Unexport", p.pin, err)
 	}
 	return nil
@@ -73,16 +68,12 @@ func (p *pwmPinSysFs) Unexport() error {
 
 // Enabled reads and returns the enabled state of the pin
 func (p *pwmPinSysFs) Enabled() (bool, error) {
-	buf, err := p.read(p.fs, p.pwmEnablePath())
+	val, err := p.sfa.readInteger(p.pwmEnablePath())
 	if err != nil {
 		return false, fmt.Errorf(pwmPinErrorPattern, "Enabled", p.pin, err)
 	}
-	if len(buf) == 0 {
-		return false, nil
-	}
 
-	val, e := strconv.Atoi(string(bytes.TrimRight(buf, "\n")))
-	return val > 0, e
+	return val > 0, nil
 }
 
 // SetEnabled writes enable(1) or disable(0) status. For most platforms this is only possible if period was
@@ -92,7 +83,7 @@ func (p *pwmPinSysFs) SetEnabled(enable bool) error {
 	if enable {
 		enableVal = 1
 	}
-	if _, err := p.write(p.fs, p.pwmEnablePath(), []byte(strconv.Itoa(enableVal))); err != nil {
+	if err := p.sfa.writeInteger(p.pwmEnablePath(), enableVal); err != nil {
 		if pwmDebug {
 			p.printState()
 		}
@@ -104,7 +95,7 @@ func (p *pwmPinSysFs) SetEnabled(enable bool) error {
 
 // Polarity reads and returns false if the polarity is inverted, otherwise true
 func (p *pwmPinSysFs) Polarity() (bool, error) {
-	buf, err := p.read(p.fs, p.pwmPolarityPath())
+	buf, err := p.sfa.read(p.pwmPolarityPath())
 	if err != nil {
 		return true, fmt.Errorf(pwmPinErrorPattern, "Polarity", p.pin, err)
 	}
@@ -133,7 +124,7 @@ func (p *pwmPinSysFs) SetPolarity(normal bool) error {
 	if !normal {
 		value = p.polarityInvertedIdentifier
 	}
-	if _, err := p.write(p.fs, p.pwmPolarityPath(), []byte(value)); err != nil {
+	if err := p.sfa.write(p.pwmPolarityPath(), []byte(value)); err != nil {
 		if pwmDebug {
 			p.printState()
 		}
@@ -144,23 +135,17 @@ func (p *pwmPinSysFs) SetPolarity(normal bool) error {
 
 // Period returns the current period
 func (p *pwmPinSysFs) Period() (uint32, error) {
-	buf, err := p.read(p.fs, p.pwmPeriodPath())
+	val, err := p.sfa.readInteger(p.pwmPeriodPath())
 	if err != nil {
 		return 0, fmt.Errorf(pwmPinErrorPattern, "Period", p.pin, err)
 	}
-	if len(buf) == 0 {
-		return 0, nil
-	}
 
-	v := bytes.TrimRight(buf, "\n")
-	val, e := strconv.Atoi(string(v))
-	return uint32(val), e
+	return uint32(val), nil
 }
 
 // SetPeriod writes the current period in nanoseconds
 func (p *pwmPinSysFs) SetPeriod(period uint32) error {
-	//nolint:perfsprint // ok here
-	if _, err := p.write(p.fs, p.pwmPeriodPath(), []byte(fmt.Sprintf("%v", period))); err != nil {
+	if err := p.sfa.writeInteger(p.pwmPeriodPath(), int(period)); err != nil {
 
 		if pwmDebug {
 			p.printState()
@@ -172,19 +157,17 @@ func (p *pwmPinSysFs) SetPeriod(period uint32) error {
 
 // DutyCycle reads and returns the duty cycle in nanoseconds
 func (p *pwmPinSysFs) DutyCycle() (uint32, error) {
-	buf, err := p.read(p.fs, p.pwmDutyCyclePath())
+	val, err := p.sfa.readInteger(p.pwmDutyCyclePath())
 	if err != nil {
 		return 0, fmt.Errorf(pwmPinErrorPattern, "DutyCycle", p.pin, err)
 	}
 
-	val, err := strconv.Atoi(string(bytes.TrimRight(buf, "\n")))
 	return uint32(val), err
 }
 
 // SetDutyCycle writes the duty cycle in nanoseconds
 func (p *pwmPinSysFs) SetDutyCycle(duty uint32) error {
-	//nolint:perfsprint // ok here
-	if _, err := p.write(p.fs, p.pwmDutyCyclePath(), []byte(fmt.Sprintf("%v", duty))); err != nil {
+	if err := p.sfa.writeInteger(p.pwmDutyCyclePath(), int(duty)); err != nil {
 		if pwmDebug {
 			p.printState()
 		}
@@ -221,32 +204,6 @@ func (p *pwmPinSysFs) pwmEnablePath() string {
 // pwmPolarityPath returns polarity path for specified pin
 func (p *pwmPinSysFs) pwmPolarityPath() string {
 	return path.Join(p.path, "pwm"+p.pin, "polarity")
-}
-
-func writePwmFile(fs filesystem, path string, data []byte) (int, error) {
-	file, err := fs.openFile(path, os.O_WRONLY, 0o644)
-	defer file.Close() //nolint:staticcheck // for historical reasons
-	if err != nil {
-		return 0, err
-	}
-
-	return file.Write(data)
-}
-
-func readPwmFile(fs filesystem, path string) ([]byte, error) {
-	file, err := fs.openFile(path, os.O_RDONLY, 0o644)
-	defer file.Close() //nolint:staticcheck // for historical reasons
-	if err != nil {
-		return make([]byte, 0), err
-	}
-
-	buf := make([]byte, 200)
-	var i int
-	i, err = file.Read(buf)
-	if i == 0 {
-		return []byte{}, err
-	}
-	return buf[:i], err
 }
 
 func (p *pwmPinSysFs) printState() {

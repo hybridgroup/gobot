@@ -99,6 +99,14 @@ type PWMPinnerProvider interface {
 	PWMPin(id string) (PWMPinner, error)
 }
 
+// AnalogPinner is the interface for system analog io interactions
+type AnalogPinner interface {
+	// Read reads the current value of the pin
+	Read() (int, error)
+	// Write writes to the pin
+	Write(val int) error
+}
+
 // I2cSystemDevicer is the interface to a i2c bus at system level, according to I2C/SMBus specification.
 // Some functions are not in the interface yet:
 // * Process Call (WriteWordDataReadWordData)
