@@ -31,7 +31,7 @@ func TestNewTemperatureSensorDriver(t *testing.T) {
 	assert.Equal(t, pin, d.Pin())
 	assert.InDelta(t, 0.0, d.lastValue, 0, 0)
 	assert.Equal(t, 0, d.lastRawValue)
-	assert.NotNil(t, d.halt)
+	assert.Nil(t, d.halt) // will be created on initialize, if cyclic reading is on
 	assert.NotNil(t, d.Eventer)
 	require.NotNil(t, d.sensorCfg)
 	assert.Equal(t, time.Duration(0), d.sensorCfg.readInterval)
@@ -139,11 +139,12 @@ func TestTemperatureSensorPublishesTemperatureInCelsius(t *testing.T) {
 	a.analogReadFunc = func() (int, error) {
 		return 585, nil
 	}
+
+	require.NoError(t, d.Start())
 	_ = d.Once(d.Event(Value), func(data interface{}) {
 		assert.Equal(t, "31.62", fmt.Sprintf("%.2f", data.(float64)))
 		sem <- true
 	})
-	require.NoError(t, d.Start())
 
 	select {
 	case <-sem:
@@ -184,16 +185,17 @@ func TestTemperatureSensorHalt_WithSensorCyclicRead(t *testing.T) {
 	// arrange
 	d := NewTemperatureSensorDriver(newAioTestAdaptor(), "1", WithSensorCyclicRead(10*time.Millisecond))
 	done := make(chan struct{})
+	require.NoError(t, d.Start())
+	// act & assert
 	go func() {
-		<-d.halt
+		require.NoError(t, d.Halt())
 		close(done)
 	}()
-	// act & assert
-	require.NoError(t, d.Halt())
+	// test that the halt is not blocked by any deadlock with mutex and/or channel
 	select {
 	case <-done:
 	case <-time.After(100 * time.Millisecond):
-		t.Errorf(" Temperature Sensor was not halted")
+		t.Errorf("Temperature Sensor was not halted")
 	}
 }
 

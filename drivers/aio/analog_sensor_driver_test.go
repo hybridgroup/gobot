@@ -34,7 +34,7 @@ func TestNewAnalogSensorDriver(t *testing.T) {
 	assert.Equal(t, pin, d.Pin())
 	assert.InDelta(t, 0.0, d.lastValue, 0, 0)
 	assert.Equal(t, 0, d.lastRawValue)
-	assert.NotNil(t, d.halt)
+	assert.Nil(t, d.halt) // will be created on initialize, if cyclic reading is on
 	assert.NotNil(t, d.Eventer)
 	require.NotNil(t, d.sensorCfg)
 	assert.Equal(t, time.Duration(0), d.sensorCfg.readInterval)
@@ -171,6 +171,9 @@ func TestAnalogSensor_WithSensorCyclicRead(t *testing.T) {
 		}
 	}
 
+	// act (start cyclic reading)
+	require.NoError(t, d.Start())
+
 	// arrange: expect raw value to be received
 	_ = d.Once(d.Event(Data), func(data interface{}) {
 		assert.Equal(t, 100, data.(int))
@@ -184,9 +187,6 @@ func TestAnalogSensor_WithSensorCyclicRead(t *testing.T) {
 		semDone <- true
 		nextVal <- -1 // arrange: error in read function
 	})
-
-	// act (start cyclic reading)
-	require.NoError(t, d.Start())
 
 	// assert: both events within timeout
 	select {
@@ -233,13 +233,14 @@ func TestAnalogSensor_WithSensorCyclicRead(t *testing.T) {
 func TestAnalogSensorHalt_WithSensorCyclicRead(t *testing.T) {
 	// arrange
 	d := NewAnalogSensorDriver(newAioTestAdaptor(), "1", WithSensorCyclicRead(10*time.Millisecond))
+	require.NoError(t, d.Start())
 	done := make(chan struct{})
+	// act & assert
 	go func() {
-		<-d.halt
+		require.NoError(t, d.Halt())
 		close(done)
 	}()
-	// act & assert
-	require.NoError(t, d.Halt())
+	// test that the halt is not blocked by any deadlock with mutex and/or channel
 	select {
 	case <-done:
 	case <-time.After(100 * time.Millisecond):

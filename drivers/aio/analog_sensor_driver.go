@@ -56,8 +56,7 @@ func NewAnalogSensorDriver(a AnalogReader, pin string, opts ...interface{}) *Ana
 		driver:    newDriver(a, "AnalogSensor"),
 		sensorCfg: &sensorConfiguration{scale: func(input int) float64 { return float64(input) }},
 		pin:       pin,
-		Eventer:   gobot.NewEventer(),
-		halt:      make(chan bool),
+		Eventer:   gobot.NewEventer(), // needed early due to grove vibration sensor driver
 	}
 	d.afterStart = d.initialize
 	d.beforeHalt = d.shutdown
@@ -75,10 +74,6 @@ func NewAnalogSensorDriver(a AnalogReader, pin string, opts ...interface{}) *Ana
 			panic(fmt.Sprintf("'%s' can not be applied on '%s'", opt, d.driverCfg.name))
 		}
 	}
-
-	d.AddEvent(Data)
-	d.AddEvent(Value)
-	d.AddEvent(Error)
 
 	d.AddCommand("Read", func(params map[string]interface{}) interface{} {
 		val, err := d.Read()
@@ -112,59 +107,6 @@ func (a *AnalogSensorDriver) SetScaler(scaler func(int) float64) {
 	WithSensorScaler(scaler).apply(a.sensorCfg)
 }
 
-// initialize the AnalogSensorDriver and if the cyclic reading is active, reads the sensor at the given interval.
-// Emits the Events:
-//
-//	Data int - Event is emitted on change and represents the current raw reading from the sensor.
-//	Value float64 - Event is emitted on change and represents the current reading from the sensor.
-//	Error error - Event is emitted on error reading from the sensor.
-func (a *AnalogSensorDriver) initialize() error {
-	if a.sensorCfg.readInterval == 0 {
-		// cyclic reading deactivated
-		return nil
-	}
-	oldRawValue := 0
-	oldValue := 0.0
-	go func() {
-		timer := time.NewTimer(a.sensorCfg.readInterval)
-		timer.Stop()
-		for {
-			rawValue, value, err := a.analogRead()
-			if err != nil {
-				a.Publish(a.Event(Error), err)
-			} else {
-				if rawValue != oldRawValue && rawValue != -1 {
-					a.Publish(a.Event(Data), rawValue)
-					oldRawValue = rawValue
-				}
-				if value != oldValue && value != -1 {
-					a.Publish(a.Event(Value), value)
-					oldValue = value
-				}
-			}
-
-			timer.Reset(a.sensorCfg.readInterval)
-			select {
-			case <-timer.C:
-			case <-a.halt:
-				timer.Stop()
-				return
-			}
-		}
-	}()
-	return nil
-}
-
-// shutdown stops polling the analog sensor for new information
-func (a *AnalogSensorDriver) shutdown() error {
-	if a.sensorCfg.readInterval == 0 {
-		// cyclic reading deactivated
-		return nil
-	}
-	a.halt <- true
-	return nil
-}
-
 // Pin returns the AnalogSensorDrivers pin
 func (a *AnalogSensorDriver) Pin() string { return a.pin }
 
@@ -194,6 +136,73 @@ func (a *AnalogSensorDriver) RawValue() int {
 	defer a.mutex.Unlock()
 
 	return a.lastRawValue
+}
+
+// initialize the AnalogSensorDriver and if the cyclic reading is active, reads the sensor at the given interval.
+// Emits the Events:
+//
+//	Data int - Event is emitted on change and represents the current raw reading from the sensor.
+//	Value float64 - Event is emitted on change and represents the current reading from the sensor.
+//	Error error - Event is emitted on error reading from the sensor.
+func (a *AnalogSensorDriver) initialize() error {
+	if a.sensorCfg.readInterval == 0 {
+		// cyclic reading deactivated
+		return nil
+	}
+
+	a.AddEvent(Data)
+	a.AddEvent(Value)
+	a.AddEvent(Error)
+
+	// A small buffer is needed to prevent mutex-channel-deadlock between Halt() and analogRead().
+	// This can happen, if the shutdown is in progress (mutex passed) and the go routine is calling
+	// the analogRead() in between, before the halt can be evaluated by the select statement.
+	// In this case the mutex of analogRead() blocks the reading of the halt channel and, without a small buffer,
+	// the writing to halt is blocked because there is no immediate read from channel.
+	// Please note, that this is special behavior caused by the first read is done immediately before the select
+	// statement.
+	a.halt = make(chan bool, 1)
+
+	oldRawValue := 0
+	oldValue := 0.0
+	go func() {
+		timer := time.NewTimer(a.sensorCfg.readInterval)
+		timer.Stop()
+		for {
+			// please note, that this ensures the first read is done immediately, but has drawbacks, see notes above
+			rawValue, value, err := a.analogRead()
+			if err != nil {
+				a.Publish(a.Event(Error), err)
+			} else {
+				if rawValue != oldRawValue && rawValue != -1 {
+					a.Publish(a.Event(Data), rawValue)
+					oldRawValue = rawValue
+				}
+				if value != oldValue && value != -1 {
+					a.Publish(a.Event(Value), value)
+					oldValue = value
+				}
+			}
+			timer.Reset(a.sensorCfg.readInterval) // ensure that after each read is a wait, independent of duration of read
+			select {
+			case <-timer.C:
+			case <-a.halt:
+				timer.Stop()
+				return
+			}
+		}
+	}()
+	return nil
+}
+
+// shutdown stops polling the analog sensor for new information
+func (a *AnalogSensorDriver) shutdown() error {
+	if a.sensorCfg.readInterval == 0 || a.halt == nil {
+		// cyclic reading deactivated
+		return nil
+	}
+	a.halt <- true
+	return nil
 }
 
 // analogRead performs an reading from the sensor and sets the internal attributes and returns the raw and scaled value

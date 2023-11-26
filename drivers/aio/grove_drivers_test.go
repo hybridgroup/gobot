@@ -39,7 +39,7 @@ func TestNewGroveRotaryDriver(t *testing.T) {
 	assert.Equal(t, pin, d.Pin())
 	assert.InDelta(t, 0.0, d.lastValue, 0, 0)
 	assert.Equal(t, 0, d.lastRawValue)
-	assert.NotNil(t, d.halt)
+	assert.Nil(t, d.halt) // will be created on initialize, if cyclic reading is on
 	assert.NotNil(t, d.Eventer)
 	require.NotNil(t, d.sensorCfg)
 	assert.Equal(t, time.Duration(0), d.sensorCfg.readInterval)
@@ -65,7 +65,7 @@ func TestNewGroveLightSensorDriver(t *testing.T) {
 	assert.Equal(t, pin, d.Pin())
 	assert.InDelta(t, 0.0, d.lastValue, 0, 0)
 	assert.Equal(t, 0, d.lastRawValue)
-	assert.NotNil(t, d.halt)
+	assert.Nil(t, d.halt) // will be created on initialize, if cyclic reading is on
 	assert.NotNil(t, d.Eventer)
 	require.NotNil(t, d.sensorCfg)
 	assert.Equal(t, time.Duration(0), d.sensorCfg.readInterval)
@@ -91,7 +91,7 @@ func TestNewGrovePiezoVibrationSensorDriver(t *testing.T) {
 	assert.Equal(t, pin, d.Pin())
 	assert.InDelta(t, 0.0, d.lastValue, 0, 0)
 	assert.Equal(t, 0, d.lastRawValue)
-	assert.NotNil(t, d.halt)
+	assert.Nil(t, d.halt) // will be created on initialize, if cyclic reading is on
 	assert.NotNil(t, d.Eventer)
 	require.NotNil(t, d.sensorCfg)
 	assert.Equal(t, time.Duration(0), d.sensorCfg.readInterval)
@@ -117,7 +117,7 @@ func TestNewGroveSoundSensorDriver(t *testing.T) {
 	assert.Equal(t, pin, d.Pin())
 	assert.InDelta(t, 0.0, d.lastValue, 0, 0)
 	assert.Equal(t, 0, d.lastRawValue)
-	assert.NotNil(t, d.halt)
+	assert.Nil(t, d.halt) // will be created on initialize, if cyclic reading is on
 	assert.NotNil(t, d.Eventer)
 	require.NotNil(t, d.sensorCfg)
 	assert.Equal(t, time.Duration(0), d.sensorCfg.readInterval)
@@ -151,8 +151,9 @@ func TestGroveDriverHalt_WithSensorCyclicRead(t *testing.T) {
 		lastCallCount := atomic.LoadInt32(&callCount)
 		// If driver was not halted, digital reads would still continue
 		time.Sleep(20 * time.Millisecond)
-		if atomic.LoadInt32(&callCount) != lastCallCount {
-			t.Errorf("AnalogRead was called after driver was halted")
+		// note: if a reading is already in progress, it will be finished before halt have an impact
+		if atomic.LoadInt32(&callCount) > lastCallCount+1 {
+			t.Errorf("AnalogRead was called more than once after driver was halted")
 		}
 	}
 }
