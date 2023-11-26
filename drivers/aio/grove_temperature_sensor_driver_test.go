@@ -34,7 +34,7 @@ func TestNewGroveTemperatureSensorDriver(t *testing.T) {
 	assert.Equal(t, pin, d.Pin())
 	assert.InDelta(t, 0.0, d.lastValue, 0, 0)
 	assert.Equal(t, 0, d.lastRawValue)
-	assert.NotNil(t, d.halt)
+	assert.Nil(t, d.halt) // will be created on initialize, if cyclic reading is on
 	assert.NotNil(t, d.Eventer)
 	require.NotNil(t, d.sensorCfg)
 	assert.Equal(t, time.Duration(0), d.sensorCfg.readInterval)
@@ -103,13 +103,14 @@ func TestGroveTemperatureSensor_publishesTemperatureInCelsius(t *testing.T) {
 	a.analogReadFunc = func() (int, error) {
 		return 585, nil
 	}
+
+	// act: start cyclic reading
+	require.NoError(t, d.Start())
+
 	_ = d.Once(d.Event(Value), func(data interface{}) {
 		assert.Equal(t, "31.62", fmt.Sprintf("%.2f", data.(float64)))
 		sem <- true
 	})
-
-	// act: start cyclic reading
-	require.NoError(t, d.Start())
 
 	// assert: value was published
 	select {
