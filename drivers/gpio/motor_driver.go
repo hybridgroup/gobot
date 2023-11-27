@@ -1,106 +1,134 @@
 package gpio
 
 import (
-	"log"
+	"fmt"
 
 	"gobot.io/x/gobot/v2"
 )
 
+// motorOptionApplier needs to be implemented by each configurable option type
+type motorOptionApplier interface {
+	apply(cfg *motorConfiguration)
+}
+
+// motorConfiguration contains all changeable attributes of the driver.
+type motorConfiguration struct {
+	modeIsAnalog bool
+	directionPin string
+	forwardPin   string
+	backwardPin  string
+}
+
+// motorModeIsAnalogOption is the type for applying analog mode to the configuration
+type motorModeIsAnalogOption bool
+
+// motorDirectionPinOption is the type for applying a direction pin to the configuration
+type motorDirectionPinOption string
+
+// motorForwardPinOption is the type for applying a forward pin to the configuration
+type motorForwardPinOption string
+
+// motorBackwardPinOption is the type for applying a backward pin to the configuration
+type motorBackwardPinOption string
+
 // MotorDriver Represents a Motor
 type MotorDriver struct {
-	name             string
-	connection       DigitalWriter
-	SpeedPin         string
-	SwitchPin        string
-	DirectionPin     string
-	ForwardPin       string
-	BackwardPin      string
-	CurrentState     byte
-	CurrentSpeed     byte
-	CurrentMode      string
-	CurrentDirection string
+	*driver
+	motorCfg         *motorConfiguration
+	currentState     byte
+	currentSpeed     byte
+	currentDirection string
 }
 
-// NewMotorDriver return a new MotorDriver given a DigitalWriter and pin
-func NewMotorDriver(a DigitalWriter, speedPin string) *MotorDriver {
-	return &MotorDriver{
-		name:             gobot.DefaultName("Motor"),
-		connection:       a,
-		SpeedPin:         speedPin,
-		CurrentState:     0,
-		CurrentSpeed:     0,
-		CurrentMode:      "digital",
-		CurrentDirection: "forward",
-	}
-}
-
-// Name returns the MotorDrivers name
-func (d *MotorDriver) Name() string { return d.name }
-
-// SetName sets the MotorDrivers name
-func (d *MotorDriver) SetName(n string) { d.name = n }
-
-// Connection returns the MotorDrivers Connection
-func (d *MotorDriver) Connection() gobot.Connection {
-	if conn, ok := d.connection.(gobot.Connection); ok {
-		return conn
+// NewMotorDriver return a new MotorDriver given a DigitalWriter and pin. This defaults to digital mode and just switch
+// on and off in forward direction. Optional pins can be given, depending on your hardware. So the direction can be
+// changed with one pin or by using separated forward and backward pins.
+//
+// If the given pin supports the PwmWriter the motor can be used/switched to analog mode by writing once to SetSpeed()
+// or by calling SetAnalogMode(). The optional pins can be used for direction control.
+//
+// Supported options:
+//
+//	"WithName"
+//	"WithMotorAnalog"
+//	"WithMotorDirectionPin"
+//	"WithMotorForwardPin"
+//	"WithMotorBackwardPin"
+func NewMotorDriver(a DigitalWriter, speedPin string, opts ...interface{}) *MotorDriver {
+	//nolint:forcetypeassert // no error return value, so there is no better way
+	d := &MotorDriver{
+		driver:           newDriver(a.(gobot.Connection), "Motor", withPin(speedPin)),
+		motorCfg:         &motorConfiguration{},
+		currentDirection: "forward",
 	}
 
-	log.Printf("%s has no gobot connection\n", d.name)
-	return nil
+	for _, opt := range opts {
+		switch o := opt.(type) {
+		case optionApplier:
+			o.apply(d.driverCfg)
+		case motorOptionApplier:
+			o.apply(d.motorCfg)
+		default:
+			panic(fmt.Sprintf("'%s' can not be applied on '%s'", opt, d.driverCfg.name))
+		}
+	}
+
+	return d
 }
 
-// Start implements the Driver interface
-func (d *MotorDriver) Start() error { return nil }
+// WithMotorAnalog change the default mode "digital" to analog for the motor.
+func WithMotorAnalog() motorOptionApplier {
+	return motorModeIsAnalogOption(true)
+}
 
-// Halt implements the Driver interface
-func (d *MotorDriver) Halt() error { return nil }
+// WithMotorDirectionPin introduces a pin for change the direction of the motor.
+func WithMotorDirectionPin(pin string) motorOptionApplier {
+	return motorDirectionPinOption(pin)
+}
 
-// Off turns the motor off or sets the motor to a 0 speed
+// WithMotorForwardPin introduces a pin for setting the direction to forward.
+func WithMotorForwardPin(pin string) motorOptionApplier {
+	return motorForwardPinOption(pin)
+}
+
+// WithMotorBackwardPin introduces a pin for setting the direction to backward.
+func WithMotorBackwardPin(pin string) motorOptionApplier {
+	return motorBackwardPinOption(pin)
+}
+
+// Off turns the motor off or sets the motor to a 0 speed.
 func (d *MotorDriver) Off() error {
-	if d.isDigital() {
+	if d.IsDigital() {
 		return d.changeState(0)
 	}
 
-	return d.Speed(0)
+	return d.SetSpeed(0)
 }
 
-// On turns the motor on or sets the motor to a maximum speed
+// On turns the motor on or sets the motor to a maximum speed.
 func (d *MotorDriver) On() error {
-	if d.isDigital() {
+	if d.IsDigital() {
 		return d.changeState(1)
 	}
-	if d.CurrentSpeed == 0 {
-		d.CurrentSpeed = 255
+
+	if d.currentSpeed == 0 {
+		d.currentSpeed = 255
 	}
 
-	return d.Speed(d.CurrentSpeed)
+	return d.SetSpeed(d.currentSpeed)
 }
 
-// Min sets the motor to the minimum speed
-func (d *MotorDriver) Min() error {
+// RunMin sets the motor to the minimum speed.
+func (d *MotorDriver) RunMin() error {
 	return d.Off()
 }
 
-// Max sets the motor to the maximum speed
-func (d *MotorDriver) Max() error {
-	return d.Speed(255)
+// RunMax sets the motor to the maximum speed.
+func (d *MotorDriver) RunMax() error {
+	return d.SetSpeed(255)
 }
 
-// IsOn returns true if the motor is on
-func (d *MotorDriver) IsOn() bool {
-	if d.isDigital() {
-		return d.CurrentState == 1
-	}
-	return d.CurrentSpeed > 0
-}
-
-// IsOff returns true if the motor is off
-func (d *MotorDriver) IsOff() bool {
-	return !d.IsOn()
-}
-
-// Toggle sets the motor to the opposite of it's current state
+// Toggle sets the motor to the opposite of it's current state.
 func (d *MotorDriver) Toggle() error {
 	if d.IsOn() {
 		return d.Off()
@@ -109,51 +137,51 @@ func (d *MotorDriver) Toggle() error {
 	return d.On()
 }
 
-// Speed sets the speed of the motor
-func (d *MotorDriver) Speed(value byte) error {
+// SetSpeed change the speed of the motor, without change the direction.
+func (d *MotorDriver) SetSpeed(value byte) error {
 	if writer, ok := d.connection.(PwmWriter); ok {
-		d.CurrentMode = "analog"
-		d.CurrentSpeed = value
-		return writer.PwmWrite(d.SpeedPin, value)
+		WithMotorAnalog().apply(d.motorCfg)
+		d.currentSpeed = value
+		return writer.PwmWrite(d.driverCfg.pin, value)
 	}
 	return ErrPwmWriteUnsupported
 }
 
-// Forward sets the forward pin to the specified speed
+// Forward runs the motor forward with the specified speed.
 func (d *MotorDriver) Forward(speed byte) error {
-	if err := d.Direction("forward"); err != nil {
+	if err := d.SetDirection("forward"); err != nil {
 		return err
 	}
-	if err := d.Speed(speed); err != nil {
+	if err := d.SetSpeed(speed); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-// Backward sets the backward pin to the specified speed
+// Backward runs the motor backward with the specified speed.
 func (d *MotorDriver) Backward(speed byte) error {
-	if err := d.Direction("backward"); err != nil {
+	if err := d.SetDirection("backward"); err != nil {
 		return err
 	}
-	if err := d.Speed(speed); err != nil {
+	if err := d.SetSpeed(speed); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-// Direction sets the direction pin to the specified speed
-func (d *MotorDriver) Direction(direction string) error {
-	d.CurrentDirection = direction
-	if d.DirectionPin != "" {
+// Direction sets the direction pin to the specified direction.
+func (d *MotorDriver) SetDirection(direction string) error {
+	d.currentDirection = direction
+	if d.motorCfg.directionPin != "" {
 		var level byte
 		if direction == "forward" {
 			level = 1
 		} else {
 			level = 0
 		}
-		return d.connection.DigitalWrite(d.DirectionPin, level)
+		return d.digitalWrite(d.motorCfg.directionPin, level)
 	}
 
 	var forwardLevel, backwardLevel byte
@@ -169,41 +197,108 @@ func (d *MotorDriver) Direction(direction string) error {
 		backwardLevel = 0
 	}
 
-	if err := d.connection.DigitalWrite(d.ForwardPin, forwardLevel); err != nil {
-		return err
+	if d.motorCfg.forwardPin != "" {
+		if err := d.digitalWrite(d.motorCfg.forwardPin, forwardLevel); err != nil {
+			return err
+		}
 	}
 
-	return d.connection.DigitalWrite(d.BackwardPin, backwardLevel)
+	if d.motorCfg.backwardPin != "" {
+		return d.digitalWrite(d.motorCfg.backwardPin, backwardLevel)
+	}
+
+	return nil
 }
 
-func (d *MotorDriver) isDigital() bool {
-	return d.CurrentMode == "digital"
+// IsAnalog returns true if the motor is in analog mode.
+func (d *MotorDriver) IsAnalog() bool {
+	return d.motorCfg.modeIsAnalog
+}
+
+// IsDigital returns true if the motor is in digital mode.
+func (d *MotorDriver) IsDigital() bool {
+	return !d.motorCfg.modeIsAnalog
+}
+
+// IsOn returns true if the motor is on.
+func (d *MotorDriver) IsOn() bool {
+	if d.IsDigital() {
+		return d.currentState == 1
+	}
+	return d.currentSpeed > 0
+}
+
+// IsOff returns true if the motor is off.
+func (d *MotorDriver) IsOff() bool {
+	return !d.IsOn()
+}
+
+// Direction returns the current direction ("forward" or "backward") of the motor.
+func (d *MotorDriver) Direction() string {
+	return d.currentDirection
+}
+
+// Speed returns the current speed of the motor.
+func (d *MotorDriver) Speed() byte {
+	return d.currentSpeed
 }
 
 func (d *MotorDriver) changeState(state byte) error {
-	d.CurrentState = state
+	d.currentState = state
 	if state == 1 {
-		d.CurrentSpeed = 255
+		d.currentSpeed = 255
 	} else {
-		d.CurrentSpeed = 0
+		d.currentSpeed = 0
 	}
 
-	if d.ForwardPin == "" {
-		return d.connection.DigitalWrite(d.SpeedPin, state)
+	if d.motorCfg.forwardPin == "" {
+		return d.digitalWrite(d.driverCfg.pin, state)
 	}
 
 	if state != 1 {
-		return d.Direction("none")
+		return d.SetDirection("none")
 	}
 
-	if err := d.Direction(d.CurrentDirection); err != nil {
+	if err := d.SetDirection(d.currentDirection); err != nil {
 		return err
 	}
-	if d.SpeedPin != "" {
-		if err := d.Speed(d.CurrentSpeed); err != nil {
+	if d.driverCfg.pin != "" {
+		if err := d.SetSpeed(d.currentSpeed); err != nil {
 			return err
 		}
 	}
 
 	return nil
+}
+
+func (o motorModeIsAnalogOption) String() string {
+	return "motor mode (analog, digital) option"
+}
+
+func (o motorDirectionPinOption) String() string {
+	return "direction pin option for motors"
+}
+
+func (o motorForwardPinOption) String() string {
+	return "forward pin option for motors"
+}
+
+func (o motorBackwardPinOption) String() string {
+	return "backward pin option for motors"
+}
+
+func (o motorModeIsAnalogOption) apply(cfg *motorConfiguration) {
+	cfg.modeIsAnalog = bool(o)
+}
+
+func (o motorDirectionPinOption) apply(cfg *motorConfiguration) {
+	cfg.directionPin = string(o)
+}
+
+func (o motorForwardPinOption) apply(cfg *motorConfiguration) {
+	cfg.forwardPin = string(o)
+}
+
+func (o motorBackwardPinOption) apply(cfg *motorConfiguration) {
+	cfg.backwardPin = string(o)
 }

@@ -9,6 +9,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"gobot.io/x/gobot/v2/drivers/aio"
 )
 
 func initTestStepperDriverWithStubbedAdaptor() (*StepperDriver, *gpioTestAdaptor) {
@@ -22,23 +24,45 @@ func initTestStepperDriverWithStubbedAdaptor() (*StepperDriver, *gpioTestAdaptor
 func TestNewStepperDriver(t *testing.T) {
 	// arrange
 	const stepsPerRev = 32
-
 	a := newGpioTestAdaptor()
 	// act
 	d := NewStepperDriver(a, [4]string{"7", "11", "13", "15"}, StepperModes.DualPhaseStepping, stepsPerRev)
 	// assert
 	assert.IsType(t, &StepperDriver{}, d)
-	assert.True(t, strings.HasPrefix(d.name, "Stepper"))
+	// assert: gpio.driver attributes
+	require.NotNil(t, d.driver)
+	assert.True(t, strings.HasPrefix(d.driverCfg.name, "Stepper"))
 	assert.Equal(t, a, d.connection)
 	require.NoError(t, d.afterStart())
 	require.NoError(t, d.beforeHalt())
 	assert.NotNil(t, d.Commander)
 	assert.NotNil(t, d.mutex)
+	// assert: driver specific attributes
 	assert.Equal(t, "forward", d.direction)
 	assert.Equal(t, StepperModes.DualPhaseStepping, d.phase)
 	assert.InDelta(t, float32(stepsPerRev), d.stepsPerRev, 0.0)
 	assert.Equal(t, 0, d.stepNum)
 	assert.Nil(t, d.stopAsynchRunFunc)
+}
+
+func TestNewStepperDriver_options(t *testing.T) {
+	// This is a general test, that options are applied in constructor by using the common WithName() option, least one
+	// option of this driver and one of another driver (which should lead to panic). Further tests for options can also
+	// be done by call of "WithOption(val).apply(cfg)".
+	// arrange
+	const (
+		myName = "left wheel"
+	)
+	panicFunc := func() {
+		NewStepperDriver(newGpioTestAdaptor(), [4]string{"7", "11", "13", "15"}, StepperModes.DualPhaseStepping,
+			32, WithName("crazy"), aio.WithActuatorScaler(func(float64) int { return 0 }))
+	}
+	// act
+	d := NewStepperDriver(newGpioTestAdaptor(), [4]string{"7", "11", "13", "15"}, StepperModes.DualPhaseStepping,
+		32, WithName(myName))
+	// assert
+	assert.Equal(t, myName, d.Name())
+	assert.PanicsWithValue(t, "'scaler option for analog actuators' can not be applied on 'crazy'", panicFunc)
 }
 
 func TestStepperMove_IsMoving(t *testing.T) {

@@ -8,6 +8,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/gpio"
@@ -18,7 +19,7 @@ import (
 func main() {
 	r := raspi.NewAdaptor()
 	gp := i2c.NewGrovePiDriver(r)
-	button := gpio.NewButtonDriver(gp, "D3")
+	button := gpio.NewButtonDriver(gp, "D3", gpio.WithButtonPollInterval(50*time.Millisecond))
 	led := gpio.NewLedDriver(gp, "D2")
 
 	work := func() {

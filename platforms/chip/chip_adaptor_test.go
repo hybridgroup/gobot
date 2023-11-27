@@ -142,17 +142,20 @@ func TestPWM(t *testing.T) {
 	assert.Equal(t, "10000000", fs.Files["/sys/class/pwm/pwmchip0/pwm0/period"].Contents) // pwmPeriodDefault
 	assert.Equal(t, "normal", fs.Files["/sys/class/pwm/pwmchip0/pwm0/polarity"].Contents)
 
+	// prepare 50Hz for servos
+	const fiftyHzNano = "20000000"
+	fs.Files["/sys/class/pwm/pwmchip0/pwm0/period"].Contents = fiftyHzNano
 	err = a.ServoWrite("PWM0", 0)
 	require.NoError(t, err)
 
 	assert.Equal(t, "500000", fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents)
-	assert.Equal(t, "10000000", fs.Files["/sys/class/pwm/pwmchip0/pwm0/period"].Contents)
+	assert.Equal(t, fiftyHzNano, fs.Files["/sys/class/pwm/pwmchip0/pwm0/period"].Contents)
 
 	err = a.ServoWrite("PWM0", 180)
 	require.NoError(t, err)
 
-	assert.Equal(t, "2000000", fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents)
-	assert.Equal(t, "10000000", fs.Files["/sys/class/pwm/pwmchip0/pwm0/period"].Contents) // pwmPeriodDefault
+	assert.Equal(t, "2500000", fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents)
+	assert.Equal(t, fiftyHzNano, fs.Files["/sys/class/pwm/pwmchip0/pwm0/period"].Contents) // pwmPeriodDefault
 
 	require.NoError(t, a.Finalize())
 }

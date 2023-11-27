@@ -275,12 +275,12 @@ a shared set of drivers provided using the `gobot/drivers/gpio` package:
   - Buzzer
   - Direct Pin
   - EasyDriver
-  - Grove Button
-  - Grove Buzzer
-  - Grove LED
-  - Grove Magnetic Switch
-  - Grove Relay
-  - Grove Touch Sensor
+  - Grove Button (by using driver for Button)
+  - Grove Buzzer (by using driver for Buzzer)
+  - Grove LED (by using driver for LED)
+  - Grove Magnetic Switch (by using driver for Button)
+  - Grove Relay (by using driver for Relay)
+  - Grove Touch Sensor (by using driver for Button)
   - HC-SR04 Ultrasonic Ranging Module
   - HD44780 LCD controller
   - LED

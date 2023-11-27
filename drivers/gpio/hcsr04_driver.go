@@ -25,12 +25,26 @@ const (
 	hcsr04PollInputIntervall time.Duration = 10 * time.Microsecond
 )
 
+// hcsr04OptionApplier needs to be implemented by each configurable option type
+type hcsr04OptionApplier interface {
+	apply(cfg *hcsr04Configuration)
+}
+
+// hcsr04Configuration contains all changeable attributes of the driver.
+type hcsr04Configuration struct {
+	useEdgePolling bool
+}
+
+// hcsr04UseEdgePollingOption is the type for applying to use discrete edge polling instead pin edge detection
+// by "cdev" from gpiod.
+type hcsr04UseEdgePollingOption bool
+
 // HCSR04Driver is a driver for ultrasonic range measurement.
 type HCSR04Driver struct {
-	*Driver
+	*driver
+	hcsr04Cfg                    *hcsr04Configuration
 	triggerPinID                 string
 	echoPinID                    string
-	useEdgePolling               bool        // use discrete edge polling instead "cdev" from gpiod
 	measureMutex                 *sync.Mutex // to ensure that only one measurement is done at a time
 	triggerPin                   gobot.DigitalPinner
 	echoPin                      gobot.DigitalPinner
@@ -44,16 +58,31 @@ type HCSR04Driver struct {
 // NewHCSR04Driver creates a new instance of the driver for HC-SR04 (same as SEN-US01).
 //
 // Datasheet: https://www.makershop.de/download/HCSR04-datasheet-version-1.pdf
-func NewHCSR04Driver(a gobot.Adaptor, triggerPinID string, echoPinID string, useEdgePolling bool) *HCSR04Driver {
-	h := HCSR04Driver{
-		Driver:         NewDriver(a, "HCSR04"),
-		triggerPinID:   triggerPinID,
-		echoPinID:      echoPinID,
-		useEdgePolling: useEdgePolling,
-		measureMutex:   &sync.Mutex{},
+//
+// Supported options:
+//
+//	"WithName"
+func NewHCSR04Driver(a gobot.Adaptor, triggerPinID, echoPinID string, opts ...interface{}) *HCSR04Driver {
+	d := HCSR04Driver{
+		driver:       newDriver(a, "HCSR04"),
+		hcsr04Cfg:    &hcsr04Configuration{},
+		triggerPinID: triggerPinID,
+		echoPinID:    echoPinID,
+		measureMutex: &sync.Mutex{},
 	}
 
-	h.afterStart = func() error {
+	for _, opt := range opts {
+		switch o := opt.(type) {
+		case optionApplier:
+			o.apply(d.driverCfg)
+		case hcsr04OptionApplier:
+			o.apply(d.hcsr04Cfg)
+		default:
+			panic(fmt.Sprintf("'%s' can not be applied on '%s'", opt, d.driverCfg.name))
+		}
+	}
+
+	d.afterStart = func() error {
 		tpin, err := a.(gobot.DigitalPinnerProvider).DigitalPin(triggerPinID)
 		if err != nil {
 			return fmt.Errorf("error on get trigger pin: %v", err)
@@ -61,7 +90,7 @@ func NewHCSR04Driver(a gobot.Adaptor, triggerPinID string, echoPinID string, use
 		if err := tpin.ApplyOptions(system.WithPinDirectionOutput(0)); err != nil {
 			return fmt.Errorf("error on apply output for trigger pin: %v", err)
 		}
-		h.triggerPin = tpin
+		d.triggerPin = tpin
 
 		// pins are inputs by default
 		epin, err := a.(gobot.DigitalPinnerProvider).DigitalPin(echoPinID)
@@ -69,99 +98,104 @@ func NewHCSR04Driver(a gobot.Adaptor, triggerPinID string, echoPinID string, use
 			return fmt.Errorf("error on get echo pin: %v", err)
 		}
 
-		epinOptions := []func(gobot.DigitalPinOptioner) bool{system.WithPinEventOnBothEdges(h.createEventHandler())}
-		if h.useEdgePolling {
-			h.pollQuitChan = make(chan struct{})
-			epinOptions = append(epinOptions, system.WithPinPollForEdgeDetection(hcsr04PollInputIntervall, h.pollQuitChan))
+		epinOptions := []func(gobot.DigitalPinOptioner) bool{system.WithPinEventOnBothEdges(d.createEventHandler())}
+		if d.hcsr04Cfg.useEdgePolling {
+			d.pollQuitChan = make(chan struct{})
+			epinOptions = append(epinOptions, system.WithPinPollForEdgeDetection(hcsr04PollInputIntervall, d.pollQuitChan))
 		}
 		if err := epin.ApplyOptions(epinOptions...); err != nil {
 			return fmt.Errorf("error on apply options for echo pin: %v", err)
 		}
-		h.echoPin = epin
+		d.echoPin = epin
 
-		h.delayMicroSecChan = make(chan int64)
+		d.delayMicroSecChan = make(chan int64)
 
 		return nil
 	}
 
-	h.beforeHalt = func() error {
-		if useEdgePolling {
-			close(h.pollQuitChan)
+	d.beforeHalt = func() error {
+		if d.hcsr04Cfg.useEdgePolling {
+			close(d.pollQuitChan)
 		}
 
-		if err := h.stopDistanceMonitor(); err != nil {
+		if err := d.stopDistanceMonitor(); err != nil {
 			fmt.Printf("no need to stop distance monitoring: %v\n", err)
 		}
 
 		// note: Unexport() of all pins will be done on adaptor.Finalize()
 
-		close(h.delayMicroSecChan)
+		close(d.delayMicroSecChan)
 
 		return nil
 	}
 
-	return &h
+	return &d
+}
+
+// WithHCSR04UseEdgePolling use discrete edge polling instead pin edge detection by "cdev" from gpiod.
+func WithHCSR04UseEdgePolling() hcsr04OptionApplier {
+	return hcsr04UseEdgePollingOption(true)
 }
 
 // MeasureDistance retrieves the distance in front of sensor in meters and returns the measure. It is not designed
 // to work in a fast loop! For this specific usage, use StartDistanceMonitor() associated with Distance() instead.
-func (h *HCSR04Driver) MeasureDistance() (float64, error) {
-	err := h.measureDistance()
+func (d *HCSR04Driver) MeasureDistance() (float64, error) {
+	err := d.measureDistance()
 	if err != nil {
 		return 0, err
 	}
-	return h.Distance(), nil
+	return d.Distance(), nil
 }
 
 // Distance returns the last distance measured in meter, it does not trigger a distance measurement
-func (h *HCSR04Driver) Distance() float64 {
-	distMm := h.lastMeasureMicroSec * hcsr04SoundSpeed / 1000 / 2
+func (d *HCSR04Driver) Distance() float64 {
+	distMm := d.lastMeasureMicroSec * hcsr04SoundSpeed / 1000 / 2
 	return float64(distMm) / 1000.0
 }
 
 // StartDistanceMonitor starts continuous measurement. The current value can be read by Distance()
-func (h *HCSR04Driver) StartDistanceMonitor() error {
+func (d *HCSR04Driver) StartDistanceMonitor() error {
 	// ensure that start and stop can not interfere
-	h.mutex.Lock()
-	defer h.mutex.Unlock()
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
 
-	if h.distanceMonitorStopChan != nil {
-		return fmt.Errorf("distance monitor already started for '%s'", h.name)
+	if d.distanceMonitorStopChan != nil {
+		return fmt.Errorf("distance monitor already started for '%s'", d.driverCfg.name)
 	}
 
-	h.distanceMonitorStopChan = make(chan struct{})
-	h.distanceMonitorStopWaitGroup = &sync.WaitGroup{}
-	h.distanceMonitorStopWaitGroup.Add(1)
+	d.distanceMonitorStopChan = make(chan struct{})
+	d.distanceMonitorStopWaitGroup = &sync.WaitGroup{}
+	d.distanceMonitorStopWaitGroup.Add(1)
 
 	go func(name string) {
-		defer h.distanceMonitorStopWaitGroup.Done()
+		defer d.distanceMonitorStopWaitGroup.Done()
 		for {
 			select {
-			case <-h.distanceMonitorStopChan:
-				h.distanceMonitorStopChan = nil
+			case <-d.distanceMonitorStopChan:
+				d.distanceMonitorStopChan = nil
 				return
 			default:
-				if err := h.measureDistance(); err != nil {
+				if err := d.measureDistance(); err != nil {
 					fmt.Printf("continuous measure distance skipped for '%s': %v\n", name, err)
 				}
 				time.Sleep(hcsr04MonitorUpdate)
 			}
 		}
-	}(h.name)
+	}(d.driverCfg.name)
 
 	return nil
 }
 
 // StopDistanceMonitor stop the monitor process
-func (h *HCSR04Driver) StopDistanceMonitor() error {
+func (d *HCSR04Driver) StopDistanceMonitor() error {
 	// ensure that start and stop can not interfere
-	h.mutex.Lock()
-	defer h.mutex.Unlock()
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
 
-	return h.stopDistanceMonitor()
+	return d.stopDistanceMonitor()
 }
 
-func (h *HCSR04Driver) createEventHandler() func(int, time.Duration, string, uint32, uint32) {
+func (d *HCSR04Driver) createEventHandler() func(int, time.Duration, string, uint32, uint32) {
 	var startTimestamp time.Duration
 	return func(offset int, t time.Duration, et string, sn uint32, lsn uint32) {
 		switch et {
@@ -173,28 +207,28 @@ func (h *HCSR04Driver) createEventHandler() func(int, time.Duration, string, uin
 			if startTimestamp == 0 {
 				return
 			}
-			h.delayMicroSecChan <- (t - startTimestamp).Microseconds()
+			d.delayMicroSecChan <- (t - startTimestamp).Microseconds()
 			startTimestamp = 0
 		}
 	}
 }
 
-func (h *HCSR04Driver) stopDistanceMonitor() error {
-	if h.distanceMonitorStopChan == nil {
-		return fmt.Errorf("distance monitor is not yet started for '%s'", h.name)
+func (d *HCSR04Driver) stopDistanceMonitor() error {
+	if d.distanceMonitorStopChan == nil {
+		return fmt.Errorf("distance monitor is not yet started for '%s'", d.driverCfg.name)
 	}
 
-	h.distanceMonitorStopChan <- struct{}{}
-	h.distanceMonitorStopWaitGroup.Wait()
+	d.distanceMonitorStopChan <- struct{}{}
+	d.distanceMonitorStopWaitGroup.Wait()
 
 	return nil
 }
 
-func (h *HCSR04Driver) measureDistance() error {
-	h.measureMutex.Lock()
-	defer h.measureMutex.Unlock()
+func (d *HCSR04Driver) measureDistance() error {
+	d.measureMutex.Lock()
+	defer d.measureMutex.Unlock()
 
-	if err := h.emitTrigger(); err != nil {
+	if err := d.emitTrigger(); err != nil {
 		return err
 	}
 
@@ -202,17 +236,25 @@ func (h *HCSR04Driver) measureDistance() error {
 	timeout := hcsr04StartTransmitTimeout + hcsr04ReceiveTimeout
 	select {
 	case <-time.After(timeout):
-		return fmt.Errorf("timeout %s reached while waiting for value with echo pin %s", timeout, h.echoPinID)
-	case h.lastMeasureMicroSec = <-h.delayMicroSecChan:
+		return fmt.Errorf("timeout %s reached while waiting for value with echo pin %s", timeout, d.echoPinID)
+	case d.lastMeasureMicroSec = <-d.delayMicroSecChan:
 	}
 
 	return nil
 }
 
-func (h *HCSR04Driver) emitTrigger() error {
-	if err := h.triggerPin.Write(1); err != nil {
+func (d *HCSR04Driver) emitTrigger() error {
+	if err := d.triggerPin.Write(1); err != nil {
 		return err
 	}
 	time.Sleep(hcsr04EmitTriggerDuration)
-	return h.triggerPin.Write(0)
+	return d.triggerPin.Write(0)
+}
+
+func (o hcsr04UseEdgePollingOption) String() string {
+	return "hcsr04 use edge polling option"
+}
+
+func (o hcsr04UseEdgePollingOption) apply(cfg *hcsr04Configuration) {
+	cfg.useEdgePolling = bool(o)
 }

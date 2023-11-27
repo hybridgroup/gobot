@@ -60,7 +60,7 @@ var StepperModes = struct {
 
 // StepperDriver is a common driver for stepper motors. It supports 3 different stepping modes.
 type StepperDriver struct {
-	*Driver
+	*driver
 
 	pins        [4]string
 	phase       phase
@@ -80,18 +80,27 @@ type StepperDriver struct {
 	stopAsynchRunFunc func(bool) error
 }
 
-// NewStepperDriver returns a new StepperDriver given a
-// DigitalWriter
+// NewStepperDriver returns a new StepperDriver given a DigitalWriter
 // Pins - To which the stepper is connected
 // Phase - Defined by StepperModes {SinglePhaseStepping, DualPhaseStepping, HalfStepping}
 // Steps - No of steps per revolution of Stepper motor
-func NewStepperDriver(a DigitalWriter, pins [4]string, phase phase, stepsPerRev uint) *StepperDriver {
+//
+// Supported options:
+//
+//	"WithName"
+func NewStepperDriver(
+	a DigitalWriter,
+	pins [4]string,
+	phase phase,
+	stepsPerRev uint,
+	opts ...interface{},
+) *StepperDriver {
 	if stepsPerRev <= 0 {
 		panic("steps per revolution needs to be greater than zero")
 	}
 	//nolint:forcetypeassert // no error return value, so there is no better way
 	d := &StepperDriver{
-		Driver:         NewDriver(a.(gobot.Connection), "Stepper"),
+		driver:         newDriver(a.(gobot.Connection), "Stepper", opts...),
 		pins:           pins,
 		phase:          phase,
 		stepsPerRev:    float32(stepsPerRev),
@@ -185,7 +194,7 @@ func (d *StepperDriver) IsMoving() bool {
 // Stop running the stepper
 func (d *StepperDriver) Stop() error {
 	if d.stopAsynchRunFunc == nil {
-		return fmt.Errorf("'%s' is not yet started", d.name)
+		return fmt.Errorf("'%s' is not yet started", d.driverCfg.name)
 	}
 
 	err := d.stopAsynchRunFunc(true)
@@ -275,13 +284,13 @@ func (d *StepperDriver) shutdown() error {
 
 func (d *StepperDriver) stepAsynch(stepsToMove float64) error {
 	if d.disabled {
-		return fmt.Errorf("'%s' is disabled and can not be running or moving", d.name)
+		return fmt.Errorf("'%s' is disabled and can not be running or moving", d.driverCfg.name)
 	}
 
 	// if running, return error or stop automatically
 	if d.stopAsynchRunFunc != nil {
 		if !d.haltIfRunning {
-			return fmt.Errorf("'%s' already running or moving", d.name)
+			return fmt.Errorf("'%s' already running or moving", d.driverCfg.name)
 		}
 		d.debug("stop former run forcefully")
 		if err := d.stopAsynchRunFunc(true); err != nil {
@@ -293,7 +302,7 @@ func (d *StepperDriver) stepAsynch(stepsToMove float64) error {
 	// prepare stepping behavior
 	stepsLeft := uint64(math.Abs(stepsToMove))
 	if stepsLeft == 0 {
-		return fmt.Errorf("no steps to do for '%s'", d.name)
+		return fmt.Errorf("no steps to do for '%s'", d.driverCfg.name)
 	}
 
 	// t [min] = steps [st] / (steps_per_revolution [st/u] * speed [u/min]) or
@@ -346,7 +355,7 @@ func (d *StepperDriver) stepAsynch(stepsToMove float64) error {
 
 		if !endlessMovement && forceStop {
 			// do not wait if an normal movement was stopped forcefully
-			log.Printf("'%s' was forcefully stopped\n", d.name)
+			log.Printf("'%s' was forcefully stopped\n", d.driverCfg.name)
 			return nil
 		}
 
@@ -356,7 +365,7 @@ func (d *StepperDriver) stepAsynch(stepsToMove float64) error {
 		case err := <-runErrChan:
 			return err
 		case <-time.After(stopTimeout):
-			return fmt.Errorf("'%s' was not finished in %s", d.name, stopTimeout)
+			return fmt.Errorf("'%s' was not finished in %s", d.driverCfg.name, stopTimeout)
 		}
 	}
 
@@ -409,7 +418,7 @@ func (d *StepperDriver) stepAsynch(stepsToMove float64) error {
 				}
 			}
 		}
-	}(d.name)
+	}(d.driverCfg.name)
 
 	return nil
 }
@@ -446,8 +455,7 @@ func (d *StepperDriver) phasedStepping() error {
 	r := int(math.Abs(float64(d.stepNum))) % len(d.phase)
 
 	for i, v := range d.phase[r] {
-		//nolint:forcetypeassert // type safe by constructor
-		if err := d.connection.(DigitalWriter).DigitalWrite(d.pins[i], v); err != nil {
+		if err := d.digitalWrite(d.pins[i], v); err != nil {
 			d.stepNum = oldStepNum
 			return err
 		}
@@ -461,8 +469,7 @@ func (d *StepperDriver) phasedStepping() error {
 
 func (d *StepperDriver) sleepOuputs() error {
 	for _, pin := range d.pins {
-		//nolint:forcetypeassert // type safe by constructor
-		if err := d.connection.(DigitalWriter).DigitalWrite(pin, 0); err != nil {
+		if err := d.digitalWrite(pin, 0); err != nil {
 			return err
 		}
 	}

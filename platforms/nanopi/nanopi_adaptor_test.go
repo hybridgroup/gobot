@@ -23,13 +23,15 @@ const (
 
 const (
 	pwmDir           = "/sys/devices/platform/soc/1c21400.pwm/pwm/pwmchip0/" //nolint:gosec // false positive
-	pwmPwmDir        = pwmDir + "pwm0/"
 	pwmExportPath    = pwmDir + "export"
 	pwmUnexportPath  = pwmDir + "unexport"
+	pwmPwmDir        = pwmDir + "pwm0/"
 	pwmEnablePath    = pwmPwmDir + "enable"
 	pwmPeriodPath    = pwmPwmDir + "period"
 	pwmDutyCyclePath = pwmPwmDir + "duty_cycle"
 	pwmPolarityPath  = pwmPwmDir + "polarity"
+
+	fiftyHzNano = "20000000"
 )
 
 var pwmMockPaths = []string{
@@ -154,6 +156,8 @@ func TestPwmWrite(t *testing.T) {
 	assert.Equal(t, "3921568", fs.Files[pwmDutyCyclePath].Contents)
 	assert.Equal(t, "normal", fs.Files[pwmPolarityPath].Contents)
 
+	// prepare 50Hz for servos
+	fs.Files[pwmPeriodPath].Contents = fiftyHzNano
 	err = a.ServoWrite("PWM", 0)
 	require.NoError(t, err)
 
@@ -162,7 +166,7 @@ func TestPwmWrite(t *testing.T) {
 	err = a.ServoWrite("PWM", 180)
 	require.NoError(t, err)
 
-	assert.Equal(t, "2000000", fs.Files[pwmDutyCyclePath].Contents)
+	assert.Equal(t, "2500000", fs.Files[pwmDutyCyclePath].Contents)
 	require.NoError(t, a.Finalize())
 }
 

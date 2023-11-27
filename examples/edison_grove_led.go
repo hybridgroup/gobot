@@ -16,7 +16,7 @@ import (
 
 func main() {
 	e := edison.NewAdaptor()
-	led := gpio.NewGroveLedDriver(e, "4")
+	led := gpio.NewLedDriver(e, "4")
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {

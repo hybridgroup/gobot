@@ -30,9 +30,13 @@ func main() {
 	// this is mandatory for systems with defunct edge detection, although the "cdev" is used with an newer Kernel
 	// keep in mind, that this cause more inaccurate measurements
 	const pollEdgeDetection = true
+	opts := []interface{}{}
+	if pollEdgeDetection {
+		opts = append(opts, gpio.WithHCSR04UseEdgePolling())
+	}
 
 	a := tinkerboard.NewAdaptor()
-	hcsr04 := gpio.NewHCSR04Driver(a, triggerOutput, echoInput, pollEdgeDetection)
+	hcsr04 := gpio.NewHCSR04Driver(a, triggerOutput, echoInput, opts...)
 
 	work := func() {
 		if pollEdgeDetection {

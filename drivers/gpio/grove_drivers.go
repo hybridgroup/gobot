@@ -1,9 +1,5 @@
 package gpio
 
-import (
-	"time"
-)
-
 // GroveRelayDriver represents a Relay with a Grove connector
 type GroveRelayDriver struct {
 	*RelayDriver
@@ -11,11 +7,17 @@ type GroveRelayDriver struct {
 
 // NewGroveRelayDriver return a new GroveRelayDriver given a DigitalWriter and pin.
 //
+// Supported options:
+//
+//	"WithName"
+//
 // Adds the following API Commands:
 //
 //	"Toggle" - See RelayDriver.Toggle
 //	"On" - See RelayDriver.On
 //	"Off" - See RelayDriver.Off
+//
+// Deprecated: Please use [gpio.NewRelayDriver] instead. Development will be discontinued.
 func NewGroveRelayDriver(a DigitalWriter, pin string) *GroveRelayDriver {
 	return &GroveRelayDriver{
 		RelayDriver: NewRelayDriver(a, pin),
@@ -27,7 +29,11 @@ type GroveLedDriver struct {
 	*LedDriver
 }
 
-// NewGroveLedDriver return a new GroveLedDriver given a DigitalWriter and pin.
+// NewGroveLedDriver return a new driver for Grove Led given a DigitalWriter and pin.
+//
+// Supported options:
+//
+//	"WithName"
 //
 // Adds the following API Commands:
 //
@@ -35,40 +41,49 @@ type GroveLedDriver struct {
 //	"Toggle" - See LedDriver.Toggle
 //	"On" - See LedDriver.On
 //	"Off" - See LedDriver.Off
+//
+// Deprecated: Please use [gpio.NewLedDriver] instead. Development will be discontinued.
 func NewGroveLedDriver(a DigitalWriter, pin string) *GroveLedDriver {
 	return &GroveLedDriver{
 		LedDriver: NewLedDriver(a, pin),
 	}
 }
 
-// GroveBuzzerDriver represents a buzzer
-// with a Grove connector
+// GroveBuzzerDriver represents a buzzer with a Grove connector
 type GroveBuzzerDriver struct {
 	*BuzzerDriver
 }
 
-// NewGroveBuzzerDriver return a new GroveBuzzerDriver given a DigitalWriter and pin.
-func NewGroveBuzzerDriver(a DigitalWriter, pin string) *GroveBuzzerDriver {
+// NewGroveBuzzerDriver return a new driver for Grove buzzer given a DigitalWriter and pin.
+//
+// Supported options:
+//
+//	"WithName"
+//
+// Deprecated: Please use [gpio.NewBuzzerDriver] instead. Development will be discontinued.
+func NewGroveBuzzerDriver(a DigitalWriter, pin string, opts ...interface{}) *GroveBuzzerDriver {
 	return &GroveBuzzerDriver{
-		BuzzerDriver: NewBuzzerDriver(a, pin),
+		BuzzerDriver: NewBuzzerDriver(a, pin, opts...),
 	}
 }
 
-// GroveButtonDriver represents a button sensor
-// with a Grove connector
+// GroveButtonDriver represents a button sensor with a Grove connector
 type GroveButtonDriver struct {
 	*ButtonDriver
 }
 
-// NewGroveButtonDriver returns a new GroveButtonDriver with a polling interval of
-// 10 Milliseconds given a DigitalReader and pin.
+// NewGroveButtonDriver returns a new driver for Grove button with a polling interval of 10 milliseconds given
+// a DigitalReader and pin.
 //
-// Optionally accepts:
+// Supported options:
 //
-//	time.Duration: Interval at which the ButtonDriver is polled for new information
-func NewGroveButtonDriver(a DigitalReader, pin string, v ...time.Duration) *GroveButtonDriver {
+//	"WithName"
+//	"WithButtonPollInterval"
+//
+// Deprecated: Please use [gpio.NewButtonDriver] instead. Development will be discontinued.
+func NewGroveButtonDriver(a DigitalReader, pin string, opts ...interface{}) *GroveButtonDriver {
 	return &GroveButtonDriver{
-		ButtonDriver: NewButtonDriver(a, pin, v...),
+		ButtonDriver: NewButtonDriver(a, pin, opts...),
 	}
 }
 
@@ -78,32 +93,37 @@ type GroveTouchDriver struct {
 	*ButtonDriver
 }
 
-// NewGroveTouchDriver returns a new GroveTouchDriver with a polling interval of
-// 10 Milliseconds given a DigitalReader and pin.
+// NewGroveTouchDriver returns a new driver for Grove touch sensor with a polling interval of 10 milliseconds given
+// a DigitalReader and pin.
 //
-// Optionally accepts:
+// Supported options:
 //
-//	time.Duration: Interval at which the ButtonDriver is polled for new information
-func NewGroveTouchDriver(a DigitalReader, pin string, v ...time.Duration) *GroveTouchDriver {
+//	"WithName"
+//	"WithButtonPollInterval"
+//
+// Deprecated: Please use [gpio.NewButtonDriver] instead. Development will be discontinued.
+func NewGroveTouchDriver(a DigitalReader, pin string, opts ...interface{}) *GroveTouchDriver {
 	return &GroveTouchDriver{
-		ButtonDriver: NewButtonDriver(a, pin, v...),
+		ButtonDriver: NewButtonDriver(a, pin, opts...),
 	}
 }
 
-// GroveMagneticSwitchDriver represent a magnetic
-// switch sensor with a Grove connector
+// GroveMagneticSwitchDriver represent a magnetic switch sensor with a Grove connector
 type GroveMagneticSwitchDriver struct {
 	*ButtonDriver
 }
 
-// NewGroveMagneticSwitchDriver returns a new GroveMagneticSwitchDriver with a polling interval of
-// 10 Milliseconds given a DigitalReader, name and pin.
+// NewGroveMagneticSwitchDriver returns a new driver for Grove magnetic switch sensor with a polling interval of
+// 10 milliseconds given a DigitalReader, name and pin.
 //
-// Optionally accepts:
+// Supported options:
 //
-//	time.Duration: Interval at which the ButtonDriver is polled for new information
-func NewGroveMagneticSwitchDriver(a DigitalReader, pin string, v ...time.Duration) *GroveMagneticSwitchDriver {
+//	"WithName"
+//	"WithButtonPollInterval"
+//
+// Deprecated: Please use [gpio.NewButtonDriver] instead. Development will be discontinued.
+func NewGroveMagneticSwitchDriver(a DigitalReader, pin string, opts ...interface{}) *GroveMagneticSwitchDriver {
 	return &GroveMagneticSwitchDriver{
-		ButtonDriver: NewButtonDriver(a, pin, v...),
+		ButtonDriver: NewButtonDriver(a, pin, opts...),
 	}
 }

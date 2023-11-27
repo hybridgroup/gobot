@@ -8,13 +8,15 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"gobot.io/x/gobot/v2/drivers/aio"
 )
 
 func initTestEasyDriverWithStubbedAdaptor() (*EasyDriver, *gpioTestAdaptor) {
 	const anglePerStep = 0.5 // use non int step angle to check int math
 
 	a := newGpioTestAdaptor()
-	d := NewEasyDriver(a, anglePerStep, "1", "2", "3", "4")
+	d := NewEasyDriver(a, anglePerStep, "1")
 	return d, a
 }
 
@@ -24,19 +26,19 @@ func TestNewEasyDriver(t *testing.T) {
 
 	a := newGpioTestAdaptor()
 	// act
-	d := NewEasyDriver(a, anglePerStep, "1", "2", "3", "4")
+	d := NewEasyDriver(a, anglePerStep, "1")
 	// assert
 	assert.IsType(t, &EasyDriver{}, d)
-	assert.True(t, strings.HasPrefix(d.name, "EasyDriver"))
+	// assert: gpio.driver attributes
+	require.NotNil(t, d.driver)
+	assert.True(t, strings.HasPrefix(d.driverCfg.name, "EasyDriver"))
 	assert.Equal(t, a, d.connection)
 	require.NoError(t, d.afterStart())
 	require.NoError(t, d.beforeHalt())
 	assert.NotNil(t, d.Commander)
 	assert.NotNil(t, d.mutex)
+	// assert: driver specific attributes
 	assert.Equal(t, "1", d.stepPin)
-	assert.Equal(t, "2", d.dirPin)
-	assert.Equal(t, "3", d.enPin)
-	assert.Equal(t, "4", d.sleepPin)
 	assert.InDelta(t, float32(anglePerStep), d.anglePerStep, 0.0)
 	assert.Equal(t, uint(14), d.speedRpm)
 	assert.Equal(t, "forward", d.direction)
@@ -44,9 +46,55 @@ func TestNewEasyDriver(t *testing.T) {
 	assert.False(t, d.disabled)
 	assert.False(t, d.sleeping)
 	assert.Nil(t, d.stopAsynchRunFunc)
+	require.NotNil(t, d.easyCfg)
+	assert.Empty(t, d.easyCfg.dirPin)
+	assert.Empty(t, d.easyCfg.enPin)
+	assert.Empty(t, d.easyCfg.sleepPin)
 }
 
-func TestEasyDriverMoveDeg_IsMoving(t *testing.T) {
+func TestNewEasyDriver_options(t *testing.T) {
+	// This is a general test, that options are applied in constructor by using the common WithName() option, least one
+	// option of this driver and one of another driver (which should lead to panic). Further tests for options can also
+	// be done by call of "WithOption(val).apply(cfg)".
+	// arrange
+	const (
+		myName = "front wheel"
+		dirPin = "2"
+	)
+	panicFunc := func() {
+		NewEasyDriver(newGpioTestAdaptor(), 0.1, "1", WithName("crazy"),
+			aio.WithActuatorScaler(func(float64) int { return 0 }))
+	}
+	// act
+	d := NewEasyDriver(newGpioTestAdaptor(), 0.2, "1", WithName(myName), WithEasyDirectionPin(dirPin))
+	// assert
+	assert.Equal(t, dirPin, d.easyCfg.dirPin)
+	assert.Equal(t, myName, d.Name())
+	assert.PanicsWithValue(t, "'scaler option for analog actuators' can not be applied on 'crazy', "+
+		"consider to use one of the options instead: WithEasyDirectionPin, WithEasyEnablePin, WithEasySleepPin", panicFunc)
+}
+
+func TestEasy_WithEasyEnablePin(t *testing.T) {
+	// arrange
+	const myEnablePin = "3"
+	cfg := easyConfiguration{}
+	// act
+	WithEasyEnablePin(myEnablePin).apply(&cfg)
+	// assert
+	assert.Equal(t, myEnablePin, cfg.enPin)
+}
+
+func TestEasy_WithEasySleepPin(t *testing.T) {
+	// arrange
+	const mySleepPin = "4"
+	cfg := easyConfiguration{}
+	// act
+	WithEasySleepPin(mySleepPin).apply(&cfg)
+	// assert
+	assert.Equal(t, mySleepPin, cfg.sleepPin)
+}
+
+func TestEasyMoveDeg_IsMoving(t *testing.T) {
 	tests := map[string]struct {
 		inputDeg               int
 		simulateDisabled       bool
@@ -121,7 +169,7 @@ func TestEasyDriverMoveDeg_IsMoving(t *testing.T) {
 	}
 }
 
-func TestEasyDriverRun_IsMoving(t *testing.T) {
+func TestEasyRun_IsMoving(t *testing.T) {
 	tests := map[string]struct {
 		simulateDisabled       bool
 		simulateAlreadyRunning bool
@@ -177,7 +225,7 @@ func TestEasyDriverRun_IsMoving(t *testing.T) {
 	}
 }
 
-func TestEasyDriverStop_IsMoving(t *testing.T) {
+func TestEasyStop_IsMoving(t *testing.T) {
 	// arrange
 	d, _ := initTestEasyDriverWithStubbedAdaptor()
 	require.NoError(t, d.Run())
@@ -201,7 +249,7 @@ func TestEasyDriverHalt_IsMoving(t *testing.T) {
 	assert.False(t, d.IsMoving())
 }
 
-func TestEasyDriverSetDirection(t *testing.T) {
+func TestEasySetDirection(t *testing.T) {
 	const anglePerStep = 0.5 // use non int step angle to check int math
 
 	tests := map[string]struct {
@@ -251,7 +299,7 @@ func TestEasyDriverSetDirection(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// arrange
 			a := newGpioTestAdaptor()
-			d := NewEasyDriver(a, anglePerStep, "1", tc.dirPin, "3", "4")
+			d := NewEasyDriver(a, anglePerStep, "1", WithEasyDirectionPin(tc.dirPin))
 			a.written = nil // reset writes of Start()
 			a.simulateWriteError = tc.simulateWriteErr
 			require.Equal(t, "forward", d.direction)
@@ -270,7 +318,7 @@ func TestEasyDriverSetDirection(t *testing.T) {
 	}
 }
 
-func TestEasyDriverMaxSpeed(t *testing.T) {
+func TestEasyMaxSpeed(t *testing.T) {
 	const delayForMaxSpeed = 1428 * time.Microsecond // 1/700Hz
 
 	tests := map[string]struct {
@@ -315,7 +363,7 @@ func TestEasyDriverMaxSpeed(t *testing.T) {
 	}
 }
 
-func TestEasyDriverSetSpeed(t *testing.T) {
+func TestEasySetSpeed(t *testing.T) {
 	const (
 		anglePerStep = 10
 		maxRpm       = 1166
@@ -365,7 +413,7 @@ func TestEasyDriverSetSpeed(t *testing.T) {
 	}
 }
 
-func TestEasyDriver_onePinStepping(t *testing.T) {
+func TestEasy_onePinStepping(t *testing.T) {
 	tests := map[string]struct {
 		countCallsForth  int
 		countCallsBack   int
@@ -469,7 +517,7 @@ func TestEasyDriver_onePinStepping(t *testing.T) {
 	}
 }
 
-func TestEasyDriverEnable_IsEnabled(t *testing.T) {
+func TestEasyEnable_IsEnabled(t *testing.T) {
 	const anglePerStep = 0.5 // use non int step angle to check int math
 
 	tests := map[string]struct {
@@ -507,7 +555,7 @@ func TestEasyDriverEnable_IsEnabled(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// arrange
 			a := newGpioTestAdaptor()
-			d := NewEasyDriver(a, anglePerStep, "1", "2", tc.enPin, "4")
+			d := NewEasyDriver(a, anglePerStep, "1", WithEasyEnablePin(tc.enPin))
 			a.written = nil // reset writes of Start()
 			a.simulateWriteError = tc.simulateWriteErr
 			d.disabled = true
@@ -528,7 +576,7 @@ func TestEasyDriverEnable_IsEnabled(t *testing.T) {
 	}
 }
 
-func TestEasyDriverDisable_IsEnabled(t *testing.T) {
+func TestEasyDisable_IsEnabled(t *testing.T) {
 	const anglePerStep = 0.5 // use non int step angle to check int math
 
 	tests := map[string]struct {
@@ -568,7 +616,7 @@ func TestEasyDriverDisable_IsEnabled(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// arrange
 			a := newGpioTestAdaptor()
-			d := NewEasyDriver(a, anglePerStep, "1", "2", tc.enPin, "4")
+			d := NewEasyDriver(a, anglePerStep, "1", WithEasyEnablePin(tc.enPin))
 			var numCallsWrite int
 			var writtenPin string
 			writtenValue := byte(0xFF)
@@ -609,7 +657,7 @@ func TestEasyDriverDisable_IsEnabled(t *testing.T) {
 	}
 }
 
-func TestEasyDriverSleep_IsSleeping(t *testing.T) {
+func TestEasySleep_IsSleeping(t *testing.T) {
 	const anglePerStep = 0.5 // use non int step angle to check int math
 
 	tests := map[string]struct {
@@ -649,7 +697,7 @@ func TestEasyDriverSleep_IsSleeping(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// arrange
 			a := newGpioTestAdaptor()
-			d := NewEasyDriver(a, anglePerStep, "1", "2", "3", tc.sleepPin)
+			d := NewEasyDriver(a, anglePerStep, "1", WithEasySleepPin(tc.sleepPin))
 			d.sleeping = false
 			require.False(t, d.IsSleeping())
 			// arrange: writes
@@ -688,7 +736,7 @@ func TestEasyDriverSleep_IsSleeping(t *testing.T) {
 	}
 }
 
-func TestEasyDriverWake_IsSleeping(t *testing.T) {
+func TestEasyWake_IsSleeping(t *testing.T) {
 	const anglePerStep = 0.5 // use non int step angle to check int math
 
 	tests := map[string]struct {
@@ -721,7 +769,7 @@ func TestEasyDriverWake_IsSleeping(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// arrange
 			a := newGpioTestAdaptor()
-			d := NewEasyDriver(a, anglePerStep, "1", "2", "3", tc.sleepPin)
+			d := NewEasyDriver(a, anglePerStep, "1", WithEasySleepPin(tc.sleepPin))
 			d.sleeping = true
 			require.True(t, d.IsSleeping())
 			// arrange: writes

@@ -154,6 +154,8 @@ func TestPwmWrite(t *testing.T) {
 	assert.Equal(t, "3921568", fs.Files[pwmDutyCyclePath].Contents)
 	assert.Equal(t, "normal", fs.Files[pwmPolarityPath].Contents)
 
+	// prepare 50Hz for servos
+	fs.Files[pwmPeriodPath].Contents = strconv.Itoa(20000000)
 	err = a.ServoWrite("33", 0)
 	require.NoError(t, err)
 
@@ -162,7 +164,7 @@ func TestPwmWrite(t *testing.T) {
 	err = a.ServoWrite("33", 180)
 	require.NoError(t, err)
 
-	assert.Equal(t, "2000000", fs.Files[pwmDutyCyclePath].Contents)
+	assert.Equal(t, "2500000", fs.Files[pwmDutyCyclePath].Contents)
 	require.NoError(t, a.Finalize())
 }
 

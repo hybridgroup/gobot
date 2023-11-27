@@ -25,38 +25,38 @@ type DriverAndEventer interface {
 }
 
 func TestDriverDefaults(t *testing.T) {
-	testAdaptor := newGpioTestAdaptor()
+	a := newGpioTestAdaptor()
 	pin := "456"
 
 	drivers := []DriverAndPinner{
-		NewGroveTouchDriver(testAdaptor, pin),
-		NewGroveButtonDriver(testAdaptor, pin),
-		NewGroveBuzzerDriver(testAdaptor, pin),
-		NewGroveLedDriver(testAdaptor, pin),
-		NewGroveRelayDriver(testAdaptor, pin),
-		NewGroveMagneticSwitchDriver(testAdaptor, pin),
+		NewGroveTouchDriver(a, pin),
+		NewGroveButtonDriver(a, pin),
+		NewGroveBuzzerDriver(a, pin),
+		NewGroveLedDriver(a, pin),
+		NewGroveRelayDriver(a, pin),
+		NewGroveMagneticSwitchDriver(a, pin),
 	}
 
 	for _, driver := range drivers {
-		assert.Equal(t, testAdaptor, driver.Connection())
+		assert.Equal(t, a, driver.Connection())
 		assert.Equal(t, pin, driver.Pin())
 	}
 }
 
 func TestDigitalDriverHalt(t *testing.T) {
-	testAdaptor := newGpioTestAdaptor()
+	a := newGpioTestAdaptor()
 	pin := "456"
 
 	drivers := []DriverAndEventer{
-		NewGroveTouchDriver(testAdaptor, pin),
-		NewGroveButtonDriver(testAdaptor, pin),
-		NewGroveMagneticSwitchDriver(testAdaptor, pin),
+		NewGroveTouchDriver(a, pin),
+		NewGroveButtonDriver(a, pin),
+		NewGroveMagneticSwitchDriver(a, pin),
 	}
 
 	for _, driver := range drivers {
 
 		var callCount int32
-		testAdaptor.digitalReadFunc = func(string) (int, error) {
+		a.digitalReadFunc = func(string) (int, error) {
 			atomic.AddInt32(&callCount, 1)
 			return 42, nil
 		}
@@ -69,20 +69,21 @@ func TestDigitalDriverHalt(t *testing.T) {
 		lastCallCount := atomic.LoadInt32(&callCount)
 		// If driver was not halted, digital reads would still continue
 		time.Sleep(20 * time.Millisecond)
-		if atomic.LoadInt32(&callCount) != lastCallCount {
-			t.Errorf("DigitalRead was called after driver was halted")
+		// note: if a reading is already in progress, it will be finished before halt have an impact
+		if atomic.LoadInt32(&callCount) > lastCallCount+1 {
+			t.Errorf("DigitalRead was called more than once after driver was halted")
 		}
 	}
 }
 
 func TestDriverPublishesError(t *testing.T) {
-	testAdaptor := newGpioTestAdaptor()
+	a := newGpioTestAdaptor()
 	pin := "456"
 
 	drivers := []DriverAndEventer{
-		NewGroveTouchDriver(testAdaptor, pin),
-		NewGroveButtonDriver(testAdaptor, pin),
-		NewGroveMagneticSwitchDriver(testAdaptor, pin),
+		NewGroveTouchDriver(a, pin),
+		NewGroveButtonDriver(a, pin),
+		NewGroveMagneticSwitchDriver(a, pin),
 	}
 
 	for _, driver := range drivers {
@@ -91,7 +92,7 @@ func TestDriverPublishesError(t *testing.T) {
 		returnErr := func(string) (int, error) {
 			return 0, errors.New("read error")
 		}
-		testAdaptor.digitalReadFunc = returnErr
+		a.digitalReadFunc = returnErr
 
 		require.NoError(t, driver.Start())
 

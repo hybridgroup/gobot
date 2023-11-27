@@ -2,6 +2,7 @@ package adaptors
 
 import (
 	"fmt"
+	"log"
 	"sync"
 
 	multierror "github.com/hashicorp/go-multierror"
@@ -110,7 +111,7 @@ func (a *PWMPinsAdaptor) Finalize() error {
 	return err
 }
 
-// PwmWrite writes a PWM signal to the specified pin.
+// PwmWrite writes a PWM signal to the specified pin. The given value is between 0 and 255.
 func (a *PWMPinsAdaptor) PwmWrite(id string, val byte) error {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
@@ -127,7 +128,7 @@ func (a *PWMPinsAdaptor) PwmWrite(id string, val byte) error {
 	return pin.SetDutyCycle(uint32(float64(period) * duty))
 }
 
-// ServoWrite writes a servo signal to the specified pin.
+// ServoWrite writes a servo signal to the specified pin. The given angle is between 0 and 180°.
 func (a *PWMPinsAdaptor) ServoWrite(id string, angle byte) error {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
@@ -136,16 +137,43 @@ func (a *PWMPinsAdaptor) ServoWrite(id string, angle byte) error {
 	if err != nil {
 		return err
 	}
-	period, err := pin.Period()
+	period, err := pin.Period() // nanoseconds
 	if err != nil {
 		return err
 	}
 
-	// 0.5 ms => -90
+	// 50Hz = 0.02 sec = 20 ms
+	const fiftyHzNanos = 20 * 1000 * 1000
+
+	if period != fiftyHzNanos {
+		log.Printf("WARNING: the PWM acts with a period of %d, but should use %d (50Hz) for servos\n", period, fiftyHzNanos)
+	}
+
+	// TODO: implement an option to give another min-max range
+	// TODO: allow usage of adaptors.WithPWMPinDefaultPeriod() from main.go
+	//
+	// for some older servos, this can happen
+	// 0.5 ms => -90 (1/40 part of period at 50Hz)
 	// 1.5 ms =>   0
-	// 2.0 ms =>  90
-	minDuty := 100 * 0.0005 * float64(period)
-	maxDuty := 100 * 0.0020 * float64(period)
+	// 2.0 ms =>  90 (1/10 part of period at 50Hz)
+
+	// some servos have profiles below/above the 0-180° value
+	// SG90: 1/90: after position a small smooth movement is done
+	// SG90: >1/100: endless movement clock wise
+	// SG90: <1/8: endless movement counter clock wise
+
+	// usually for the most servos (at 50Hz) for 90°
+	// 1.0 ms =>   0 (1/20 part of period at 50Hz)
+	// 1.5 ms =>  45
+	// 2.0 ms =>  90 (1/10 part of period at 50Hz)
+
+	// usually for the most servos (at 50Hz) for 180° (SG90, AD002)
+	// 0.5 ms =>   0 (1/40 part of period at 50Hz)
+	// 1.5 ms =>  90
+	// 2.5 ms => 180 (1/8 part of period at 50Hz)
+
+	minDuty := float64(period) / 40
+	maxDuty := float64(period) / 8
 	duty := uint32(gobot.ToScale(gobot.FromScale(float64(angle), 0, 180), minDuty, maxDuty))
 	return pin.SetDutyCycle(duty)
 }

@@ -4,6 +4,7 @@ package aio
 import (
 	"fmt"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -217,8 +218,8 @@ func TestAnalogSensor_WithSensorCyclicRead(t *testing.T) {
 		semDone <- true
 	})
 
-	// act: send a halt message
-	d.halt <- true
+	// act: send the halt message
+	require.NoError(t, d.Halt())
 
 	// assert: no event
 	select {
@@ -234,18 +235,20 @@ func TestAnalogSensorHalt_WithSensorCyclicRead(t *testing.T) {
 	// arrange
 	d := NewAnalogSensorDriver(newAioTestAdaptor(), "1", WithSensorCyclicRead(10*time.Millisecond))
 	require.NoError(t, d.Start())
-	done := make(chan struct{})
-	// act & assert
+	timeout := 2 * d.sensorCfg.readInterval
+	wg := sync.WaitGroup{}
+	wg.Add(1)
 	go func() {
-		require.NoError(t, d.Halt())
-		close(done)
+		defer wg.Done()
+		select {
+		case <-d.halt: // wait until halt is broadcasted by close the channel
+		case <-time.After(timeout): // otherwise run into the timeout
+			assert.Fail(t, "halt was not received within %s", timeout)
+		}
 	}()
-	// test that the halt is not blocked by any deadlock with mutex and/or channel
-	select {
-	case <-done:
-	case <-time.After(100 * time.Millisecond):
-		t.Errorf("AnalogSensor was not halted")
-	}
+	// act & assert
+	require.NoError(t, d.Halt())
+	wg.Wait() // wait until the go function was really finished
 }
 
 func TestAnalogSensorCommands_WithSensorScaler(t *testing.T) {

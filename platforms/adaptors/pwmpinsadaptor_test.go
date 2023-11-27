@@ -206,13 +206,13 @@ func TestServoWrite(t *testing.T) {
 	assert.Equal(t, "44", fs.Files[pwmExportPath].Contents)
 	assert.Equal(t, "1", fs.Files[pwmEnablePath].Contents)
 	assert.Equal(t, fmt.Sprintf("%d", a.periodDefault), fs.Files[pwmPeriodPath].Contents) //nolint:perfsprint // ok here
-	assert.Equal(t, "500000", fs.Files[pwmDutyCyclePath].Contents)
+	assert.Equal(t, "250000", fs.Files[pwmDutyCyclePath].Contents)
 	assert.Equal(t, "normal", fs.Files[pwmPolarityPath].Contents)
 	require.NoError(t, err)
 
 	err = a.ServoWrite("33", 180)
 	require.NoError(t, err)
-	assert.Equal(t, "2000000", fs.Files[pwmDutyCyclePath].Contents)
+	assert.Equal(t, "1250000", fs.Files[pwmDutyCyclePath].Contents)
 
 	err = a.ServoWrite("notexist", 42)
 	require.ErrorContains(t, err, "'notexist' is not a valid id of a PWM pin")

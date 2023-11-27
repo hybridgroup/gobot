@@ -1,55 +1,80 @@
 package gpio
 
 import (
+	"fmt"
 	"time"
 
 	"gobot.io/x/gobot/v2"
 )
 
-// ButtonDriver Represents a digital Button
-type ButtonDriver struct {
-	*Driver
-	gobot.Eventer
-	pin          string
-	active       bool
-	defaultState int
-	halt         chan bool
-	interval     time.Duration
+// buttonOptionApplier needs to be implemented by each configurable option type
+type buttonOptionApplier interface {
+	apply(cfg *buttonConfiguration)
 }
 
-// NewButtonDriver returns a new ButtonDriver with a polling interval of
-// 10 Milliseconds given a DigitalReader and pin.
+// buttonConfiguration contains all changeable attributes of the driver.
+type buttonConfiguration struct {
+	readInterval time.Duration
+	defaultState int
+}
+
+// buttonReadIntervalOption is the type for applying another read interval to the configuration
+type buttonReadIntervalOption time.Duration
+
+// buttonDefaultStateOption is the type for applying another default state to the configuration
+type buttonDefaultStateOption int
+
+// ButtonDriver Represents a digital Button
+type ButtonDriver struct {
+	*driver
+	buttonCfg *buttonConfiguration
+	gobot.Eventer
+	active bool
+	halt   chan struct{}
+}
+
+// NewButtonDriver returns a driver for a button with a polling interval for changed state of 10 milliseconds,
+// given a DigitalReader and pin.
 //
-// Optionally accepts:
+// Supported options:
 //
-//	time.Duration: Interval at which the ButtonDriver is polled for new information
-func NewButtonDriver(a DigitalReader, pin string, v ...time.Duration) *ButtonDriver {
+//	"WithName"
+//	"WithButtonPollInterval"
+func NewButtonDriver(a DigitalReader, pin string, opts ...interface{}) *ButtonDriver {
 	//nolint:forcetypeassert // no error return value, so there is no better way
 	d := &ButtonDriver{
-		Driver:       NewDriver(a.(gobot.Connection), "Button"),
-		Eventer:      gobot.NewEventer(),
-		pin:          pin,
-		active:       false,
-		defaultState: 0,
-		interval:     10 * time.Millisecond,
-		halt:         make(chan bool),
+		driver:    newDriver(a.(gobot.Connection), "Button", withPin(pin)),
+		buttonCfg: &buttonConfiguration{readInterval: 10 * time.Millisecond, defaultState: 0},
 	}
 	d.afterStart = d.initialize
 	d.beforeHalt = d.shutdown
 
-	if len(v) > 0 {
-		d.interval = v[0]
+	for _, opt := range opts {
+		switch o := opt.(type) {
+		case optionApplier:
+			o.apply(d.driverCfg)
+		case buttonOptionApplier:
+			o.apply(d.buttonCfg)
+		case time.Duration:
+			// TODO this is only for backward compatibility and will be removed after version 2.x
+			d.buttonCfg.readInterval = o
+		default:
+			panic(fmt.Sprintf("'%s' can not be applied on '%s'", opt, d.driverCfg.name))
+		}
 	}
-
-	d.AddEvent(ButtonPush)
-	d.AddEvent(ButtonRelease)
-	d.AddEvent(Error)
 
 	return d
 }
 
-// Pin returns the ButtonDrivers pin
-func (d *ButtonDriver) Pin() string { return d.pin }
+// WithButtonPollInterval change the asynchronous cyclic reading interval from default 10ms to the given value.
+func WithButtonPollInterval(interval time.Duration) buttonOptionApplier {
+	return buttonReadIntervalOption(interval)
+}
+
+// WithButtonDefaultState change the default state from default 0 to the given value.
+func WithButtonDefaultState(s int) buttonOptionApplier {
+	return buttonDefaultStateOption(s)
+}
 
 // Active gets the current state
 func (d *ButtonDriver) Active() bool {
@@ -61,12 +86,13 @@ func (d *ButtonDriver) Active() bool {
 }
 
 // SetDefaultState for the next start.
+// Deprecated: Please use option [gpio.WithButtonDefaultState] instead.
 func (d *ButtonDriver) SetDefaultState(s int) {
 	// ensure that read and write can not interfere
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	d.defaultState = s
+	WithButtonDefaultState(s).apply(d.buttonCfg)
 }
 
 // initialize the ButtonDriver and polls the state of the button at the given interval.
@@ -77,18 +103,30 @@ func (d *ButtonDriver) SetDefaultState(s int) {
 //	Release int - On button release
 //	Error error - On button error
 func (d *ButtonDriver) initialize() error {
-	state := d.defaultState
+	if d.buttonCfg.readInterval == 0 {
+		return fmt.Errorf("the read interval for button needs to be greater than zero")
+	}
+
+	d.Eventer = gobot.NewEventer()
+	d.AddEvent(ButtonPush)
+	d.AddEvent(ButtonRelease)
+	d.AddEvent(Error)
+
+	d.halt = make(chan struct{})
+
+	state := d.buttonCfg.defaultState
+
 	go func() {
 		for {
-			newValue, err := d.connection.(DigitalReader).DigitalRead(d.Pin())
-			if err != nil {
-				d.Publish(Error, err)
-			} else if newValue != state && newValue != -1 {
-				state = newValue
-				d.update(newValue)
-			}
 			select {
-			case <-time.After(d.interval):
+			case <-time.After(d.buttonCfg.readInterval):
+				newValue, err := d.digitalRead(d.driverCfg.pin)
+				if err != nil {
+					d.Publish(Error, err)
+				} else if newValue != state && newValue != -1 {
+					state = newValue
+					d.update(newValue)
+				}
 			case <-d.halt:
 				return
 			}
@@ -98,7 +136,12 @@ func (d *ButtonDriver) initialize() error {
 }
 
 func (d *ButtonDriver) shutdown() error {
-	d.halt <- true
+	if d.buttonCfg.readInterval == 0 || d.halt == nil {
+		// cyclic reading deactivated
+		return nil
+	}
+
+	close(d.halt) // broadcast halt, also to the test
 	return nil
 }
 
@@ -107,11 +150,27 @@ func (d *ButtonDriver) update(newValue int) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	if newValue != d.defaultState {
+	if newValue != d.buttonCfg.defaultState {
 		d.active = true
 		d.Publish(ButtonPush, newValue)
 	} else {
 		d.active = false
 		d.Publish(ButtonRelease, newValue)
 	}
+}
+
+func (o buttonReadIntervalOption) String() string {
+	return "read interval option for buttons"
+}
+
+func (o buttonDefaultStateOption) String() string {
+	return "default state option for buttons"
+}
+
+func (o buttonReadIntervalOption) apply(cfg *buttonConfiguration) {
+	cfg.readInterval = time.Duration(o)
+}
+
+func (o buttonDefaultStateOption) apply(cfg *buttonConfiguration) {
+	cfg.defaultState = int(o)
 }
