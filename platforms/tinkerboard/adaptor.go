@@ -23,10 +23,27 @@ const (
 	defaultSpiMaxSpeed   = 500000
 )
 
+type cdevPin struct {
+	chip uint8
+	line uint8
+}
+
+type gpioPinDefinition struct {
+	sysfs int
+	cdev  cdevPin
+}
+
+type analogPinDefinition struct {
+	path   string
+	r      bool // readable
+	w      bool // writable
+	bufLen uint16
+}
+
 type pwmPinDefinition struct {
-	channel   int
 	dir       string
 	dirRegexp string
+	channel   int
 }
 
 // Adaptor represents a Gobot Adaptor for the ASUS Tinker Board
@@ -34,6 +51,7 @@ type Adaptor struct {
 	name  string
 	sys   *system.Accesser
 	mutex sync.Mutex
+	*adaptors.AnalogPinsAdaptor
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.PWMPinsAdaptor
 	*adaptors.I2cBusAdaptor
@@ -44,10 +62,10 @@ type Adaptor struct {
 //
 // Optional parameters:
 //
-//			adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs (still used by default)
-//			adaptors.WithSpiGpioAccess(sclk, nss, mosi, miso):	use GPIO's instead of /dev/spidev#.#
-//	   adaptors.WithGpiosActiveLow(pin's): invert the pin behavior
-//	   adaptors.WithGpiosPullUp/Down(pin's): sets the internal pull resistor
+//	adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs (still used by default)
+//	adaptors.WithSpiGpioAccess(sclk, nss, mosi, miso):	use GPIO's instead of /dev/spidev#.#
+//	adaptors.WithGpiosActiveLow(pin's): invert the pin behavior
+//	adaptors.WithGpiosPullUp/Down(pin's): sets the internal pull resistor
 //
 // note from RK3288 datasheet: "The pull direction (pullup or pulldown) for all of GPIOs are software-programmable", but
 // the latter is not working for any pin (armbian 22.08.7)
@@ -57,6 +75,7 @@ func NewAdaptor(opts ...func(adaptors.Optioner)) *Adaptor {
 		name: gobot.DefaultName("Tinker Board"),
 		sys:  sys,
 	}
+	c.AnalogPinsAdaptor = adaptors.NewAnalogPinsAdaptor(sys, c.translateAnalogPin)
 	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.translateDigitalPin, opts...)
 	c.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, c.translatePWMPin,
 		adaptors.WithPolarityInvertedIdentifier(pwmInvertedIdentifier))
@@ -85,6 +104,10 @@ func (c *Adaptor) Connect() error {
 		return err
 	}
 
+	if err := c.AnalogPinsAdaptor.Connect(); err != nil {
+		return err
+	}
+
 	if err := c.PWMPinsAdaptor.Connect(); err != nil {
 		return err
 	}
@@ -99,6 +122,10 @@ func (c *Adaptor) Finalize() error {
 	err := c.DigitalPinsAdaptor.Finalize()
 
 	if e := c.PWMPinsAdaptor.Finalize(); e != nil {
+		err = multierror.Append(err, e)
+	}
+
+	if e := c.AnalogPinsAdaptor.Finalize(); e != nil {
 		err = multierror.Append(err, e)
 	}
 
@@ -128,6 +155,24 @@ func (c *Adaptor) validateI2cBusNumber(busNr int) error {
 		return fmt.Errorf("Bus number %d out of range", busNr)
 	}
 	return nil
+}
+
+func (c *Adaptor) translateAnalogPin(id string) (string, bool, bool, uint16, error) {
+	pinInfo, ok := analogPinDefinitions[id]
+	if !ok {
+		return "", false, false, 0, fmt.Errorf("'%s' is not a valid id for a analog pin", id)
+	}
+
+	path := pinInfo.path
+	info, err := c.sys.Stat(path)
+	if err != nil {
+		return "", false, false, 0, fmt.Errorf("Error (%v) on access '%s'", err, path)
+	}
+	if info.IsDir() {
+		return "", false, false, 0, fmt.Errorf("The item '%s' is a directory, which is not expected", path)
+	}
+
+	return path, pinInfo.r, pinInfo.w, pinInfo.bufLen, nil
 }
 
 func (c *Adaptor) translateDigitalPin(id string) (string, int, error) {

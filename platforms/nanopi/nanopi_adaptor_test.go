@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/aio"
 	"gobot.io/x/gobot/v2/drivers/gpio"
 	"gobot.io/x/gobot/v2/drivers/i2c"
 	"gobot.io/x/gobot/v2/system"
@@ -58,6 +59,7 @@ var (
 	_ gpio.DigitalWriter          = (*Adaptor)(nil)
 	_ gpio.PwmWriter              = (*Adaptor)(nil)
 	_ gpio.ServoWriter            = (*Adaptor)(nil)
+	_ aio.AnalogReader            = (*Adaptor)(nil)
 	_ i2c.Connector               = (*Adaptor)(nil)
 )
 
@@ -96,6 +98,29 @@ func TestDigitalIO(t *testing.T) {
 	assert.Equal(t, 1, i)
 
 	require.ErrorContains(t, a.DigitalWrite("99", 1), "'99' is not a valid id for a digital pin")
+	require.NoError(t, a.Finalize())
+}
+
+func TestAnalog(t *testing.T) {
+	mockPaths := []string{
+		"/sys/class/thermal/thermal_zone0/temp",
+	}
+
+	a, fs := initTestAdaptorWithMockedFilesystem(mockPaths)
+
+	fs.Files["/sys/class/thermal/thermal_zone0/temp"].Contents = "567\n"
+	got, err := a.AnalogRead("thermal_zone0")
+	require.NoError(t, err)
+	assert.Equal(t, 567, got)
+
+	_, err = a.AnalogRead("thermal_zone10")
+	require.ErrorContains(t, err, "'thermal_zone10' is not a valid id for a analog pin")
+
+	fs.WithReadError = true
+	_, err = a.AnalogRead("thermal_zone0")
+	require.ErrorContains(t, err, "read error")
+	fs.WithReadError = false
+
 	require.NoError(t, a.Finalize())
 }
 
@@ -338,6 +363,49 @@ func Test_translateDigitalPin(t *testing.T) {
 			assert.Equal(t, tc.wantErr, err)
 			assert.Equal(t, tc.wantChip, chip)
 			assert.Equal(t, tc.wantLine, line)
+		})
+	}
+}
+
+func Test_translateAnalogPin(t *testing.T) {
+	mockedPaths := []string{
+		"/sys/class/thermal/thermal_zone0/temp",
+		"/sys/class/thermal/thermal_zone1/temp",
+	}
+	tests := map[string]struct {
+		id           string
+		wantPath     string
+		wantReadable bool
+		wantBufLen   uint16
+		wantErr      string
+	}{
+		"translate_thermal_zone0": {
+			id:           "thermal_zone0",
+			wantPath:     "/sys/class/thermal/thermal_zone0/temp",
+			wantReadable: true,
+			wantBufLen:   7,
+		},
+		"unknown_id": {
+			id:      "thermal_zone1",
+			wantErr: "'thermal_zone1' is not a valid id for a analog pin",
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			a, _ := initTestAdaptorWithMockedFilesystem(mockedPaths)
+			// act
+			path, r, w, buf, err := a.translateAnalogPin(tc.id)
+			// assert
+			if tc.wantErr != "" {
+				require.EqualError(t, err, tc.wantErr)
+			} else {
+				require.NoError(t, err)
+			}
+			assert.Equal(t, tc.wantPath, path)
+			assert.Equal(t, tc.wantReadable, r)
+			assert.False(t, w)
+			assert.Equal(t, tc.wantBufLen, buf)
 		})
 	}
 }

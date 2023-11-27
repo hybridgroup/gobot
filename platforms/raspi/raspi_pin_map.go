@@ -86,3 +86,8 @@ var pins = map[string]map[string]int{
 		"3": 21,
 	},
 }
+
+var analogPinDefinitions = map[string]analogPinDefinition{
+	// +/-273.200 °C need >=7 characters to read: +/-273200 millidegree Celsius
+	"thermal_zone0": {path: "/sys/class/thermal/thermal_zone0/temp", r: true, w: false, bufLen: 7},
+}

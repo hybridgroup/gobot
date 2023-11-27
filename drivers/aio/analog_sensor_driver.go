@@ -26,7 +26,7 @@ type sensorScaleOption struct {
 	scaler func(input int) (value float64)
 }
 
-// AnalogSensorDriver represents an Analog Sensor
+// AnalogSensorDriver represents an analog sensor
 type AnalogSensorDriver struct {
 	*driver
 	sensorCfg *sensorConfiguration
@@ -35,6 +35,7 @@ type AnalogSensorDriver struct {
 	gobot.Eventer
 	lastRawValue int
 	lastValue    float64
+	analogRead   func() (int, float64, error)
 }
 
 // NewAnalogSensorDriver returns a new driver for analog sensors, given an AnalogReader and pin.
@@ -60,6 +61,7 @@ func NewAnalogSensorDriver(a AnalogReader, pin string, opts ...interface{}) *Ana
 	}
 	d.afterStart = d.initialize
 	d.beforeHalt = d.shutdown
+	d.analogRead = d.analogSensorRead
 
 	for _, opt := range opts {
 		switch o := opt.(type) {
@@ -168,6 +170,7 @@ func (a *AnalogSensorDriver) initialize() error {
 	go func() {
 		timer := time.NewTimer(a.sensorCfg.readInterval)
 		timer.Stop()
+
 		for {
 			// please note, that this ensures the first read is done immediately, but has drawbacks, see notes above
 			rawValue, value, err := a.analogRead()
@@ -183,6 +186,7 @@ func (a *AnalogSensorDriver) initialize() error {
 					oldValue = value
 				}
 			}
+
 			timer.Reset(a.sensorCfg.readInterval) // ensure that after each read is a wait, independent of duration of read
 			select {
 			case <-timer.C:
@@ -205,8 +209,9 @@ func (a *AnalogSensorDriver) shutdown() error {
 	return nil
 }
 
-// analogRead performs an reading from the sensor and sets the internal attributes and returns the raw and scaled value
-func (a *AnalogSensorDriver) analogRead() (int, float64, error) {
+// analogSensorRead performs an reading from the sensor, sets the internal attributes and returns
+// the raw and scaled value
+func (a *AnalogSensorDriver) analogSensorRead() (int, float64, error) {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 

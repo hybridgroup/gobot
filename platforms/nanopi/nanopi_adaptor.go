@@ -33,6 +33,13 @@ type gpioPinDefinition struct {
 	cdev  cdevPin
 }
 
+type analogPinDefinition struct {
+	path   string
+	r      bool // readable
+	w      bool // writable
+	bufLen uint16
+}
+
 type pwmPinDefinition struct {
 	channel   int
 	dir       string
@@ -46,6 +53,7 @@ type Adaptor struct {
 	gpioPinMap map[string]gpioPinDefinition
 	pwmPinMap  map[string]pwmPinDefinition
 	mutex      sync.Mutex
+	*adaptors.AnalogPinsAdaptor
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.PWMPinsAdaptor
 	*adaptors.I2cBusAdaptor
@@ -56,13 +64,13 @@ type Adaptor struct {
 //
 // Optional parameters:
 //
-//			adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs (still used by default)
-//			adaptors.WithSpiGpioAccess(sclk, nss, mosi, miso):	use GPIO's instead of /dev/spidev#.#
-//	   adaptors.WithGpiosActiveLow(pin's): invert the pin behavior
-//	   adaptors.WithGpiosPullUp/Down(pin's): sets the internal pull resistor
-//	   adaptors.WithGpiosOpenDrain/Source(pin's): sets the output behavior
-//	   adaptors.WithGpioDebounce(pin, period): sets the input debouncer
-//	   adaptors.WithGpioEventOnFallingEdge/RaisingEdge/BothEdges(pin, handler): activate edge detection
+//	adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs (still used by default)
+//	adaptors.WithSpiGpioAccess(sclk, nss, mosi, miso):	use GPIO's instead of /dev/spidev#.#
+//	adaptors.WithGpiosActiveLow(pin's): invert the pin behavior
+//	adaptors.WithGpiosPullUp/Down(pin's): sets the internal pull resistor
+//	adaptors.WithGpiosOpenDrain/Source(pin's): sets the output behavior
+//	adaptors.WithGpioDebounce(pin, period): sets the input debouncer
+//	adaptors.WithGpioEventOnFallingEdge/RaisingEdge/BothEdges(pin, handler): activate edge detection
 func NewNeoAdaptor(opts ...func(adaptors.Optioner)) *Adaptor {
 	sys := system.NewAccesser(system.WithDigitalPinGpiodAccess())
 	c := &Adaptor{
@@ -71,6 +79,7 @@ func NewNeoAdaptor(opts ...func(adaptors.Optioner)) *Adaptor {
 		gpioPinMap: neoGpioPins,
 		pwmPinMap:  neoPwmPins,
 	}
+	c.AnalogPinsAdaptor = adaptors.NewAnalogPinsAdaptor(sys, c.translateAnalogPin)
 	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.translateDigitalPin, opts...)
 	c.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, c.translatePWMPin,
 		adaptors.WithPolarityInvertedIdentifier(pwmInvertedIdentifier))
@@ -99,6 +108,10 @@ func (c *Adaptor) Connect() error {
 		return err
 	}
 
+	if err := c.AnalogPinsAdaptor.Connect(); err != nil {
+		return err
+	}
+
 	if err := c.PWMPinsAdaptor.Connect(); err != nil {
 		return err
 	}
@@ -113,6 +126,10 @@ func (c *Adaptor) Finalize() error {
 	err := c.DigitalPinsAdaptor.Finalize()
 
 	if e := c.PWMPinsAdaptor.Finalize(); e != nil {
+		err = multierror.Append(err, e)
+	}
+
+	if e := c.AnalogPinsAdaptor.Finalize(); e != nil {
 		err = multierror.Append(err, e)
 	}
 
@@ -141,6 +158,24 @@ func (c *Adaptor) validateI2cBusNumber(busNr int) error {
 		return fmt.Errorf("Bus number %d out of range", busNr)
 	}
 	return nil
+}
+
+func (c *Adaptor) translateAnalogPin(id string) (string, bool, bool, uint16, error) {
+	pinInfo, ok := analogPinDefinitions[id]
+	if !ok {
+		return "", false, false, 0, fmt.Errorf("'%s' is not a valid id for a analog pin", id)
+	}
+
+	path := pinInfo.path
+	info, err := c.sys.Stat(path)
+	if err != nil {
+		return "", false, false, 0, fmt.Errorf("Error (%v) on access '%s'", err, path)
+	}
+	if info.IsDir() {
+		return "", false, false, 0, fmt.Errorf("The item '%s' is a directory, which is not expected", path)
+	}
+
+	return path, pinInfo.r, pinInfo.w, pinInfo.bufLen, nil
 }
 
 func (c *Adaptor) translateDigitalPin(id string) (string, int, error) {
