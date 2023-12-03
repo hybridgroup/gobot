@@ -31,7 +31,7 @@ type AnalogSensorDriver struct {
 	*driver
 	sensorCfg *sensorConfiguration
 	pin       string
-	halt      chan bool
+	halt      chan struct{}
 	gobot.Eventer
 	lastRawValue int
 	lastValue    float64
@@ -163,7 +163,7 @@ func (a *AnalogSensorDriver) initialize() error {
 	// the writing to halt is blocked because there is no immediate read from channel.
 	// Please note, that this is special behavior caused by the first read is done immediately before the select
 	// statement.
-	a.halt = make(chan bool, 1)
+	a.halt = make(chan struct{}, 1)
 
 	oldRawValue := 0
 	oldValue := 0.0
@@ -205,7 +205,7 @@ func (a *AnalogSensorDriver) shutdown() error {
 		// cyclic reading deactivated
 		return nil
 	}
-	a.halt <- true
+	close(a.halt) // broadcast halt, also to the test
 	return nil
 }
 

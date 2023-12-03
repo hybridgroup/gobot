@@ -10,19 +10,36 @@ import (
 
 const easyDriverDebug = false
 
+// easyOptionApplier needs to be implemented by each configurable option type
+type easyOptionApplier interface {
+	apply(cfg *easyConfiguration)
+}
+
+// easyConfiguration contains all changeable attributes of the driver.
+type easyConfiguration struct {
+	dirPin   string
+	enPin    string
+	sleepPin string
+}
+
+// easyDirPinOption is the type for applying a pin for change direction
+type easyDirPinOption string
+
+// easyEnPinOption is the type for applying a pin for device disabling/enabling
+type easyEnPinOption string
+
+// easySleepPinOption is the type for applying a pin for setting device to sleep/wake
+type easySleepPinOption string
+
 // EasyDriver is an driver for stepper hardware board from SparkFun (https://www.sparkfun.com/products/12779)
 // This should also work for the BigEasyDriver (untested). It is basically a wrapper for the common StepperDriver{}
 // with the specific additions for the board, e.g. direction, enable and sleep outputs.
 type EasyDriver struct {
 	*StepperDriver
-
+	easyCfg      *easyConfiguration
 	stepPin      string
-	dirPin       string
-	enPin        string
-	sleepPin     string
 	anglePerStep float32
-
-	sleeping bool
+	sleeping     bool
 }
 
 // NewEasyDriver returns a new driver
@@ -30,39 +47,32 @@ type EasyDriver struct {
 // A - DigitalWriter
 // anglePerStep - Step angle of motor
 // stepPin - Pin corresponding to step input on EasyDriver
-// dirPin - Pin corresponding to dir input on EasyDriver.  Optional
-// enPin - Pin corresponding to enabled input on EasyDriver.  Optional
-// sleepPin - Pin corresponding to sleep input on EasyDriver.  Optional
-func NewEasyDriver(
-	a DigitalWriter,
-	anglePerStep float32,
-	stepPin string,
-	dirPin string,
-	enPin string,
-	sleepPin string,
-) *EasyDriver {
+//
+// Supported options:
+//
+//	"WithName"
+//	"WithEasyDirectionPin"
+//	"WithEasyEnablePin"
+//	"WithEasySleepPin"
+func NewEasyDriver(a DigitalWriter, anglePerStep float32, stepPin string, opts ...interface{}) *EasyDriver {
 	if anglePerStep <= 0 {
 		panic("angle per step needs to be greater than zero")
 	}
-	// panic if step pin isn't set
+
 	if stepPin == "" {
-		panic("Step pin is not set")
+		panic("step pin is mandatory for easy driver")
 	}
 
 	stepper := NewStepperDriver(a, [4]string{}, nil, 1)
-	stepper.name = gobot.DefaultName("EasyDriver")
+	stepper.driverCfg.name = gobot.DefaultName("EasyDriver")
 	stepper.stepperDebug = easyDriverDebug
 	stepper.haltIfRunning = false
 	stepper.stepsPerRev = 360.0 / anglePerStep
 	d := &EasyDriver{
 		StepperDriver: stepper,
+		easyCfg:       &easyConfiguration{},
 		stepPin:       stepPin,
-		dirPin:        dirPin,
-		enPin:         enPin,
-		sleepPin:      sleepPin,
 		anglePerStep:  anglePerStep,
-
-		sleeping: false,
 	}
 	d.stepFunc = d.onePinStepping
 	d.sleepFunc = d.sleepWithSleepPin
@@ -71,19 +81,48 @@ func NewEasyDriver(
 	// 1/4 of max speed. Not too fast, not too slow
 	d.speedRpm = d.MaxSpeed() / 4
 
+	for _, opt := range opts {
+		switch o := opt.(type) {
+		case optionApplier:
+			o.apply(d.driverCfg)
+		case easyOptionApplier:
+			o.apply(d.easyCfg)
+		default:
+			oNames := []string{"WithEasyDirectionPin", "WithEasyEnablePin", "WithEasySleepPin"}
+			msg := fmt.Sprintf("'%s' can not be applied on '%s', consider to use one of the options instead: %s",
+				opt, d.driverCfg.name, strings.Join(oNames, ", "))
+			panic(msg)
+		}
+	}
+
 	return d
+}
+
+// WithEasyDirectionPin configure a pin for change the moving direction.
+func WithEasyDirectionPin(pin string) easyOptionApplier {
+	return easyDirPinOption(pin)
+}
+
+// WithEasyEnablePin configure a pin for disabling/enabling the driver.
+func WithEasyEnablePin(pin string) easyOptionApplier {
+	return easyEnPinOption(pin)
+}
+
+// WithEasySleepPin configure a pin for sleep/wake the driver.
+func WithEasySleepPin(pin string) easyOptionApplier {
+	return easySleepPinOption(pin)
 }
 
 // SetDirection sets the direction to be moving.
 func (d *EasyDriver) SetDirection(direction string) error {
+	if d.easyCfg.dirPin == "" {
+		return fmt.Errorf("dirPin is not set for '%s'", d.driverCfg.name)
+	}
+
 	direction = strings.ToLower(direction)
 	if direction != StepperDriverForward && direction != StepperDriverBackward {
 		return fmt.Errorf("Invalid direction '%s'. Value should be '%s' or '%s'",
 			direction, StepperDriverForward, StepperDriverBackward)
-	}
-
-	if d.dirPin == "" {
-		return fmt.Errorf("dirPin is not set for '%s'", d.name)
 	}
 
 	writeVal := byte(0) // low is forward
@@ -91,8 +130,7 @@ func (d *EasyDriver) SetDirection(direction string) error {
 		writeVal = 1 // high is backward
 	}
 
-	//nolint:forcetypeassert // type safe by constructor
-	if err := d.connection.(DigitalWriter).DigitalWrite(d.dirPin, writeVal); err != nil {
+	if err := d.digitalWrite(d.easyCfg.dirPin, writeVal); err != nil {
 		return err
 	}
 
@@ -106,14 +144,13 @@ func (d *EasyDriver) SetDirection(direction string) error {
 
 // Enable enables all motor output
 func (d *EasyDriver) Enable() error {
-	if d.enPin == "" {
+	if d.easyCfg.enPin == "" {
 		d.disabled = false
-		return fmt.Errorf("enPin is not set - board '%s' is enabled by default", d.name)
+		return fmt.Errorf("enPin is not set - board '%s' is enabled by default", d.driverCfg.name)
 	}
 
 	// enPin is active low
-	//nolint:forcetypeassert // type safe by constructor
-	if err := d.connection.(DigitalWriter).DigitalWrite(d.enPin, 0); err != nil {
+	if err := d.digitalWrite(d.easyCfg.enPin, 0); err != nil {
 		return err
 	}
 
@@ -123,15 +160,14 @@ func (d *EasyDriver) Enable() error {
 
 // Disable disables all motor output
 func (d *EasyDriver) Disable() error {
-	if d.enPin == "" {
-		return fmt.Errorf("enPin is not set for '%s'", d.name)
+	if d.easyCfg.enPin == "" {
+		return fmt.Errorf("enPin is not set for '%s'", d.driverCfg.name)
 	}
 
 	_ = d.stopIfRunning() // drop step errors
 
 	// enPin is active low
-	//nolint:forcetypeassert // type safe by constructor
-	if err := d.connection.(DigitalWriter).DigitalWrite(d.enPin, 1); err != nil {
+	if err := d.digitalWrite(d.easyCfg.enPin, 1); err != nil {
 		return err
 	}
 	d.disabled = true
@@ -146,13 +182,12 @@ func (d *EasyDriver) IsEnabled() bool {
 
 // Wake wakes up the driver
 func (d *EasyDriver) Wake() error {
-	if d.sleepPin == "" {
-		return fmt.Errorf("sleepPin is not set for '%s'", d.name)
+	if d.easyCfg.sleepPin == "" {
+		return fmt.Errorf("sleepPin is not set for '%s'", d.driverCfg.name)
 	}
 
 	// sleepPin is active low
-	//nolint:forcetypeassert // type safe by constructor
-	if err := d.connection.(DigitalWriter).DigitalWrite(d.sleepPin, 1); err != nil {
+	if err := d.digitalWrite(d.easyCfg.sleepPin, 1); err != nil {
 		return err
 	}
 
@@ -175,14 +210,12 @@ func (d *EasyDriver) onePinStepping() error {
 	defer d.valueMutex.Unlock()
 
 	// a valid steps occurs for a low to high transition
-	//nolint:forcetypeassert // type safe by constructor
-	if err := d.connection.(DigitalWriter).DigitalWrite(d.stepPin, 0); err != nil {
+	if err := d.digitalWrite(d.stepPin, 0); err != nil {
 		return err
 	}
 
 	time.Sleep(d.getDelayPerStep())
-	//nolint:forcetypeassert // type safe by constructor
-	if err := d.connection.(DigitalWriter).DigitalWrite(d.stepPin, 1); err != nil {
+	if err := d.digitalWrite(d.stepPin, 1); err != nil {
 		return err
 	}
 
@@ -197,18 +230,41 @@ func (d *EasyDriver) onePinStepping() error {
 
 // sleepWithSleepPin puts the driver to sleep and disables all motor output.  Low power mode.
 func (d *EasyDriver) sleepWithSleepPin() error {
-	if d.sleepPin == "" {
-		return fmt.Errorf("sleepPin is not set for '%s'", d.name)
+	if d.easyCfg.sleepPin == "" {
+		return fmt.Errorf("sleepPin is not set for '%s'", d.driverCfg.name)
 	}
 
 	_ = d.stopIfRunning() // drop step errors
 
 	// sleepPin is active low
-	//nolint:forcetypeassert // type safe by constructor
-	if err := d.connection.(DigitalWriter).DigitalWrite(d.sleepPin, 0); err != nil {
+	if err := d.digitalWrite(d.easyCfg.sleepPin, 0); err != nil {
 		return err
 	}
 	d.sleeping = true
 
 	return nil
+}
+
+func (o easyDirPinOption) String() string {
+	return "direction pin option easy driver"
+}
+
+func (o easyEnPinOption) String() string {
+	return "enable pin option easy driver"
+}
+
+func (o easySleepPinOption) String() string {
+	return "sleep pin option easy driver"
+}
+
+func (o easyDirPinOption) apply(cfg *easyConfiguration) {
+	cfg.dirPin = string(o)
+}
+
+func (o easyEnPinOption) apply(cfg *easyConfiguration) {
+	cfg.enPin = string(o)
+}
+
+func (o easySleepPinOption) apply(cfg *easyConfiguration) {
+	cfg.sleepPin = string(o)
 }

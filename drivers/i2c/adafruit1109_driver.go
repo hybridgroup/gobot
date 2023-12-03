@@ -84,8 +84,9 @@ func NewAdafruit1109Driver(a Connector, options ...func(Config)) *Adafruit1109Dr
 	// but inside the driver the row is used as row and col as column
 	rows := 2
 	columns := 16
-	lcd := gpio.NewHD44780Driver(d, columns, rows, gpio.HD44780_4BITMODE, d.rsPin.String(), d.enPin.String(), dataPins)
-	lcd.SetRWPin(d.rwPin.String())
+	lcd := gpio.NewHD44780Driver(d, columns, rows, gpio.HD44780_4BITMODE, d.rsPin.String(), d.enPin.String(), dataPins,
+		gpio.WithHD44780RWPin(d.rwPin.String()))
+
 	d.HD44780Driver = lcd
 	return d
 }

@@ -4,7 +4,8 @@ package gobot
 type Driver interface {
 	// Name returns the label for the Driver
 	Name() string
-	// SetName sets the label for the Driver
+	// SetName sets the label for the Driver.
+	// Please prefer to use options [gpio.WithName or aio.WithName] instead, if possible.
 	SetName(s string)
 	// Start initiates the Driver
 	Start() error

@@ -16,7 +16,7 @@ import (
 
 func main() {
 	e := edison.NewAdaptor()
-	button := gpio.NewGroveButtonDriver(e, "2")
+	button := gpio.NewButtonDriver(e, "2")
 
 	work := func() {
 		button.On(gpio.ButtonPush, func(data interface{}) {

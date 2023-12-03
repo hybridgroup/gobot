@@ -1,53 +1,75 @@
 package gpio
 
 import (
+	"fmt"
 	"time"
 
 	"gobot.io/x/gobot/v2"
 )
 
-// PIRMotionDriver represents a digital Proximity Infra Red (PIR) motion detecter
-type PIRMotionDriver struct {
-	*Driver
-	gobot.Eventer
-	pin      string
-	active   bool
-	halt     chan bool
-	interval time.Duration
+// pirMotionOptionApplier needs to be implemented by each configurable option type
+type pirMotionOptionApplier interface {
+	apply(cfg *pirMotionConfiguration)
 }
 
-// NewPIRMotionDriver returns a new PIRMotionDriver with a polling interval of
-// 10 Milliseconds given a DigitalReader and pin.
+// pirMotionConfiguration contains all changeable attributes of the driver.
+type pirMotionConfiguration struct {
+	readInterval time.Duration
+}
+
+// pirMotionReadIntervalOption is the type for applying another read interval to the configuration
+type pirMotionReadIntervalOption time.Duration
+
+// PIRMotionDriver represents a digital Proximity Infra Red (PIR) motion detecter
 //
-// Optionally accepts:
+// Supported options:
 //
-//	time.Duration: Interval at which the PIRMotionDriver is polled for new information
-func NewPIRMotionDriver(a DigitalReader, pin string, v ...time.Duration) *PIRMotionDriver {
+//	"WithName"
+type PIRMotionDriver struct {
+	*driver
+	pirMotionCfg *pirMotionConfiguration
+	gobot.Eventer
+	active bool
+	halt   chan struct{}
+}
+
+// NewPIRMotionDriver returns a new driver for  PIR motion sensor with a polling interval of 10 Milliseconds,
+// given a DigitalReader and pin.
+//
+// Supported options:
+//
+//	"WithName"
+//	"WithButtonPollInterval"
+func NewPIRMotionDriver(a DigitalReader, pin string, opts ...interface{}) *PIRMotionDriver {
 	//nolint:forcetypeassert // no error return value, so there is no better way
 	d := &PIRMotionDriver{
-		Driver:   NewDriver(a.(gobot.Connection), "PIRMotion"),
-		Eventer:  gobot.NewEventer(),
-		pin:      pin,
-		active:   false,
-		interval: 10 * time.Millisecond,
-		halt:     make(chan bool),
+		driver:       newDriver(a.(gobot.Connection), "PIRMotion", withPin(pin)),
+		pirMotionCfg: &pirMotionConfiguration{readInterval: 10 * time.Millisecond},
 	}
 	d.afterStart = d.initialize
 	d.beforeHalt = d.shutdown
 
-	if len(v) > 0 {
-		d.interval = v[0]
+	for _, opt := range opts {
+		switch o := opt.(type) {
+		case optionApplier:
+			o.apply(d.driverCfg)
+		case pirMotionOptionApplier:
+			o.apply(d.pirMotionCfg)
+		case time.Duration:
+			// TODO this is only for backward compatibility and will be removed after version 2.x
+			d.pirMotionCfg.readInterval = o
+		default:
+			panic(fmt.Sprintf("'%s' can not be applied on '%s'", opt, d.driverCfg.name))
+		}
 	}
-
-	d.AddEvent(MotionDetected)
-	d.AddEvent(MotionStopped)
-	d.AddEvent(Error)
 
 	return d
 }
 
-// Pin returns the PIRMotionDriver pin
-func (d *PIRMotionDriver) Pin() string { return d.pin }
+// WithPIRMotionPollInterval change the asynchronous cyclic reading interval from default 10ms to the given value.
+func WithPIRMotionPollInterval(interval time.Duration) pirMotionOptionApplier {
+	return pirMotionReadIntervalOption(interval)
+}
 
 // Active gets the current state
 func (d *PIRMotionDriver) Active() bool {
@@ -64,22 +86,33 @@ func (d *PIRMotionDriver) Active() bool {
 //
 //	MotionDetected - On motion detected
 //	MotionStopped int - On motion stopped
-//	Error error - On button error
+//	Error error - On pirMotion error
 //
 // The PIRMotionDriver will send the MotionDetected event over and over,
 // just as long as motion is still being detected.
 // It will only send the MotionStopped event once, however, until
 // motion starts being detected again
 func (d *PIRMotionDriver) initialize() error {
+	if d.pirMotionCfg.readInterval == 0 {
+		return fmt.Errorf("the read interval for pirMotion needs to be greater than zero")
+	}
+
+	d.Eventer = gobot.NewEventer()
+	d.AddEvent(MotionDetected)
+	d.AddEvent(MotionStopped)
+	d.AddEvent(Error)
+
+	d.halt = make(chan struct{})
+
 	go func() {
 		for {
-			newValue, err := d.connection.(DigitalReader).DigitalRead(d.Pin())
-			if err != nil {
-				d.Publish(Error, err)
-			}
-			d.update(newValue)
 			select {
-			case <-time.After(d.interval):
+			case <-time.After(d.pirMotionCfg.readInterval):
+				newValue, err := d.digitalRead(d.driverCfg.pin)
+				if err != nil {
+					d.Publish(Error, err)
+				}
+				d.update(newValue)
 			case <-d.halt:
 				return
 			}
@@ -90,7 +123,12 @@ func (d *PIRMotionDriver) initialize() error {
 
 // shutdown stops polling
 func (d *PIRMotionDriver) shutdown() error {
-	d.halt <- true
+	if d.pirMotionCfg.readInterval == 0 || d.halt == nil {
+		// cyclic reading deactivated
+		return nil
+	}
+
+	close(d.halt) // broadcast halt, also to the test
 	return nil
 }
 
@@ -111,4 +149,12 @@ func (d *PIRMotionDriver) update(newValue int) {
 			d.Publish(MotionStopped, newValue)
 		}
 	}
+}
+
+func (o pirMotionReadIntervalOption) String() string {
+	return "read interval option for PIR motion sensor"
+}
+
+func (o pirMotionReadIntervalOption) apply(cfg *pirMotionConfiguration) {
+	cfg.readInterval = time.Duration(o)
 }

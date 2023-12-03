@@ -39,51 +39,53 @@ func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.
 	return a, fs
 }
 
+const (
+	pwmDir               = "/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/" //nolint:gosec // false positive
+	pwmChip0Dir          = pwmDir + "pwmchip0/"
+	pwmChip0ExportPath   = pwmChip0Dir + "export"
+	pwmChip0UnexportPath = pwmChip0Dir + "unexport"
+	pwmChip0Pwm0Dir      = pwmChip0Dir + "pwm0/"
+	pwm0EnablePath       = pwmChip0Pwm0Dir + "enable"
+	pwm0PeriodPath       = pwmChip0Pwm0Dir + "period"
+	pwm0DutyCyclePath    = pwmChip0Pwm0Dir + "duty_cycle"
+	pwm0PolarityPath     = pwmChip0Pwm0Dir + "polarity"
+
+	pwmChip0Pwm1Dir   = pwmChip0Dir + "pwm1/"
+	pwm1EnablePath    = pwmChip0Pwm1Dir + "enable"
+	pwm1PeriodPath    = pwmChip0Pwm1Dir + "period"
+	pwm1DutyCyclePath = pwmChip0Pwm1Dir + "duty_cycle"
+	pwm1PolarityPath  = pwmChip0Pwm1Dir + "polarity"
+)
+
 func TestPWM(t *testing.T) {
 	mockPaths := []string{
 		"/sys/devices/platform/ocp/ocp:P9_22_pinmux/state",
 		"/sys/devices/platform/ocp/ocp:P9_21_pinmux/state",
 		"/sys/bus/iio/devices/iio:device0/in_voltage1_raw",
-		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/export",
-		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/unexport",
-		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/enable",
-		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/period",
-		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/duty_cycle",
-		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/polarity",
-		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/enable",
-		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/period",
-		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/duty_cycle",
-		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/polarity",
+		pwmChip0ExportPath,
+		pwmChip0UnexportPath,
+		pwm0EnablePath,
+		pwm0PeriodPath,
+		pwm0DutyCyclePath,
+		pwm0PolarityPath,
+		pwm1EnablePath,
+		pwm1PeriodPath,
+		pwm1DutyCyclePath,
+		pwm1PolarityPath,
 	}
 
 	a, fs := initTestAdaptorWithMockedFilesystem(mockPaths)
-	fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/duty_cycle"].Contents = "0"
-	fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/period"].Contents = "0"
+	fs.Files[pwm1DutyCyclePath].Contents = "0"
+	fs.Files[pwm1PeriodPath].Contents = "0"
 
 	require.ErrorContains(t, a.PwmWrite("P9_99", 175), "'P9_99' is not a valid id for a PWM pin")
 	_ = a.PwmWrite("P9_21", 175)
-	assert.Equal(
-		t,
-		"500000",
-		fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/period"].Contents,
-	)
-	assert.Equal(
-		t,
-		"343137",
-		fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/duty_cycle"].Contents,
-	)
+	assert.Equal(t, "500000", fs.Files[pwm1PeriodPath].Contents)
+	assert.Equal(t, "343137", fs.Files[pwm1DutyCyclePath].Contents)
 
 	_ = a.ServoWrite("P9_21", 100)
-	assert.Equal(
-		t,
-		"500000",
-		fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/period"].Contents,
-	)
-	assert.Equal(
-		t,
-		"66666",
-		fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/duty_cycle"].Contents,
-	)
+	assert.Equal(t, "500000", fs.Files[pwm1PeriodPath].Contents)
+	assert.Equal(t, "40277", fs.Files[pwm1DutyCyclePath].Contents)
 
 	require.NoError(t, a.Finalize())
 }

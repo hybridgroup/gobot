@@ -133,7 +133,7 @@ func (p *pwmPinSysFs) SetPolarity(normal bool) error {
 	return nil
 }
 
-// Period returns the current period
+// Period returns the current period in nanoseconds
 func (p *pwmPinSysFs) Period() (uint32, error) {
 	val, err := p.sfa.readInteger(p.pwmPeriodPath())
 	if err != nil {

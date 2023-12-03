@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/aio"
 )
 
 var _ gobot.Driver = (*ButtonDriver)(nil)
@@ -30,21 +31,52 @@ func TestNewButtonDriver(t *testing.T) {
 	d := NewButtonDriver(a, "1")
 	// assert
 	assert.IsType(t, &ButtonDriver{}, d)
-	assert.True(t, strings.HasPrefix(d.name, "Button"))
+	// assert: gpio.driver attributes
+	require.NotNil(t, d.driver)
+	assert.True(t, strings.HasPrefix(d.driverCfg.name, "Button"))
+	assert.Equal(t, "1", d.driverCfg.pin)
 	assert.Equal(t, a, d.connection)
 	assert.NotNil(t, d.afterStart)
 	assert.NotNil(t, d.beforeHalt)
 	assert.NotNil(t, d.Commander)
 	assert.NotNil(t, d.mutex)
-	assert.NotNil(t, d.Eventer)
-	assert.Equal(t, "1", d.pin)
+	// assert: driver specific attributes
 	assert.False(t, d.active)
-	assert.Equal(t, 0, d.defaultState)
-	assert.Equal(t, 10*time.Millisecond, d.interval)
-	assert.NotNil(t, d.halt)
-	// act & assert other interval
-	d = NewButtonDriver(newGpioTestAdaptor(), "1", 30*time.Second)
-	assert.Equal(t, 30*time.Second, d.interval)
+	assert.Nil(t, d.Eventer) // will be created on initialize
+	assert.Nil(t, d.halt)    // will be created on initialize
+	require.NotNil(t, d.buttonCfg)
+	assert.Equal(t, 0, d.buttonCfg.defaultState)
+	assert.Equal(t, 10*time.Millisecond, d.buttonCfg.readInterval)
+}
+
+func TestNewButtonDriver_options(t *testing.T) {
+	// This is a general test, that options are applied in constructor by using the common WithName() option, least one
+	// option of this driver and one of another driver (which should lead to panic). Further tests for options can also
+	// be done by call of "WithOption(val).apply(cfg)".
+	// arrange
+	const (
+		myName     = "count up"
+		cycReadDur = 30 * time.Millisecond
+	)
+	panicFunc := func() {
+		NewButtonDriver(newGpioTestAdaptor(), "1", WithName("crazy"), aio.WithActuatorScaler(func(float64) int { return 0 }))
+	}
+	// act
+	d := NewButtonDriver(newGpioTestAdaptor(), "1", WithName(myName), WithButtonPollInterval(cycReadDur))
+	// assert
+	assert.Equal(t, cycReadDur, d.buttonCfg.readInterval)
+	assert.Equal(t, myName, d.Name())
+	assert.PanicsWithValue(t, "'scaler option for analog actuators' can not be applied on 'crazy'", panicFunc)
+}
+
+func TestButton_WithButtonDefaultState(t *testing.T) {
+	// arrange
+	const myDefaultState = 5 // only for test, usually it would be 0 or 1
+	cfg := buttonConfiguration{}
+	// act
+	WithButtonDefaultState(myDefaultState).apply(&cfg)
+	// assert
+	assert.Equal(t, myDefaultState, cfg.defaultState)
 }
 
 func TestButtonStart(t *testing.T) {
@@ -67,14 +99,14 @@ func TestButtonStart(t *testing.T) {
 		}
 	}
 
+	// act: start cyclic reading
+	err := d.Start()
+
 	_ = d.Once(ButtonPush, func(data interface{}) {
 		assert.True(t, d.Active())
 		nextVal <- 0
 		sem <- true
 	})
-
-	// act
-	err := d.Start()
 
 	// assert & rearrange
 	require.NoError(t, err)
@@ -82,7 +114,7 @@ func TestButtonStart(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(buttonTestDelay * time.Millisecond):
-		t.Errorf("Button Event \"Push\" was not published")
+		assert.Fail(t, "Button Event \"Push\" was not published")
 	}
 
 	_ = d.Once(ButtonRelease, func(data interface{}) {
@@ -94,7 +126,7 @@ func TestButtonStart(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(buttonTestDelay * time.Millisecond):
-		t.Errorf("Button Event \"Release\" was not published")
+		assert.Fail(t, "Button Event \"Release\" was not published")
 	}
 
 	_ = d.Once(Error, func(data interface{}) {
@@ -104,28 +136,29 @@ func TestButtonStart(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(buttonTestDelay * time.Millisecond):
-		t.Errorf("Button Event \"Error\" was not published")
+		assert.Fail(t, "Button Event \"Error\" was not published")
 	}
 
 	_ = d.Once(ButtonPush, func(data interface{}) {
 		sem <- true
 	})
 
-	d.halt <- true
+	require.NoError(t, d.Halt())
 	nextVal <- 1
 
 	select {
 	case <-sem:
-		t.Errorf("Button Event \"Press\" should not published")
+		assert.Fail(t, "Button Event \"Press\" should not published")
 	case <-time.After(buttonTestDelay * time.Millisecond):
 	}
 }
 
-func TestButtonSetDefaultState(t *testing.T) {
+func TestButtonStart_WithDefaultState(t *testing.T) {
 	// arrange
 	sem := make(chan bool)
 	nextVal := make(chan int, 1)
-	d, a := initTestButtonDriverWithStubbedAdaptor()
+	a := newGpioTestAdaptor()
+	d := NewButtonDriver(a, "1", WithButtonDefaultState(1))
 
 	a.digitalReadFunc = func(string) (int, error) {
 		val := 0
@@ -136,23 +169,19 @@ func TestButtonSetDefaultState(t *testing.T) {
 			return val, nil
 		}
 	}
+
+	// act: start cyclic reading
+	require.NoError(t, d.Start())
 	_ = d.Once(ButtonPush, func(data interface{}) {
 		assert.True(t, d.Active())
 		nextVal <- 1
 		sem <- true
 	})
 
-	// act
-	d.SetDefaultState(1)
-
-	// assert & rearrange
-	require.Equal(t, 1, d.defaultState)
-	require.NoError(t, d.Start())
-
 	select {
 	case <-sem:
 	case <-time.After(buttonTestDelay * time.Millisecond):
-		t.Errorf("Button Event \"Push\" was not published")
+		assert.Fail(t, "Button Event \"Push\" was not published")
 	}
 
 	_ = d.Once(ButtonRelease, func(data interface{}) {
@@ -164,44 +193,28 @@ func TestButtonSetDefaultState(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(buttonTestDelay * time.Millisecond):
-		t.Errorf("Button Event \"Release\" was not published")
+		assert.Fail(t, "Button Event \"Release\" was not published")
 	}
 }
 
 func TestButtonHalt(t *testing.T) {
 	// arrange
 	d, _ := initTestButtonDriverWithStubbedAdaptor()
-	const timeout = 10 * time.Microsecond
+	require.NoError(t, d.Start())
+	timeout := 2 * d.buttonCfg.readInterval
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		select {
-		case <-d.halt: // wait until halt was set to the channel
+		case <-d.halt: // wait until halt is broadcasted by close the channel
 		case <-time.After(timeout): // otherwise run into the timeout
-			t.Errorf("halt was not received within %s", timeout)
+			assert.Fail(t, "halt was not received within %s", timeout)
 		}
 	}()
 	// act & assert
 	require.NoError(t, d.Halt())
 	wg.Wait() // wait until the go function was really finished
-}
-
-func TestButtonPin(t *testing.T) {
-	tests := map[string]struct {
-		want string
-	}{
-		"10": {want: "10"},
-		"36": {want: "36"},
-	}
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			// arrange
-			d := ButtonDriver{pin: name}
-			// act & assert
-			assert.Equal(t, tc.want, d.Pin())
-		})
-	}
 }
 
 func TestButtonActive(t *testing.T) {
@@ -214,7 +227,7 @@ func TestButtonActive(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			d := ButtonDriver{Driver: NewDriver(nil, "Button")} // just for mutex
+			d := ButtonDriver{driver: newDriver(nil, "Button")} // just for mutex
 			d.active = tc.want
 			// act & assert
 			assert.Equal(t, tc.want, d.Active())

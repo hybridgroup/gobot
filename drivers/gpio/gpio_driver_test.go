@@ -10,15 +10,15 @@ import (
 	"gobot.io/x/gobot/v2"
 )
 
-var _ gobot.Driver = (*Driver)(nil)
+var _ gobot.Driver = (*driver)(nil)
 
-func initTestDriverWithStubbedAdaptor() (*Driver, *gpioTestAdaptor) {
+func initTestDriverWithStubbedAdaptor() (*driver, *gpioTestAdaptor) {
 	a := newGpioTestAdaptor()
-	d := NewDriver(a, "GPIO_BASIC")
+	d := newDriver(a, "GPIO_BASIC")
 	return d, a
 }
 
-func initTestDriver() *Driver {
+func initTestDriver() *driver {
 	d, _ := initTestDriverWithStubbedAdaptor()
 	return d
 }
@@ -27,10 +27,10 @@ func TestNewDriver(t *testing.T) {
 	// arrange
 	a := newGpioTestAdaptor()
 	// act
-	d := NewDriver(a, "GPIO_BASIC")
+	d := newDriver(a, "GPIO_BASIC")
 	// assert
-	assert.IsType(t, &Driver{}, d)
-	assert.Contains(t, d.name, "GPIO_BASIC")
+	assert.IsType(t, &driver{}, d)
+	assert.Contains(t, d.driverCfg.name, "GPIO_BASIC")
 	assert.Equal(t, a, d.connection)
 	require.NoError(t, d.afterStart())
 	require.NoError(t, d.beforeHalt())
@@ -38,13 +38,24 @@ func TestNewDriver(t *testing.T) {
 	assert.NotNil(t, d.mutex)
 }
 
-func TestSetName(t *testing.T) {
+func Test_applyWithName(t *testing.T) {
 	// arrange
-	d := initTestDriver()
+	const name = "mybot"
+	cfg := configuration{name: "oldname"}
 	// act
-	d.SetName("TESTME")
+	WithName(name).apply(&cfg)
 	// assert
-	assert.Equal(t, "TESTME", d.Name())
+	assert.Equal(t, name, cfg.name)
+}
+
+func Test_applywithPin(t *testing.T) {
+	// arrange
+	const pin = "36"
+	cfg := configuration{pin: "oldpin"}
+	// act
+	withPin(pin).apply(&cfg)
+	// assert
+	assert.Equal(t, pin, cfg.pin)
 }
 
 func TestConnection(t *testing.T) {

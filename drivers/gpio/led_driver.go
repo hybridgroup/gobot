@@ -1,21 +1,20 @@
 package gpio
 
 import (
-	"log"
-
 	"gobot.io/x/gobot/v2"
 )
 
 // LedDriver represents a digital Led
 type LedDriver struct {
-	pin        string
-	name       string
-	connection DigitalWriter
-	high       bool
-	gobot.Commander
+	*driver
+	high bool
 }
 
 // NewLedDriver return a new LedDriver given a DigitalWriter and pin.
+//
+// Supported options:
+//
+//	"WithName"
 //
 // Adds the following API Commands:
 //
@@ -23,13 +22,10 @@ type LedDriver struct {
 //	"Toggle" - See LedDriver.Toggle
 //	"On" - See LedDriver.On
 //	"Off" - See LedDriver.Off
-func NewLedDriver(a DigitalWriter, pin string) *LedDriver {
+func NewLedDriver(a DigitalWriter, pin string, opts ...interface{}) *LedDriver {
+	//nolint:forcetypeassert // no error return value, so there is no better way
 	d := &LedDriver{
-		name:       gobot.DefaultName("LED"),
-		pin:        pin,
-		connection: a,
-		high:       false,
-		Commander:  gobot.NewCommander(),
+		driver: newDriver(a.(gobot.Connection), "LED", append(opts, withPin(pin))...),
 	}
 
 	d.AddCommand("Brightness", func(params map[string]interface{}) interface{} {
@@ -52,31 +48,6 @@ func NewLedDriver(a DigitalWriter, pin string) *LedDriver {
 	return d
 }
 
-// Start implements the Driver interface
-func (d *LedDriver) Start() error { return nil }
-
-// Halt implements the Driver interface
-func (d *LedDriver) Halt() error { return nil }
-
-// Name returns the LedDrivers name
-func (d *LedDriver) Name() string { return d.name }
-
-// SetName sets the LedDrivers name
-func (d *LedDriver) SetName(n string) { d.name = n }
-
-// Pin returns the LedDrivers name
-func (d *LedDriver) Pin() string { return d.pin }
-
-// Connection returns the LedDrivers Connection
-func (d *LedDriver) Connection() gobot.Connection {
-	if conn, ok := d.connection.(gobot.Connection); ok {
-		return conn
-	}
-
-	log.Printf("%s has no gobot connection\n", d.name)
-	return nil
-}
-
 // State return true if the led is On and false if the led is Off
 func (d *LedDriver) State() bool {
 	return d.high
@@ -84,7 +55,7 @@ func (d *LedDriver) State() bool {
 
 // On sets the led to a high state.
 func (d *LedDriver) On() error {
-	if err := d.connection.DigitalWrite(d.Pin(), 1); err != nil {
+	if err := d.digitalWrite(d.driverCfg.pin, 1); err != nil {
 		return err
 	}
 	d.high = true
@@ -93,7 +64,7 @@ func (d *LedDriver) On() error {
 
 // Off sets the led to a low state.
 func (d *LedDriver) Off() error {
-	if err := d.connection.DigitalWrite(d.Pin(), 0); err != nil {
+	if err := d.digitalWrite(d.driverCfg.pin, 0); err != nil {
 		return err
 	}
 	d.high = false
@@ -110,8 +81,5 @@ func (d *LedDriver) Toggle() error {
 
 // Brightness sets the led to the specified level of brightness
 func (d *LedDriver) Brightness(level byte) error {
-	if writer, ok := d.connection.(PwmWriter); ok {
-		return writer.PwmWrite(d.Pin(), level)
-	}
-	return ErrPwmWriteUnsupported
+	return d.pwmWrite(d.driverCfg.pin, level)
 }

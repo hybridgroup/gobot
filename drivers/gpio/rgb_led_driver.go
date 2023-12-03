@@ -1,27 +1,26 @@
 package gpio
 
 import (
-	"log"
-
 	"gobot.io/x/gobot/v2"
 )
 
 // RgbLedDriver represents a digital RGB Led
 type RgbLedDriver struct {
+	*driver
 	pinRed     string
 	redColor   byte
 	pinGreen   string
 	greenColor byte
 	pinBlue    string
 	blueColor  byte
-	name       string
-	connection DigitalWriter
 	high       bool
-	gobot.Commander
 }
 
-// NewRgbLedDriver return a new RgbLedDriver given a DigitalWriter and
-// 3 pins: redPin, greenPin, and bluePin
+// NewRgbLedDriver return a new RgbLedDriver given a PwmWriter and 3 pins: redPin, greenPin, and bluePin
+//
+// Supported options:
+//
+//	"WithName"
 //
 // Adds the following API Commands:
 //
@@ -29,15 +28,13 @@ type RgbLedDriver struct {
 //	"Toggle" - See RgbLedDriver.Toggle
 //	"On" - See RgbLedDriver.On
 //	"Off" - See RgbLedDriver.Off
-func NewRgbLedDriver(a DigitalWriter, redPin string, greenPin string, bluePin string) *RgbLedDriver {
+func NewRgbLedDriver(a PwmWriter, redPin string, greenPin string, bluePin string, opts ...interface{}) *RgbLedDriver {
+	//nolint:forcetypeassert // no error return value, so there is no better way
 	d := &RgbLedDriver{
-		name:       gobot.DefaultName("RGBLED"),
-		pinRed:     redPin,
-		pinGreen:   greenPin,
-		pinBlue:    bluePin,
-		connection: a,
-		high:       false,
-		Commander:  gobot.NewCommander(),
+		driver:   newDriver(a.(gobot.Connection), "RGBLED", opts...),
+		pinRed:   redPin,
+		pinGreen: greenPin,
+		pinBlue:  bluePin,
 	}
 
 	//nolint:forcetypeassert // ok here
@@ -63,18 +60,6 @@ func NewRgbLedDriver(a DigitalWriter, redPin string, greenPin string, bluePin st
 	return d
 }
 
-// Start implements the Driver interface
-func (d *RgbLedDriver) Start() error { return nil }
-
-// Halt implements the Driver interface
-func (d *RgbLedDriver) Halt() error { return nil }
-
-// Name returns the RGBLEDDrivers name
-func (d *RgbLedDriver) Name() string { return d.name }
-
-// SetName sets the RGBLEDDrivers name
-func (d *RgbLedDriver) SetName(n string) { d.name = n }
-
 // Pin returns the RgbLedDrivers pins
 func (d *RgbLedDriver) Pin() string {
 	return "r=" + d.pinRed + ", g=" + d.pinGreen + ", b=" + d.pinBlue
@@ -88,16 +73,6 @@ func (d *RgbLedDriver) GreenPin() string { return d.pinGreen }
 
 // BluePin returns the RgbLedDrivers bluePin
 func (d *RgbLedDriver) BluePin() string { return d.pinBlue }
-
-// Connection returns the RgbLedDriver Connection
-func (d *RgbLedDriver) Connection() gobot.Connection {
-	if conn, ok := d.connection.(gobot.Connection); ok {
-		return conn
-	}
-
-	log.Printf("%s has no gobot connection\n", d.name)
-	return nil
-}
 
 // State return true if the led is On and false if the led is Off
 func (d *RgbLedDriver) State() bool {
@@ -151,10 +126,7 @@ func (d *RgbLedDriver) Toggle() error {
 
 // SetLevel sets the led to the specified color level
 func (d *RgbLedDriver) SetLevel(pin string, level byte) error {
-	if writer, ok := d.connection.(PwmWriter); ok {
-		return writer.PwmWrite(pin, level)
-	}
-	return ErrPwmWriteUnsupported
+	return d.pwmWrite(pin, level)
 }
 
 // SetRGB sets the Red Green Blue value of the LED.

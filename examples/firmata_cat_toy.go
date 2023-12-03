@@ -45,7 +45,7 @@ func main() {
 		gobot.Every(10*time.Millisecond, func() {
 			servo1.Move(uint8(x))
 			servo2.Move(uint8(z))
-			fmt.Println("Current Angle: ", servo1.CurrentAngle, ",", servo2.CurrentAngle)
+			fmt.Println("Current Angle: ", servo1.Angle(), ",", servo2.Angle())
 		})
 	}
 
