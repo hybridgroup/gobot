@@ -2,6 +2,7 @@ package up2
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -12,6 +13,7 @@ import (
 	"gobot.io/x/gobot/v2/drivers/gpio"
 	"gobot.io/x/gobot/v2/drivers/i2c"
 	"gobot.io/x/gobot/v2/drivers/spi"
+	"gobot.io/x/gobot/v2/platforms/adaptors"
 	"gobot.io/x/gobot/v2/system"
 )
 
@@ -36,8 +38,6 @@ const (
 	pwmDutyCyclePath = pwmDir + "pwm0/duty_cycle"
 	pwmPeriodPath    = pwmDir + "pwm0/period"
 	pwmPolarityPath  = pwmDir + "pwm0/polarity"
-
-	fiftyHzNano = "20000000"
 )
 
 var pwmMockPaths = []string{
@@ -95,33 +95,45 @@ func TestDigitalIO(t *testing.T) {
 	require.NoError(t, a.Finalize())
 }
 
-func TestPWM(t *testing.T) {
+func TestPWMWrite(t *testing.T) {
+	// arrange
 	a, fs := initTestAdaptorWithMockedFilesystem(pwmMockPaths)
 	fs.Files[pwmDutyCyclePath].Contents = "0"
 	fs.Files[pwmPeriodPath].Contents = "0"
-
+	// act
 	err := a.PwmWrite("32", 100)
+	// assert
 	require.NoError(t, err)
-
 	assert.Equal(t, "0", fs.Files[pwmExportPath].Contents)
 	assert.Equal(t, "1", fs.Files[pwmEnablePath].Contents)
 	assert.Equal(t, "3921568", fs.Files[pwmDutyCyclePath].Contents)
 	assert.Equal(t, "10000000", fs.Files[pwmPeriodPath].Contents) // pwmPeriodDefault
 	assert.Equal(t, "normal", fs.Files[pwmPolarityPath].Contents)
 
-	// prepare 50Hz for servos
-	fs.Files[pwmPeriodPath].Contents = fiftyHzNano
-	err = a.ServoWrite("32", 0)
-	require.NoError(t, err)
+	require.NoError(t, a.Finalize())
+}
 
+func TestServoWrite(t *testing.T) {
+	// arrange: prepare 50Hz for servos
+	const (
+		pin         = "32"
+		fiftyHzNano = 20000000
+	)
+	a := NewAdaptor(adaptors.WithPWMDefaultPeriodForPin(pin, fiftyHzNano))
+	fs := a.sys.UseMockFilesystem(pwmMockPaths)
+	require.NoError(t, a.Connect())
+	fs.Files[pwmDutyCyclePath].Contents = "0"
+	fs.Files[pwmPeriodPath].Contents = "0"
+	// act & assert for 0° (min default value)
+	err := a.ServoWrite(pin, 0)
+	require.NoError(t, err)
+	assert.Equal(t, strconv.Itoa(fiftyHzNano), fs.Files[pwmPeriodPath].Contents)
 	assert.Equal(t, "500000", fs.Files[pwmDutyCyclePath].Contents)
-	assert.Equal(t, fiftyHzNano, fs.Files[pwmPeriodPath].Contents)
-
-	err = a.ServoWrite("32", 180)
+	// act & assert for 180° (max default value)
+	err = a.ServoWrite(pin, 180)
 	require.NoError(t, err)
-
+	assert.Equal(t, strconv.Itoa(fiftyHzNano), fs.Files[pwmPeriodPath].Contents)
 	assert.Equal(t, "2500000", fs.Files[pwmDutyCyclePath].Contents)
-	assert.Equal(t, fiftyHzNano, fs.Files[pwmPeriodPath].Contents)
 
 	require.NoError(t, a.Finalize())
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"sync"
+	"time"
 
 	multierror "github.com/hashicorp/go-multierror"
 
@@ -17,69 +18,112 @@ import (
 // 100ns = 10MHz, 10ns = 100MHz, 1ns = 1GHz
 const pwmPeriodDefault = 10000000 // 10 ms = 100 Hz
 
+// 50Hz = 0.02 sec = 20 ms
+const fiftyHzNanos = 20 * 1000 * 1000
+
 type (
 	pwmPinTranslator  func(pin string) (path string, channel int, err error)
-	pwmPinInitializer func(gobot.PWMPinner) error
+	pwmPinInitializer func(id string, pin gobot.PWMPinner) error
 )
 
-type pwmPinsOption interface {
-	setInitializer(initializer pwmPinInitializer)
-	setDefaultPeriod(period uint32)
-	setPolarityInvertedIdentifier(id string)
+type pwmPinServoScale struct {
+	minDegree, maxDegree float64
+	minDuty, maxDuty     time.Duration
 }
 
-// PWMPinsAdaptor is a adaptor for PWM pins, normally used for composition in platforms.
-type PWMPinsAdaptor struct {
-	sys                        *system.Accesser
-	translate                  pwmPinTranslator
+// pwmPinConfiguration contains all changeable attributes of the adaptor.
+type pwmPinsConfiguration struct {
 	initialize                 pwmPinInitializer
 	periodDefault              uint32
 	polarityNormalIdentifier   string
 	polarityInvertedIdentifier string
 	adjustDutyOnSetPeriod      bool
-	pins                       map[string]gobot.PWMPinner
-	mutex                      sync.Mutex
+	pinsDefaultPeriod          map[string]uint32           // the key is the pin id
+	pinsServoScale             map[string]pwmPinServoScale // the key is the pin id
+}
+
+// PWMPinsAdaptor is a adaptor for PWM pins, normally used for composition in platforms.
+type PWMPinsAdaptor struct {
+	sys        *system.Accesser
+	translate  pwmPinTranslator
+	pwmPinsCfg *pwmPinsConfiguration
+	pins       map[string]gobot.PWMPinner
+	mutex      sync.Mutex
 }
 
 // NewPWMPinsAdaptor provides the access to PWM pins of the board. It uses sysfs system drivers. The translator is used
 // to adapt the pin header naming, which is given by user, to the internal file name nomenclature. This varies by each
 // platform. If for some reasons the default initializer is not suitable, it can be given by the option
 // "WithPWMPinInitializer()".
-func NewPWMPinsAdaptor(sys *system.Accesser, t pwmPinTranslator, options ...func(pwmPinsOption)) *PWMPinsAdaptor {
+//
+// Further options:
+//
+//	"WithPWMDefaultPeriod"
+//	"WithPWMPolarityInvertedIdentifier"
+//	"WithPWMNoDutyCycleAdjustment"
+//	"WithPWMDefaultPeriodForPin"
+//	"WithPWMServoDutyCycleRangeForPin"
+//	"WithPWMServoAngleRangeForPin"
+func NewPWMPinsAdaptor(sys *system.Accesser, t pwmPinTranslator, opts ...PwmPinsOptionApplier) *PWMPinsAdaptor {
 	a := &PWMPinsAdaptor{
-		sys:                        sys,
-		translate:                  t,
-		periodDefault:              pwmPeriodDefault,
-		polarityNormalIdentifier:   "normal",
-		polarityInvertedIdentifier: "inverted",
-		adjustDutyOnSetPeriod:      true,
+		sys:       sys,
+		translate: t,
+		pwmPinsCfg: &pwmPinsConfiguration{
+			periodDefault:              pwmPeriodDefault,
+			pinsDefaultPeriod:          make(map[string]uint32),
+			pinsServoScale:             make(map[string]pwmPinServoScale),
+			polarityNormalIdentifier:   "normal",
+			polarityInvertedIdentifier: "inverted",
+			adjustDutyOnSetPeriod:      true,
+		},
 	}
-	a.initialize = a.getDefaultInitializer()
-	for _, option := range options {
-		option(a)
+	a.pwmPinsCfg.initialize = a.getDefaultInitializer()
+
+	for _, o := range opts {
+		o.apply(a.pwmPinsCfg)
 	}
+
 	return a
 }
 
 // WithPWMPinInitializer substitute the default initializer.
-func WithPWMPinInitializer(pc pwmPinInitializer) func(pwmPinsOption) {
-	return func(a pwmPinsOption) {
-		a.setInitializer(pc)
-	}
+func WithPWMPinInitializer(pc pwmPinInitializer) pwmPinsInitializeOption {
+	return pwmPinsInitializeOption(pc)
 }
 
-// WithPWMPinDefaultPeriod substitute the default period of 10 ms (100 Hz) for all created pins.
-func WithPWMPinDefaultPeriod(periodNanoSec uint32) func(pwmPinsOption) {
-	return func(a pwmPinsOption) {
-		a.setDefaultPeriod(periodNanoSec)
-	}
+// WithPWMDefaultPeriod substitute the default period of 10 ms (100 Hz) for all created pins.
+func WithPWMDefaultPeriod(periodNanoSec uint32) pwmPinsPeriodDefaultOption {
+	return pwmPinsPeriodDefaultOption(periodNanoSec)
 }
 
-// WithPolarityInvertedIdentifier use the given identifier, which will replace the default "inverted".
-func WithPolarityInvertedIdentifier(identifier string) func(pwmPinsOption) {
-	return func(a pwmPinsOption) {
-		a.setPolarityInvertedIdentifier(identifier)
-	}
+// WithPWMPolarityInvertedIdentifier use the given identifier, which will replace the default "inverted".
+func WithPWMPolarityInvertedIdentifier(identifier string) pwmPinsPolarityInvertedIdentifierOption {
+	return pwmPinsPolarityInvertedIdentifierOption(identifier)
+}
+
+// WithPWMNoDutyCycleAdjustment switch off the automatic adjustment of duty cycle on setting the period.
+func WithPWMNoDutyCycleAdjustment() pwmPinsAdjustDutyOnSetPeriodOption {
+	return pwmPinsAdjustDutyOnSetPeriodOption(false)
+}
+
+// WithPWMDefaultPeriodForPin substitute the default period of 10 ms (100 Hz) for the given pin.
+// This option also overrides a default period given by the WithPWMDefaultPeriod() option.
+// This is often needed for servo applications, where the default period is 50Hz (20.000.000 ns).
+func WithPWMDefaultPeriodForPin(pin string, periodNanoSec uint32) pwmPinsDefaultPeriodForPinOption {
+	o := pwmPinsDefaultPeriodForPinOption{id: pin, period: periodNanoSec}
+	return o
+}
+
+// WithPWMServoDutyCycleRangeForPin set new values for range of duty cycle for servo calls, which replaces the default
+// 0.5-2.5 ms range. The given duration values will be internally converted to nanoseconds.
+func WithPWMServoDutyCycleRangeForPin(pin string, min, max time.Duration) pwmPinsServoDutyScaleForPinOption {
+	return pwmPinsServoDutyScaleForPinOption{id: pin, min: min, max: max}
+}
+
+// WithPWMServoAngleRangeForPin set new values for range of angle for servo calls, which replaces
+// the default 0.0-180.0° range.
+func WithPWMServoAngleRangeForPin(pin string, min, max float64) pwmPinsServoAngleScaleForPinOption {
+	return pwmPinsServoAngleScaleForPinOption{id: pin, minDegree: min, maxDegree: max}
 }
 
 // Connect prepare new connection to PWM pins.
@@ -142,40 +186,19 @@ func (a *PWMPinsAdaptor) ServoWrite(id string, angle byte) error {
 		return err
 	}
 
-	// 50Hz = 0.02 sec = 20 ms
-	const fiftyHzNanos = 20 * 1000 * 1000
-
 	if period != fiftyHzNanos {
 		log.Printf("WARNING: the PWM acts with a period of %d, but should use %d (50Hz) for servos\n", period, fiftyHzNanos)
 	}
 
-	// TODO: implement an option to give another min-max range
-	// TODO: allow usage of adaptors.WithPWMPinDefaultPeriod() from main.go
-	//
-	// for some older servos, this can happen
-	// 0.5 ms => -90 (1/40 part of period at 50Hz)
-	// 1.5 ms =>   0
-	// 2.0 ms =>  90 (1/10 part of period at 50Hz)
+	scale, ok := a.pwmPinsCfg.pinsServoScale[id]
+	if !ok {
+		return fmt.Errorf("no scaler found for servo pin '%s'", id)
+	}
 
-	// some servos have profiles below/above the 0-180° value
-	// SG90: 1/90: after position a small smooth movement is done
-	// SG90: >1/100: endless movement clock wise
-	// SG90: <1/8: endless movement counter clock wise
-
-	// usually for the most servos (at 50Hz) for 90°
-	// 1.0 ms =>   0 (1/20 part of period at 50Hz)
-	// 1.5 ms =>  45
-	// 2.0 ms =>  90 (1/10 part of period at 50Hz)
-
-	// usually for the most servos (at 50Hz) for 180° (SG90, AD002)
-	// 0.5 ms =>   0 (1/40 part of period at 50Hz)
-	// 1.5 ms =>  90
-	// 2.5 ms => 180 (1/8 part of period at 50Hz)
-
-	minDuty := float64(period) / 40
-	maxDuty := float64(period) / 8
-	duty := uint32(gobot.ToScale(gobot.FromScale(float64(angle), 0, 180), minDuty, maxDuty))
-	return pin.SetDutyCycle(duty)
+	duty := gobot.ToScale(gobot.FromScale(float64(angle),
+		scale.minDegree, scale.maxDegree),
+		float64(scale.minDuty), float64(scale.maxDuty))
+	return pin.SetDutyCycle(uint32(duty))
 }
 
 // SetPeriod adjusts the period of the specified PWM pin immediately.
@@ -188,7 +211,7 @@ func (a *PWMPinsAdaptor) SetPeriod(id string, period uint32) error {
 	if err != nil {
 		return err
 	}
-	return setPeriod(pin, period, a.adjustDutyOnSetPeriod)
+	return setPeriod(pin, period, a.pwmPinsCfg.adjustDutyOnSetPeriod)
 }
 
 // PWMPin initializes the pin for PWM and returns matched pwmPin for specified pin number.
@@ -200,20 +223,8 @@ func (a *PWMPinsAdaptor) PWMPin(id string) (gobot.PWMPinner, error) {
 	return a.pwmPin(id)
 }
 
-func (a *PWMPinsAdaptor) setInitializer(pinInit pwmPinInitializer) {
-	a.initialize = pinInit
-}
-
-func (a *PWMPinsAdaptor) setDefaultPeriod(periodNanoSec uint32) {
-	a.periodDefault = periodNanoSec
-}
-
-func (a *PWMPinsAdaptor) setPolarityInvertedIdentifier(identifier string) {
-	a.polarityInvertedIdentifier = identifier
-}
-
-func (a *PWMPinsAdaptor) getDefaultInitializer() func(gobot.PWMPinner) error {
-	return func(pin gobot.PWMPinner) error {
+func (a *PWMPinsAdaptor) getDefaultInitializer() func(string, gobot.PWMPinner) error {
+	return func(id string, pin gobot.PWMPinner) error {
 		if err := pin.Export(); err != nil {
 			return err
 		}
@@ -223,9 +234,38 @@ func (a *PWMPinsAdaptor) getDefaultInitializer() func(gobot.PWMPinner) error {
 				return err
 			}
 		}
-		if err := setPeriod(pin, a.periodDefault, a.adjustDutyOnSetPeriod); err != nil {
+
+		// looking for a pin specific period
+		defaultPeriod, ok := a.pwmPinsCfg.pinsDefaultPeriod[id]
+		if !ok {
+			defaultPeriod = a.pwmPinsCfg.periodDefault
+		}
+
+		if err := setPeriod(pin, defaultPeriod, a.pwmPinsCfg.adjustDutyOnSetPeriod); err != nil {
 			return err
 		}
+
+		// ensure servo scaler is present
+		//
+		// usually for the most servos (at 50Hz) for 180° (SG90, AD002)
+		// 0.5 ms =>   0 (1/40 part of period at 50Hz)
+		// 1.5 ms =>  90
+		// 2.5 ms => 180 (1/8 part of period at 50Hz)
+		scale, ok := a.pwmPinsCfg.pinsServoScale[id]
+		if !ok {
+			scale = pwmPinServoScale{
+				minDegree: 0,
+				maxDegree: 180,
+			}
+		}
+		if scale.minDuty == 0 {
+			scale.minDuty = time.Duration(defaultPeriod / 40)
+		}
+		if scale.maxDuty == 0 {
+			scale.maxDuty = time.Duration(defaultPeriod / 8)
+		}
+		a.pwmPinsCfg.pinsServoScale[id] = scale
+
 		// period needs to be set >1 before all next statements
 		if err := pin.SetPolarity(true); err != nil {
 			return err
@@ -246,8 +286,8 @@ func (a *PWMPinsAdaptor) pwmPin(id string) (gobot.PWMPinner, error) {
 		if err != nil {
 			return nil, err
 		}
-		pin = a.sys.NewPWMPin(path, channel, a.polarityNormalIdentifier, a.polarityInvertedIdentifier)
-		if err := a.initialize(pin); err != nil {
+		pin = a.sys.NewPWMPin(path, channel, a.pwmPinsCfg.polarityNormalIdentifier, a.pwmPinsCfg.polarityInvertedIdentifier)
+		if err := a.pwmPinsCfg.initialize(id, pin); err != nil {
 			return nil, err
 		}
 		a.pins[id] = pin

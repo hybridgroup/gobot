@@ -56,7 +56,7 @@ type Adaptor struct {
 //	adaptors.WithGpiosOpenDrain/Source(pin's): sets the output behavior
 //	adaptors.WithGpioDebounce(pin, period): sets the input debouncer
 //	adaptors.WithGpioEventOnFallingEdge/RaisingEdge/BothEdges(pin, handler): activate edge detection
-func NewAdaptor(opts ...func(adaptors.Optioner)) *Adaptor {
+func NewAdaptor(opts ...func(adaptors.DigitalPinsOptioner)) *Adaptor {
 	sys := system.NewAccesser(system.WithDigitalPinGpiodAccess())
 	c := &Adaptor{
 		name:            gobot.DefaultName("RaspberryPi"),

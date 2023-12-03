@@ -1,7 +1,6 @@
 package edison
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 
@@ -579,15 +578,15 @@ func Test_validateI2cBusNumber(t *testing.T) {
 	tests := map[string]struct {
 		board   string
 		busNr   int
-		wantErr error
+		wantErr string
 	}{
 		"arduino_number_negative_error": {
 			busNr:   -1,
-			wantErr: fmt.Errorf("Unsupported I2C bus '-1'"),
+			wantErr: "Unsupported I2C bus '-1'",
 		},
 		"arduino_number_1_error": {
 			busNr:   1,
-			wantErr: fmt.Errorf("Unsupported I2C bus '1'"),
+			wantErr: "Unsupported I2C bus '1'",
 		},
 		"arduino_number_6_ok": {
 			busNr: 6,
@@ -595,7 +594,7 @@ func Test_validateI2cBusNumber(t *testing.T) {
 		"sparkfun_number_negative_error": {
 			board:   "sparkfun",
 			busNr:   -1,
-			wantErr: fmt.Errorf("Unsupported I2C bus '-1'"),
+			wantErr: "Unsupported I2C bus '-1'",
 		},
 		"sparkfun_number_1_ok": {
 			board: "sparkfun",
@@ -604,7 +603,7 @@ func Test_validateI2cBusNumber(t *testing.T) {
 		"miniboard_number_6_error": {
 			board:   "miniboard",
 			busNr:   6,
-			wantErr: fmt.Errorf("Unsupported I2C bus '6'"),
+			wantErr: "Unsupported I2C bus '6'",
 		},
 	}
 	for name, tc := range tests {
@@ -616,7 +615,11 @@ func Test_validateI2cBusNumber(t *testing.T) {
 			// act
 			err := a.validateAndSetupI2cBusNumber(tc.busNr)
 			// assert
-			assert.Equal(t, tc.wantErr, err)
+			if tc.wantErr != "" {
+				require.EqualError(t, err, tc.wantErr)
+			} else {
+				require.NoError(t, err)
+			}
 		})
 	}
 }

@@ -50,7 +50,7 @@ func initTestPWMPinsAdaptorWithMockedFilesystem(mockPaths []string) (*PWMPinsAda
 	fs.Files[pwmEnablePath].Contents = "0"
 	fs.Files[pwmPeriodPath].Contents = "0"
 	fs.Files[pwmDutyCyclePath].Contents = "0"
-	fs.Files[pwmPolarityPath].Contents = a.polarityInvertedIdentifier
+	fs.Files[pwmPolarityPath].Contents = a.pwmPinsCfg.polarityInvertedIdentifier
 	if err := a.Connect(); err != nil {
 		panic(err)
 	}
@@ -72,44 +72,10 @@ func TestNewPWMPinsAdaptor(t *testing.T) {
 	// act
 	a := NewPWMPinsAdaptor(system.NewAccesser(), translate)
 	// assert
-	assert.Equal(t, uint32(pwmPeriodDefault), a.periodDefault)
-	assert.Equal(t, "normal", a.polarityNormalIdentifier)
-	assert.Equal(t, "inverted", a.polarityInvertedIdentifier)
-	assert.True(t, a.adjustDutyOnSetPeriod)
-}
-
-func TestWithPWMPinInitializer(t *testing.T) {
-	// This is a general test, that options are applied by using the WithPWMPinInitializer() option.
-	// All other configuration options can also be tested by With..(val)(a).
-	// arrange
-	wantErr := fmt.Errorf("new_initializer")
-	newInitializer := func(gobot.PWMPinner) error { return wantErr }
-	// act
-	a := NewPWMPinsAdaptor(system.NewAccesser(), func(pin string) (c string, l int, e error) { return },
-		WithPWMPinInitializer(newInitializer))
-	// assert
-	err := a.initialize(nil)
-	assert.Equal(t, wantErr, err)
-}
-
-func TestWithPWMPinDefaultPeriod(t *testing.T) {
-	// arrange
-	const newPeriod = uint32(10)
-	a := NewPWMPinsAdaptor(system.NewAccesser(), func(string) (c string, l int, e error) { return })
-	// act
-	WithPWMPinDefaultPeriod(newPeriod)(a)
-	// assert
-	assert.Equal(t, newPeriod, a.periodDefault)
-}
-
-func TestWithPolarityInvertedIdentifier(t *testing.T) {
-	// arrange
-	const newPolarityIdent = "pwm_invers"
-	a := NewPWMPinsAdaptor(system.NewAccesser(), func(pin string) (c string, l int, e error) { return })
-	// act
-	WithPolarityInvertedIdentifier(newPolarityIdent)(a)
-	// assert
-	assert.Equal(t, newPolarityIdent, a.polarityInvertedIdentifier)
+	assert.Equal(t, uint32(pwmPeriodDefault), a.pwmPinsCfg.periodDefault)
+	assert.Equal(t, "normal", a.pwmPinsCfg.polarityNormalIdentifier)
+	assert.Equal(t, "inverted", a.pwmPinsCfg.polarityInvertedIdentifier)
+	assert.True(t, a.pwmPinsCfg.adjustDutyOnSetPeriod)
 }
 
 func TestPWMPinsConnect(t *testing.T) {
@@ -182,7 +148,8 @@ func TestPwmWrite(t *testing.T) {
 
 	assert.Equal(t, "44", fs.Files[pwmExportPath].Contents)
 	assert.Equal(t, "1", fs.Files[pwmEnablePath].Contents)
-	assert.Equal(t, fmt.Sprintf("%d", a.periodDefault), fs.Files[pwmPeriodPath].Contents) //nolint:perfsprint // ok here
+	//nolint:perfsprint // ok here
+	assert.Equal(t, fmt.Sprintf("%d", a.pwmPinsCfg.periodDefault), fs.Files[pwmPeriodPath].Contents)
 	assert.Equal(t, "3921568", fs.Files[pwmDutyCyclePath].Contents)
 	assert.Equal(t, "normal", fs.Files[pwmPolarityPath].Contents)
 
@@ -203,12 +170,13 @@ func TestServoWrite(t *testing.T) {
 	a, fs := initTestPWMPinsAdaptorWithMockedFilesystem(pwmMockPaths)
 
 	err := a.ServoWrite("33", 0)
+	require.NoError(t, err)
 	assert.Equal(t, "44", fs.Files[pwmExportPath].Contents)
 	assert.Equal(t, "1", fs.Files[pwmEnablePath].Contents)
-	assert.Equal(t, fmt.Sprintf("%d", a.periodDefault), fs.Files[pwmPeriodPath].Contents) //nolint:perfsprint // ok here
+	//nolint:perfsprint // ok here
+	assert.Equal(t, fmt.Sprintf("%d", a.pwmPinsCfg.periodDefault), fs.Files[pwmPeriodPath].Contents)
 	assert.Equal(t, "250000", fs.Files[pwmDutyCyclePath].Contents)
 	assert.Equal(t, "normal", fs.Files[pwmPolarityPath].Contents)
-	require.NoError(t, err)
 
 	err = a.ServoWrite("33", 180)
 	require.NoError(t, err)
@@ -225,6 +193,11 @@ func TestServoWrite(t *testing.T) {
 	fs.WithReadError = true
 	err = a.ServoWrite("33", 100)
 	require.ErrorContains(t, err, "read error")
+	fs.WithReadError = false
+
+	delete(a.pwmPinsCfg.pinsServoScale, "33")
+	err = a.ServoWrite("33", 42)
+	require.EqualError(t, err, "no scaler found for servo pin '33'")
 }
 
 func TestSetPeriod(t *testing.T) {

@@ -13,6 +13,7 @@ import (
 	"gobot.io/x/gobot/v2/drivers/aio"
 	"gobot.io/x/gobot/v2/drivers/gpio"
 	"gobot.io/x/gobot/v2/drivers/i2c"
+	"gobot.io/x/gobot/v2/platforms/adaptors"
 	"gobot.io/x/gobot/v2/system"
 )
 
@@ -79,11 +80,29 @@ func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.
 	return a, fs
 }
 
-func TestName(t *testing.T) {
+func TestNewAdaptor(t *testing.T) {
+	// arrange & act
 	a := NewAdaptor()
+	// assert
+	assert.IsType(t, &Adaptor{}, a)
 	assert.True(t, strings.HasPrefix(a.Name(), "Tinker Board"))
+	assert.NotNil(t, a.sys)
+	assert.NotNil(t, a.mutex)
+	assert.NotNil(t, a.AnalogPinsAdaptor)
+	assert.NotNil(t, a.DigitalPinsAdaptor)
+	assert.NotNil(t, a.PWMPinsAdaptor)
+	assert.NotNil(t, a.I2cBusAdaptor)
+	assert.NotNil(t, a.SpiBusAdaptor)
+	// act & assert
 	a.SetName("NewName")
 	assert.Equal(t, "NewName", a.Name())
+}
+
+func TestNewAdaptorWithOption(t *testing.T) {
+	// arrange & act
+	a := NewAdaptor(adaptors.WithGpiosActiveLow("1"))
+	// assert
+	require.NoError(t, a.Connect())
 }
 
 func TestDigitalIO(t *testing.T) {
@@ -101,7 +120,7 @@ func TestDigitalIO(t *testing.T) {
 	require.NoError(t, a.Finalize())
 }
 
-func TestAnalog(t *testing.T) {
+func TestAnalogRead(t *testing.T) {
 	mockPaths := []string{
 		"/sys/class/thermal/thermal_zone0/temp",
 	}
@@ -124,47 +143,50 @@ func TestAnalog(t *testing.T) {
 	require.NoError(t, a.Finalize())
 }
 
-func TestInvalidPWMPin(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem(pwmMockPaths)
-	preparePwmFs(fs)
-
-	err := a.PwmWrite("666", 42)
-	require.ErrorContains(t, err, "'666' is not a valid id for a PWM pin")
-
-	err = a.ServoWrite("666", 120)
-	require.ErrorContains(t, err, "'666' is not a valid id for a PWM pin")
-
-	err = a.PwmWrite("3", 42)
-	require.ErrorContains(t, err, "'3' is not a valid id for a PWM pin")
-
-	err = a.ServoWrite("3", 120)
-	require.ErrorContains(t, err, "'3' is not a valid id for a PWM pin")
-}
-
 func TestPwmWrite(t *testing.T) {
+	// arrange
 	a, fs := initTestAdaptorWithMockedFilesystem(pwmMockPaths)
 	preparePwmFs(fs)
-
+	// act
 	err := a.PwmWrite("33", 100)
+	// assert
 	require.NoError(t, err)
-
 	assert.Equal(t, "0", fs.Files[pwmExportPath].Contents)
 	assert.Equal(t, "1", fs.Files[pwmEnablePath].Contents)
-	assert.Equal(t, strconv.Itoa(10000000), fs.Files[pwmPeriodPath].Contents)
+	assert.Equal(t, "10000000", fs.Files[pwmPeriodPath].Contents)
 	assert.Equal(t, "3921568", fs.Files[pwmDutyCyclePath].Contents)
 	assert.Equal(t, "normal", fs.Files[pwmPolarityPath].Contents)
+	// act & assert invalid pin
+	err = a.PwmWrite("666", 42)
+	require.ErrorContains(t, err, "'666' is not a valid id for a PWM pin")
 
-	// prepare 50Hz for servos
-	fs.Files[pwmPeriodPath].Contents = strconv.Itoa(20000000)
-	err = a.ServoWrite("33", 0)
+	require.NoError(t, a.Finalize())
+}
+
+func TestServoWrite(t *testing.T) {
+	// arrange: prepare 50Hz for servos
+	const (
+		pin         = "33"
+		fiftyHzNano = 20000000
+	)
+	a := NewAdaptor(adaptors.WithPWMDefaultPeriodForPin(pin, fiftyHzNano))
+	fs := a.sys.UseMockFilesystem(pwmMockPaths)
+	preparePwmFs(fs)
+	require.NoError(t, a.Connect())
+	// act & assert for 0° (min default value)
+	err := a.ServoWrite(pin, 0)
 	require.NoError(t, err)
-
+	assert.Equal(t, strconv.Itoa(fiftyHzNano), fs.Files[pwmPeriodPath].Contents)
 	assert.Equal(t, "500000", fs.Files[pwmDutyCyclePath].Contents)
-
-	err = a.ServoWrite("33", 180)
+	// act & assert for 180° (max default value)
+	err = a.ServoWrite(pin, 180)
 	require.NoError(t, err)
-
+	assert.Equal(t, strconv.Itoa(fiftyHzNano), fs.Files[pwmPeriodPath].Contents)
 	assert.Equal(t, "2500000", fs.Files[pwmDutyCyclePath].Contents)
+	// act & assert invalid pins
+	err = a.ServoWrite("3", 120)
+	require.ErrorContains(t, err, "'3' is not a valid id for a PWM pin")
+
 	require.NoError(t, a.Finalize())
 }
 

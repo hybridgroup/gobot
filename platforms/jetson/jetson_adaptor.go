@@ -41,7 +41,7 @@ type Adaptor struct {
 //
 //	adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs
 //	adaptors.WithSpiGpioAccess(sclk, nss, mosi, miso):	use GPIO's instead of /dev/spidev#.#
-func NewAdaptor(opts ...func(adaptors.Optioner)) *Adaptor {
+func NewAdaptor(opts ...func(adaptors.DigitalPinsOptioner)) *Adaptor {
 	sys := system.NewAccesser()
 	c := &Adaptor{
 		name: gobot.DefaultName("JetsonNano"),
