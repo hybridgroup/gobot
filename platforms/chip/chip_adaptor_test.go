@@ -2,6 +2,7 @@ package chip
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -11,6 +12,7 @@ import (
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/gpio"
 	"gobot.io/x/gobot/v2/drivers/i2c"
+	"gobot.io/x/gobot/v2/platforms/adaptors"
 	"gobot.io/x/gobot/v2/system"
 )
 
@@ -73,7 +75,6 @@ func TestNewProAdaptor(t *testing.T) {
 
 func TestFinalizeErrorAfterGPIO(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem()
-	require.NoError(t, a.Connect())
 	require.NoError(t, a.DigitalWrite("CSID7", 1))
 
 	fs.WithWriteError = true
@@ -87,7 +88,6 @@ func TestFinalizeErrorAfterPWM(t *testing.T) {
 	fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents = "0"
 	fs.Files["/sys/class/pwm/pwmchip0/pwm0/period"].Contents = "0"
 
-	require.NoError(t, a.Connect())
 	require.NoError(t, a.PwmWrite("PWM0", 100))
 
 	fs.WithWriteError = true
@@ -98,9 +98,8 @@ func TestFinalizeErrorAfterPWM(t *testing.T) {
 
 func TestDigitalIO(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem()
-	_ = a.Connect()
 
-	_ = a.DigitalWrite("CSID7", 1)
+	require.NoError(t, a.DigitalWrite("CSID7", 1))
 	assert.Equal(t, "1", fs.Files["/sys/class/gpio/gpio139/value"].Contents)
 
 	fs.Files["/sys/class/gpio/gpio50/value"].Contents = "1"
@@ -126,36 +125,45 @@ func TestProDigitalIO(t *testing.T) {
 	require.NoError(t, a.Finalize())
 }
 
-func TestPWM(t *testing.T) {
+func TestPWMWrite(t *testing.T) {
+	// arrange
 	a, fs := initTestAdaptorWithMockedFilesystem()
 	fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents = "0"
 	fs.Files["/sys/class/pwm/pwmchip0/pwm0/period"].Contents = "0"
-
-	_ = a.Connect()
-
+	// act
 	err := a.PwmWrite("PWM0", 100)
+	// assert
 	require.NoError(t, err)
-
 	assert.Equal(t, "0", fs.Files["/sys/class/pwm/pwmchip0/export"].Contents)
 	assert.Equal(t, "1", fs.Files["/sys/class/pwm/pwmchip0/pwm0/enable"].Contents)
 	assert.Equal(t, "3921568", fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents)
 	assert.Equal(t, "10000000", fs.Files["/sys/class/pwm/pwmchip0/pwm0/period"].Contents) // pwmPeriodDefault
 	assert.Equal(t, "normal", fs.Files["/sys/class/pwm/pwmchip0/pwm0/polarity"].Contents)
 
-	// prepare 50Hz for servos
-	const fiftyHzNano = "20000000"
-	fs.Files["/sys/class/pwm/pwmchip0/pwm0/period"].Contents = fiftyHzNano
-	err = a.ServoWrite("PWM0", 0)
-	require.NoError(t, err)
+	require.NoError(t, a.Finalize())
+}
 
+func TestServoWrite(t *testing.T) {
+	// arrange: prepare 50Hz for servos
+	const (
+		pin         = "PWM0"
+		fiftyHzNano = 20000000
+	)
+	a := NewAdaptor(adaptors.WithPWMDefaultPeriodForPin(pin, fiftyHzNano))
+	fs := a.sys.UseMockFilesystem(mockPaths)
+	require.NoError(t, a.Connect())
+	fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents = "0"
+	fs.Files["/sys/class/pwm/pwmchip0/pwm0/period"].Contents = "0"
+	// act & assert for 0° (min default value)
+	err := a.ServoWrite(pin, 0)
+	require.NoError(t, err)
+	assert.Equal(t, strconv.Itoa(fiftyHzNano), fs.Files["/sys/class/pwm/pwmchip0/pwm0/period"].Contents)
 	assert.Equal(t, "500000", fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents)
-	assert.Equal(t, fiftyHzNano, fs.Files["/sys/class/pwm/pwmchip0/pwm0/period"].Contents)
-
-	err = a.ServoWrite("PWM0", 180)
+	// act & assert for 180° (max default value)
+	err = a.ServoWrite(pin, 180)
 	require.NoError(t, err)
-
+	assert.Equal(t, strconv.Itoa(fiftyHzNano), fs.Files["/sys/class/pwm/pwmchip0/pwm0/period"].Contents)
 	assert.Equal(t, "2500000", fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents)
-	assert.Equal(t, fiftyHzNano, fs.Files["/sys/class/pwm/pwmchip0/pwm0/period"].Contents) // pwmPeriodDefault
 
 	require.NoError(t, a.Finalize())
 }

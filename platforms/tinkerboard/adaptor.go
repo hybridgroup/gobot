@@ -50,7 +50,7 @@ type pwmPinDefinition struct {
 type Adaptor struct {
 	name  string
 	sys   *system.Accesser
-	mutex sync.Mutex
+	mutex *sync.Mutex
 	*adaptors.AnalogPinsAdaptor
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.PWMPinsAdaptor
@@ -67,79 +67,95 @@ type Adaptor struct {
 //	adaptors.WithGpiosActiveLow(pin's): invert the pin behavior
 //	adaptors.WithGpiosPullUp/Down(pin's): sets the internal pull resistor
 //
+//	Optional parameters for PWM, see [adaptors.NewPWMPinsAdaptor]
+//
 // note from RK3288 datasheet: "The pull direction (pullup or pulldown) for all of GPIOs are software-programmable", but
 // the latter is not working for any pin (armbian 22.08.7)
-func NewAdaptor(opts ...func(adaptors.Optioner)) *Adaptor {
+func NewAdaptor(opts ...interface{}) *Adaptor {
 	sys := system.NewAccesser(system.WithDigitalPinGpiodAccess())
-	c := &Adaptor{
-		name: gobot.DefaultName("Tinker Board"),
-		sys:  sys,
+	a := &Adaptor{
+		name:  gobot.DefaultName("Tinker Board"),
+		sys:   sys,
+		mutex: &sync.Mutex{},
 	}
-	c.AnalogPinsAdaptor = adaptors.NewAnalogPinsAdaptor(sys, c.translateAnalogPin)
-	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.translateDigitalPin, opts...)
-	c.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, c.translatePWMPin,
-		adaptors.WithPolarityInvertedIdentifier(pwmInvertedIdentifier))
-	c.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, c.validateI2cBusNumber, defaultI2cBusNumber)
-	c.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, c.validateSpiBusNumber, defaultSpiBusNumber, defaultSpiChipNumber,
+
+	var digitalPinsOpts []func(adaptors.DigitalPinsOptioner)
+	pwmPinsOpts := []adaptors.PwmPinsOptionApplier{adaptors.WithPWMPolarityInvertedIdentifier(pwmInvertedIdentifier)}
+	for _, opt := range opts {
+		switch o := opt.(type) {
+		case func(adaptors.DigitalPinsOptioner):
+			digitalPinsOpts = append(digitalPinsOpts, o)
+		case adaptors.PwmPinsOptionApplier:
+			pwmPinsOpts = append(pwmPinsOpts, o)
+		default:
+			panic(fmt.Sprintf("'%s' can not be applied on adaptor '%s'", opt, a.name))
+		}
+	}
+
+	a.AnalogPinsAdaptor = adaptors.NewAnalogPinsAdaptor(sys, a.translateAnalogPin)
+	a.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, a.translateDigitalPin, digitalPinsOpts...)
+	a.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, a.translatePWMPin, pwmPinsOpts...)
+	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, a.validateI2cBusNumber, defaultI2cBusNumber)
+	a.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, a.validateSpiBusNumber, defaultSpiBusNumber, defaultSpiChipNumber,
 		defaultSpiMode, defaultSpiBitsNumber, defaultSpiMaxSpeed)
-	return c
+	return a
 }
 
 // Name returns the name of the Adaptor
-func (c *Adaptor) Name() string { return c.name }
+func (a *Adaptor) Name() string { return a.name }
 
 // SetName sets the name of the Adaptor
-func (c *Adaptor) SetName(n string) { c.name = n }
+func (a *Adaptor) SetName(n string) { a.name = n }
 
 // Connect create new connection to board and pins.
-func (c *Adaptor) Connect() error {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
+func (a *Adaptor) Connect() error {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
 
-	if err := c.SpiBusAdaptor.Connect(); err != nil {
+	if err := a.SpiBusAdaptor.Connect(); err != nil {
 		return err
 	}
 
-	if err := c.I2cBusAdaptor.Connect(); err != nil {
+	if err := a.I2cBusAdaptor.Connect(); err != nil {
 		return err
 	}
 
-	if err := c.AnalogPinsAdaptor.Connect(); err != nil {
+	if err := a.AnalogPinsAdaptor.Connect(); err != nil {
 		return err
 	}
 
-	if err := c.PWMPinsAdaptor.Connect(); err != nil {
+	if err := a.PWMPinsAdaptor.Connect(); err != nil {
 		return err
 	}
-	return c.DigitalPinsAdaptor.Connect()
+	return a.DigitalPinsAdaptor.Connect()
 }
 
 // Finalize closes connection to board, pins and bus
-func (c *Adaptor) Finalize() error {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
+func (a *Adaptor) Finalize() error {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
 
-	err := c.DigitalPinsAdaptor.Finalize()
+	err := a.DigitalPinsAdaptor.Finalize()
 
-	if e := c.PWMPinsAdaptor.Finalize(); e != nil {
+	if e := a.PWMPinsAdaptor.Finalize(); e != nil {
 		err = multierror.Append(err, e)
 	}
 
-	if e := c.AnalogPinsAdaptor.Finalize(); e != nil {
+	if e := a.AnalogPinsAdaptor.Finalize(); e != nil {
 		err = multierror.Append(err, e)
 	}
 
-	if e := c.I2cBusAdaptor.Finalize(); e != nil {
+	if e := a.I2cBusAdaptor.Finalize(); e != nil {
 		err = multierror.Append(err, e)
 	}
 
-	if e := c.SpiBusAdaptor.Finalize(); e != nil {
+	if e := a.SpiBusAdaptor.Finalize(); e != nil {
 		err = multierror.Append(err, e)
 	}
 	return err
 }
 
-func (c *Adaptor) validateSpiBusNumber(busNr int) error {
+func (a *Adaptor) validateSpiBusNumber(busNr int) error {
 	// Valid bus numbers are [0,2] which corresponds to /dev/spidev0.x, /dev/spidev2.x
 	// x is the chip number <255
 	if (busNr != 0) && (busNr != 2) {
@@ -148,7 +164,7 @@ func (c *Adaptor) validateSpiBusNumber(busNr int) error {
 	return nil
 }
 
-func (c *Adaptor) validateI2cBusNumber(busNr int) error {
+func (a *Adaptor) validateI2cBusNumber(busNr int) error {
 	// Valid bus number is [0..4] which corresponds to /dev/i2c-0 through /dev/i2c-4.
 	// We don't support "/dev/i2c-6 DesignWare HDMI".
 	if (busNr < 0) || (busNr > 4) {
@@ -157,14 +173,14 @@ func (c *Adaptor) validateI2cBusNumber(busNr int) error {
 	return nil
 }
 
-func (c *Adaptor) translateAnalogPin(id string) (string, bool, bool, uint16, error) {
+func (a *Adaptor) translateAnalogPin(id string) (string, bool, bool, uint16, error) {
 	pinInfo, ok := analogPinDefinitions[id]
 	if !ok {
 		return "", false, false, 0, fmt.Errorf("'%s' is not a valid id for a analog pin", id)
 	}
 
 	path := pinInfo.path
-	info, err := c.sys.Stat(path)
+	info, err := a.sys.Stat(path)
 	if err != nil {
 		return "", false, false, 0, fmt.Errorf("Error (%v) on access '%s'", err, path)
 	}
@@ -175,12 +191,12 @@ func (c *Adaptor) translateAnalogPin(id string) (string, bool, bool, uint16, err
 	return path, pinInfo.r, pinInfo.w, pinInfo.bufLen, nil
 }
 
-func (c *Adaptor) translateDigitalPin(id string) (string, int, error) {
+func (a *Adaptor) translateDigitalPin(id string) (string, int, error) {
 	pindef, ok := gpioPinDefinitions[id]
 	if !ok {
 		return "", -1, fmt.Errorf("'%s' is not a valid id for a digital pin", id)
 	}
-	if c.sys.IsSysfsDigitalPinAccess() {
+	if a.sys.IsSysfsDigitalPinAccess() {
 		return "", pindef.sysfs, nil
 	}
 	chip := fmt.Sprintf("gpiochip%d", pindef.cdev.chip)
@@ -188,12 +204,12 @@ func (c *Adaptor) translateDigitalPin(id string) (string, int, error) {
 	return chip, line, nil
 }
 
-func (c *Adaptor) translatePWMPin(id string) (string, int, error) {
+func (a *Adaptor) translatePWMPin(id string) (string, int, error) {
 	pinInfo, ok := pwmPinDefinitions[id]
 	if !ok {
 		return "", -1, fmt.Errorf("'%s' is not a valid id for a PWM pin", id)
 	}
-	path, err := pinInfo.findPWMDir(c.sys)
+	path, err := pinInfo.findPWMDir(a.sys)
 	if err != nil {
 		return "", -1, err
 	}

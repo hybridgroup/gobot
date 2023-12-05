@@ -13,6 +13,7 @@ import (
 	"gobot.io/x/gobot/v2/drivers/aio"
 	"gobot.io/x/gobot/v2/drivers/gpio"
 	"gobot.io/x/gobot/v2/drivers/i2c"
+	"gobot.io/x/gobot/v2/platforms/adaptors"
 	"gobot.io/x/gobot/v2/system"
 )
 
@@ -30,8 +31,6 @@ const (
 	pwmPeriodPath    = pwmPwmDir + "period"
 	pwmDutyCyclePath = pwmPwmDir + "duty_cycle"
 	pwmPolarityPath  = pwmPwmDir + "polarity"
-
-	fiftyHzNano = "20000000"
 )
 
 var pwmMockPaths = []string{
@@ -144,29 +143,46 @@ func TestInvalidPWMPin(t *testing.T) {
 }
 
 func TestPwmWrite(t *testing.T) {
+	// arrange
 	a, fs := initTestAdaptorWithMockedFilesystem(pwmMockPaths)
 	preparePwmFs(fs)
-
+	// act
 	err := a.PwmWrite("PWM", 100)
+	// assert
 	require.NoError(t, err)
-
 	assert.Equal(t, "0", fs.Files[pwmExportPath].Contents)
 	assert.Equal(t, "1", fs.Files[pwmEnablePath].Contents)
 	assert.Equal(t, strconv.Itoa(10000000), fs.Files[pwmPeriodPath].Contents)
 	assert.Equal(t, "3921568", fs.Files[pwmDutyCyclePath].Contents)
 	assert.Equal(t, "normal", fs.Files[pwmPolarityPath].Contents)
 
-	// prepare 50Hz for servos
-	fs.Files[pwmPeriodPath].Contents = fiftyHzNano
-	err = a.ServoWrite("PWM", 0)
-	require.NoError(t, err)
+	require.NoError(t, a.Finalize())
+}
 
+func TestServoWrite(t *testing.T) {
+	// arrange: prepare 50Hz for servos
+	const (
+		pin         = "PWM"
+		fiftyHzNano = 20000000
+	)
+	a := NewNeoAdaptor(adaptors.WithPWMDefaultPeriodForPin(pin, fiftyHzNano))
+	fs := a.sys.UseMockFilesystem(pwmMockPaths)
+	preparePwmFs(fs)
+	require.NoError(t, a.Connect())
+	// act & assert for 0° (min default value)
+	err := a.ServoWrite(pin, 0)
+	require.NoError(t, err)
+	assert.Equal(t, strconv.Itoa(fiftyHzNano), fs.Files[pwmPeriodPath].Contents)
 	assert.Equal(t, "500000", fs.Files[pwmDutyCyclePath].Contents)
-
-	err = a.ServoWrite("PWM", 180)
+	// act & assert for 180° (max default value)
+	err = a.ServoWrite(pin, 180)
 	require.NoError(t, err)
-
+	assert.Equal(t, strconv.Itoa(fiftyHzNano), fs.Files[pwmPeriodPath].Contents)
 	assert.Equal(t, "2500000", fs.Files[pwmDutyCyclePath].Contents)
+	// act & assert invalid pins
+	err = a.ServoWrite("3", 120)
+	require.ErrorContains(t, err, "'3' is not a valid id for a PWM pin")
+
 	require.NoError(t, a.Finalize())
 }
 

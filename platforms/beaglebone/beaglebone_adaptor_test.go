@@ -2,6 +2,7 @@ package beaglebone
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -13,6 +14,7 @@ import (
 	"gobot.io/x/gobot/v2/drivers/gpio"
 	"gobot.io/x/gobot/v2/drivers/i2c"
 	"gobot.io/x/gobot/v2/drivers/spi"
+	"gobot.io/x/gobot/v2/platforms/adaptors"
 	"gobot.io/x/gobot/v2/system"
 )
 
@@ -45,47 +47,115 @@ const (
 	pwmChip0ExportPath   = pwmChip0Dir + "export"
 	pwmChip0UnexportPath = pwmChip0Dir + "unexport"
 	pwmChip0Pwm0Dir      = pwmChip0Dir + "pwm0/"
-	pwm0EnablePath       = pwmChip0Pwm0Dir + "enable"
-	pwm0PeriodPath       = pwmChip0Pwm0Dir + "period"
-	pwm0DutyCyclePath    = pwmChip0Pwm0Dir + "duty_cycle"
-	pwm0PolarityPath     = pwmChip0Pwm0Dir + "polarity"
+	pwmChip0Pwm1Dir      = pwmChip0Dir + "pwm1/"
 
-	pwmChip0Pwm1Dir   = pwmChip0Dir + "pwm1/"
+	pwm0EnablePath    = pwmChip0Pwm0Dir + "enable"
+	pwm0PeriodPath    = pwmChip0Pwm0Dir + "period"
+	pwm0DutyCyclePath = pwmChip0Pwm0Dir + "duty_cycle"
+	pwm0PolarityPath  = pwmChip0Pwm0Dir + "polarity"
+
 	pwm1EnablePath    = pwmChip0Pwm1Dir + "enable"
 	pwm1PeriodPath    = pwmChip0Pwm1Dir + "period"
 	pwm1DutyCyclePath = pwmChip0Pwm1Dir + "duty_cycle"
 	pwm1PolarityPath  = pwmChip0Pwm1Dir + "polarity"
 )
 
-func TestPWM(t *testing.T) {
-	mockPaths := []string{
-		"/sys/devices/platform/ocp/ocp:P9_22_pinmux/state",
-		"/sys/devices/platform/ocp/ocp:P9_21_pinmux/state",
-		"/sys/bus/iio/devices/iio:device0/in_voltage1_raw",
-		pwmChip0ExportPath,
-		pwmChip0UnexportPath,
-		pwm0EnablePath,
-		pwm0PeriodPath,
-		pwm0DutyCyclePath,
-		pwm0PolarityPath,
-		pwm1EnablePath,
-		pwm1PeriodPath,
-		pwm1DutyCyclePath,
-		pwm1PolarityPath,
-	}
+var pwmMockPaths = []string{
+	"/sys/devices/platform/ocp/ocp:P9_22_pinmux/state",
+	"/sys/devices/platform/ocp/ocp:P9_21_pinmux/state",
+	"/sys/bus/iio/devices/iio:device0/in_voltage1_raw",
+	pwmChip0ExportPath,
+	pwmChip0UnexportPath,
+	pwm0EnablePath,
+	pwm0PeriodPath,
+	pwm0DutyCyclePath,
+	pwm0PolarityPath,
+	pwm1EnablePath,
+	pwm1PeriodPath,
+	pwm1DutyCyclePath,
+	pwm1PolarityPath,
+}
 
-	a, fs := initTestAdaptorWithMockedFilesystem(mockPaths)
+func TestNewAdaptor(t *testing.T) {
+	// arrange & act
+	a := NewAdaptor()
+	// assert
+	assert.IsType(t, &Adaptor{}, a)
+	assert.True(t, strings.HasPrefix(a.Name(), "Beaglebone"))
+	assert.NotNil(t, a.sys)
+	assert.NotNil(t, a.mutex)
+	assert.NotNil(t, a.AnalogPinsAdaptor)
+	assert.NotNil(t, a.DigitalPinsAdaptor)
+	assert.NotNil(t, a.PWMPinsAdaptor)
+	assert.NotNil(t, a.I2cBusAdaptor)
+	assert.NotNil(t, a.SpiBusAdaptor)
+	assert.Equal(t, bbbPinMap, a.pinMap)
+	assert.Equal(t, bbbPwmPinMap, a.pwmPinMap)
+	assert.Equal(t, bbbAnalogPinMap, a.analogPinMap)
+	assert.Equal(t, "/sys/class/leds/beaglebone:green:", a.usrLed)
+	// act & assert
+	a.SetName("NewName")
+	assert.Equal(t, "NewName", a.Name())
+}
+
+func TestNewPocketBeagleAdaptor(t *testing.T) {
+	// arrange & act
+	a := NewPocketBeagleAdaptor()
+	// assert
+	assert.IsType(t, &PocketBeagleAdaptor{}, a)
+	assert.True(t, strings.HasPrefix(a.Name(), "PocketBeagle"))
+	assert.NotNil(t, a.sys)
+	assert.Equal(t, pocketBeaglePinMap, a.pinMap)
+	assert.Equal(t, pocketBeaglePwmPinMap, a.pwmPinMap)
+	assert.Equal(t, pocketBeagleAnalogPinMap, a.analogPinMap)
+	assert.Equal(t, "/sys/class/leds/beaglebone:green:", a.usrLed)
+}
+
+func TestNewPocketBeagleAdaptorWithOption(t *testing.T) {
+	// arrange & act
+	a := NewPocketBeagleAdaptor(adaptors.WithGpiodAccess())
+	// assert
+	require.NoError(t, a.Connect())
+}
+
+func TestPWMWrite(t *testing.T) {
+	// arrange
+	a, fs := initTestAdaptorWithMockedFilesystem(pwmMockPaths)
 	fs.Files[pwm1DutyCyclePath].Contents = "0"
 	fs.Files[pwm1PeriodPath].Contents = "0"
-
+	// act & assert wrong pin
 	require.ErrorContains(t, a.PwmWrite("P9_99", 175), "'P9_99' is not a valid id for a PWM pin")
+
+	// act & assert values
 	_ = a.PwmWrite("P9_21", 175)
 	assert.Equal(t, "500000", fs.Files[pwm1PeriodPath].Contents)
 	assert.Equal(t, "343137", fs.Files[pwm1DutyCyclePath].Contents)
 
-	_ = a.ServoWrite("P9_21", 100)
-	assert.Equal(t, "500000", fs.Files[pwm1PeriodPath].Contents)
-	assert.Equal(t, "40277", fs.Files[pwm1DutyCyclePath].Contents)
+	require.NoError(t, a.Finalize())
+}
+
+func TestServoWrite(t *testing.T) {
+	// arrange: prepare 50Hz for servos
+	const (
+		pin         = "P9_21"
+		fiftyHzNano = 20000000
+	)
+	a := NewAdaptor(adaptors.WithPWMDefaultPeriodForPin(pin, fiftyHzNano))
+	fs := a.sys.UseMockFilesystem(pwmMockPaths)
+	require.NoError(t, a.Connect())
+	// act & assert for 0° (min default value)
+	err := a.ServoWrite(pin, 0)
+	require.NoError(t, err)
+	assert.Equal(t, strconv.Itoa(fiftyHzNano), fs.Files[pwm1PeriodPath].Contents)
+	assert.Equal(t, "500000", fs.Files[pwm1DutyCyclePath].Contents)
+	// act & assert for 180° (max default value)
+	err = a.ServoWrite(pin, 180)
+	require.NoError(t, err)
+	assert.Equal(t, strconv.Itoa(fiftyHzNano), fs.Files[pwm1PeriodPath].Contents)
+	assert.Equal(t, "2500000", fs.Files[pwm1DutyCyclePath].Contents)
+	// act & assert invalid pins
+	err = a.ServoWrite("3", 120)
+	require.ErrorContains(t, err, "'3' is not a valid id for a PWM pin")
 
 	require.NoError(t, a.Finalize())
 }
@@ -160,13 +230,6 @@ func TestDigitalIO(t *testing.T) {
 	require.NoError(t, a.Finalize())
 }
 
-func TestName(t *testing.T) {
-	a := NewAdaptor()
-	assert.True(t, strings.HasPrefix(a.Name(), "Beaglebone"))
-	a.SetName("NewName")
-	assert.Equal(t, "NewName", a.Name())
-}
-
 func TestAnalogReadFileError(t *testing.T) {
 	mockPaths := []string{
 		"/sys/devices/platform/whatever",
@@ -210,11 +273,6 @@ func TestDigitalPinFinalizeFileError(t *testing.T) {
 
 	err = a.Finalize()
 	require.ErrorContains(t, err, "/sys/class/gpio/unexport: no such file")
-}
-
-func TestPocketName(t *testing.T) {
-	a := NewPocketBeagleAdaptor()
-	assert.True(t, strings.HasPrefix(a.Name(), "PocketBeagle"))
 }
 
 func TestSpiDefaultValues(t *testing.T) {

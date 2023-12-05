@@ -12,6 +12,7 @@ import (
 
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/gpio"
+	"gobot.io/x/gobot/v2/platforms/adaptors"
 	"gobot.io/x/gobot/v2/platforms/tinkerboard"
 )
 
@@ -25,15 +26,16 @@ func main() {
 
 		fiftyHzNanos = 20 * 1000 * 1000 // 50Hz = 0.02 sec = 20 ms
 	)
-	adaptor := tinkerboard.NewAdaptor()
+	// usually a frequency of 50Hz is used for servos, most servos have 0.5 ms..2.5 ms for 0-180°,
+	// however the mapping can be changed with options:
+	adaptor := tinkerboard.NewAdaptor(
+		adaptors.WithPWMDefaultPeriodForPin(pwmPin, fiftyHzNanos),
+		adaptors.WithPWMServoDutyCycleRangeForPin(pwmPin, time.Millisecond, 2*time.Millisecond),
+		adaptors.WithPWMServoAngleRangeForPin(pwmPin, 0, 270),
+	)
 	servo := gpio.NewServoDriver(adaptor, pwmPin)
 
 	work := func() {
-		// usually a frequency of 50Hz is used for servos
-		if err := adaptor.SetPeriod(pwmPin, fiftyHzNanos); err != nil {
-			log.Println(err)
-		}
-
 		fmt.Printf("first move to minimal position for %s...\n", wait)
 		if err := servo.ToMin(); err != nil {
 			log.Println(err)
@@ -55,7 +57,7 @@ func main() {
 
 		time.Sleep(wait)
 
-		fmt.Println("finally move 0-180° and back forever...")
+		fmt.Println("finally move 0-180° (or what your servo do for the new mapping) and back forever...")
 		angle := 0
 		fadeAmount := 45
 

@@ -43,7 +43,7 @@ const (
 type Adaptor struct {
 	name  string
 	sys   *system.Accesser
-	mutex sync.Mutex
+	mutex *sync.Mutex
 	*adaptors.AnalogPinsAdaptor
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.PWMPinsAdaptor
@@ -61,75 +61,91 @@ type Adaptor struct {
 //
 //	adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs
 //	adaptors.WithSpiGpioAccess(sclk, nss, mosi, miso):	use GPIO's instead of /dev/spidev#.#
-func NewAdaptor(opts ...func(adaptors.Optioner)) *Adaptor {
+//
+//	Optional parameters for PWM, see [adaptors.NewPWMPinsAdaptor]
+func NewAdaptor(opts ...interface{}) *Adaptor {
 	sys := system.NewAccesser()
-	c := &Adaptor{
+	a := &Adaptor{
 		name:         gobot.DefaultName("BeagleboneBlack"),
 		sys:          sys,
+		mutex:        &sync.Mutex{},
 		pinMap:       bbbPinMap,
 		pwmPinMap:    bbbPwmPinMap,
 		analogPinMap: bbbAnalogPinMap,
 		usrLed:       "/sys/class/leds/beaglebone:green:",
 	}
-	c.AnalogPinsAdaptor = adaptors.NewAnalogPinsAdaptor(sys, c.translateAnalogPin)
-	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.translateAndMuxDigitalPin, opts...)
-	c.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, c.translateAndMuxPWMPin,
-		adaptors.WithPWMPinDefaultPeriod(pwmPeriodDefault))
-	c.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, c.validateI2cBusNumber, defaultI2cBusNumber)
-	c.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, c.validateSpiBusNumber, defaultSpiBusNumber, defaultSpiChipNumber,
+
+	var digitalPinsOpts []func(adaptors.DigitalPinsOptioner)
+	pwmPinsOpts := []adaptors.PwmPinsOptionApplier{adaptors.WithPWMDefaultPeriod(pwmPeriodDefault)}
+	for _, opt := range opts {
+		switch o := opt.(type) {
+		case func(adaptors.DigitalPinsOptioner):
+			digitalPinsOpts = append(digitalPinsOpts, o)
+		case adaptors.PwmPinsOptionApplier:
+			pwmPinsOpts = append(pwmPinsOpts, o)
+		default:
+			panic(fmt.Sprintf("'%s' can not be applied on adaptor '%s'", opt, a.name))
+		}
+	}
+
+	a.AnalogPinsAdaptor = adaptors.NewAnalogPinsAdaptor(sys, a.translateAnalogPin)
+	a.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, a.translateAndMuxDigitalPin, digitalPinsOpts...)
+	a.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, a.translateAndMuxPWMPin, pwmPinsOpts...)
+	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, a.validateI2cBusNumber, defaultI2cBusNumber)
+	a.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, a.validateSpiBusNumber, defaultSpiBusNumber, defaultSpiChipNumber,
 		defaultSpiMode, defaultSpiBitsNumber, defaultSpiMaxSpeed)
-	return c
+	return a
 }
 
 // Name returns the Adaptor name
-func (c *Adaptor) Name() string { return c.name }
+func (a *Adaptor) Name() string { return a.name }
 
 // SetName sets the Adaptor name
-func (c *Adaptor) SetName(n string) { c.name = n }
+func (a *Adaptor) SetName(n string) { a.name = n }
 
 // Connect create new connection to board and pins.
-func (c *Adaptor) Connect() error {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
+func (a *Adaptor) Connect() error {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
 
-	if err := c.SpiBusAdaptor.Connect(); err != nil {
+	if err := a.SpiBusAdaptor.Connect(); err != nil {
 		return err
 	}
 
-	if err := c.I2cBusAdaptor.Connect(); err != nil {
+	if err := a.I2cBusAdaptor.Connect(); err != nil {
 		return err
 	}
 
-	if err := c.AnalogPinsAdaptor.Connect(); err != nil {
+	if err := a.AnalogPinsAdaptor.Connect(); err != nil {
 		return err
 	}
 
-	if err := c.PWMPinsAdaptor.Connect(); err != nil {
+	if err := a.PWMPinsAdaptor.Connect(); err != nil {
 		return err
 	}
-	return c.DigitalPinsAdaptor.Connect()
+	return a.DigitalPinsAdaptor.Connect()
 }
 
 // Finalize releases all i2c devices and exported analog, digital, pwm pins.
-func (c *Adaptor) Finalize() error {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
+func (a *Adaptor) Finalize() error {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
 
-	err := c.DigitalPinsAdaptor.Finalize()
+	err := a.DigitalPinsAdaptor.Finalize()
 
-	if e := c.PWMPinsAdaptor.Finalize(); e != nil {
+	if e := a.PWMPinsAdaptor.Finalize(); e != nil {
 		err = multierror.Append(err, e)
 	}
 
-	if e := c.AnalogPinsAdaptor.Finalize(); e != nil {
+	if e := a.AnalogPinsAdaptor.Finalize(); e != nil {
 		err = multierror.Append(err, e)
 	}
 
-	if e := c.I2cBusAdaptor.Finalize(); e != nil {
+	if e := a.I2cBusAdaptor.Finalize(); e != nil {
 		err = multierror.Append(err, e)
 	}
 
-	if e := c.SpiBusAdaptor.Finalize(); e != nil {
+	if e := a.SpiBusAdaptor.Finalize(); e != nil {
 		err = multierror.Append(err, e)
 	}
 	return err
@@ -137,12 +153,12 @@ func (c *Adaptor) Finalize() error {
 
 // DigitalWrite writes a digital value to specified pin.
 // valid usr pin values are usr0, usr1, usr2 and usr3
-func (c *Adaptor) DigitalWrite(id string, val byte) error {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
+func (a *Adaptor) DigitalWrite(id string, val byte) error {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
 
 	if strings.Contains(id, "usr") {
-		fi, e := c.sys.OpenFile(c.usrLed+id+"/brightness", os.O_WRONLY|os.O_APPEND, 0o666)
+		fi, e := a.sys.OpenFile(a.usrLed+id+"/brightness", os.O_WRONLY|os.O_APPEND, 0o666)
 		defer fi.Close() //nolint:staticcheck // for historical reasons
 		if e != nil {
 			return e
@@ -151,10 +167,10 @@ func (c *Adaptor) DigitalWrite(id string, val byte) error {
 		return err
 	}
 
-	return c.DigitalPinsAdaptor.DigitalWrite(id, val)
+	return a.DigitalPinsAdaptor.DigitalWrite(id, val)
 }
 
-func (c *Adaptor) validateSpiBusNumber(busNr int) error {
+func (a *Adaptor) validateSpiBusNumber(busNr int) error {
 	// Valid bus numbers are [0,1] which corresponds to /dev/spidev0.x through /dev/spidev1.x.
 	// x is the chip number <255
 	if (busNr < 0) || (busNr > 1) {
@@ -163,7 +179,7 @@ func (c *Adaptor) validateSpiBusNumber(busNr int) error {
 	return nil
 }
 
-func (c *Adaptor) validateI2cBusNumber(busNr int) error {
+func (a *Adaptor) validateI2cBusNumber(busNr int) error {
 	// Valid bus number is either 0 or 2 which corresponds to /dev/i2c-0 or /dev/i2c-2.
 	if (busNr != 0) && (busNr != 2) {
 		return fmt.Errorf("Bus number %d out of range", busNr)
@@ -172,8 +188,8 @@ func (c *Adaptor) validateI2cBusNumber(busNr int) error {
 }
 
 // translateAnalogPin converts analog pin name to pin position
-func (c *Adaptor) translateAnalogPin(pin string) (string, bool, bool, uint16, error) {
-	pinInfo, ok := c.analogPinMap[pin]
+func (a *Adaptor) translateAnalogPin(pin string) (string, bool, bool, uint16, error) {
+	pinInfo, ok := a.analogPinMap[pin]
 	if !ok {
 		return "", false, false, 0, fmt.Errorf("Not a valid analog pin")
 	}
@@ -182,30 +198,30 @@ func (c *Adaptor) translateAnalogPin(pin string) (string, bool, bool, uint16, er
 }
 
 // translatePin converts digital pin name to pin position
-func (c *Adaptor) translateAndMuxDigitalPin(id string) (string, int, error) {
-	line, ok := c.pinMap[id]
+func (a *Adaptor) translateAndMuxDigitalPin(id string) (string, int, error) {
+	line, ok := a.pinMap[id]
 	if !ok {
 		return "", -1, fmt.Errorf("'%s' is not a valid id for a digital pin", id)
 	}
 	// mux is done by id, not by line
-	if err := c.muxPin(id, "gpio"); err != nil {
+	if err := a.muxPin(id, "gpio"); err != nil {
 		return "", -1, err
 	}
 	return "", line, nil
 }
 
-func (c *Adaptor) translateAndMuxPWMPin(id string) (string, int, error) {
-	pinInfo, ok := c.pwmPinMap[id]
+func (a *Adaptor) translateAndMuxPWMPin(id string) (string, int, error) {
+	pinInfo, ok := a.pwmPinMap[id]
 	if !ok {
 		return "", -1, fmt.Errorf("'%s' is not a valid id for a PWM pin", id)
 	}
 
-	path, err := pinInfo.findPWMDir(c.sys)
+	path, err := pinInfo.findPWMDir(a.sys)
 	if err != nil {
 		return "", -1, err
 	}
 
-	if err := c.muxPin(id, "pwm"); err != nil {
+	if err := a.muxPin(id, "pwm"); err != nil {
 		return "", -1, err
 	}
 
@@ -230,9 +246,9 @@ func (p pwmPinDefinition) findPWMDir(sys *system.Accesser) (string, error) {
 	return dir, nil
 }
 
-func (c *Adaptor) muxPin(pin, cmd string) error {
+func (a *Adaptor) muxPin(pin, cmd string) error {
 	path := fmt.Sprintf("/sys/devices/platform/ocp/ocp:%s_pinmux/state", pin)
-	fi, e := c.sys.OpenFile(path, os.O_WRONLY, 0o666)
+	fi, e := a.sys.OpenFile(path, os.O_WRONLY, 0o666)
 	defer fi.Close() //nolint:staticcheck // for historical reasons
 	if e != nil {
 		return e
