@@ -1,7 +1,6 @@
 package jetson
 
 import (
-	"errors"
 	"fmt"
 	"sync"
 
@@ -13,7 +12,9 @@ import (
 )
 
 const (
-	pwmPeriodDefault = 3000000 // 3 ms = 333 Hz
+	pwmPeriodDefault   = 3000000 // 3 ms = 333 Hz
+	pwmPeriodMinimum   = 5334
+	pwmDutyRateMinimum = 0.0005 // minimum duty of 1500 for default period, ~3 for minimum period
 
 	defaultI2cBusNumber = 1
 
@@ -26,11 +27,11 @@ const (
 
 // Adaptor is the Gobot adaptor for the Jetson Nano
 type Adaptor struct {
-	name    string
-	sys     *system.Accesser
-	mutex   sync.Mutex
-	pwmPins map[string]gobot.PWMPinner
+	name  string
+	sys   *system.Accesser
+	mutex *sync.Mutex
 	*adaptors.DigitalPinsAdaptor
+	*adaptors.PWMPinsAdaptor
 	*adaptors.I2cBusAdaptor
 	*adaptors.SpiBusAdaptor
 }
@@ -41,143 +42,99 @@ type Adaptor struct {
 //
 //	adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs
 //	adaptors.WithSpiGpioAccess(sclk, nss, mosi, miso):	use GPIO's instead of /dev/spidev#.#
-func NewAdaptor(opts ...func(adaptors.DigitalPinsOptioner)) *Adaptor {
+//
+//	Optional parameters for PWM, see [adaptors.NewPWMPinsAdaptor]
+func NewAdaptor(opts ...interface{}) *Adaptor {
 	sys := system.NewAccesser()
-	c := &Adaptor{
-		name: gobot.DefaultName("JetsonNano"),
-		sys:  sys,
+	a := &Adaptor{
+		name:  gobot.DefaultName("JetsonNano"),
+		sys:   sys,
+		mutex: &sync.Mutex{},
 	}
-	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.translateDigitalPin, opts...)
-	c.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, c.validateI2cBusNumber, defaultI2cBusNumber)
-	c.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, c.validateSpiBusNumber, defaultSpiBusNumber, defaultSpiChipNumber,
+
+	var digitalPinsOpts []func(adaptors.DigitalPinsOptioner)
+	pwmPinsOpts := []adaptors.PwmPinsOptionApplier{
+		adaptors.WithPWMDefaultPeriod(pwmPeriodDefault),
+		adaptors.WithPWMMinimumPeriod(pwmPeriodMinimum),
+		adaptors.WithPWMMinimumDutyRate(pwmDutyRateMinimum),
+	}
+	for _, opt := range opts {
+		switch o := opt.(type) {
+		case func(adaptors.DigitalPinsOptioner):
+			digitalPinsOpts = append(digitalPinsOpts, o)
+		case adaptors.PwmPinsOptionApplier:
+			pwmPinsOpts = append(pwmPinsOpts, o)
+		default:
+			panic(fmt.Sprintf("'%s' can not be applied on adaptor '%s'", opt, a.name))
+		}
+	}
+
+	a.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, a.translateDigitalPin, digitalPinsOpts...)
+	a.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, a.translatePWMPin, pwmPinsOpts...)
+	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, a.validateI2cBusNumber, defaultI2cBusNumber)
+	a.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, a.validateSpiBusNumber, defaultSpiBusNumber, defaultSpiChipNumber,
 		defaultSpiMode, defaultSpiBitsNumber, defaultSpiMaxSpeed)
-	return c
+	return a
 }
 
 // Name returns the Adaptor's name
-func (c *Adaptor) Name() string {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
+func (a *Adaptor) Name() string {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
 
-	return c.name
+	return a.name
 }
 
 // SetName sets the Adaptor's name
-func (c *Adaptor) SetName(n string) {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
+func (a *Adaptor) SetName(n string) {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
 
-	c.name = n
+	a.name = n
 }
 
 // Connect create new connection to board and pins.
-func (c *Adaptor) Connect() error {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
+func (a *Adaptor) Connect() error {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
 
-	if err := c.SpiBusAdaptor.Connect(); err != nil {
+	if err := a.SpiBusAdaptor.Connect(); err != nil {
 		return err
 	}
 
-	if err := c.I2cBusAdaptor.Connect(); err != nil {
+	if err := a.I2cBusAdaptor.Connect(); err != nil {
 		return err
 	}
 
-	c.pwmPins = make(map[string]gobot.PWMPinner)
-	return c.DigitalPinsAdaptor.Connect()
+	if err := a.PWMPinsAdaptor.Connect(); err != nil {
+		return err
+	}
+
+	return a.DigitalPinsAdaptor.Connect()
 }
 
 // Finalize closes connection to board and pins
-func (c *Adaptor) Finalize() error {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
+func (a *Adaptor) Finalize() error {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
 
-	err := c.DigitalPinsAdaptor.Finalize()
+	err := a.DigitalPinsAdaptor.Finalize()
 
-	for _, pin := range c.pwmPins {
-		if pin != nil {
-			if perr := pin.Unexport(); err != nil {
-				err = multierror.Append(err, perr)
-			}
-		}
-	}
-	c.pwmPins = nil
-
-	if e := c.I2cBusAdaptor.Finalize(); e != nil {
+	if e := a.PWMPinsAdaptor.Finalize(); e != nil {
 		err = multierror.Append(err, e)
 	}
 
-	if e := c.SpiBusAdaptor.Finalize(); e != nil {
+	if e := a.I2cBusAdaptor.Finalize(); e != nil {
+		err = multierror.Append(err, e)
+	}
+
+	if e := a.SpiBusAdaptor.Finalize(); e != nil {
 		err = multierror.Append(err, e)
 	}
 	return err
 }
 
-// PWMPin returns a Jetson Nano. PWMPin which provides the gobot.PWMPinner interface
-func (c *Adaptor) PWMPin(pin string) (gobot.PWMPinner, error) {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	return c.pwmPin(pin)
-}
-
-// PwmWrite writes a PWM signal to the specified pin
-func (c *Adaptor) PwmWrite(pin string, val byte) error {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	sysPin, err := c.pwmPin(pin)
-	if err != nil {
-		return err
-	}
-
-	duty := uint32(gobot.FromScale(float64(val), 0, 255) * float64(pwmPeriodDefault))
-	return sysPin.SetDutyCycle(duty)
-}
-
-// ServoWrite writes a servo signal to the specified pin
-func (c *Adaptor) ServoWrite(pin string, angle byte) error {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	sysPin, err := c.pwmPin(pin)
-	if err != nil {
-		return err
-	}
-
-	duty := uint32(gobot.FromScale(float64(angle), 0, 180) * float64(pwmPeriodDefault))
-	return sysPin.SetDutyCycle(duty)
-}
-
-func (c *Adaptor) pwmPin(pin string) (gobot.PWMPinner, error) {
-	if c.pwmPins == nil {
-		return nil, fmt.Errorf("not connected")
-	}
-
-	if c.pwmPins[pin] != nil {
-		return c.pwmPins[pin], nil
-	}
-
-	fn, err := c.translatePwmPin(pin)
-	if err != nil {
-		return nil, err
-	}
-
-	c.pwmPins[pin] = NewPWMPin(c.sys, "/sys/class/pwm/pwmchip0", fn)
-	if err := c.pwmPins[pin].Export(); err != nil {
-		return nil, err
-	}
-	if err := c.pwmPins[pin].SetPeriod(pwmPeriodDefault); err != nil {
-		return nil, err
-	}
-	if err := c.pwmPins[pin].SetEnabled(true); err != nil {
-		return nil, err
-	}
-
-	return c.pwmPins[pin], nil
-}
-
-func (c *Adaptor) validateSpiBusNumber(busNr int) error {
+func (a *Adaptor) validateSpiBusNumber(busNr int) error {
 	// Valid bus numbers are [0,1] which corresponds to /dev/spidev0.x through /dev/spidev1.x.
 	// x is the chip number <255
 	if (busNr < 0) || (busNr > 1) {
@@ -186,7 +143,7 @@ func (c *Adaptor) validateSpiBusNumber(busNr int) error {
 	return nil
 }
 
-func (c *Adaptor) validateI2cBusNumber(busNr int) error {
+func (a *Adaptor) validateI2cBusNumber(busNr int) error {
 	// Valid bus number is [0..1] which corresponds to /dev/i2c-0 through /dev/i2c-1.
 	if (busNr < 0) || (busNr > 1) {
 		return fmt.Errorf("Bus number %d out of range", busNr)
@@ -194,16 +151,16 @@ func (c *Adaptor) validateI2cBusNumber(busNr int) error {
 	return nil
 }
 
-func (c *Adaptor) translateDigitalPin(id string) (string, int, error) {
+func (a *Adaptor) translateDigitalPin(id string) (string, int, error) {
 	if line, ok := gpioPins[id]; ok {
 		return "", line, nil
 	}
 	return "", -1, fmt.Errorf("'%s' is not a valid id for a digital pin", id)
 }
 
-func (c *Adaptor) translatePwmPin(pin string) (string, error) {
-	if fn, ok := pwmPins[pin]; ok {
-		return fn, nil
+func (a *Adaptor) translatePWMPin(id string) (string, int, error) {
+	if channel, ok := pwmPins[id]; ok {
+		return "/sys/class/pwm/pwmchip0", channel, nil
 	}
-	return "", errors.New("Not a valid pin")
+	return "", 0, fmt.Errorf("'%s' is not a valid pin id for PWM on '%s'", id, a.name)
 }

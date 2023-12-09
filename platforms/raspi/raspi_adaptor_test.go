@@ -16,8 +16,31 @@ import (
 	"gobot.io/x/gobot/v2/drivers/gpio"
 	"gobot.io/x/gobot/v2/drivers/i2c"
 	"gobot.io/x/gobot/v2/drivers/spi"
+	"gobot.io/x/gobot/v2/platforms/adaptors"
 	"gobot.io/x/gobot/v2/system"
 )
+
+const (
+	pwmDir           = "/sys/class/pwm/pwmchip0/" //nolint:gosec // false positive
+	pwmPwmDir        = pwmDir + "pwm0/"
+	pwmExportPath    = pwmDir + "export"
+	pwmUnexportPath  = pwmDir + "unexport"
+	pwmEnablePath    = pwmPwmDir + "enable"
+	pwmPeriodPath    = pwmPwmDir + "period"
+	pwmDutyCyclePath = pwmPwmDir + "duty_cycle"
+	pwmPolarityPath  = pwmPwmDir + "polarity"
+
+	pwmInvertedIdentifier = "inversed"
+)
+
+var pwmMockPaths = []string{
+	pwmExportPath,
+	pwmUnexportPath,
+	pwmEnablePath,
+	pwmPeriodPath,
+	pwmDutyCyclePath,
+	pwmPolarityPath,
+}
 
 // make sure that this Adaptor fulfills all the required interfaces
 var (
@@ -33,10 +56,19 @@ var (
 	_ spi.Connector               = (*Adaptor)(nil)
 )
 
+func preparePwmFs(fs *system.MockFilesystem) {
+	fs.Files[pwmEnablePath].Contents = "0"
+	fs.Files[pwmPeriodPath].Contents = "0"
+	fs.Files[pwmDutyCyclePath].Contents = "0"
+	fs.Files[pwmPolarityPath].Contents = pwmInvertedIdentifier
+}
+
 func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.MockFilesystem) {
 	a := NewAdaptor()
 	fs := a.sys.UseMockFilesystem(mockPaths)
-	_ = a.Connect()
+	if err := a.Connect(); err != nil {
+		panic(err)
+	}
 	return a, fs
 }
 
@@ -133,35 +165,96 @@ func TestAnalog(t *testing.T) {
 	require.NoError(t, a.Finalize())
 }
 
-func TestDigitalPWM(t *testing.T) {
+func TestPwmWrite(t *testing.T) {
+	// arrange
+	a, fs := initTestAdaptorWithMockedFilesystem(pwmMockPaths)
+	preparePwmFs(fs)
+	// act
+	err := a.PwmWrite("pwm0", 100)
+	// assert
+	require.NoError(t, err)
+	assert.Equal(t, "0", fs.Files[pwmExportPath].Contents)
+	assert.Equal(t, "1", fs.Files[pwmEnablePath].Contents)
+	assert.Equal(t, "10000000", fs.Files[pwmPeriodPath].Contents)
+	assert.Equal(t, "3921568", fs.Files[pwmDutyCyclePath].Contents)
+	assert.Equal(t, "normal", fs.Files[pwmPolarityPath].Contents)
+	// act & assert invalid pin
+	err = a.PwmWrite("pwm1", 42)
+	require.ErrorContains(t, err, "'pwm1' is not a valid pin id for raspi revision 0")
+	require.NoError(t, a.Finalize())
+}
+
+func TestServoWrite(t *testing.T) {
+	// arrange: prepare 50Hz for servos
+	const (
+		pin         = "pwm0"
+		fiftyHzNano = 20000000
+	)
+	a := NewAdaptor(adaptors.WithPWMDefaultPeriodForPin(pin, fiftyHzNano))
+	fs := a.sys.UseMockFilesystem(pwmMockPaths)
+	preparePwmFs(fs)
+	require.NoError(t, a.Connect())
+	// act & assert for 0° (min default value)
+	err := a.ServoWrite(pin, 0)
+	require.NoError(t, err)
+	assert.Equal(t, strconv.Itoa(fiftyHzNano), fs.Files[pwmPeriodPath].Contents)
+	assert.Equal(t, "500000", fs.Files[pwmDutyCyclePath].Contents)
+	// act & assert for 180° (max default value)
+	err = a.ServoWrite(pin, 180)
+	require.NoError(t, err)
+	assert.Equal(t, strconv.Itoa(fiftyHzNano), fs.Files[pwmPeriodPath].Contents)
+	assert.Equal(t, "2500000", fs.Files[pwmDutyCyclePath].Contents)
+	// act & assert invalid pins
+	err = a.ServoWrite("3", 120)
+	require.ErrorContains(t, err, "'3' is not a valid pin id for raspi revision 0")
+	require.NoError(t, a.Finalize())
+}
+
+func TestPWMWrite_piPlaster(t *testing.T) {
+	// arrange
+	const hundredHzNano = 10000000
 	mockedPaths := []string{"/dev/pi-blaster"}
-	a, fs := initTestAdaptorWithMockedFilesystem(mockedPaths)
-	a.PiBlasterPeriod = 20000000
-
-	require.NoError(t, a.PwmWrite("7", 4))
-
-	pin, _ := a.PWMPin("7")
-	period, _ := pin.Period()
-	assert.Equal(t, uint32(20000000), period)
-
+	a := NewAdaptor(adaptors.WithPWMUsePiBlaster())
+	fs := a.sys.UseMockFilesystem(mockedPaths)
+	require.NoError(t, a.Connect())
+	// act & assert: Write & Pin & Period
 	require.NoError(t, a.PwmWrite("7", 255))
-
 	assert.Equal(t, "4=1", strings.Split(fs.Files["/dev/pi-blaster"].Contents, "\n")[0])
-
-	require.NoError(t, a.ServoWrite("11", 90))
-
-	assert.Equal(t, "17=0.5", strings.Split(fs.Files["/dev/pi-blaster"].Contents, "\n")[0])
-
-	require.ErrorContains(t, a.PwmWrite("notexist", 1), "Not a valid pin")
-	require.ErrorContains(t, a.ServoWrite("notexist", 1), "Not a valid pin")
-
+	pin, _ := a.PWMPin("7")
+	period, err := pin.Period()
+	require.NoError(t, err)
+	assert.Equal(t, uint32(hundredHzNano), period)
+	// act & assert: nonexistent pin
+	require.ErrorContains(t, a.PwmWrite("notexist", 1), "'notexist' is not a valid pin id for raspi revision 0")
+	// act & assert: SetDutyCycle
 	pin, _ = a.PWMPin("12")
-	period, _ = pin.Period()
-	assert.Equal(t, uint32(20000000), period)
-
 	require.NoError(t, pin.SetDutyCycle(1.5*1000*1000))
+	assert.Equal(t, "18=0.15", strings.Split(fs.Files["/dev/pi-blaster"].Contents, "\n")[0])
+}
 
-	assert.Equal(t, "18=0.075", strings.Split(fs.Files["/dev/pi-blaster"].Contents, "\n")[0])
+func TestPWM_piPlaster(t *testing.T) {
+	// arrange
+	const fiftyHzNano = 20000000 // 20 ms
+	mockedPaths := []string{"/dev/pi-blaster"}
+	a := NewAdaptor(adaptors.WithPWMUsePiBlaster(), adaptors.WithPWMDefaultPeriod(fiftyHzNano))
+	fs := a.sys.UseMockFilesystem(mockedPaths)
+	require.NoError(t, a.Connect())
+	// act & assert: Pin & Period
+	pin, _ := a.PWMPin("7")
+	period, err := pin.Period()
+	require.NoError(t, err)
+	assert.Equal(t, uint32(fiftyHzNano), period)
+	// act & assert for 180° (max default value), 2.5 ms => 12.5%
+	require.NoError(t, a.ServoWrite("11", 180))
+	assert.Equal(t, "17=0.125", strings.Split(fs.Files["/dev/pi-blaster"].Contents, "\n")[0])
+	// act & assert for 90° (center value), 1.5 ms => 7.5% duty
+	require.NoError(t, a.ServoWrite("11", 90))
+	assert.Equal(t, "17=0.075", strings.Split(fs.Files["/dev/pi-blaster"].Contents, "\n")[0])
+	// act & assert for 0° (min default value), 0.5 ms => 2.5% duty
+	require.NoError(t, a.ServoWrite("11", 0))
+	assert.Equal(t, "17=0.025", strings.Split(fs.Files["/dev/pi-blaster"].Contents, "\n")[0])
+	// act & assert: nonexistent pin
+	require.ErrorContains(t, a.ServoWrite("notexist", 1), "'notexist' is not a valid pin id for raspi revision 0")
 }
 
 func TestDigitalIO(t *testing.T) {
@@ -187,7 +280,7 @@ func TestDigitalIO(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, 1, i)
 
-	require.ErrorContains(t, a.DigitalWrite("notexist", 1), "Not a valid pin")
+	require.ErrorContains(t, a.DigitalWrite("notexist", 1), "'notexist' is not a valid pin id for raspi revision 2")
 	require.NoError(t, a.Finalize())
 }
 
@@ -212,55 +305,6 @@ func TestDigitalPinConcurrency(t *testing.T) {
 
 		wg.Wait()
 	}
-}
-
-func TestPWMPin(t *testing.T) {
-	a := NewAdaptor()
-	if err := a.Connect(); err != nil {
-		panic(err)
-	}
-
-	assert.Empty(t, a.pwmPins)
-
-	a.revision = "3"
-	firstSysPin, err := a.PWMPin("35")
-	require.NoError(t, err)
-	assert.Len(t, a.pwmPins, 1)
-
-	secondSysPin, err := a.PWMPin("35")
-
-	require.NoError(t, err)
-	assert.Len(t, a.pwmPins, 1)
-	assert.Equal(t, secondSysPin, firstSysPin)
-
-	otherSysPin, err := a.PWMPin("36")
-
-	require.NoError(t, err)
-	assert.Len(t, a.pwmPins, 2)
-	assert.NotEqual(t, otherSysPin, firstSysPin)
-}
-
-func TestPWMPinsReConnect(t *testing.T) {
-	// arrange
-	a := NewAdaptor()
-	a.revision = "3"
-	if err := a.Connect(); err != nil {
-		panic(err)
-	}
-
-	_, err := a.PWMPin("35")
-	require.NoError(t, err)
-	assert.Len(t, a.pwmPins, 1)
-	require.NoError(t, a.Finalize())
-	// act
-	err = a.Connect()
-	// assert
-	require.NoError(t, err)
-	assert.Empty(t, a.pwmPins)
-	_, _ = a.PWMPin("35")
-	_, err = a.PWMPin("36")
-	require.NoError(t, err)
-	assert.Len(t, a.pwmPins, 2)
 }
 
 func TestSpiDefaultValues(t *testing.T) {
@@ -404,6 +448,76 @@ func Test_translateAnalogPin(t *testing.T) {
 			assert.Equal(t, tc.wantReadable, r)
 			assert.False(t, w)
 			assert.Equal(t, tc.wantBufLen, buf)
+		})
+	}
+}
+
+func Test_getPinTranslatorFunction(t *testing.T) {
+	tests := map[string]struct {
+		id       string
+		revision string
+		wantPath string
+		wantLine int
+		wantErr  string
+	}{
+		"translate_12_rev0": {
+			id:       "12",
+			wantPath: "gpiochip0",
+			wantLine: 18,
+		},
+		"translate_13_rev0": {
+			id:      "13",
+			wantErr: "'13' is not a valid pin id for raspi revision 0",
+		},
+		"translate_13_rev1": {
+			id:       "13",
+			revision: "1",
+			wantPath: "gpiochip0",
+			wantLine: 21,
+		},
+		"translate_29_rev1": {
+			id:       "29",
+			revision: "1",
+			wantErr:  "'29' is not a valid pin id for raspi revision 1",
+		},
+		"translate_29_rev3": {
+			id:       "29",
+			revision: "3",
+			wantPath: "gpiochip0",
+			wantLine: 5,
+		},
+		"translate_pwm0_rev0": {
+			id:       "pwm0",
+			wantPath: "/sys/class/pwm/pwmchip0",
+			wantLine: 0,
+		},
+		"translate_pwm1_rev0": {
+			id:      "pwm1",
+			wantErr: "'pwm1' is not a valid pin id for raspi revision 0",
+		},
+		"translate_pwm1_rev3": {
+			id:       "pwm1",
+			revision: "3",
+			wantPath: "/sys/class/pwm/pwmchip0",
+			wantLine: 1,
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			a := NewAdaptor()
+			a.revision = tc.revision
+			// act
+			f := a.getPinTranslatorFunction()
+			path, line, err := f(tc.id)
+			// assert
+			if tc.wantErr != "" {
+				require.EqualError(t, err, tc.wantErr)
+			} else {
+				require.NoError(t, err)
+			}
+			assert.Equal(t, tc.wantPath, path)
+			assert.Equal(t, tc.wantLine, line)
 		})
 	}
 }

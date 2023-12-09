@@ -12,8 +12,6 @@ import (
 )
 
 const (
-	pwmInvertedIdentifier = "inversed"
-
 	defaultI2cBusNumber = 0
 
 	defaultSpiBusNumber  = 0
@@ -83,7 +81,7 @@ func NewNeoAdaptor(opts ...interface{}) *Adaptor {
 	}
 
 	var digitalPinsOpts []func(adaptors.DigitalPinsOptioner)
-	pwmPinsOpts := []adaptors.PwmPinsOptionApplier{adaptors.WithPWMPolarityInvertedIdentifier(pwmInvertedIdentifier)}
+	var pwmPinsOpts []adaptors.PwmPinsOptionApplier
 	for _, opt := range opts {
 		switch o := opt.(type) {
 		case func(adaptors.DigitalPinsOptioner):

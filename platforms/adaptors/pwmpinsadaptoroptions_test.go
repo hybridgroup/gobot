@@ -25,6 +25,15 @@ func TestWithPWMPinInitializer(t *testing.T) {
 	assert.Equal(t, wantErr, err)
 }
 
+func TestWithPWMUsePiBlaster(t *testing.T) {
+	// arrange
+	cfg := &pwmPinsConfiguration{usePiBlasterPin: false}
+	// act
+	WithPWMUsePiBlaster().apply(cfg)
+	// assert
+	assert.True(t, cfg.usePiBlasterPin)
+}
+
 func TestWithPWMDefaultPeriod(t *testing.T) {
 	// arrange
 	const newPeriod = uint32(10)
@@ -33,6 +42,26 @@ func TestWithPWMDefaultPeriod(t *testing.T) {
 	WithPWMDefaultPeriod(newPeriod).apply(cfg)
 	// assert
 	assert.Equal(t, newPeriod, cfg.periodDefault)
+}
+
+func TestWithPWMMinimumPeriod(t *testing.T) {
+	// arrange
+	const newMinPeriod = uint32(10)
+	cfg := &pwmPinsConfiguration{periodMinimum: 23}
+	// act
+	WithPWMMinimumPeriod(newMinPeriod).apply(cfg)
+	// assert
+	assert.Equal(t, newMinPeriod, cfg.periodMinimum)
+}
+
+func TestWithPWMMinimumDutyRate(t *testing.T) {
+	// arrange
+	const newRate = 11.0
+	cfg := &pwmPinsConfiguration{dutyRateMinimum: 33}
+	// act
+	WithPWMMinimumDutyRate(newRate).apply(cfg)
+	// assert
+	assert.InDelta(t, newRate, cfg.dutyRateMinimum, 0.0)
 }
 
 func TestWithPWMPolarityInvertedIdentifier(t *testing.T) {
@@ -145,4 +174,17 @@ func TestWithPWMServoAngleRangeForPin(t *testing.T) {
 			assert.Equal(t, tc.wantScaleMap, cfg.pinsServoScale)
 		})
 	}
+}
+
+func TestStringer(t *testing.T) {
+	assert.NotEmpty(t, pwmPinsInitializeOption(nil).String())
+	assert.NotEmpty(t, pwmPinsUsePiBlasterPinOption(true).String())
+	assert.NotEmpty(t, pwmPinsPeriodDefaultOption(1).String())
+	assert.NotEmpty(t, pwmPinsPeriodMinimumOption(1).String())
+	assert.NotEmpty(t, pwmPinsDutyRateMinimumOption(1).String())
+	assert.NotEmpty(t, pwmPinsPolarityInvertedIdentifierOption("1").String())
+	assert.NotEmpty(t, pwmPinsAdjustDutyOnSetPeriodOption(true).String())
+	assert.NotEmpty(t, pwmPinsDefaultPeriodForPinOption{}.String())
+	assert.NotEmpty(t, pwmPinsServoDutyScaleForPinOption{}.String())
+	assert.NotEmpty(t, pwmPinsServoAngleScaleForPinOption{}.String())
 }

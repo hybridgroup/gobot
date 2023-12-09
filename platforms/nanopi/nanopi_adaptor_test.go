@@ -31,6 +31,8 @@ const (
 	pwmPeriodPath    = pwmPwmDir + "period"
 	pwmDutyCyclePath = pwmPwmDir + "duty_cycle"
 	pwmPolarityPath  = pwmPwmDir + "polarity"
+
+	pwmInvertedIdentifier = "inversed"
 )
 
 var pwmMockPaths = []string{

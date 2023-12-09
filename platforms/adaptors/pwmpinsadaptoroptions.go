@@ -10,12 +10,22 @@ type PwmPinsOptionApplier interface {
 // pwmPinInitializeOption is the type for applying another than the default initializer.
 type pwmPinsInitializeOption pwmPinInitializer
 
+// pwmPinsUsePiBlasterPinOption is the type for applying the usage of the pi-blaster PWM pin implementation, which will
+// replace the default sysfs-implementation for PWM-pins.
+type pwmPinsUsePiBlasterPinOption bool
+
 // pwmPinPeriodDefaultOption is the type for applying another than the default period of 10 ms (100 Hz) for all
 // created pins.
 type pwmPinsPeriodDefaultOption uint32
 
+// pwmPinsPeriodMinimumOption is the type for applying another than the default minimum period of "0".
+type pwmPinsPeriodMinimumOption uint32
+
+// pwmPinsDutyRateMinimumOption is the type for applying another than the default minimum rate of 1/period.
+type pwmPinsDutyRateMinimumOption float64
+
 // pwmPinPolarityInvertedIdentifierOption is the type for applying another identifier, which will replace the default
-// "inverted".
+// "inversed".
 type pwmPinsPolarityInvertedIdentifierOption string
 
 // pwmPinsAdjustDutyOnSetPeriodOption is the type for applying the automatic adjustment of duty cycle on setting
@@ -49,12 +59,24 @@ func (o pwmPinsInitializeOption) String() string {
 	return "pin initializer option for PWM's"
 }
 
+func (o pwmPinsUsePiBlasterPinOption) String() string {
+	return "pi-blaster pin implementation option for PWM's"
+}
+
 func (o pwmPinsPeriodDefaultOption) String() string {
 	return "default period option for PWM's"
 }
 
+func (o pwmPinsPeriodMinimumOption) String() string {
+	return "minimum period option for PWM's"
+}
+
+func (o pwmPinsDutyRateMinimumOption) String() string {
+	return "minimum duty rate option for PWM's"
+}
+
 func (o pwmPinsPolarityInvertedIdentifierOption) String() string {
-	return "inverted identifier option for PWM's"
+	return "identifier for 'inversed' option for PWM's"
 }
 
 func (o pwmPinsAdjustDutyOnSetPeriodOption) String() string {
@@ -77,8 +99,20 @@ func (o pwmPinsInitializeOption) apply(cfg *pwmPinsConfiguration) {
 	cfg.initialize = pwmPinInitializer(o)
 }
 
+func (o pwmPinsUsePiBlasterPinOption) apply(cfg *pwmPinsConfiguration) {
+	cfg.usePiBlasterPin = bool(o)
+}
+
 func (o pwmPinsPeriodDefaultOption) apply(cfg *pwmPinsConfiguration) {
 	cfg.periodDefault = uint32(o)
+}
+
+func (o pwmPinsPeriodMinimumOption) apply(cfg *pwmPinsConfiguration) {
+	cfg.periodMinimum = uint32(o)
+}
+
+func (o pwmPinsDutyRateMinimumOption) apply(cfg *pwmPinsConfiguration) {
+	cfg.dutyRateMinimum = float64(o)
 }
 
 func (o pwmPinsPolarityInvertedIdentifierOption) apply(cfg *pwmPinsConfiguration) {

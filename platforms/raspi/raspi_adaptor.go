@@ -1,7 +1,6 @@
 package raspi
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -37,12 +36,11 @@ type Adaptor struct {
 	mutex    sync.Mutex
 	sys      *system.Accesser
 	revision string
-	pwmPins  map[string]gobot.PWMPinner
 	*adaptors.AnalogPinsAdaptor
 	*adaptors.DigitalPinsAdaptor
+	*adaptors.PWMPinsAdaptor
 	*adaptors.I2cBusAdaptor
 	*adaptors.SpiBusAdaptor
-	PiBlasterPeriod uint32
 }
 
 // NewAdaptor creates a Raspi Adaptor
@@ -56,83 +54,95 @@ type Adaptor struct {
 //	adaptors.WithGpiosOpenDrain/Source(pin's): sets the output behavior
 //	adaptors.WithGpioDebounce(pin, period): sets the input debouncer
 //	adaptors.WithGpioEventOnFallingEdge/RaisingEdge/BothEdges(pin, handler): activate edge detection
-func NewAdaptor(opts ...func(adaptors.DigitalPinsOptioner)) *Adaptor {
+func NewAdaptor(opts ...interface{}) *Adaptor {
 	sys := system.NewAccesser(system.WithDigitalPinGpiodAccess())
-	c := &Adaptor{
-		name:            gobot.DefaultName("RaspberryPi"),
-		sys:             sys,
-		PiBlasterPeriod: 10000000,
+	a := &Adaptor{
+		name: gobot.DefaultName("RaspberryPi"),
+		sys:  sys,
 	}
-	c.AnalogPinsAdaptor = adaptors.NewAnalogPinsAdaptor(sys, c.translateAnalogPin)
-	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.getPinTranslatorFunction(), opts...)
-	c.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, c.validateI2cBusNumber, 1)
-	c.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, c.validateSpiBusNumber, defaultSpiBusNumber, defaultSpiChipNumber,
+
+	var digitalPinsOpts []func(adaptors.DigitalPinsOptioner)
+	var pwmPinsOpts []adaptors.PwmPinsOptionApplier
+	for _, opt := range opts {
+		switch o := opt.(type) {
+		case func(adaptors.DigitalPinsOptioner):
+			digitalPinsOpts = append(digitalPinsOpts, o)
+		case adaptors.PwmPinsOptionApplier:
+			pwmPinsOpts = append(pwmPinsOpts, o)
+		default:
+			panic(fmt.Sprintf("'%s' can not be applied on adaptor '%s'", opt, a.name))
+		}
+	}
+
+	a.AnalogPinsAdaptor = adaptors.NewAnalogPinsAdaptor(sys, a.translateAnalogPin)
+	a.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, a.getPinTranslatorFunction(), digitalPinsOpts...)
+	a.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, a.getPinTranslatorFunction(), pwmPinsOpts...)
+	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, a.validateI2cBusNumber, 1)
+	a.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, a.validateSpiBusNumber, defaultSpiBusNumber, defaultSpiChipNumber,
 		defaultSpiMode, defaultSpiBitsNumber, defaultSpiMaxSpeed)
-	return c
+	return a
 }
 
 // Name returns the Adaptor's name
-func (c *Adaptor) Name() string {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
+func (a *Adaptor) Name() string {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
 
-	return c.name
+	return a.name
 }
 
 // SetName sets the Adaptor's name
-func (c *Adaptor) SetName(n string) {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
+func (a *Adaptor) SetName(n string) {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
 
-	c.name = n
+	a.name = n
 }
 
 // Connect create new connection to board and pins.
-func (c *Adaptor) Connect() error {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
+func (a *Adaptor) Connect() error {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
 
-	if err := c.SpiBusAdaptor.Connect(); err != nil {
+	if err := a.SpiBusAdaptor.Connect(); err != nil {
 		return err
 	}
 
-	if err := c.I2cBusAdaptor.Connect(); err != nil {
+	if err := a.I2cBusAdaptor.Connect(); err != nil {
 		return err
 	}
 
-	if err := c.AnalogPinsAdaptor.Connect(); err != nil {
+	if err := a.AnalogPinsAdaptor.Connect(); err != nil {
 		return err
 	}
 
-	c.pwmPins = make(map[string]gobot.PWMPinner)
-	return c.DigitalPinsAdaptor.Connect()
+	if err := a.PWMPinsAdaptor.Connect(); err != nil {
+		return err
+	}
+
+	return a.DigitalPinsAdaptor.Connect()
 }
 
 // Finalize closes connection to board and pins
-func (c *Adaptor) Finalize() error {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
+func (a *Adaptor) Finalize() error {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
 
-	err := c.DigitalPinsAdaptor.Finalize()
+	err := a.DigitalPinsAdaptor.Finalize()
 
-	for _, pin := range c.pwmPins {
-		if pin != nil {
-			if perr := pin.Unexport(); err != nil {
-				err = multierror.Append(err, perr)
-			}
-		}
-	}
-	c.pwmPins = nil
-
-	if e := c.AnalogPinsAdaptor.Finalize(); e != nil {
+	if e := a.PWMPinsAdaptor.Finalize(); e != nil {
 		err = multierror.Append(err, e)
 	}
 
-	if e := c.I2cBusAdaptor.Finalize(); e != nil {
+	if e := a.AnalogPinsAdaptor.Finalize(); e != nil {
 		err = multierror.Append(err, e)
 	}
 
-	if e := c.SpiBusAdaptor.Finalize(); e != nil {
+	if e := a.I2cBusAdaptor.Finalize(); e != nil {
+		err = multierror.Append(err, e)
+	}
+
+	if e := a.SpiBusAdaptor.Finalize(); e != nil {
 		err = multierror.Append(err, e)
 	}
 	return err
@@ -140,51 +150,15 @@ func (c *Adaptor) Finalize() error {
 
 // DefaultI2cBus returns the default i2c bus for this platform.
 // This overrides the base function due to the revision dependency.
-func (c *Adaptor) DefaultI2cBus() int {
-	rev := c.readRevision()
+func (a *Adaptor) DefaultI2cBus() int {
+	rev := a.readRevision()
 	if rev == "2" || rev == "3" {
 		return 1
 	}
 	return 0
 }
 
-// PWMPin returns a raspi.PWMPin which provides the gobot.PWMPinner interface
-func (c *Adaptor) PWMPin(id string) (gobot.PWMPinner, error) {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	return c.pwmPin(id)
-}
-
-// PwmWrite writes a PWM signal to the specified pin
-func (c *Adaptor) PwmWrite(pin string, val byte) error {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	sysPin, err := c.pwmPin(pin)
-	if err != nil {
-		return err
-	}
-
-	duty := uint32(gobot.FromScale(float64(val), 0, 255) * float64(c.PiBlasterPeriod))
-	return sysPin.SetDutyCycle(duty)
-}
-
-// ServoWrite writes a servo signal to the specified pin
-func (c *Adaptor) ServoWrite(pin string, angle byte) error {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	sysPin, err := c.pwmPin(pin)
-	if err != nil {
-		return err
-	}
-
-	duty := uint32(gobot.FromScale(float64(angle), 0, 180) * float64(c.PiBlasterPeriod))
-	return sysPin.SetDutyCycle(duty)
-}
-
-func (c *Adaptor) validateSpiBusNumber(busNr int) error {
+func (a *Adaptor) validateSpiBusNumber(busNr int) error {
 	// Valid bus numbers are [0,1] which corresponds to /dev/spidev0.x through /dev/spidev1.x.
 	// x is the chip number <255
 	if (busNr < 0) || (busNr > 1) {
@@ -193,7 +167,7 @@ func (c *Adaptor) validateSpiBusNumber(busNr int) error {
 	return nil
 }
 
-func (c *Adaptor) validateI2cBusNumber(busNr int) error {
+func (a *Adaptor) validateI2cBusNumber(busNr int) error {
 	// Valid bus number is [0..1] which corresponds to /dev/i2c-0 through /dev/i2c-1.
 	if (busNr < 0) || (busNr > 1) {
 		return fmt.Errorf("Bus number %d out of range", busNr)
@@ -201,14 +175,14 @@ func (c *Adaptor) validateI2cBusNumber(busNr int) error {
 	return nil
 }
 
-func (c *Adaptor) translateAnalogPin(id string) (string, bool, bool, uint16, error) {
+func (a *Adaptor) translateAnalogPin(id string) (string, bool, bool, uint16, error) {
 	pinInfo, ok := analogPinDefinitions[id]
 	if !ok {
 		return "", false, false, 0, fmt.Errorf("'%s' is not a valid id for a analog pin", id)
 	}
 
 	path := pinInfo.path
-	info, err := c.sys.Stat(path)
+	info, err := a.sys.Stat(path)
 	if err != nil {
 		return "", false, false, 0, fmt.Errorf("Error (%v) on access '%s'", err, path)
 	}
@@ -219,28 +193,37 @@ func (c *Adaptor) translateAnalogPin(id string) (string, bool, bool, uint16, err
 	return path, pinInfo.r, pinInfo.w, pinInfo.bufLen, nil
 }
 
-func (c *Adaptor) getPinTranslatorFunction() func(string) (string, int, error) {
+// getPinTranslatorFunction returns a function to be able to translate GPIO and PWM pins.
+// This means for pi-blaster usage, each pin can be used and therefore the pin is given as number, like a GPIO pin.
+// For sysfs-PWM usage, the pin will be given as "pwm0" or "pwm1", because the real pin number depends on the user
+// configuration in "/boot/config.txt". For further details, see "/boot/overlays/README".
+func (a *Adaptor) getPinTranslatorFunction() func(string) (string, int, error) {
 	return func(pin string) (string, int, error) {
 		var line int
-		if val, ok := pins[pin][c.readRevision()]; ok {
+		if val, ok := pins[pin][a.readRevision()]; ok {
 			line = val
 		} else if val, ok := pins[pin]["*"]; ok {
 			line = val
 		} else {
-			return "", 0, errors.New("Not a valid pin")
+			return "", 0, fmt.Errorf("'%s' is not a valid pin id for raspi revision %s", pin, a.revision)
 		}
-		// TODO: Pi1 model B has only this single "gpiochip0", a change of the translator is needed,
-		// to support different chips with different revisions
-		return "gpiochip0", line, nil
+		// We always use "gpiochip0", because currently all pins are available with this approach. A change of the
+		// translator would be needed to support different chips (e.g. gpiochip1) with different revisions.
+		path := "gpiochip0"
+		if strings.HasPrefix(pin, "pwm") {
+			path = "/sys/class/pwm/pwmchip0"
+		}
+
+		return path, line, nil
 	}
 }
 
-func (c *Adaptor) readRevision() string {
-	if c.revision == "" {
-		c.revision = "0"
-		content, err := c.sys.ReadFile(infoFile)
+func (a *Adaptor) readRevision() string {
+	if a.revision == "" {
+		a.revision = "0"
+		content, err := a.sys.ReadFile(infoFile)
 		if err != nil {
-			return c.revision
+			return a.revision
 		}
 		for _, v := range strings.Split(string(content), "\n") {
 			if strings.Contains(v, "Revision") {
@@ -248,34 +231,15 @@ func (c *Adaptor) readRevision() string {
 				version, _ := strconv.ParseInt("0x"+s[len(s)-1], 0, 64)
 				switch {
 				case version <= 3:
-					c.revision = "1"
+					a.revision = "1"
 				case version <= 15:
-					c.revision = "2"
+					a.revision = "2"
 				default:
-					c.revision = "3"
+					a.revision = "3"
 				}
 			}
 		}
 	}
 
-	return c.revision
-}
-
-func (c *Adaptor) pwmPin(id string) (gobot.PWMPinner, error) {
-	pin := c.pwmPins[id]
-
-	if pin == nil {
-		tf := c.getPinTranslatorFunction()
-		_, i, err := tf(id)
-		if err != nil {
-			return nil, err
-		}
-		pin = NewPWMPin(c.sys, "/dev/pi-blaster", strconv.Itoa(i))
-		if err := pin.SetPeriod(c.PiBlasterPeriod); err != nil {
-			return nil, err
-		}
-		c.pwmPins[id] = pin
-	}
-
-	return pin, nil
+	return a.revision
 }

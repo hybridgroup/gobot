@@ -51,9 +51,7 @@ func main() {
 }
 ```
 
-## How to Connect
-
-### Compiling
+## Compiling
 
 Compile your Gobot program on your workstation like this:
 
@@ -74,9 +72,48 @@ scp raspi_blink pi@192.168.1.xxx:/home/pi/
 ssh -t pi@192.168.1.xxx "./raspi_blink"
 ```
 
-### Enabling PWM output on GPIO pins
+## Enabling PWM output on GPIO pins
 
-For extended PWM support on the Raspberry Pi, you will need to use a program called pi-blaster. You can follow the
-instructions for pi-blaster install in the pi-blaster repo here:
+### Using Linux Kernel sysfs implementation
 
-[https://github.com/sarfata/pi-blaster](https://github.com/sarfata/pi-blaster)
+The PWM needs to be enabled in the device tree. Please read `/boot/overlays/README` of your device. Usually "pwm0" can
+be activated for all raspi variants with a line `dtoverlay=pwm,pin=18,func=2` added to `/boot/config.txt`. The number
+relates to "GPIO18", not the header number, which is "12" in this case.
+
+Now the pin can be used with gobot by the pwm channel name, e.g. for our example above:
+
+```go
+...
+// create the adaptor with a 50Hz default frequency for usage with servos
+a := NewAdaptor(adaptors.WithPWMDefaultPeriod(20000000))
+// move servo connected with header pin 12 to 90°
+a.ServoWrite("pwm0", 90)
+...
+```
+
+> If the activation fails or something strange happen, maybe the audio driver conflicts with the PWM. Please deactivate
+> the audio device tree overlay in `/boot/config.txt` to avoid conflicts.
+
+### Using pi-blaster
+
+For support PWM on all pins, you may use a program called pi-blaster. You can follow the instructions for install in
+the pi-blaster repo here: <https://github.com/sarfata/pi-blaster>
+
+For using a PWM for servo, the default 100Hz period needs to be adjusted to 50Hz in the source code of the driver.
+Please refer to <https://github.com/sarfata/pi-blaster#how-to-adjust-the-frequency-and-the-resolution-of-the-pwm>.
+
+It is not possible to change the period from gobot side.
+
+Now the pin can be used with gobot by the header number, e.g.:
+
+```go
+...
+// create the adaptor with usage of pi-blaster instead of default sysfs, 50Hz default is given for calculate
+// duty cycle for servos but will not change everything for the pi-blaster driver, see description above
+a := NewAdaptor(adaptors.WithPWMUsePiBlaster(), adaptors.WithPWMDefaultPeriod(20000000))
+// move servo to 90°
+a.ServoWrite("11", 90)
+// this will not work like expected, see description
+a.SetPeriod("11", 20000000)
+...
+```

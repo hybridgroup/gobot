@@ -25,7 +25,8 @@ var gpioPins = map[string]int{
 	"40": 78,
 }
 
-var pwmPins = map[string]string{
-	"32": "0",
-	"33": "2",
+// pin to pwm channel (pwm0, pwm2)
+var pwmPins = map[string]int{
+	"32": 0,
+	"33": 2,
 }
