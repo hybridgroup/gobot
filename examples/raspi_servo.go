@@ -13,26 +13,26 @@ import (
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/gpio"
 	"gobot.io/x/gobot/v2/platforms/adaptors"
-	"gobot.io/x/gobot/v2/platforms/tinkerboard"
+	"gobot.io/x/gobot/v2/platforms/raspi"
 )
 
 // Wiring
-// PWR Tinkerboard: 1 (+3.3V, VCC), 2(+5V), 6, 9, 14, 20 (GND)
-// PWM Tinkerboard: header pin 33 (PWM2) or pin 32 (PWM3)
+// PWM Raspi: header pin 12 (GPIO18-PWM0), please refer to the README.md, located in the folder of raspi platform, on
+// how to activate the pwm support.
+// Servo: orange (PWM), black (GND), red (VCC) 4-6V (please read the manual of your device)
 func main() {
 	const (
-		pwmPin = "32"
+		pwmPin = "pwm0"
 		wait   = 3 * time.Second
 
 		fiftyHzNanos = 20 * 1000 * 1000 // 50Hz = 0.02 sec = 20 ms
 	)
-	// usually a frequency of 50Hz is used for servos, most servos have 0.5 ms..2.5 ms for 0-180°,
-	// however the mapping can be changed with options:
-	adaptor := tinkerboard.NewAdaptor(
-		adaptors.WithPWMDefaultPeriodForPin(pwmPin, fiftyHzNanos),
-		adaptors.WithPWMServoDutyCycleRangeForPin(pwmPin, time.Millisecond, 2*time.Millisecond),
-		adaptors.WithPWMServoAngleRangeForPin(pwmPin, 0, 270),
-	)
+	// usually a frequency of 50Hz is used for servos, most servos have 0.5 ms..2.5 ms for 0-180°, however the mapping
+	// can be changed with options...
+	//
+	// for usage of pi-blaster driver just add the option "adaptors.WithPWMUsePiBlaster()" and use your pin number
+	// instead of "pwm0"
+	adaptor := raspi.NewAdaptor(adaptors.WithPWMDefaultPeriodForPin(pwmPin, fiftyHzNanos))
 	servo := gpio.NewServoDriver(adaptor, pwmPin)
 
 	work := func() {

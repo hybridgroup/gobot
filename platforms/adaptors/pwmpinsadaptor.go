@@ -34,7 +34,10 @@ type pwmPinServoScale struct {
 // pwmPinConfiguration contains all changeable attributes of the adaptor.
 type pwmPinsConfiguration struct {
 	initialize                 pwmPinInitializer
+	usePiBlasterPin            bool
 	periodDefault              uint32
+	periodMinimum              uint32
+	dutyRateMinimum            float64 // is the minimal relation of duty/period (except 0.0)
 	polarityNormalIdentifier   string
 	polarityInvertedIdentifier string
 	adjustDutyOnSetPeriod      bool
@@ -73,7 +76,7 @@ func NewPWMPinsAdaptor(sys *system.Accesser, t pwmPinTranslator, opts ...PwmPins
 			pinsDefaultPeriod:          make(map[string]uint32),
 			pinsServoScale:             make(map[string]pwmPinServoScale),
 			polarityNormalIdentifier:   "normal",
-			polarityInvertedIdentifier: "inverted",
+			polarityInvertedIdentifier: "inversed",
 			adjustDutyOnSetPeriod:      true,
 		},
 	}
@@ -91,12 +94,28 @@ func WithPWMPinInitializer(pc pwmPinInitializer) pwmPinsInitializeOption {
 	return pwmPinsInitializeOption(pc)
 }
 
+// WithPWMUsePiBlaster substitute the default sysfs-implementation for PWM-pins by the implementation for pi-blaster.
+func WithPWMUsePiBlaster() pwmPinsUsePiBlasterPinOption {
+	return pwmPinsUsePiBlasterPinOption(true)
+}
+
 // WithPWMDefaultPeriod substitute the default period of 10 ms (100 Hz) for all created pins.
 func WithPWMDefaultPeriod(periodNanoSec uint32) pwmPinsPeriodDefaultOption {
 	return pwmPinsPeriodDefaultOption(periodNanoSec)
 }
 
-// WithPWMPolarityInvertedIdentifier use the given identifier, which will replace the default "inverted".
+// WithPWMMinimumPeriod substitute the default minimum period limit of 0 nanoseconds.
+func WithPWMMinimumPeriod(periodNanoSec uint32) pwmPinsPeriodMinimumOption {
+	return pwmPinsPeriodMinimumOption(periodNanoSec)
+}
+
+// WithPWMMinimumDutyRate substitute the default minimum duty rate of 1/period. The given limit only come into effect,
+// if the rate is > 0, because a rate of 0.0 is always allowed.
+func WithPWMMinimumDutyRate(dutyRate float64) pwmPinsDutyRateMinimumOption {
+	return pwmPinsDutyRateMinimumOption(dutyRate)
+}
+
+// WithPWMPolarityInvertedIdentifier use the given identifier, which will replace the default "inversed".
 func WithPWMPolarityInvertedIdentifier(identifier string) pwmPinsPolarityInvertedIdentifierOption {
 	return pwmPinsPolarityInvertedIdentifierOption(identifier)
 }
@@ -132,6 +151,11 @@ func (a *PWMPinsAdaptor) Connect() error {
 	defer a.mutex.Unlock()
 
 	a.pins = make(map[string]gobot.PWMPinner)
+
+	if a.pwmPinsCfg.dutyRateMinimum == 0 && a.pwmPinsCfg.periodDefault > 0 {
+		a.pwmPinsCfg.dutyRateMinimum = 1 / float64(a.pwmPinsCfg.periodDefault)
+	}
+
 	return nil
 }
 
@@ -164,12 +188,18 @@ func (a *PWMPinsAdaptor) PwmWrite(id string, val byte) error {
 	if err != nil {
 		return err
 	}
-	period, err := pin.Period()
+	periodNanos, err := pin.Period()
 	if err != nil {
 		return err
 	}
-	duty := gobot.FromScale(float64(val), 0, 255.0)
-	return pin.SetDutyCycle(uint32(float64(period) * duty))
+
+	dutyNanos := float64(periodNanos) * gobot.FromScale(float64(val), 0, 255.0)
+
+	if err := a.validateDutyCycle(id, dutyNanos, float64(periodNanos)); err != nil {
+		return err
+	}
+
+	return pin.SetDutyCycle(uint32(dutyNanos))
 }
 
 // ServoWrite writes a servo signal to the specified pin. The given angle is between 0 and 180°.
@@ -181,13 +211,14 @@ func (a *PWMPinsAdaptor) ServoWrite(id string, angle byte) error {
 	if err != nil {
 		return err
 	}
-	period, err := pin.Period() // nanoseconds
+	periodNanos, err := pin.Period()
 	if err != nil {
 		return err
 	}
 
-	if period != fiftyHzNanos {
-		log.Printf("WARNING: the PWM acts with a period of %d, but should use %d (50Hz) for servos\n", period, fiftyHzNanos)
+	if periodNanos != fiftyHzNanos {
+		log.Printf("WARNING: the PWM acts with a period of %d, but should use %d (50Hz) for servos\n",
+			periodNanos, fiftyHzNanos)
 	}
 
 	scale, ok := a.pwmPinsCfg.pinsServoScale[id]
@@ -195,10 +226,15 @@ func (a *PWMPinsAdaptor) ServoWrite(id string, angle byte) error {
 		return fmt.Errorf("no scaler found for servo pin '%s'", id)
 	}
 
-	duty := gobot.ToScale(gobot.FromScale(float64(angle),
+	dutyNanos := gobot.ToScale(gobot.FromScale(float64(angle),
 		scale.minDegree, scale.maxDegree),
 		float64(scale.minDuty), float64(scale.maxDuty))
-	return pin.SetDutyCycle(uint32(duty))
+
+	if err := a.validateDutyCycle(id, dutyNanos, float64(periodNanos)); err != nil {
+		return err
+	}
+
+	return pin.SetDutyCycle(uint32(dutyNanos))
 }
 
 // SetPeriod adjusts the period of the specified PWM pin immediately.
@@ -286,7 +322,13 @@ func (a *PWMPinsAdaptor) pwmPin(id string) (gobot.PWMPinner, error) {
 		if err != nil {
 			return nil, err
 		}
-		pin = a.sys.NewPWMPin(path, channel, a.pwmPinsCfg.polarityNormalIdentifier, a.pwmPinsCfg.polarityInvertedIdentifier)
+
+		if a.pwmPinsCfg.usePiBlasterPin {
+			pin = newPiBlasterPWMPin(a.sys, channel)
+		} else {
+			pin = a.sys.NewPWMPin(path, channel, a.pwmPinsCfg.polarityNormalIdentifier,
+				a.pwmPinsCfg.polarityInvertedIdentifier)
+		}
 		if err := a.pwmPinsCfg.initialize(id, pin); err != nil {
 			return nil, err
 		}
@@ -294,6 +336,28 @@ func (a *PWMPinsAdaptor) pwmPin(id string) (gobot.PWMPinner, error) {
 	}
 
 	return pin, nil
+}
+
+func (a *PWMPinsAdaptor) validateDutyCycle(id string, dutyNanos, periodNanos float64) error {
+	if periodNanos == 0 {
+		return nil
+	}
+
+	if dutyNanos > periodNanos {
+		return fmt.Errorf("duty cycle (%d) exceeds period (%d) for PWM pin id '%s'",
+			uint32(dutyNanos), uint32(periodNanos), id)
+	}
+
+	if dutyNanos == 0 {
+		return nil
+	}
+
+	rate := dutyNanos / periodNanos
+	if rate < a.pwmPinsCfg.dutyRateMinimum {
+		return fmt.Errorf("duty rate (%.8f) is lower than allowed (%.8f) for PWM pin id '%s'",
+			rate, a.pwmPinsCfg.dutyRateMinimum, id)
+	}
+	return nil
 }
 
 // setPeriod adjusts the PWM period of the given pin. If duty cycle is already set and this feature is not suppressed,

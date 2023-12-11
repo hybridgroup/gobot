@@ -14,7 +14,7 @@ var _ gobot.PWMPinner = (*pwmPinSysFs)(nil)
 
 const (
 	normal   = "normal"
-	inverted = "inverted"
+	inverted = "inversed"
 )
 
 func initTestPWMPinSysFsWithMockedFilesystem(mockPaths []string) (*pwmPinSysFs, *MockFilesystem) {

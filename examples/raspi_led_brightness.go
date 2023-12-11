@@ -16,7 +16,7 @@ import (
 
 func main() {
 	r := raspi.NewAdaptor()
-	led := gpio.NewLedDriver(r, "11")
+	led := gpio.NewLedDriver(r, "pwm0")
 
 	work := func() {
 		brightness := uint8(0)

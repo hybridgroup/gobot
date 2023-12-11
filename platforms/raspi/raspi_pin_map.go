@@ -85,6 +85,12 @@ var pins = map[string]map[string]int{
 	"40": {
 		"3": 21,
 	},
+	"pwm0": { // pin 12 (GPIO18) and pin 32 (GPIO12) can be configured for "pwm0"
+		"*": 0,
+	},
+	"pwm1": { // pin 33 (GPIO13) and pin 35 (GPIO19) can be configured for "pwm1"
+		"3": 1,
+	},
 }
 
 var analogPinDefinitions = map[string]analogPinDefinition{
