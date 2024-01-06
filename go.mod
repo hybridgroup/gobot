@@ -19,7 +19,7 @@ require (
 	go.bug.st/serial v1.6.1
 	gocv.io/x/gocv v0.35.0
 	golang.org/x/net v0.19.0
-	golang.org/x/sys v0.15.0
+	golang.org/x/sys v0.16.0
 	periph.io/x/conn/v3 v3.7.0
 	periph.io/x/host/v3 v3.8.2
 	tinygo.org/x/bluetooth v0.8.0
@@ -36,13 +36,13 @@ require (
 	github.com/klauspost/compress v1.17.4 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/muka/go-bluetooth v0.0.0-20221213043340-85dc80edc4e1 // indirect
-	github.com/nats-io/nkeys v0.4.6 // indirect
+	github.com/nats-io/nkeys v0.4.7 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/saltosystems/winrt-go v0.0.0-20231011131235-9071442c0c84 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/tinygo-org/cbgo v0.0.4 // indirect
-	golang.org/x/crypto v0.16.0 // indirect
-	golang.org/x/sync v0.5.0 // indirect
+	golang.org/x/crypto v0.17.0 // indirect
+	golang.org/x/sync v0.6.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
