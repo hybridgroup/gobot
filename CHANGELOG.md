@@ -1,6 +1,53 @@
 # CHANGELOG
 
-## [Unreleased](https://github.com/hybridgroup/gobot/compare/v2.2.0...HEAD)
+## [Unreleased](https://github.com/hybridgroup/gobot/compare/v2.3.0...HEAD)
+
+## [v2.3.0](https://github.com/hybridgroup/gobot/compare/v2.2.0...v2.3.0) (2024-01-06)
+
+### Adaptors
+
+* **pwm:** introduce scale option for servo ([#1046](https://github.com/hybridgroup/gobot/issues/1046))
+* **analogpins:** add a generic analog pin adaptor ([#1041](https://github.com/hybridgroup/gobot/issues/1041))
+
+### Aio
+
+* fix data race in AnalogSensorDriver ([#1024](https://github.com/hybridgroup/gobot/issues/1024))
+* **all:** introduce functional options ([#1039](https://github.com/hybridgroup/gobot/issues/1039))
+* **analog sensor:** fix deadlock in cyclic reading ([#1042](https://github.com/hybridgroup/gobot/issues/1042))
+* **thermalzone:** add driver for read a thermalzone from system ([#1040](https://github.com/hybridgroup/gobot/issues/1040))
+
+### Build
+
+* **go, deps:** update modules ([#1047](https://github.com/hybridgroup/gobot/issues/1047), [#1052](https://github.com/hybridgroup/gobot/issues/1052))
+
+### Doc
+
+* **test:** use -race for tests by default ([#1035](https://github.com/hybridgroup/gobot/issues/1035))
+
+### Gpio
+
+* fix data race in StepperDriver ([#1029](https://github.com/hybridgroup/gobot/issues/1029))
+* fix data race in PIRMotionDriver ([#1028](https://github.com/hybridgroup/gobot/issues/1028))
+* fix data race in ButtonDriver ([#1027](https://github.com/hybridgroup/gobot/issues/1027))
+* fix data race in EasyDriver ([#1025](https://github.com/hybridgroup/gobot/issues/1025))
+* **all:** introduce functional options ([#1045](https://github.com/hybridgroup/gobot/issues/1045))
+
+### I2c
+
+* **core:** fix problems with usage of uintptr ([#1033](https://github.com/hybridgroup/gobot/issues/1033))
+
+### Lint
+
+* **all:** fix issues of errorlint etc ([#1037](https://github.com/hybridgroup/gobot/issues/1037))
+* **all:** switch to 1.55.2 and adjust linter issues ([#1036](https://github.com/hybridgroup/gobot/issues/1036))
+
+### Ollie
+
+* **test:** fix data race in test ([#1034](https://github.com/hybridgroup/gobot/issues/1034))
+
+### Raspi
+
+* **pwm:** add support for sysfs and fix pi-blaster ([#1048](https://github.com/hybridgroup/gobot/issues/1048))
 
 ## [v2.2.0](https://github.com/hybridgroup/gobot/compare/v2.1.1...v2.2.0) (2023-10-29)
 
