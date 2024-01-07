@@ -7,6 +7,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 	"gocv.io/x/gocv"
 )
@@ -33,12 +35,12 @@ func TestWindowDriverName(t *testing.T) {
 
 func TestWindowDriverStart(t *testing.T) {
 	d := initTestWindowDriver()
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 }
 
 func TestWindowDriverHalt(t *testing.T) {
 	d := initTestWindowDriver()
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 }
 
 func TestWindowDriverShowImage(t *testing.T) {

@@ -7,6 +7,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -159,7 +161,7 @@ func TestPCA953xReadGPIO(t *testing.T) {
 			got, err := d.ReadGPIO(tc.idx)
 			// assert
 			assert.Equal(t, tc.wantErr, err)
-			assert.Equal(t, 1, len(a.written))
+			assert.Len(t, a.written, 1)
 			assert.Equal(t, wantReg, a.written[0])
 			assert.Equal(t, tc.want, got)
 		})
@@ -200,7 +202,7 @@ func TestPCA953xWritePeriod(t *testing.T) {
 			// act
 			err := d.WritePeriod(tc.idx, tc.val)
 			// assert
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, tc.wantWritten, a.written)
 		})
 	}
@@ -251,7 +253,7 @@ func TestPCA953xReadPeriod(t *testing.T) {
 			got, err := d.ReadPeriod(tc.idx)
 			// assert
 			assert.Equal(t, tc.wantErr, err)
-			assert.Equal(t, tc.want, got)
+			assert.InDelta(t, tc.want, got, 0.0)
 			assert.Equal(t, tc.wantWritten, a.written)
 		})
 	}
@@ -291,7 +293,7 @@ func TestPCA953xWriteFrequency(t *testing.T) {
 			// act
 			err := d.WriteFrequency(tc.idx, tc.val)
 			// assert
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, tc.wantWritten, a.written)
 		})
 	}
@@ -342,7 +344,7 @@ func TestPCA953xReadFrequency(t *testing.T) {
 			got, err := d.ReadFrequency(tc.idx)
 			// assert
 			assert.Equal(t, tc.wantErr, err)
-			assert.Equal(t, tc.want, got)
+			assert.InDelta(t, tc.want, got, 0.0)
 			assert.Equal(t, tc.wantWritten, a.written)
 		})
 	}
@@ -382,7 +384,7 @@ func TestPCA953xWriteDutyCyclePercent(t *testing.T) {
 			// act
 			err := d.WriteDutyCyclePercent(tc.idx, tc.val)
 			// assert
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, tc.wantWritten, a.written)
 		})
 	}
@@ -433,7 +435,7 @@ func TestPCA953xReadDutyCyclePercent(t *testing.T) {
 			got, err := d.ReadDutyCyclePercent(tc.idx)
 			// assert
 			assert.Equal(t, tc.wantErr, err)
-			assert.Equal(t, tc.want, got)
+			assert.InDelta(t, tc.want, got, 0.0)
 			assert.Equal(t, tc.wantWritten, a.written)
 		})
 	}
@@ -465,12 +467,12 @@ func TestPCA953x_readRegister(t *testing.T) {
 	// act
 	val, err := d.readRegister(wantRegAddress)
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, 1, numCallsRead)
 	assert.Equal(t, 1, numCallsWrite)
 	assert.Equal(t, wantRegVal, val)
 	assert.Equal(t, wantReadByteCount, readByteCount)
-	assert.Equal(t, 1, len(a.written))
+	assert.Len(t, a.written, 1)
 	assert.Equal(t, uint8(wantRegAddress), a.written[0])
 }
 
@@ -491,10 +493,10 @@ func TestPCA953x_writeRegister(t *testing.T) {
 	// act
 	err := d.writeRegister(wantRegAddress, wantRegVal)
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, 1, numCallsWrite)
 	assert.Equal(t, 1, numCallsWrite)
-	assert.Equal(t, wantByteCount, len(a.written))
+	assert.Len(t, a.written, wantByteCount)
 	assert.Equal(t, uint8(wantRegAddress), a.written[0])
 	assert.Equal(t, wantRegVal, a.written[1])
 }
@@ -539,7 +541,7 @@ func TestPCA953x_pca953xCalcPeriod(t *testing.T) {
 			// act
 			val := pca953xCalcPeriod(tc.psc)
 			// assert
-			assert.Equal(t, tc.want, float32(math.Round(float64(val)*10000)/10000))
+			assert.InDelta(t, tc.want, float32(math.Round(float64(val)*10000)/10000), 0.0)
 		})
 	}
 }
@@ -585,7 +587,7 @@ func TestPCA953x_pca953xCalcDutyCyclePercent(t *testing.T) {
 			// act
 			val := pca953xCalcDutyCyclePercent(tc.pwm)
 			// assert
-			assert.Equal(t, tc.want, float32(math.Round(float64(val)*10)/10))
+			assert.InDelta(t, tc.want, float32(math.Round(float64(val)*10)/10), 0.0)
 		})
 	}
 }

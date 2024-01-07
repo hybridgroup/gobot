@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/nats-io/nats.go"
+
 	"gobot.io/x/gobot/v2"
 )
 

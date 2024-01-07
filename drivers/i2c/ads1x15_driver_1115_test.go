@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func initTestADS1115DriverWithStubbedAdaptor() (*ADS1x15Driver, *i2cTestAdaptor) {
@@ -73,38 +74,38 @@ func TestADS1115AnalogRead(t *testing.T) {
 
 	val, err := d.AnalogRead("0")
 	assert.Equal(t, 32767, val)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	val, err = d.AnalogRead("1")
 	assert.Equal(t, 32767, val)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	val, err = d.AnalogRead("2")
 	assert.Equal(t, 32767, val)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	val, err = d.AnalogRead("3")
 	assert.Equal(t, 32767, val)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	val, err = d.AnalogRead("0-1")
 	assert.Equal(t, 32767, val)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	val, err = d.AnalogRead("0-3")
 	assert.Equal(t, 32767, val)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	val, err = d.AnalogRead("1-3")
 	assert.Equal(t, 32767, val)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	val, err = d.AnalogRead("2-3")
 	assert.Equal(t, 32767, val)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	_, err = d.AnalogRead("3-2")
-	assert.NotNil(t, err.Error())
+	require.Error(t, err)
 }
 
 func TestADS1115AnalogReadError(t *testing.T) {
@@ -115,14 +116,14 @@ func TestADS1115AnalogReadError(t *testing.T) {
 	}
 
 	_, err := d.AnalogRead("0")
-	assert.ErrorContains(t, err, "read error")
+	require.ErrorContains(t, err, "read error")
 }
 
 func TestADS1115AnalogReadInvalidPin(t *testing.T) {
 	d, _ := initTestADS1115DriverWithStubbedAdaptor()
 
 	_, err := d.AnalogRead("98")
-	assert.ErrorContains(t, err, "Invalid channel (98), must be between 0 and 3")
+	require.ErrorContains(t, err, "Invalid channel (98), must be between 0 and 3")
 }
 
 func TestADS1115AnalogReadWriteError(t *testing.T) {
@@ -133,41 +134,41 @@ func TestADS1115AnalogReadWriteError(t *testing.T) {
 	}
 
 	_, err := d.AnalogRead("0")
-	assert.ErrorContains(t, err, "write error")
+	require.ErrorContains(t, err, "write error")
 
 	_, err = d.AnalogRead("0-1")
-	assert.ErrorContains(t, err, "write error")
+	require.ErrorContains(t, err, "write error")
 
 	_, err = d.AnalogRead("2-3")
-	assert.ErrorContains(t, err, "write error")
+	require.ErrorContains(t, err, "write error")
 }
 
 func TestADS1115ReadInvalidChannel(t *testing.T) {
 	d, _ := initTestADS1115DriverWithStubbedAdaptor()
 
 	_, err := d.Read(7, 1, 1600)
-	assert.ErrorContains(t, err, "Invalid channel (7), must be between 0 and 3")
+	require.ErrorContains(t, err, "Invalid channel (7), must be between 0 and 3")
 }
 
 func TestADS1115ReadInvalidGain(t *testing.T) {
 	d, _ := initTestADS1115DriverWithStubbedAdaptor()
 
 	_, err := d.Read(0, 21, 1600)
-	assert.ErrorContains(t, err, "Gain (21) must be one of: [0 1 2 3 4 5 6 7]")
+	require.ErrorContains(t, err, "Gain (21) must be one of: [0 1 2 3 4 5 6 7]")
 }
 
 func TestADS1115ReadInvalidDataRate(t *testing.T) {
 	d, _ := initTestADS1115DriverWithStubbedAdaptor()
 
 	_, err := d.Read(0, 1, 678)
-	assert.ErrorContains(t, err, "Invalid data rate (678). Accepted values: [8 16 32 64 128 250 475 860]")
+	require.ErrorContains(t, err, "Invalid data rate (678). Accepted values: [8 16 32 64 128 250 475 860]")
 }
 
 func TestADS1115ReadDifferenceInvalidChannel(t *testing.T) {
 	d, _ := initTestADS1115DriverWithStubbedAdaptor()
 
 	_, err := d.ReadDifference(5, 1, 1600)
-	assert.ErrorContains(t, err, "Invalid channel (5), must be between 0 and 3")
+	require.ErrorContains(t, err, "Invalid channel (5), must be between 0 and 3")
 }
 
 func TestADS1115_rawRead(t *testing.T) {
@@ -252,13 +253,13 @@ func TestADS1115_rawRead(t *testing.T) {
 	// arrange
 	channel := 0
 	channelOffset := 1
-	for name, tt := range tests {
+	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			a.written = []byte{} // reset writes of Start() and former test
 			// arrange reads
 			conversion := []uint8{0x00, 0x00}   // a conversion is in progress
 			noConversion := []uint8{0x80, 0x00} // no conversion in progress
-			returnRead := [3][]uint8{conversion, noConversion, tt.input}
+			returnRead := [3][]uint8{conversion, noConversion, tc.input}
 			numCallsRead := 0
 			a.i2cReadImpl = func(b []byte) (int, error) {
 				numCallsRead++
@@ -267,15 +268,15 @@ func TestADS1115_rawRead(t *testing.T) {
 				return len(b), nil
 			}
 			// act
-			got, err := d.rawRead(channel, channelOffset, tt.gain, tt.dataRate)
+			got, err := d.rawRead(channel, channelOffset, tc.gain, tc.dataRate)
 			// assert
-			assert.NoError(t, err)
-			assert.Equal(t, tt.want, got)
+			require.NoError(t, err)
+			assert.Equal(t, tc.want, got)
 			assert.Equal(t, 3, numCallsRead)
-			assert.Equal(t, 6, len(a.written))
+			assert.Len(t, a.written, 6)
 			assert.Equal(t, uint8(ads1x15PointerConfig), a.written[0])
-			assert.Equal(t, tt.wantConfig[0], a.written[1])            // MSByte: OS, MUX, PGA, MODE
-			assert.Equal(t, tt.wantConfig[1], a.written[2])            // LSByte: DR, COMP_*
+			assert.Equal(t, tc.wantConfig[0], a.written[1])            // MSByte: OS, MUX, PGA, MODE
+			assert.Equal(t, tc.wantConfig[1], a.written[2])            // LSByte: DR, COMP_*
 			assert.Equal(t, uint8(ads1x15PointerConfig), a.written[3]) // first check for no conversion
 			assert.Equal(t, uint8(ads1x15PointerConfig), a.written[4]) // second check for no conversion
 			assert.Equal(t, uint8(ads1x15PointerConversion), a.written[5])

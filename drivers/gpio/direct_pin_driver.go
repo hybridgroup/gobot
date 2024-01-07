@@ -8,13 +8,14 @@ import (
 
 // DirectPinDriver represents a GPIO pin
 type DirectPinDriver struct {
-	name       string
-	pin        string
-	connection gobot.Connection
-	gobot.Commander
+	*driver
 }
 
 // NewDirectPinDriver return a new DirectPinDriver given a Connection and pin.
+//
+// Supported options:
+//
+//	"WithName"
 //
 // Adds the following API Commands:
 //
@@ -22,12 +23,9 @@ type DirectPinDriver struct {
 //	"DigitalWrite" - See DirectPinDriver.DigitalWrite
 //	"PwmWrite" - See DirectPinDriver.PwmWrite
 //	"ServoWrite" - See DirectPinDriver.ServoWrite
-func NewDirectPinDriver(a gobot.Connection, pin string) *DirectPinDriver {
+func NewDirectPinDriver(a gobot.Connection, pin string, opts ...interface{}) *DirectPinDriver {
 	d := &DirectPinDriver{
-		name:       gobot.DefaultName("DirectPin"),
-		connection: a,
-		pin:        pin,
-		Commander:  gobot.NewCommander(),
+		driver: newDriver(a, "DirectPin", append(opts, withPin(pin))...),
 	}
 
 	d.AddCommand("DigitalRead", func(params map[string]interface{}) interface{} {
@@ -50,74 +48,32 @@ func NewDirectPinDriver(a gobot.Connection, pin string) *DirectPinDriver {
 	return d
 }
 
-// Name returns the DirectPinDrivers name
-func (d *DirectPinDriver) Name() string { return d.name }
-
-// SetName sets the DirectPinDrivers name
-func (d *DirectPinDriver) SetName(n string) { d.name = n }
-
-// Pin returns the DirectPinDrivers pin
-func (d *DirectPinDriver) Pin() string { return d.pin }
-
-// Connection returns the DirectPinDrivers Connection
-func (d *DirectPinDriver) Connection() gobot.Connection { return d.connection }
-
-// Start implements the Driver interface
-func (d *DirectPinDriver) Start() (err error) { return }
-
-// Halt implements the Driver interface
-func (d *DirectPinDriver) Halt() (err error) { return }
-
 // Off turn off pin
-func (d *DirectPinDriver) Off() (err error) {
-	if writer, ok := d.Connection().(DigitalWriter); ok {
-		return writer.DigitalWrite(d.Pin(), byte(0))
-	}
-	err = ErrDigitalWriteUnsupported
-	return
+func (d *DirectPinDriver) Off() error {
+	return d.digitalWrite(d.driverCfg.pin, byte(0))
 }
 
 // On turn on pin
-func (d *DirectPinDriver) On() (err error) {
-	if writer, ok := d.Connection().(DigitalWriter); ok {
-		return writer.DigitalWrite(d.Pin(), byte(1))
-	}
-	err = ErrDigitalWriteUnsupported
-	return
+func (d *DirectPinDriver) On() error {
+	return d.digitalWrite(d.driverCfg.pin, byte(1))
 }
 
 // DigitalRead returns the current digital state of the pin
-func (d *DirectPinDriver) DigitalRead() (val int, err error) {
-	if reader, ok := d.Connection().(DigitalReader); ok {
-		return reader.DigitalRead(d.Pin())
-	}
-	err = ErrDigitalReadUnsupported
-	return
+func (d *DirectPinDriver) DigitalRead() (int, error) {
+	return d.digitalRead(d.driverCfg.pin)
 }
 
 // DigitalWrite writes to the pin. Acceptable values are 1 or 0
-func (d *DirectPinDriver) DigitalWrite(level byte) (err error) {
-	if writer, ok := d.Connection().(DigitalWriter); ok {
-		return writer.DigitalWrite(d.Pin(), level)
-	}
-	err = ErrDigitalWriteUnsupported
-	return
+func (d *DirectPinDriver) DigitalWrite(level byte) error {
+	return d.digitalWrite(d.driverCfg.pin, level)
 }
 
 // PwmWrite writes the 0-254 value to the specified pin
-func (d *DirectPinDriver) PwmWrite(level byte) (err error) {
-	if writer, ok := d.Connection().(PwmWriter); ok {
-		return writer.PwmWrite(d.Pin(), level)
-	}
-	err = ErrPwmWriteUnsupported
-	return
+func (d *DirectPinDriver) PwmWrite(level byte) error {
+	return d.pwmWrite(d.driverCfg.pin, level)
 }
 
 // ServoWrite writes value to the specified pin
-func (d *DirectPinDriver) ServoWrite(level byte) (err error) {
-	if writer, ok := d.Connection().(ServoWriter); ok {
-		return writer.ServoWrite(d.Pin(), level)
-	}
-	err = ErrServoWriteUnsupported
-	return
+func (d *DirectPinDriver) ServoWrite(level byte) error {
+	return d.servoWrite(d.driverCfg.pin, level)
 }

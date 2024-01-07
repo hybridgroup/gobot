@@ -37,30 +37,30 @@ func main() {
 	robot.Start()
 }
 
-func adafruitDCMotorRunner(a *i2c.Adafruit2348Driver, dcMotor int) (err error) {
+func adafruitDCMotorRunner(a *i2c.Adafruit2348Driver, dcMotor int) error {
 	log.Printf("DC Motor Run Loop...\n")
 	// set the speed:
 	var speed int32 = 255 // 255 = full speed!
-	if err = a.SetDCMotorSpeed(dcMotor, speed); err != nil {
-		return
+	if err := a.SetDCMotorSpeed(dcMotor, speed); err != nil {
+		return err
 	}
 	// run FORWARD
-	if err = a.RunDCMotor(dcMotor, i2c.Adafruit2348Forward); err != nil {
-		return
+	if err := a.RunDCMotor(dcMotor, i2c.Adafruit2348Forward); err != nil {
+		return err
 	}
 	// Sleep and RELEASE
 	time.Sleep(2000 * time.Millisecond)
-	if err = a.RunDCMotor(dcMotor, i2c.Adafruit2348Release); err != nil {
-		return
+	if err := a.RunDCMotor(dcMotor, i2c.Adafruit2348Release); err != nil {
+		return err
 	}
 	// run BACKWARD
-	if err = a.RunDCMotor(dcMotor, i2c.Adafruit2348Backward); err != nil {
-		return
+	if err := a.RunDCMotor(dcMotor, i2c.Adafruit2348Backward); err != nil {
+		return err
 	}
 	// Sleep and RELEASE
 	time.Sleep(2000 * time.Millisecond)
-	if err = a.RunDCMotor(dcMotor, i2c.Adafruit2348Release); err != nil {
-		return
+	if err := a.RunDCMotor(dcMotor, i2c.Adafruit2348Release); err != nil {
+		return err
 	}
-	return
+	return nil
 }

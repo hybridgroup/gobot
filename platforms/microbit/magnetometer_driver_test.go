@@ -1,3 +1,4 @@
+//nolint:forcetypeassert,dupl // ok here
 package microbit
 
 import (
@@ -6,6 +7,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -25,8 +28,8 @@ func TestMagnetometerDriver(t *testing.T) {
 
 func TestMagnetometerDriverStartAndHalt(t *testing.T) {
 	d := initTestMagnetometerDriver()
-	assert.NoError(t, d.Start())
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
 }
 
 func TestMagnetometerDriverReadData(t *testing.T) {
@@ -35,9 +38,9 @@ func TestMagnetometerDriverReadData(t *testing.T) {
 	d := NewMagnetometerDriver(a)
 	_ = d.Start()
 	_ = d.On(Magnetometer, func(data interface{}) {
-		assert.Equal(t, float32(8.738), data.(*MagnetometerData).X)
-		assert.Equal(t, float32(8.995), data.(*MagnetometerData).Y)
-		assert.Equal(t, float32(9.252), data.(*MagnetometerData).Z)
+		assert.InDelta(t, float32(8.738), data.(*MagnetometerData).X, 0.0)
+		assert.InDelta(t, float32(8.995), data.(*MagnetometerData).Y, 0.0)
+		assert.InDelta(t, float32(9.252), data.(*MagnetometerData).Z, 0.0)
 		sem <- true
 	})
 

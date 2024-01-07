@@ -1,3 +1,4 @@
+//nolint:forcetypeassert // ok here
 package joystick
 
 import (
@@ -5,11 +6,11 @@ import (
 	"testing"
 	"time"
 
+	js "github.com/0xcafed00d/joystick"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"gobot.io/x/gobot/v2"
-
-	js "github.com/0xcafed00d/joystick"
 )
 
 var _ gobot.Driver = (*Driver)(nil)
@@ -17,7 +18,7 @@ var _ gobot.Driver = (*Driver)(nil)
 func initTestDriver(config string) (*Driver, *testJoystick) {
 	a := NewAdaptor("6")
 	tj := &testJoystick{}
-	a.connect = func(j *Adaptor) (err error) {
+	a.connect = func(j *Adaptor) error {
 		j.joystick = tj
 		return nil
 	}
@@ -30,13 +31,13 @@ func TestJoystickDriverName(t *testing.T) {
 	d, _ := initTestDriver("./configs/dualshock3.json")
 	assert.True(t, strings.HasPrefix(d.Name(), "Joystick"))
 	d.SetName("NewName")
-	assert.Equal(t, d.Name(), "NewName")
+	assert.Equal(t, "NewName", d.Name())
 }
 
 func TestDriverStart(t *testing.T) {
 	d, _ := initTestDriver("./configs/dualshock3.json")
 	d.interval = 1 * time.Millisecond
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 	time.Sleep(2 * time.Millisecond)
 }
 
@@ -45,7 +46,7 @@ func TestDriverHalt(t *testing.T) {
 	go func() {
 		<-d.halt
 	}()
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 }
 
 func TestDriverHandleEventDS3(t *testing.T) {
@@ -219,5 +220,5 @@ func TestDriverHandleEventDS4(t *testing.T) {
 func TestDriverInvalidConfig(t *testing.T) {
 	d, _ := initTestDriver("./configs/doesnotexist")
 	err := d.Start()
-	assert.Contains(t, err.Error(), "loadfile error")
+	require.ErrorContains(t, err, "loadfile error")
 }

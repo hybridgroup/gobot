@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -42,12 +44,12 @@ func TestSHT2xOptions(t *testing.T) {
 
 func TestSHT2xStart(t *testing.T) {
 	d := NewSHT2xDriver(newI2cTestAdaptor())
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 }
 
 func TestSHT2xHalt(t *testing.T) {
 	d, _ := initTestSHT2xDriverWithStubbedAdaptor()
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 }
 
 func TestSHT2xReset(t *testing.T) {
@@ -57,7 +59,7 @@ func TestSHT2xReset(t *testing.T) {
 	}
 	_ = d.Start()
 	err := d.Reset()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestSHT2xMeasurements(t *testing.T) {
@@ -75,22 +77,23 @@ func TestSHT2xMeasurements(t *testing.T) {
 	}
 	_ = d.Start()
 	temp, err := d.Temperature()
-	assert.NoError(t, err)
-	assert.Equal(t, float32(18.809052), temp)
+	require.NoError(t, err)
+	assert.InDelta(t, float32(18.809052), temp, 0.0)
 	hum, err := d.Humidity()
-	assert.NoError(t, err)
-	assert.Equal(t, float32(40.279907), hum)
+	require.NoError(t, err)
+	assert.InDelta(t, float32(40.279907), hum, 0.0)
 }
 
 func TestSHT2xAccuracy(t *testing.T) {
 	d, a := initTestSHT2xDriverWithStubbedAdaptor()
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
-		if a.written[len(a.written)-1] == SHT2xReadUserReg {
+		switch {
+		case a.written[len(a.written)-1] == SHT2xReadUserReg:
 			buf.Write([]byte{0x3a})
-		} else if a.written[len(a.written)-2] == SHT2xWriteUserReg {
+		case a.written[len(a.written)-2] == SHT2xWriteUserReg:
 			buf.Write([]byte{a.written[len(a.written)-1]})
-		} else {
+		default:
 			return 0, nil
 		}
 		copy(b, buf.Bytes())
@@ -100,7 +103,7 @@ func TestSHT2xAccuracy(t *testing.T) {
 	_ = d.SetAccuracy(SHT2xAccuracyLow)
 	assert.Equal(t, SHT2xAccuracyLow, d.Accuracy())
 	err := d.sendAccuracy()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestSHT2xTemperatureCrcError(t *testing.T) {
@@ -116,8 +119,8 @@ func TestSHT2xTemperatureCrcError(t *testing.T) {
 		return buf.Len(), nil
 	}
 	temp, err := d.Temperature()
-	assert.ErrorContains(t, err, "Invalid crc")
-	assert.Equal(t, float32(0.0), temp)
+	require.ErrorContains(t, err, "Invalid crc")
+	assert.InDelta(t, float32(0.0), temp, 0.0)
 }
 
 func TestSHT2xHumidityCrcError(t *testing.T) {
@@ -133,8 +136,8 @@ func TestSHT2xHumidityCrcError(t *testing.T) {
 		return buf.Len(), nil
 	}
 	hum, err := d.Humidity()
-	assert.ErrorContains(t, err, "Invalid crc")
-	assert.Equal(t, float32(0.0), hum)
+	require.ErrorContains(t, err, "Invalid crc")
+	assert.InDelta(t, float32(0.0), hum, 0.0)
 }
 
 func TestSHT2xTemperatureLengthError(t *testing.T) {
@@ -151,7 +154,7 @@ func TestSHT2xTemperatureLengthError(t *testing.T) {
 	}
 	temp, err := d.Temperature()
 	assert.Equal(t, ErrNotEnoughBytes, err)
-	assert.Equal(t, float32(0.0), temp)
+	assert.InDelta(t, float32(0.0), temp, 0.0)
 }
 
 func TestSHT2xHumidityLengthError(t *testing.T) {
@@ -168,5 +171,5 @@ func TestSHT2xHumidityLengthError(t *testing.T) {
 	}
 	hum, err := d.Humidity()
 	assert.Equal(t, ErrNotEnoughBytes, err)
-	assert.Equal(t, float32(0.0), hum)
+	assert.InDelta(t, float32(0.0), hum, 0.0)
 }

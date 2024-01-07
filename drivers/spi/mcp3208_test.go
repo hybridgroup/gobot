@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/aio"
 )
@@ -93,6 +95,6 @@ func TestMCP3208ReadWithError(t *testing.T) {
 	// act
 	got, err := d.Read(0)
 	// assert
-	assert.ErrorContains(t, err, "error while SPI read in mock")
+	require.ErrorContains(t, err, "error while SPI read in mock")
 	assert.Equal(t, 0, got)
 }

@@ -154,6 +154,8 @@ func (s *TH02Driver) Heater() (bool, error) {
 }
 
 // Sample returns the temperature in celsius and relative humidity for one sample
+//
+//nolint:nonamedreturns // is sufficient here
 func (s *TH02Driver) Sample() (temperature float32, relhumidity float32, _ error) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
@@ -179,8 +181,7 @@ func (s *TH02Driver) Sample() (temperature float32, relhumidity float32, _ error
 	}
 	temperature = float32(rawt>>2)/32.0 - 50.0
 
-	switch s.Units {
-	case "F":
+	if s.Units == "F" {
 		temperature = 9.0/5.0*temperature + 32.0
 	}
 

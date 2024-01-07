@@ -169,11 +169,13 @@ func NewSSD1306Driver(a gobot.Adaptor, options ...func(Config)) *SSD1306Driver {
 		err := s.Clear()
 		return map[string]interface{}{"err": err}
 	})
+	//nolint:forcetypeassert // ok here
 	s.AddCommand("SetContrast", func(params map[string]interface{}) interface{} {
 		contrast := params["contrast"].(byte)
 		err := s.SetContrast(contrast)
 		return map[string]interface{}{"err": err}
 	})
+	//nolint:forcetypeassert // ok here
 	s.AddCommand("Set", func(params map[string]interface{}) interface{} {
 		x := params["x"].(int)
 		y := params["y"].(int)

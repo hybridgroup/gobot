@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/gpio"
 )
@@ -57,7 +59,7 @@ func TestPCA9685Start(t *testing.T) {
 		return 1, nil
 	}
 	// act & assert
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 }
 
 func TestPCA9685StartError(t *testing.T) {
@@ -68,7 +70,7 @@ func TestPCA9685StartError(t *testing.T) {
 		return 0, errors.New("write error")
 	}
 	// act & assert
-	assert.ErrorContains(t, d.Start(), "write error")
+	require.ErrorContains(t, d.Start(), "write error")
 }
 
 func TestPCA9685Halt(t *testing.T) {
@@ -78,9 +80,9 @@ func TestPCA9685Halt(t *testing.T) {
 	// act
 	err := d.Halt()
 	// assert
-	assert.NoError(t, err)
-	assert.NoError(t, err)
-	assert.Equal(t, 2, len(a.written))
+	require.NoError(t, err)
+	require.NoError(t, err)
+	assert.Len(t, a.written, 2)
 	assert.Equal(t, []byte{0xFD, 0x10}, a.written)
 }
 
@@ -91,7 +93,7 @@ func TestPCA9685HaltError(t *testing.T) {
 		return 0, errors.New("write error")
 	}
 	// act & assert
-	assert.ErrorContains(t, d.Halt(), "write error")
+	require.ErrorContains(t, d.Halt(), "write error")
 }
 
 func TestPCA9685SetPWM(t *testing.T) {
@@ -126,8 +128,8 @@ func TestPCA9685SetPWM(t *testing.T) {
 			// act
 			err := d.SetPWM(tc.pin, tc.onCounts, tc.offCounts)
 			// assert
-			assert.NoError(t, err)
-			assert.Equal(t, 8, len(a.written))
+			require.NoError(t, err)
+			assert.Len(t, a.written, 8)
 			for writeIdx, wantVal := range tc.wantLedOnTimeOffTimeSet {
 				assert.Equal(t, wantVal, a.written[writeIdx], "index %d differs", writeIdx)
 			}
@@ -142,7 +144,7 @@ func TestPCA9685SetPWMError(t *testing.T) {
 		return 0, errors.New("write error")
 	}
 	// act & assert
-	assert.ErrorContains(t, d.SetPWM(0, 0, 256), "write error")
+	require.ErrorContains(t, d.SetPWM(0, 0, 256), "write error")
 }
 
 func TestPCA9685SetAllPWM(t *testing.T) {
@@ -180,8 +182,8 @@ func TestPCA9685SetAllPWM(t *testing.T) {
 			// act
 			err := d.SetAllPWM(tc.onCounts, tc.offCounts)
 			// assert
-			assert.NoError(t, err)
-			assert.Equal(t, 8, len(a.written))
+			require.NoError(t, err)
+			assert.Len(t, a.written, 8)
 			for writeIdx, wantVal := range tc.wantLedOnTimeOffTimeSet {
 				assert.Equal(t, wantVal, a.written[writeIdx], "index %d differs", writeIdx)
 			}
@@ -196,7 +198,7 @@ func TestPCA9685SetAllPWMError(t *testing.T) {
 		return 0, errors.New("write error")
 	}
 	// act & assert
-	assert.ErrorContains(t, d.SetAllPWM(0, 256), "write error")
+	require.ErrorContains(t, d.SetAllPWM(0, 256), "write error")
 }
 
 func TestPCA9685SetPWMFreq(t *testing.T) {
@@ -240,8 +242,8 @@ func TestPCA9685SetPWMFreq(t *testing.T) {
 			// act
 			err := d.SetPWMFreq(tc.freq)
 			// assert
-			assert.NoError(t, err)
-			assert.Equal(t, 9, len(a.written))
+			require.NoError(t, err)
+			assert.Len(t, a.written, 9)
 			var writeIdx int
 			// for read old mode:
 			assert.Equal(t, wantMode1SleepSequence[0], a.written[writeIdx], "index %d differs", writeIdx)
@@ -274,7 +276,7 @@ func TestPCA9685SetPWMFreqReadError(t *testing.T) {
 		return 0, errors.New("read error")
 	}
 	// act & assert
-	assert.ErrorContains(t, d.SetPWMFreq(60), "read error")
+	require.ErrorContains(t, d.SetPWMFreq(60), "read error")
 }
 
 func TestPCA9685SetPWMFreqWriteError(t *testing.T) {
@@ -284,7 +286,7 @@ func TestPCA9685SetPWMFreqWriteError(t *testing.T) {
 		return 0, errors.New("write error")
 	}
 	// act & assert
-	assert.ErrorContains(t, d.SetPWMFreq(60), "write error")
+	require.ErrorContains(t, d.SetPWMFreq(60), "write error")
 }
 
 func TestPCA9685Commands(t *testing.T) {
@@ -323,8 +325,8 @@ func TestPCA9685_initialize(t *testing.T) {
 	// act, assert - initialize() must be called on Start()
 	err := d.Start()
 	// assert
-	assert.NoError(t, err)
-	assert.Equal(t, 15, len(a.written))
+	require.NoError(t, err)
+	assert.Len(t, a.written, 15)
 	var writeIdx int
 	for idx, wantVal := range wantAllLedOnTimeOffTimeSequence {
 		assert.Equal(t, wantVal, a.written[writeIdx], "index %d (%d) differs", writeIdx, idx)

@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -36,7 +38,7 @@ func TestNewMPU6050Driver(t *testing.T) {
 	assert.Equal(t, MPU6050AccelFsConfig(0x00), d.accelFs)
 	assert.Equal(t, MPU6050GyroFsConfig(0x00), d.gyroFs)
 	assert.Equal(t, MPU6050Pwr1ClockConfig(0x01), d.clock)
-	assert.Equal(t, 9.80665, d.gravity)
+	assert.InDelta(t, 9.80665, d.gravity, 0.0)
 }
 
 func TestMPU6050Options(t *testing.T) {
@@ -69,7 +71,7 @@ func TestWithMPU6050ClockSource(t *testing.T) {
 
 func TestWithMPU6050Gravity(t *testing.T) {
 	d := NewMPU6050Driver(newI2cTestAdaptor(), WithMPU6050Gravity(1.0))
-	assert.Equal(t, 1.0, d.gravity)
+	assert.InDelta(t, 1.0, d.gravity, 0.0)
 }
 
 func TestMPU6050GetData(t *testing.T) {
@@ -113,7 +115,7 @@ func TestMPU6050GetData(t *testing.T) {
 	// assert
 	assert.Equal(t, wantAccel, d.Accelerometer)
 	assert.Equal(t, wantGyro, d.Gyroscope)
-	assert.Equal(t, wantTemp, d.Temperature)
+	assert.InDelta(t, wantTemp, d.Temperature, 0.0)
 }
 
 func TestMPU6050GetDataReadError(t *testing.T) {
@@ -124,7 +126,7 @@ func TestMPU6050GetDataReadError(t *testing.T) {
 		return 0, errors.New("read error")
 	}
 
-	assert.ErrorContains(t, d.GetData(), "read error")
+	require.ErrorContains(t, d.GetData(), "read error")
 }
 
 func TestMPU6050GetDataWriteError(t *testing.T) {
@@ -135,7 +137,7 @@ func TestMPU6050GetDataWriteError(t *testing.T) {
 		return 0, errors.New("write error")
 	}
 
-	assert.ErrorContains(t, d.GetData(), "write error")
+	require.ErrorContains(t, d.GetData(), "write error")
 }
 
 func TestMPU6050_initialize(t *testing.T) {
@@ -172,9 +174,9 @@ func TestMPU6050_initialize(t *testing.T) {
 	// act, assert - initialize() must be called on Start()
 	err := d.Start()
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, 1, readCallCounter)
-	assert.Equal(t, 13, len(a.written))
+	assert.Len(t, a.written, 13)
 	assert.Equal(t, uint8(0x6B), a.written[0])
 	assert.Equal(t, uint8(0x80), a.written[1])
 	assert.Equal(t, uint8(0x6B), a.written[2])

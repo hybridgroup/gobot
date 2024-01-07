@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func initTestYL40DriverWithStubbedAdaptor() (*YL40Driver, *i2cTestAdaptor) {
@@ -55,10 +56,10 @@ func TestYL40DriverWithYL40Interval(t *testing.T) {
 func TestYL40DriverWithYL40InputScaler(t *testing.T) {
 	// arrange
 	yl := NewYL40Driver(newI2cTestAdaptor())
-	f1 := func(input int) (value float64) { return 0.1 }
-	f2 := func(input int) (value float64) { return 0.2 }
-	f3 := func(input int) (value float64) { return 0.3 }
-	f4 := func(input int) (value float64) { return 0.4 }
+	f1 := func(input int) float64 { return 0.1 }
+	f2 := func(input int) float64 { return 0.2 }
+	f3 := func(input int) float64 { return 0.3 }
+	f4 := func(input int) float64 { return 0.4 }
 	// act
 	WithYL40InputScaler(YL40Bri, f1)(yl)
 	WithYL40InputScaler(YL40Temp, f2)(yl)
@@ -74,7 +75,7 @@ func TestYL40DriverWithYL40InputScaler(t *testing.T) {
 func TestYL40DriverWithYL40WithYL40OutputScaler(t *testing.T) {
 	// arrange
 	yl := NewYL40Driver(newI2cTestAdaptor())
-	fo := func(input float64) (value int) { return 123 }
+	fo := func(input float64) int { return 123 }
 	// act
 	WithYL40OutputScaler(fo)(yl)
 	// assert
@@ -107,13 +108,13 @@ func TestYL40DriverReadBrightness(t *testing.T) {
 	got, err := yl.ReadBrightness()
 	got2, err2 := yl.Brightness()
 	// assert
-	assert.NoError(t, err)
-	assert.Equal(t, 1, len(adaptor.written))
+	require.NoError(t, err)
+	assert.Len(t, adaptor.written, 1)
 	assert.Equal(t, ctrlByteOn, adaptor.written[0])
 	assert.Equal(t, 2, numCallsRead)
-	assert.Equal(t, want, got)
-	assert.NoError(t, err2)
-	assert.Equal(t, want, got2)
+	assert.InDelta(t, want, got, 0.0)
+	require.NoError(t, err2)
+	assert.InDelta(t, want, got2, 0.0)
 }
 
 func TestYL40DriverReadTemperature(t *testing.T) {
@@ -143,13 +144,13 @@ func TestYL40DriverReadTemperature(t *testing.T) {
 	got, err := yl.ReadTemperature()
 	got2, err2 := yl.Temperature()
 	// assert
-	assert.NoError(t, err)
-	assert.Equal(t, 1, len(adaptor.written))
+	require.NoError(t, err)
+	assert.Len(t, adaptor.written, 1)
 	assert.Equal(t, ctrlByteOn, adaptor.written[0])
 	assert.Equal(t, 2, numCallsRead)
-	assert.Equal(t, want, got)
-	assert.NoError(t, err2)
-	assert.Equal(t, want, got2)
+	assert.InDelta(t, want, got, 0.0)
+	require.NoError(t, err2)
+	assert.InDelta(t, want, got2, 0.0)
 }
 
 func TestYL40DriverReadAIN2(t *testing.T) {
@@ -178,13 +179,13 @@ func TestYL40DriverReadAIN2(t *testing.T) {
 	got, err := yl.ReadAIN2()
 	got2, err2 := yl.AIN2()
 	// assert
-	assert.NoError(t, err)
-	assert.Equal(t, 1, len(adaptor.written))
+	require.NoError(t, err)
+	assert.Len(t, adaptor.written, 1)
 	assert.Equal(t, ctrlByteOn, adaptor.written[0])
 	assert.Equal(t, 2, numCallsRead)
-	assert.Equal(t, want, got)
-	assert.NoError(t, err2)
-	assert.Equal(t, want, got2)
+	assert.InDelta(t, want, got, 0.0)
+	require.NoError(t, err2)
+	assert.InDelta(t, want, got2, 0.0)
 }
 
 func TestYL40DriverReadPotentiometer(t *testing.T) {
@@ -213,13 +214,13 @@ func TestYL40DriverReadPotentiometer(t *testing.T) {
 	got, err := yl.ReadPotentiometer()
 	got2, err2 := yl.Potentiometer()
 	// assert
-	assert.NoError(t, err)
-	assert.Equal(t, 1, len(adaptor.written))
+	require.NoError(t, err)
+	assert.Len(t, adaptor.written, 1)
 	assert.Equal(t, ctrlByteOn, adaptor.written[0])
 	assert.Equal(t, 2, numCallsRead)
-	assert.Equal(t, want, got)
-	assert.NoError(t, err2)
-	assert.Equal(t, want, got2)
+	assert.InDelta(t, want, got, 0.0)
+	require.NoError(t, err2)
+	assert.InDelta(t, want, got2, 0.0)
 }
 
 func TestYL40DriverAnalogWrite(t *testing.T) {
@@ -238,20 +239,20 @@ func TestYL40DriverAnalogWrite(t *testing.T) {
 	// act
 	err := pcf.Write(write)
 	// assert
-	assert.NoError(t, err)
-	assert.Equal(t, 2, len(adaptor.written))
+	require.NoError(t, err)
+	assert.Len(t, adaptor.written, 2)
 	assert.Equal(t, ctrlByteOn, adaptor.written[0])
 	assert.Equal(t, want, adaptor.written[1])
 }
 
 func TestYL40DriverStart(t *testing.T) {
 	yl := NewYL40Driver(newI2cTestAdaptor())
-	assert.NoError(t, yl.Start())
+	require.NoError(t, yl.Start())
 }
 
 func TestYL40DriverHalt(t *testing.T) {
 	yl := NewYL40Driver(newI2cTestAdaptor())
-	assert.NoError(t, yl.Halt())
+	require.NoError(t, yl.Halt())
 }
 
 func fEqual(want interface{}, got interface{}) bool {

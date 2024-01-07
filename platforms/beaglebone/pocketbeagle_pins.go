@@ -76,7 +76,7 @@ var pocketBeaglePinMap = map[string]int{
 	// P2_36 - AIO7
 }
 
-var pocketBeaglePwmPinMap = map[string]pwmPinData{
+var pocketBeaglePwmPinMap = map[string]pwmPinDefinition{
 	"P1_33": {dir: "/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/", dirRegexp: "pwmchip[0-9]+$", channel: 1},
 	"P1_36": {dir: "/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/", dirRegexp: "pwmchip[0-9]+$", channel: 0},
 
@@ -84,11 +84,11 @@ var pocketBeaglePwmPinMap = map[string]pwmPinData{
 	"P2_3": {dir: "/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/", dirRegexp: "pwmchip[0-9]+$", channel: 1},
 }
 
-var pocketBeagleAnalogPinMap = map[string]string{
-	"P1_19": "in_voltage0_raw",
-	"P1_21": "in_voltage1_raw",
-	"P1_23": "in_voltage2_raw",
-	"P1_25": "in_voltage3_raw",
-	"P1_27": "in_voltage4_raw",
-	"P2_36": "in_voltage7_raw",
+var pocketBeagleAnalogPinMap = map[string]analogPinDefinition{
+	"P1_19": {path: "/sys/bus/iio/devices/iio:device0/in_voltage0_raw", r: true, w: false, bufLen: 1024},
+	"P1_21": {path: "/sys/bus/iio/devices/iio:device0/in_voltage1_raw", r: true, w: false, bufLen: 1024},
+	"P1_23": {path: "/sys/bus/iio/devices/iio:device0/in_voltage2_raw", r: true, w: false, bufLen: 1024},
+	"P1_25": {path: "/sys/bus/iio/devices/iio:device0/in_voltage3_raw", r: true, w: false, bufLen: 1024},
+	"P1_27": {path: "/sys/bus/iio/devices/iio:device0/in_voltage4_raw", r: true, w: false, bufLen: 1024},
+	"P2_36": {path: "/sys/bus/iio/devices/iio:device0/in_voltage7_raw", r: true, w: false, bufLen: 1024},
 }

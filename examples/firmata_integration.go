@@ -29,7 +29,7 @@ func main() {
 	led1 := gpio.NewLedDriver(firmataAdaptor, "3")
 	led2 := gpio.NewLedDriver(firmataAdaptor, "4")
 	button := gpio.NewButtonDriver(firmataAdaptor, "2")
-	sensor := aio.NewAnalogSensorDriver(firmataAdaptor, "0")
+	sensor := aio.NewAnalogSensorDriver(firmataAdaptor, "0", aio.WithSensorCyclicRead(500*time.Millisecond))
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {

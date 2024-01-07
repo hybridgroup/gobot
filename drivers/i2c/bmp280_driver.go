@@ -161,29 +161,30 @@ func WithBMP280IIRFilter(val BMP280IIRFilter) func(Config) {
 }
 
 // Temperature returns the current temperature, in celsius degrees.
-func (d *BMP280Driver) Temperature() (temp float32, err error) {
+func (d *BMP280Driver) Temperature() (float32, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	var rawT int32
-	if rawT, err = d.rawTemp(); err != nil {
+	rawT, err := d.rawTemp()
+	if err != nil {
 		return 0.0, err
 	}
-	temp, _ = d.calculateTemp(rawT)
-	return
+	temp, _ := d.calculateTemp(rawT)
+	return temp, nil
 }
 
 // Pressure returns the current barometric pressure, in Pa
-func (d *BMP280Driver) Pressure() (press float32, err error) {
+func (d *BMP280Driver) Pressure() (float32, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	var rawT, rawP int32
-	if rawT, err = d.rawTemp(); err != nil {
+	rawT, err := d.rawTemp()
+	if err != nil {
 		return 0.0, err
 	}
 
-	if rawP, err = d.rawPressure(); err != nil {
+	rawP, err := d.rawPressure()
+	if err != nil {
 		return 0.0, err
 	}
 	_, tFine := d.calculateTemp(rawT)
@@ -195,12 +196,15 @@ func (d *BMP280Driver) Pressure() (press float32, err error) {
 // Calculation is based on code from Adafruit BME280 library
 //
 //	https://github.com/adafruit/Adafruit_BME280_Library
-func (d *BMP280Driver) Altitude() (alt float32, err error) {
-	atmP, _ := d.Pressure()
+func (d *BMP280Driver) Altitude() (float32, error) {
+	atmP, err := d.Pressure()
+	if err != nil {
+		return 0, err
+	}
 	atmP /= 100.0
-	alt = float32(44330.0 * (1.0 - math.Pow(float64(atmP/bmp280SeaLevelPressure), 0.1903)))
+	alt := float32(44330.0 * (1.0 - math.Pow(float64(atmP/bmp280SeaLevelPressure), 0.1903)))
 
-	return
+	return alt, nil
 }
 
 // initialization reads the calibration coefficients.
@@ -300,7 +304,8 @@ func (d *BMP280Driver) rawPressure() (int32, error) {
 
 func (d *BMP280Driver) calculateTemp(rawTemp int32) (float32, int32) {
 	tcvar1 := ((float32(rawTemp) / 16384.0) - (float32(d.calCoeffs.t1) / 1024.0)) * float32(d.calCoeffs.t2)
-	tcvar2 := (((float32(rawTemp) / 131072.0) - (float32(d.calCoeffs.t1) / 8192.0)) * ((float32(rawTemp) / 131072.0) - float32(d.calCoeffs.t1)/8192.0)) * float32(d.calCoeffs.t3)
+	tcvar2 := (((float32(rawTemp) / 131072.0) - (float32(d.calCoeffs.t1) / 8192.0)) * ((float32(rawTemp) / 131072.0) -
+		float32(d.calCoeffs.t1)/8192.0)) * float32(d.calCoeffs.t3)
 	temperatureComp := (tcvar1 + tcvar2) / 5120.0
 
 	tFine := int32(tcvar1 + tcvar2)

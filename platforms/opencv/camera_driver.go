@@ -21,7 +21,7 @@ type CameraDriver struct {
 	name   string
 	camera capture
 	Source interface{}
-	start  func(*CameraDriver) (err error)
+	start  func(*CameraDriver) error
 	gobot.Eventer
 }
 
@@ -32,7 +32,7 @@ func NewCameraDriver(source interface{}) *CameraDriver {
 		name:    "Camera",
 		Eventer: gobot.NewEventer(),
 		Source:  source,
-		start: func(c *CameraDriver) (err error) {
+		start: func(c *CameraDriver) error {
 			switch v := c.Source.(type) {
 			case string:
 				c.camera, _ = gocv.VideoCaptureFile(v)
@@ -60,7 +60,7 @@ func (c *CameraDriver) SetName(n string) { c.name = n }
 func (c *CameraDriver) Connection() gobot.Connection { return nil }
 
 // Start initializes camera by grabbing frames
-func (c *CameraDriver) Start() (err error) {
+func (c *CameraDriver) Start() error {
 	if err := c.start(c); err != nil {
 		return err
 	}
@@ -76,4 +76,4 @@ func (c *CameraDriver) Start() (err error) {
 }
 
 // Halt stops camera driver
-func (c *CameraDriver) Halt() (err error) { return }
+func (c *CameraDriver) Halt() error { return nil }

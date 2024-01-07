@@ -37,8 +37,8 @@ func (d *digitalPinMock) Write(b int) error {
 }
 
 // Read reads the given value from character device
-func (d *digitalPinMock) Read() (n int, err error) {
-	return 0, err
+func (d *digitalPinMock) Read() (int, error) {
+	return 0, nil
 }
 
 // Export sets the pin as exported with the configured direction

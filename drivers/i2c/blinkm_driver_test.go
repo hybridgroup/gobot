@@ -1,3 +1,4 @@
+//nolint:forcetypeassert // ok here
 package i2c
 
 import (
@@ -6,6 +7,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -42,12 +45,12 @@ func TestBlinkMOptions(t *testing.T) {
 
 func TestBlinkMStart(t *testing.T) {
 	d := NewBlinkMDriver(newI2cTestAdaptor())
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 }
 
 func TestBlinkMHalt(t *testing.T) {
 	d, _ := initTestBlinkMDriverWithStubbedAdaptor()
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 }
 
 // Commands
@@ -125,7 +128,7 @@ func TestBlinkMFirmwareVersion(t *testing.T) {
 	}
 
 	_, err := d.FirmwareVersion()
-	assert.ErrorContains(t, err, "write error")
+	require.ErrorContains(t, err, "write error")
 }
 
 func TestBlinkMColor(t *testing.T) {
@@ -153,7 +156,7 @@ func TestBlinkMColor(t *testing.T) {
 	}
 
 	_, err := d.Color()
-	assert.ErrorContains(t, err, "write error")
+	require.ErrorContains(t, err, "write error")
 }
 
 func TestBlinkMFade(t *testing.T) {
@@ -163,7 +166,7 @@ func TestBlinkMFade(t *testing.T) {
 	}
 
 	err := d.Fade(100, 100, 100)
-	assert.ErrorContains(t, err, "write error")
+	require.ErrorContains(t, err, "write error")
 }
 
 func TestBlinkMRGB(t *testing.T) {
@@ -173,5 +176,5 @@ func TestBlinkMRGB(t *testing.T) {
 	}
 
 	err := d.Rgb(100, 100, 100)
-	assert.ErrorContains(t, err, "write error")
+	require.ErrorContains(t, err, "write error")
 }

@@ -10,6 +10,7 @@ import (
 	"strconv"
 
 	"github.com/donovanhide/eventsource"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -74,6 +75,7 @@ func (s *Adaptor) AnalogRead(pin string) (int, error) {
 
 	resp, err := s.request("POST", url, params)
 	if err == nil {
+		//nolint:forcetypeassert // ok here
 		return int(resp["return_value"].(float64)), nil
 	}
 
@@ -119,6 +121,7 @@ func (s *Adaptor) DigitalRead(pin string) (int, error) {
 		return -1, err
 	}
 
+	//nolint:forcetypeassert // ok here
 	return int(resp["return_value"].(float64)), nil
 }
 
@@ -147,7 +150,7 @@ func (s *Adaptor) ServoWrite(pin string, angle byte) error {
 // * name  - Event name to subscribe for, leave blank to subscribe to all events.
 //
 // A new event is emitted as a particle.Event struct
-func (s *Adaptor) EventStream(source string, name string) (event *gobot.Event, err error) {
+func (s *Adaptor) EventStream(source string, name string) (*gobot.Event, error) {
 	var url string
 
 	switch source {
@@ -158,13 +161,12 @@ func (s *Adaptor) EventStream(source string, name string) (event *gobot.Event, e
 	case "device":
 		url = fmt.Sprintf("%s/events/%s?access_token=%s", s.deviceURL(), name, s.AccessToken)
 	default:
-		err = errors.New("source param should be: all, devices or device")
-		return
+		return nil, errors.New("source param should be: all, devices or device")
 	}
 
 	events, _, err := eventSource(url)
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	go func() {
@@ -175,17 +177,19 @@ func (s *Adaptor) EventStream(source string, name string) (event *gobot.Event, e
 			}
 		}
 	}()
-	return
+
+	return nil, nil //nolint:nilnil // seems ok here
 }
 
 // Variable returns a core variable value as a string
-func (s *Adaptor) Variable(name string) (result string, err error) {
+func (s *Adaptor) Variable(name string) (string, error) {
 	url := fmt.Sprintf("%v/%s?access_token=%s", s.deviceURL(), name, s.AccessToken)
 	resp, err := s.request("GET", url, nil)
 	if err != nil {
-		return
+		return "", err
 	}
 
+	var result string
 	switch val := resp["result"].(type) {
 	case bool:
 		result = strconv.FormatBool(val)
@@ -195,7 +199,7 @@ func (s *Adaptor) Variable(name string) (result string, err error) {
 		result = val
 	}
 
-	return
+	return result, nil
 }
 
 // Function executes a core function and
@@ -214,6 +218,7 @@ func (s *Adaptor) Function(name string, args string) (int, error) {
 		return -1, err
 	}
 
+	//nolint:forcetypeassert // ok here
 	return int(resp["return_value"].(float64)), nil
 }
 
@@ -224,7 +229,7 @@ func (s *Adaptor) setAPIServer(server string) {
 
 // deviceURL constructs device url to make requests from Particle cloud api
 func (s *Adaptor) deviceURL() string {
-	if len(s.APIServer) <= 0 {
+	if len(s.APIServer) == 0 {
 		s.setAPIServer("https://api.particle.io")
 	}
 	return fmt.Sprintf("%v/v1/devices/%v", s.APIServer, s.DeviceID)
@@ -240,9 +245,11 @@ func (s *Adaptor) pinLevel(level byte) string {
 
 // request makes request to Particle cloud server, return err != nil if there is
 // any issue with the request.
-func (s *Adaptor) request(method string, url string, params url.Values) (m map[string]interface{}, err error) {
+//
+//nolint:bodyclose,noctx // not changed yet
+func (s *Adaptor) request(method string, url string, params url.Values) (map[string]interface{}, error) {
 	var resp *http.Response
-
+	var err error
 	if method == "POST" {
 		resp, err = http.PostForm(url, params) //nolint:gosec // accepted, because local function and no exposed routing
 	} else if method == "GET" {
@@ -250,30 +257,34 @@ func (s *Adaptor) request(method string, url string, params url.Values) (m map[s
 	}
 
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	buf, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return
+		return nil, err
 	}
 
+	var m map[string]interface{}
 	if err := json.Unmarshal(buf, &m); err != nil {
 		return m, err
 	}
 
 	if resp.Status != "200 OK" {
-		err = fmt.Errorf("%v: error communicating to the Particle cloud", resp.Status)
-	} else if _, ok := m["error"]; ok {
-		err = errors.New(m["error"].(string))
+		return m, fmt.Errorf("%v: error communicating to the Particle cloud", resp.Status)
 	}
 
-	return
+	if _, ok := m["error"]; ok {
+		//nolint:forcetypeassert // ok here
+		return m, errors.New(m["error"].(string))
+	}
+
+	return m, nil
 }
 
 func (s *Adaptor) servoPinOpen(pin string) error {
 	params := url.Values{
-		"params":       {fmt.Sprintf("%v", pin)},
+		"params":       {pin},
 		"access_token": {s.AccessToken},
 	}
 	url := fmt.Sprintf("%v/servoOpen", s.deviceURL())

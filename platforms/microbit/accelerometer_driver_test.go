@@ -1,3 +1,4 @@
+//nolint:forcetypeassert,dupl // ok here
 package microbit
 
 import (
@@ -6,6 +7,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -25,8 +28,8 @@ func TestAccelerometerDriver(t *testing.T) {
 
 func TestAccelerometerDriverStartAndHalt(t *testing.T) {
 	d := initTestAccelerometerDriver()
-	assert.NoError(t, d.Start())
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
 }
 
 func TestAccelerometerDriverReadData(t *testing.T) {
@@ -35,9 +38,9 @@ func TestAccelerometerDriverReadData(t *testing.T) {
 	d := NewAccelerometerDriver(a)
 	_ = d.Start()
 	_ = d.On(Accelerometer, func(data interface{}) {
-		assert.Equal(t, float32(8.738), data.(*AccelerometerData).X)
-		assert.Equal(t, float32(8.995), data.(*AccelerometerData).Y)
-		assert.Equal(t, float32(9.252), data.(*AccelerometerData).Z)
+		assert.InDelta(t, float32(8.738), data.(*AccelerometerData).X, 0.0)
+		assert.InDelta(t, float32(8.995), data.(*AccelerometerData).Y, 0.0)
+		assert.InDelta(t, float32(9.252), data.(*AccelerometerData).Z, 0.0)
 		sem <- true
 	})
 

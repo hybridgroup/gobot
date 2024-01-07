@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -11,6 +10,7 @@ import (
 	"time"
 
 	"github.com/bmizerany/pat"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/api/robeaux"
 )
@@ -178,12 +178,14 @@ func (a *API) robeaux(res http.ResponseWriter, req *http.Request) {
 		http.Error(res, err.Error(), http.StatusNotFound)
 		return
 	}
-	t := strings.Split(path, ".")
-	if t[len(t)-1] == "js" {
+	split := strings.Split(path, ".")
+	ext := split[len(split)-1]
+	switch ext {
+	case "js":
 		res.Header().Set("Content-Type", "text/javascript; charset=utf-8")
-	} else if t[len(t)-1] == "css" {
+	case "css":
 		res.Header().Set("Content-Type", "text/css; charset=utf-8")
-	} else if t[len(t)-1] == "html" {
+	case "html":
 		res.Header().Set("Content-Type", "text/html; charset=utf-8")
 	}
 	if _, err := res.Write(buf); err != nil {
@@ -269,9 +271,11 @@ func (a *API) robotDeviceEvent(res http.ResponseWriter, req *http.Request) {
 	device := a.master.Robot(req.URL.Query().Get(":robot")).
 		Device(req.URL.Query().Get(":device"))
 
+	//nolint:forcetypeassert // no error return value, so there is no better way
 	if event := a.master.Robot(req.URL.Query().Get(":robot")).
 		Device(req.URL.Query().Get(":device")).(gobot.Eventer).
 		Event(req.URL.Query().Get(":event")); len(event) > 0 {
+		//nolint:forcetypeassert // no error return value, so there is no better way
 		if err := device.(gobot.Eventer).On(event, func(data interface{}) {
 			d, _ := json.Marshal(data)
 			dataChan <- string(d)
@@ -345,6 +349,7 @@ func (a *API) executeRobotDeviceCommand(res http.ResponseWriter, req *http.Reque
 		a.writeJSON(map[string]interface{}{"error": err.Error()}, res)
 	} else {
 		a.executeCommand(
+			//nolint:forcetypeassert // no error return value, so there is no better way
 			a.master.Robot(req.URL.Query().Get(":robot")).
 				Device(req.URL.Query().Get(":device")).(gobot.Commander).
 				Command(req.URL.Query().Get(":command")),
@@ -387,7 +392,10 @@ func (a *API) executeCommand(f func(map[string]interface{}) interface{},
 
 // writeJSON writes `j` as JSON in response
 func (a *API) writeJSON(j interface{}, res http.ResponseWriter) {
-	data, _ := json.Marshal(j)
+	data, err := json.Marshal(j)
+	if err != nil {
+		panic(err)
+	}
 	res.Header().Set("Content-Type", "application/json; charset=utf-8")
 	if _, err := res.Write(data); err != nil {
 		panic(err)
@@ -401,29 +409,25 @@ func (a *API) Debug() {
 	})
 }
 
-func (a *API) jsonRobotFor(name string) (jrobot *gobot.JSONRobot, err error) {
+func (a *API) jsonRobotFor(name string) (*gobot.JSONRobot, error) {
 	if robot := a.master.Robot(name); robot != nil {
-		jrobot = gobot.NewJSONRobot(robot)
-	} else {
-		err = errors.New("No Robot found with the name " + name)
+		return gobot.NewJSONRobot(robot), nil
 	}
-	return
+	return nil, fmt.Errorf("No Robot found with the name %s", name)
 }
 
-func (a *API) jsonDeviceFor(robot string, name string) (jdevice *gobot.JSONDevice, err error) {
+func (a *API) jsonDeviceFor(robot string, name string) (*gobot.JSONDevice, error) {
 	if device := a.master.Robot(robot).Device(name); device != nil {
-		jdevice = gobot.NewJSONDevice(device)
-	} else {
-		err = errors.New("No Device found with the name " + name)
+		return gobot.NewJSONDevice(device), nil
 	}
-	return
+
+	return nil, fmt.Errorf("No Device found with the name %s", name)
 }
 
-func (a *API) jsonConnectionFor(robot string, name string) (jconnection *gobot.JSONConnection, err error) {
+func (a *API) jsonConnectionFor(robot string, name string) (*gobot.JSONConnection, error) {
 	if connection := a.master.Robot(robot).Connection(name); connection != nil {
-		jconnection = gobot.NewJSONConnection(connection)
-	} else {
-		err = errors.New("No Connection found with the name " + name)
+		return gobot.NewJSONConnection(connection), nil
 	}
-	return
+
+	return nil, fmt.Errorf("No Connection found with the name %s", name)
 }

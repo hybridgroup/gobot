@@ -5,6 +5,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -24,8 +26,8 @@ func TestGenericAccessDriver(t *testing.T) {
 
 func TestGenericAccessDriverStartAndHalt(t *testing.T) {
 	d := initTestGenericAccessDriver()
-	assert.NoError(t, d.Start())
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
 }
 
 func TestGenericAccessDriverGetDeviceName(t *testing.T) {

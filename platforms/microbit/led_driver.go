@@ -44,106 +44,90 @@ func (b *LEDDriver) SetName(n string) { b.name = n }
 
 // adaptor returns BLE adaptor
 func (b *LEDDriver) adaptor() ble.BLEConnector {
+	//nolint:forcetypeassert // ok here
 	return b.Connection().(ble.BLEConnector)
 }
 
 // Start tells driver to get ready to do work
-func (b *LEDDriver) Start() (err error) {
-	return
-}
+func (b *LEDDriver) Start() error { return nil }
 
 // Halt stops LED driver (void)
-func (b *LEDDriver) Halt() (err error) {
-	return
-}
+func (b *LEDDriver) Halt() error { return nil }
 
 // ReadMatrix read the current LED matrix state
-func (b *LEDDriver) ReadMatrix() (data []byte, err error) {
-	data, err = b.adaptor().ReadCharacteristic(ledMatrixStateCharacteristic)
-	return
+func (b *LEDDriver) ReadMatrix() ([]byte, error) {
+	return b.adaptor().ReadCharacteristic(ledMatrixStateCharacteristic)
 }
 
 // WriteMatrix writes an array of 5 bytes to set the LED matrix
-func (b *LEDDriver) WriteMatrix(data []byte) (err error) {
-	err = b.adaptor().WriteCharacteristic(ledMatrixStateCharacteristic, data)
-	return
+func (b *LEDDriver) WriteMatrix(data []byte) error {
+	return b.adaptor().WriteCharacteristic(ledMatrixStateCharacteristic, data)
 }
 
 // WriteText writes a text message to the Microbit LED matrix
-func (b *LEDDriver) WriteText(msg string) (err error) {
-	err = b.adaptor().WriteCharacteristic(ledTextCharacteristic, []byte(msg))
-	return err
+func (b *LEDDriver) WriteText(msg string) error {
+	return b.adaptor().WriteCharacteristic(ledTextCharacteristic, []byte(msg))
 }
 
-func (b *LEDDriver) ReadScrollingDelay() (delay uint16, err error) {
-	return
+func (b *LEDDriver) ReadScrollingDelay() (uint16, error) {
+	return 0, nil
 }
 
-func (b *LEDDriver) WriteScrollingDelay(delay uint16) (err error) {
+func (b *LEDDriver) WriteScrollingDelay(delay uint16) error {
 	buf := []byte{byte(delay)}
-	err = b.adaptor().WriteCharacteristic(ledScrollingDelayCharacteristic, buf)
-	return
+	return b.adaptor().WriteCharacteristic(ledScrollingDelayCharacteristic, buf)
 }
 
 // Blank clears the LEDs on the Microbit
-func (b *LEDDriver) Blank() (err error) {
+func (b *LEDDriver) Blank() error {
 	buf := []byte{0x00, 0x00, 0x00, 0x00, 0x00}
-	err = b.WriteMatrix(buf)
-	return
+	return b.WriteMatrix(buf)
 }
 
 // Solid turns on all of the Microbit LEDs
-func (b *LEDDriver) Solid() (err error) {
+func (b *LEDDriver) Solid() error {
 	buf := []byte{0x1F, 0x1F, 0x1F, 0x1F, 0x1F}
-	err = b.WriteMatrix(buf)
-	return
+	return b.WriteMatrix(buf)
 }
 
 // UpRightArrow displays an arrow pointing upwards and to the right on the Microbit LEDs
-func (b *LEDDriver) UpRightArrow() (err error) {
+func (b *LEDDriver) UpRightArrow() error {
 	buf := []byte{0x0F, 0x03, 0x05, 0x09, 0x10}
-	err = b.WriteMatrix(buf)
-	return
+	return b.WriteMatrix(buf)
 }
 
 // UpLeftArrow displays an arrow pointing upwards and to the left on the Microbit LEDs
-func (b *LEDDriver) UpLeftArrow() (err error) {
+func (b *LEDDriver) UpLeftArrow() error {
 	buf := []byte{0x1E, 0x18, 0x14, 0x12, 0x01}
-	err = b.WriteMatrix(buf)
-	return
+	return b.WriteMatrix(buf)
 }
 
 // DownRightArrow displays an arrow pointing down and to the right on the Microbit LEDs
-func (b *LEDDriver) DownRightArrow() (err error) {
+func (b *LEDDriver) DownRightArrow() error {
 	buf := []byte{0x10, 0x09, 0x05, 0x03, 0x0F}
-	err = b.WriteMatrix(buf)
-	return
+	return b.WriteMatrix(buf)
 }
 
 // DownLeftArrow displays an arrow pointing down and to the left on the Microbit LEDs
-func (b *LEDDriver) DownLeftArrow() (err error) {
+func (b *LEDDriver) DownLeftArrow() error {
 	buf := []byte{0x01, 0x12, 0x14, 0x18, 0x1E}
-	err = b.WriteMatrix(buf)
-	return
+	return b.WriteMatrix(buf)
 }
 
 // Dimond displays a dimond on the Microbit LEDs
-func (b *LEDDriver) Dimond() (err error) {
+func (b *LEDDriver) Dimond() error {
 	buf := []byte{0x04, 0x0A, 0x11, 0x0A, 0x04}
-	err = b.WriteMatrix(buf)
-	return
+	return b.WriteMatrix(buf)
 }
 
 // Smile displays a smile on the Microbit LEDs
-func (b *LEDDriver) Smile() (err error) {
+func (b *LEDDriver) Smile() error {
 	buf := []byte{0x0A, 0x0A, 0x00, 0x11, 0x0E}
-	err = b.WriteMatrix(buf)
-	return
+	return b.WriteMatrix(buf)
 }
 
 // Wink displays a wink on the Microbit LEDs
-func (b *LEDDriver) Wink() (err error) {
+func (b *LEDDriver) Wink() error {
 	buf := []byte{0x08, 0x0B, 0x00, 0x11, 0x0E}
-	err = b.WriteMatrix(buf)
-	return
+	return b.WriteMatrix(buf)
 }

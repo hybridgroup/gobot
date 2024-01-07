@@ -147,6 +147,7 @@ func (b *Driver) SetName(n string) { b.name = n }
 
 // adaptor returns BLE adaptor
 func (b *Driver) adaptor() ble.BLEConnector {
+	//nolint:forcetypeassert // ok here
 	return b.Connection().(ble.BLEConnector)
 }
 
@@ -194,7 +195,9 @@ func (b *Driver) Init() error {
 // GenerateAllStates sets up all the default states aka settings on the drone
 func (b *Driver) GenerateAllStates() error {
 	b.stepsfa0b++
-	buf := []byte{0x04, byte(b.stepsfa0b), 0x00, 0x04, 0x01, 0x00, 0x32, 0x30, 0x31, 0x34, 0x2D, 0x31, 0x30, 0x2D, 0x32, 0x38, 0x00}
+	buf := []byte{
+		0x04, byte(b.stepsfa0b), 0x00, 0x04, 0x01, 0x00, 0x32, 0x30, 0x31, 0x34, 0x2D, 0x31, 0x30, 0x2D, 0x32, 0x38, 0x00,
+	}
 	return b.adaptor().WriteCharacteristic(commandCharacteristic, buf)
 }
 

@@ -50,27 +50,27 @@ func NewBH1750Driver(c Connector, options ...func(Config)) *BH1750Driver {
 }
 
 // RawSensorData returns the raw value from the bh1750
-func (h *BH1750Driver) RawSensorData() (level int, err error) {
+func (h *BH1750Driver) RawSensorData() (int, error) {
 	buf := []byte{0, 0}
 	bytesRead, err := h.connection.Read(buf)
-	if bytesRead != 2 {
-		err = errors.New("wrong number of bytes read")
-		return
-	}
 	if err != nil {
-		return
+		return 0, err
 	}
-	level = int(buf[0])<<8 | int(buf[1])
+	if bytesRead != 2 {
+		return 0, errors.New("wrong number of bytes read")
+	}
 
-	return
+	level := int(buf[0])<<8 | int(buf[1])
+
+	return level, nil
 }
 
 // Lux returns the adjusted value from the bh1750
-func (h *BH1750Driver) Lux() (lux int, err error) {
-	lux, err = h.RawSensorData()
-	lux = int(float64(lux) / 1.2)
+func (h *BH1750Driver) Lux() (int, error) {
+	rawLux, err := h.RawSensorData()
+	lux := int(float64(rawLux) / 1.2)
 
-	return
+	return lux, err
 }
 
 func (h *BH1750Driver) initialize() error {

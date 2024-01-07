@@ -43,7 +43,7 @@ const (
 	pcf8583CtrlStopCounting  PCF8583Control = 0x80 // 0: count, 1: stop counting, reset divider
 )
 
-// PCF8583Driver is a Gobot Driver for the PCF8583 clock and calendar chip & 240 x 8-bit bit RAM with 1 address program pin.
+// PCF8583Driver is a driver for the PCF8583 clock and calendar chip & 240 x 8-bit bit RAM with 1 address program pin.
 // please refer to data sheet: https://www.nxp.com/docs/en/data-sheet/PCF8583.pdf
 //
 // 0 1 0 1 0 0 0 A0|rd
@@ -81,35 +81,34 @@ func NewPCF8583Driver(c Connector, options ...func(Config)) *PCF8583Driver {
 	}
 
 	// API commands
+	//nolint:forcetypeassert // ok here
 	d.AddCommand("WriteTime", func(params map[string]interface{}) interface{} {
 		val := params["val"].(time.Time)
 		err := d.WriteTime(val)
 		return map[string]interface{}{"err": err}
 	})
-
 	d.AddCommand("ReadTime", func(params map[string]interface{}) interface{} {
 		val, err := d.ReadTime()
 		return map[string]interface{}{"val": val, "err": err}
 	})
-
+	//nolint:forcetypeassert // ok here
 	d.AddCommand("WriteCounter", func(params map[string]interface{}) interface{} {
 		val := params["val"].(int32)
 		err := d.WriteCounter(val)
 		return map[string]interface{}{"err": err}
 	})
-
 	d.AddCommand("ReadCounter", func(params map[string]interface{}) interface{} {
 		val, err := d.ReadCounter()
 		return map[string]interface{}{"val": val, "err": err}
 	})
-
+	//nolint:forcetypeassert // ok here
 	d.AddCommand("WriteRAM", func(params map[string]interface{}) interface{} {
 		address := params["address"].(uint8)
 		val := params["val"].(uint8)
 		err := d.WriteRAM(address, val)
 		return map[string]interface{}{"err": err}
 	})
-
+	//nolint:forcetypeassert // ok here
 	d.AddCommand("ReadRAM", func(params map[string]interface{}) interface{} {
 		address := params["address"].(uint8)
 		val, err := d.ReadRAM(address)
@@ -152,12 +151,15 @@ func (d *PCF8583Driver) WriteTime(val time.Time) error {
 	err = d.connection.WriteBlockData(uint8(pcf8583Reg_CTRL),
 		[]byte{
 			ctrlRegVal | uint8(pcf8583CtrlStopCounting),
-			pcf8583encodeBcd(uint8(val.Nanosecond() / 1000000 / 10)), // sub seconds in 1/10th seconds
+			// sub seconds in 1/10th seconds
+			pcf8583encodeBcd(uint8(val.Nanosecond() / 1000000 / 10)),
 			pcf8583encodeBcd(uint8(val.Second())),
 			pcf8583encodeBcd(uint8(val.Minute())),
 			pcf8583encodeBcd(uint8(val.Hour())),
-			pcf8583encodeBcd(uint8(day)),                             // year, date (we keep the year counter zero and set the offset)
-			uint8(val.Weekday())<<5 | pcf8583encodeBcd(uint8(month)), // month, weekday (not BCD): Sunday = 0, Monday = 1 ...
+			// year, date (we keep the year counter zero and set the offset)
+			pcf8583encodeBcd(uint8(day)),
+			// month, weekday (not BCD): Sunday = 0, Monday = 1 ...
+			uint8(val.Weekday())<<5 | pcf8583encodeBcd(uint8(month)),
 		})
 	if err != nil {
 		return err
@@ -167,7 +169,7 @@ func (d *PCF8583Driver) WriteTime(val time.Time) error {
 }
 
 // ReadTime reads the clock and returns the value
-func (d *PCF8583Driver) ReadTime() (val time.Time, err error) {
+func (d *PCF8583Driver) ReadTime() (time.Time, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
@@ -175,20 +177,20 @@ func (d *PCF8583Driver) ReadTime() (val time.Time, err error) {
 	// is not needed when reading with auto increment
 	ctrlRegVal, err := d.connection.ReadByteData(uint8(pcf8583Reg_CTRL))
 	if err != nil {
-		return
+		return time.Time{}, err
 	}
 	if !PCF8583Control(ctrlRegVal).isClockMode() {
-		return val, fmt.Errorf("%s: can't read time because the device is in wrong mode 0x%02x", d.name, ctrlRegVal)
+		return time.Time{}, fmt.Errorf("%s: can't read time because the device is in wrong mode 0x%02x", d.name, ctrlRegVal)
 	}
 	// auto increment feature is used
 	clockDataSize := 6
 	data := make([]byte, clockDataSize)
 	read, err := d.connection.Read(data)
 	if err != nil {
-		return
+		return time.Time{}, err
 	}
 	if read != clockDataSize {
-		return val, fmt.Errorf("%s: %d bytes read, but %d expected", d.name, read, clockDataSize)
+		return time.Time{}, fmt.Errorf("%s: %d bytes read, but %d expected", d.name, read, clockDataSize)
 	}
 	nanos := int(pcf8583decodeBcd(data[0])) * 1000000 * 10 // sub seconds in 1/10th seconds
 	seconds := int(pcf8583decodeBcd(data[1]))
@@ -231,7 +233,7 @@ func (d *PCF8583Driver) WriteCounter(val int32) error {
 }
 
 // ReadCounter reads the counter registers
-func (d *PCF8583Driver) ReadCounter() (val int32, err error) {
+func (d *PCF8583Driver) ReadCounter() (int32, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
@@ -239,20 +241,20 @@ func (d *PCF8583Driver) ReadCounter() (val int32, err error) {
 	// is not needed when reading with auto increment
 	ctrlRegVal, err := d.connection.ReadByteData(uint8(pcf8583Reg_CTRL))
 	if err != nil {
-		return
+		return 0, err
 	}
 	if !PCF8583Control(ctrlRegVal).isCounterMode() {
-		return val, fmt.Errorf("%s: can't read counter because the device is in wrong mode 0x%02x", d.name, ctrlRegVal)
+		return 0, fmt.Errorf("%s: can't read counter because the device is in wrong mode 0x%02x", d.name, ctrlRegVal)
 	}
 	// auto increment feature is used
 	counterDataSize := 3
 	data := make([]byte, counterDataSize)
 	read, err := d.connection.Read(data)
 	if err != nil {
-		return
+		return 0, err
 	}
 	if read != counterDataSize {
-		return val, fmt.Errorf("%s: %d bytes read, but %d expected", d.name, read, counterDataSize)
+		return 0, fmt.Errorf("%s: %d bytes read, but %d expected", d.name, read, counterDataSize)
 	}
 	return int32(pcf8583decodeBcd(data[0])) +
 		int32(pcf8583decodeBcd(data[1]))*100 +
@@ -272,13 +274,13 @@ func (d *PCF8583Driver) WriteRAM(address uint8, val uint8) error {
 }
 
 // ReadRAM reads a value from a given address (0x00-0xFF)
-func (d *PCF8583Driver) ReadRAM(address uint8) (val uint8, err error) {
+func (d *PCF8583Driver) ReadRAM(address uint8) (uint8, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
 	realAddress := uint16(address) + uint16(d.ramOffset)
 	if realAddress > 0xFF {
-		return val, fmt.Errorf("%s: RAM address overflow %d", d.name, realAddress)
+		return 0, fmt.Errorf("%s: RAM address overflow %d", d.name, realAddress)
 	}
 	return d.connection.ReadByteData(uint8(realAddress))
 }

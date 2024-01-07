@@ -1,3 +1,4 @@
+//nolint:forcetypeassert // ok here
 package ollie
 
 import (
@@ -7,6 +8,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/platforms/sphero"
 )
@@ -26,8 +29,8 @@ func TestOllieDriver(t *testing.T) {
 
 func TestOllieDriverStartAndHalt(t *testing.T) {
 	d := initTestOllieDriver()
-	assert.NoError(t, d.Start())
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
 }
 
 func TestLocatorData(t *testing.T) {
@@ -50,7 +53,9 @@ func TestLocatorData(t *testing.T) {
 
 	for _, point := range tables {
 		// 0x0B is the locator ID
-		packet := []byte{0xFF, 0xFF, 0x00, 0x00, 0x0B, point.x1, point.x2, point.y1, point.y2, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
+		packet := []byte{
+			0xFF, 0xFF, 0x00, 0x00, 0x0B, point.x1, point.x2, point.y1, point.y2, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		}
 
 		d.GetLocatorData(func(p Point2D) {
 			assert.Equal(t, point.y, p.Y)
@@ -64,12 +69,12 @@ func TestDataStreaming(t *testing.T) {
 
 	_ = d.SetDataStreamingConfig(sphero.DefaultDataStreamingConfig())
 
-	response := false
+	responseChan := make(chan bool)
 	_ = d.On("sensordata", func(data interface{}) {
 		cont := data.(DataStreamingPacket)
 		fmt.Printf("got streaming packet: %+v \n", cont)
 		assert.Equal(t, int16(10), cont.RawAccX)
-		response = true
+		responseChan <- true
 	})
 
 	// example data packet
@@ -95,8 +100,9 @@ func TestDataStreaming(t *testing.T) {
 
 	// send empty packet to indicate start of next message
 	d.HandleResponses([]byte{0xFF}, nil)
-	time.Sleep(10 * time.Millisecond)
-	if response == false {
+	select {
+	case <-responseChan:
+	case <-time.After(10 * time.Millisecond):
 		t.Error("no response received")
 	}
 }

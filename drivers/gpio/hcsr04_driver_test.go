@@ -9,6 +9,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"gobot.io/x/gobot/v2/drivers/aio"
 	"gobot.io/x/gobot/v2/system"
 )
 
@@ -16,7 +18,7 @@ func initTestHCSR04DriverWithStubbedAdaptor(triggerPinID string, echoPinID strin
 	a := newGpioTestAdaptor()
 	tpin := a.addDigitalPin(triggerPinID)
 	_ = a.addDigitalPin(echoPinID)
-	d := NewHCSR04Driver(a, triggerPinID, echoPinID, false)
+	d := NewHCSR04Driver(a, triggerPinID, echoPinID)
 	if err := d.Start(); err != nil {
 		panic(err)
 	}
@@ -33,21 +35,45 @@ func TestNewHCSR04Driver(t *testing.T) {
 	tpin := a.addDigitalPin(triggerPinID)
 	epin := a.addDigitalPin(echoPinID)
 	// act
-	d := NewHCSR04Driver(a, triggerPinID, echoPinID, false)
+	d := NewHCSR04Driver(a, triggerPinID, echoPinID)
 	// assert
 	assert.IsType(t, &HCSR04Driver{}, d)
-	assert.NotNil(t, d.Driver)
-	assert.True(t, strings.HasPrefix(d.name, "HCSR04"))
+	// assert: gpio.driver attributes
+	assert.NotNil(t, d.driver)
+	assert.True(t, strings.HasPrefix(d.driverCfg.name, "HCSR04"))
 	assert.Equal(t, a, d.connection)
-	assert.NoError(t, d.afterStart())
-	assert.NoError(t, d.beforeHalt())
+	require.NoError(t, d.afterStart())
+	require.NoError(t, d.beforeHalt())
 	assert.NotNil(t, d.Commander)
 	assert.NotNil(t, d.mutex)
+	// assert: driver specific attributes
+	assert.False(t, d.hcsr04Cfg.useEdgePolling)
 	assert.Equal(t, triggerPinID, d.triggerPinID)
 	assert.Equal(t, echoPinID, d.echoPinID)
-	assert.Equal(t, false, d.useEdgePolling)
+	assert.NotNil(t, d.measureMutex)
 	assert.Equal(t, tpin, d.triggerPin)
 	assert.Equal(t, epin, d.echoPin)
+}
+
+func TestNewHCSR04Driver_options(t *testing.T) {
+	// This is a general test, that options are applied in constructor by using the common WithName() option, least one
+	// option of this driver and one of another driver (which should lead to panic). Further tests for options can also
+	// be done by call of "WithOption(val).apply(cfg)".
+	// arrange
+	const (
+		myName     = "count up"
+		cycReadDur = 30 * time.Millisecond
+	)
+	panicFunc := func() {
+		NewHCSR04Driver(newGpioTestAdaptor(), "1", "2", WithName("crazy"),
+			aio.WithActuatorScaler(func(float64) int { return 0 }))
+	}
+	// act
+	d := NewHCSR04Driver(newGpioTestAdaptor(), "1", "2", WithName(myName), WithHCSR04UseEdgePolling())
+	// assert
+	assert.True(t, d.hcsr04Cfg.useEdgePolling)
+	assert.Equal(t, myName, d.Name())
+	assert.PanicsWithValue(t, "'scaler option for analog actuators' can not be applied on 'crazy'", panicFunc)
 }
 
 func TestHCSR04MeasureDistance(t *testing.T) {
@@ -115,11 +141,11 @@ func TestHCSR04MeasureDistance(t *testing.T) {
 			// assert
 			assert.Equal(t, tc.wantCallsWrite, numCallsWrite)
 			if tc.wantErr != "" {
-				assert.ErrorContains(t, err, tc.wantErr)
+				require.ErrorContains(t, err, tc.wantErr)
 			} else {
 				require.NoError(t, err)
 			}
-			assert.Equal(t, tc.wantVal, got)
+			assert.InDelta(t, tc.wantVal, got, 0.0)
 		})
 	}
 }
@@ -151,7 +177,7 @@ func TestHCSR04Distance(t *testing.T) {
 			// act
 			got := d.Distance()
 			// assert
-			assert.Equal(t, tc.wantVal, got)
+			assert.InDelta(t, tc.wantVal, got, 0.0)
 		})
 	}
 }
@@ -197,7 +223,7 @@ func TestHCSR04StartDistanceMonitor(t *testing.T) {
 			time.Sleep(1 * time.Millisecond) // < 160 ms
 			// assert
 			if tc.wantErr != "" {
-				assert.ErrorContains(t, err, tc.wantErr)
+				require.ErrorContains(t, err, tc.wantErr)
 			} else {
 				require.NoError(t, err)
 				assert.NotNil(t, d.distanceMonitorStopChan)
@@ -240,7 +266,7 @@ func TestHCSR04StopDistanceMonitor(t *testing.T) {
 			time.Sleep(1 * time.Millisecond) // < 160 ms
 			// assert
 			if tc.wantErr != "" {
-				assert.ErrorContains(t, err, tc.wantErr)
+				require.ErrorContains(t, err, tc.wantErr)
 			} else {
 				require.NoError(t, err)
 				assert.Nil(t, d.distanceMonitorStopChan)

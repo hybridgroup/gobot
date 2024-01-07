@@ -13,7 +13,7 @@ const systemDebug = false
 type File interface {
 	Write(b []byte) (n int, err error)
 	WriteString(s string) (ret int, err error)
-	Sync() (err error)
+	Sync() error
 	Read(b []byte) (n int, err error)
 	ReadAt(b []byte, off int64) (n int, err error)
 	Seek(offset int64, whence int) (ret int64, err error)
@@ -31,8 +31,15 @@ type filesystem interface {
 
 // systemCaller represents unexposed Syscall interface to allow the switch between native and mocked implementation
 // Prevent unsafe call, since go 1.15, see "Pattern 4" in: https://go101.org/article/unsafe.html
+// For go vet false positives, see: https://github.com/golang/go/issues/41205
 type systemCaller interface {
-	syscall(trap uintptr, f File, signal uintptr, payload unsafe.Pointer) (r1, r2 uintptr, err SyscallErrno)
+	syscall(
+		trap uintptr,
+		f File,
+		signal uintptr,
+		payload unsafe.Pointer,
+		address uint16,
+	) (r1, r2 uintptr, err SyscallErrno)
 }
 
 // digitalPinAccesser represents unexposed interface to allow the switch between different implementations and
@@ -65,7 +72,7 @@ func NewAccesser(options ...func(Optioner)) *Accesser {
 		fs:  &nativeFilesystem{},
 	}
 	s.spiAccess = &periphioSpiAccess{fs: s.fs}
-	s.digitalPinAccess = &sysfsDigitalPinAccess{fs: s.fs}
+	s.digitalPinAccess = &sysfsDigitalPinAccess{sfa: &sysfsFileAccess{fs: s.fs, readBufLen: 2}}
 	for _, option := range options {
 		option(s)
 	}
@@ -78,7 +85,7 @@ func (a *Accesser) UseDigitalPinAccessWithMockFs(digitalPinAccess string, files 
 	var dph digitalPinAccesser
 	switch digitalPinAccess {
 	case "sysfs":
-		dph = &sysfsDigitalPinAccess{fs: fs}
+		dph = &sysfsDigitalPinAccess{sfa: &sysfsFileAccess{fs: fs, readBufLen: 2}}
 	case "cdev":
 		dph = &gpiodDigitalPinAccess{fs: fs}
 	default:
@@ -128,7 +135,15 @@ func (a *Accesser) IsSysfsDigitalPinAccess() bool {
 
 // NewPWMPin returns a new system PWM pin, according to the given pin number.
 func (a *Accesser) NewPWMPin(path string, pin int, polNormIdent string, polInvIdent string) gobot.PWMPinner {
-	return newPWMPinSysfs(a.fs, path, pin, polNormIdent, polInvIdent)
+	sfa := &sysfsFileAccess{fs: a.fs, readBufLen: 200}
+	return newPWMPinSysfs(sfa, path, pin, polNormIdent, polInvIdent)
+}
+
+func (a *Accesser) NewAnalogPin(path string, r, w bool, readBufLen uint16) gobot.AnalogPinner {
+	if readBufLen == 0 {
+		readBufLen = 32 // max. count of characters for int value is 20
+	}
+	return newAnalogPinSysfs(&sysfsFileAccess{fs: a.fs, readBufLen: readBufLen}, path, r, w)
 }
 
 // NewSpiDevice returns a new connection to SPI with the given parameters.

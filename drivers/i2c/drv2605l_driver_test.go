@@ -8,6 +8,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -51,7 +53,7 @@ func TestDRV2605LOptions(t *testing.T) {
 
 func TestDRV2605LStart(t *testing.T) {
 	d := NewDRV2605LDriver(newI2cTestAdaptor())
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 }
 
 func TestDRV2605LHalt(t *testing.T) {
@@ -62,8 +64,9 @@ func TestDRV2605LHalt(t *testing.T) {
 	writeNewStandbyModeData := []byte{drv2605RegMode, 42 | drv2605Standby}
 	d, a := initTestDRV2605LDriverWithStubbedAdaptor()
 	a.written = []byte{}
-	assert.NoError(t, d.Halt())
-	assert.Equal(t, append(append(writeStopPlaybackData, readCurrentStandbyModeData), writeNewStandbyModeData...), a.written)
+	require.NoError(t, d.Halt())
+	assert.Equal(t, append(append(writeStopPlaybackData, readCurrentStandbyModeData), writeNewStandbyModeData...),
+		a.written)
 }
 
 func TestDRV2605LGetPause(t *testing.T) {
@@ -76,7 +79,7 @@ func TestDRV2605LGetPause(t *testing.T) {
 func TestDRV2605LSequenceTermination(t *testing.T) {
 	d, a := initTestDRV2605LDriverWithStubbedAdaptor()
 	a.written = []byte{}
-	assert.NoError(t, d.SetSequence([]byte{1, 2}))
+	require.NoError(t, d.SetSequence([]byte{1, 2}))
 	assert.Equal(t, []byte{
 		drv2605RegWaveSeq1, 1,
 		drv2605RegWaveSeq2, 2,
@@ -87,7 +90,7 @@ func TestDRV2605LSequenceTermination(t *testing.T) {
 func TestDRV2605LSequenceTruncation(t *testing.T) {
 	d, a := initTestDRV2605LDriverWithStubbedAdaptor()
 	a.written = []byte{}
-	assert.NoError(t, d.SetSequence([]byte{1, 2, 3, 4, 5, 6, 7, 8, 99, 100}))
+	require.NoError(t, d.SetSequence([]byte{1, 2, 3, 4, 5, 6, 7, 8, 99, 100}))
 	assert.Equal(t, []byte{
 		drv2605RegWaveSeq1, 1,
 		drv2605RegWaveSeq2, 2,
@@ -102,7 +105,7 @@ func TestDRV2605LSequenceTruncation(t *testing.T) {
 
 func TestDRV2605LSetMode(t *testing.T) {
 	d, _ := initTestDRV2605LDriverWithStubbedAdaptor()
-	assert.NoError(t, d.SetMode(DRV2605ModeIntTrig))
+	require.NoError(t, d.SetMode(DRV2605ModeIntTrig))
 }
 
 func TestDRV2605LSetModeReadError(t *testing.T) {
@@ -110,12 +113,12 @@ func TestDRV2605LSetModeReadError(t *testing.T) {
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		return 0, errors.New("read error")
 	}
-	assert.ErrorContains(t, d.SetMode(DRV2605ModeIntTrig), "read error")
+	require.ErrorContains(t, d.SetMode(DRV2605ModeIntTrig), "read error")
 }
 
 func TestDRV2605LSetStandbyMode(t *testing.T) {
 	d, _ := initTestDRV2605LDriverWithStubbedAdaptor()
-	assert.NoError(t, d.SetStandbyMode(true))
+	require.NoError(t, d.SetStandbyMode(true))
 }
 
 func TestDRV2605LSetStandbyModeReadError(t *testing.T) {
@@ -123,15 +126,15 @@ func TestDRV2605LSetStandbyModeReadError(t *testing.T) {
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		return 0, errors.New("read error")
 	}
-	assert.ErrorContains(t, d.SetStandbyMode(true), "read error")
+	require.ErrorContains(t, d.SetStandbyMode(true), "read error")
 }
 
 func TestDRV2605LSelectLibrary(t *testing.T) {
 	d, _ := initTestDRV2605LDriverWithStubbedAdaptor()
-	assert.NoError(t, d.SelectLibrary(1))
+	require.NoError(t, d.SelectLibrary(1))
 }
 
 func TestDRV2605LGo(t *testing.T) {
 	d, _ := initTestDRV2605LDriverWithStubbedAdaptor()
-	assert.NoError(t, d.Go())
+	require.NoError(t, d.Go())
 }

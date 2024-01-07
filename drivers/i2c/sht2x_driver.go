@@ -110,59 +110,59 @@ func NewSHT2xDriver(c Connector, options ...func(Config)) *SHT2xDriver {
 func (d *SHT2xDriver) Accuracy() byte { return d.accuracy }
 
 // SetAccuracy sets the accuracy of the sampling
-func (d *SHT2xDriver) SetAccuracy(acc byte) (err error) {
+func (d *SHT2xDriver) SetAccuracy(acc byte) error {
 	d.accuracy = acc
 
 	if d.connection != nil {
-		err = d.sendAccuracy()
+		return d.sendAccuracy()
 	}
 
-	return
+	return nil
 }
 
 // Reset does a software reset of the device
-func (d *SHT2xDriver) Reset() (err error) {
-	if err = d.connection.WriteByte(SHT2xSoftReset); err != nil {
-		return
+func (d *SHT2xDriver) Reset() error {
+	if err := d.connection.WriteByte(SHT2xSoftReset); err != nil {
+		return err
 	}
 
 	time.Sleep(15 * time.Millisecond) // 15ms delay (from the datasheet 5.5)
 
-	return
+	return nil
 }
 
 // Temperature returns the current temperature, in celsius degrees.
-func (d *SHT2xDriver) Temperature() (temp float32, err error) {
-	var rawT uint16
-	if rawT, err = d.readSensor(SHT2xTriggerTempMeasureNohold); err != nil {
-		return
+func (d *SHT2xDriver) Temperature() (float32, error) {
+	rawT, err := d.readSensor(SHT2xTriggerTempMeasureNohold)
+	if err != nil {
+		return 0, err
 	}
 
 	// From the datasheet 6.2:
 	// T[C] = -46.85 + 175.72 * St / 2^16
-	temp = -46.85 + 175.72/65536.0*float32(rawT)
+	temp := -46.85 + 175.72/65536.0*float32(rawT)
 
-	return
+	return temp, nil
 }
 
 // Humidity returns the current humidity in percentage of relative humidity
-func (d *SHT2xDriver) Humidity() (humidity float32, err error) {
-	var rawH uint16
-	if rawH, err = d.readSensor(SHT2xTriggerHumdMeasureNohold); err != nil {
-		return
+func (d *SHT2xDriver) Humidity() (float32, error) {
+	rawH, err := d.readSensor(SHT2xTriggerHumdMeasureNohold)
+	if err != nil {
+		return 0, err
 	}
 
 	// From the datasheet 6.1:
 	// RH = -6 + 125 * Srh / 2^16
-	humidity = -6.0 + 125.0/65536.0*float32(rawH)
+	humidity := -6.0 + 125.0/65536.0*float32(rawH)
 
-	return
+	return humidity, nil
 }
 
 // sendCommandDelayGetResponse is a helper function to reduce duplicated code
-func (d *SHT2xDriver) readSensor(cmd byte) (read uint16, err error) {
-	if err = d.connection.WriteByte(cmd); err != nil {
-		return
+func (d *SHT2xDriver) readSensor(cmd byte) (uint16, error) {
+	if err := d.connection.WriteByte(cmd); err != nil {
+		return 0, err
 	}
 
 	// Hang out while measurement is taken. 85ms max, page 9 of datasheet.
@@ -172,16 +172,14 @@ func (d *SHT2xDriver) readSensor(cmd byte) (read uint16, err error) {
 	buf := make([]byte, 3)
 	counter := 0
 	for {
-		var got int
-		got, err = d.connection.Read(buf)
+		got, err := d.connection.Read(buf)
 		counter++
 		if counter > 50 {
-			return
+			return 0, err
 		}
 		if err == nil {
 			if got != 3 {
-				err = ErrNotEnoughBytes
-				return
+				return 0, ErrNotEnoughBytes
 			}
 			break
 		}
@@ -191,13 +189,12 @@ func (d *SHT2xDriver) readSensor(cmd byte) (read uint16, err error) {
 	// Store the result
 	crc := crc8.Checksum(buf[0:2], d.crcTable)
 	if buf[2] != crc {
-		err = errors.New("Invalid crc")
-		return
+		return 0, errors.New("Invalid crc")
 	}
-	read = uint16(buf[0])<<8 | uint16(buf[1])
+	read := uint16(buf[0])<<8 | uint16(buf[1])
 	read &= 0xfffc // clear two low bits (status bits)
 
-	return
+	return read, nil
 }
 
 func (d *SHT2xDriver) initialize() error {
@@ -205,11 +202,7 @@ func (d *SHT2xDriver) initialize() error {
 		return err
 	}
 
-	if err := d.sendAccuracy(); err != nil {
-		return err
-	}
-
-	return nil
+	return d.sendAccuracy()
 }
 
 func (d *SHT2xDriver) sendAccuracy() error {
@@ -231,9 +224,6 @@ func (d *SHT2xDriver) sendAccuracy() error {
 		return err
 	}
 
-	if _, err := d.connection.ReadByte(); err != nil {
-		return err
-	}
-
-	return nil
+	_, err = d.connection.ReadByte()
+	return err
 }

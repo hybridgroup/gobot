@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	multierror "github.com/hashicorp/go-multierror"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/platforms/adaptors"
 	"gobot.io/x/gobot/v2/system"
@@ -41,81 +42,96 @@ type Adaptor struct {
 //
 //	adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs
 //	adaptors.WithSpiGpioAccess(sclk, nss, mosi, miso):	use GPIO's instead of /dev/spidev#.#
-func NewAdaptor(opts ...func(adaptors.Optioner)) *Adaptor {
+//
+//	Optional parameters for PWM, see [adaptors.NewPWMPinsAdaptor]
+func NewAdaptor(opts ...interface{}) *Adaptor {
 	sys := system.NewAccesser()
-	c := &Adaptor{
+	a := &Adaptor{
 		name: gobot.DefaultName("CHIP"),
 		sys:  sys,
 	}
 
-	c.pinmap = chipPins
+	a.pinmap = chipPins
 	baseAddr, _ := getXIOBase()
 	for i := 0; i < 8; i++ {
 		pin := fmt.Sprintf("XIO-P%d", i)
-		c.pinmap[pin] = sysfsPin{pin: baseAddr + i, pwmPin: -1}
+		a.pinmap[pin] = sysfsPin{pin: baseAddr + i, pwmPin: -1}
 	}
 
-	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.translateDigitalPin, opts...)
-	c.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, c.translatePWMPin)
-	c.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, c.validateI2cBusNumber, defaultI2cBusNumber)
-	return c
+	var digitalPinsOpts []func(adaptors.DigitalPinsOptioner)
+	var pwmPinsOpts []adaptors.PwmPinsOptionApplier
+	for _, opt := range opts {
+		switch o := opt.(type) {
+		case func(adaptors.DigitalPinsOptioner):
+			digitalPinsOpts = append(digitalPinsOpts, o)
+		case adaptors.PwmPinsOptionApplier:
+			pwmPinsOpts = append(pwmPinsOpts, o)
+		default:
+			panic(fmt.Sprintf("'%s' can not be applied on adaptor '%s'", opt, a.name))
+		}
+	}
+
+	a.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, a.translateDigitalPin, digitalPinsOpts...)
+	a.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, a.translatePWMPin, pwmPinsOpts...)
+	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, a.validateI2cBusNumber, defaultI2cBusNumber)
+	return a
 }
 
 // NewProAdaptor creates a C.H.I.P. Pro Adaptor
 func NewProAdaptor() *Adaptor {
-	c := NewAdaptor()
-	c.name = gobot.DefaultName("CHIP Pro")
-	c.pinmap = chipProPins
-	return c
+	a := NewAdaptor()
+	a.name = gobot.DefaultName("CHIP Pro")
+	a.pinmap = chipProPins
+	return a
 }
 
 // Name returns the name of the Adaptor
-func (c *Adaptor) Name() string { return c.name }
+func (a *Adaptor) Name() string { return a.name }
 
 // SetName sets the name of the Adaptor
-func (c *Adaptor) SetName(n string) { c.name = n }
+func (a *Adaptor) SetName(n string) { a.name = n }
 
 // Connect create new connection to board and pins.
-func (c *Adaptor) Connect() error {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
+func (a *Adaptor) Connect() error {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
 
-	if err := c.I2cBusAdaptor.Connect(); err != nil {
+	if err := a.I2cBusAdaptor.Connect(); err != nil {
 		return err
 	}
 
-	if err := c.PWMPinsAdaptor.Connect(); err != nil {
+	if err := a.PWMPinsAdaptor.Connect(); err != nil {
 		return err
 	}
-	return c.DigitalPinsAdaptor.Connect()
+	return a.DigitalPinsAdaptor.Connect()
 }
 
 // Finalize closes connection to board and pins
-func (c *Adaptor) Finalize() error {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
+func (a *Adaptor) Finalize() error {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
 
-	err := c.DigitalPinsAdaptor.Finalize()
+	err := a.DigitalPinsAdaptor.Finalize()
 
-	if e := c.PWMPinsAdaptor.Finalize(); e != nil {
+	if e := a.PWMPinsAdaptor.Finalize(); e != nil {
 		err = multierror.Append(err, e)
 	}
 
-	if e := c.I2cBusAdaptor.Finalize(); e != nil {
+	if e := a.I2cBusAdaptor.Finalize(); e != nil {
 		err = multierror.Append(err, e)
 	}
 
 	return err
 }
 
-func getXIOBase() (baseAddr int, err error) {
+func getXIOBase() (int, error) {
 	// Default to original base from 4.3 kernel
-	baseAddr = 408
+	baseAddr := 408
 	const expanderID = "pcf8574a"
 
 	labels, err := filepath.Glob("/sys/class/gpio/*/label")
 	if err != nil {
-		return
+		return baseAddr, err
 	}
 
 	for _, labelPath := range labels {
@@ -138,7 +154,7 @@ func getXIOBase() (baseAddr int, err error) {
 	return baseAddr, nil
 }
 
-func (c *Adaptor) validateI2cBusNumber(busNr int) error {
+func (a *Adaptor) validateI2cBusNumber(busNr int) error {
 	// Valid bus number is [0..2] which corresponds to /dev/i2c-0 through /dev/i2c-2.
 	if (busNr < 0) || (busNr > 2) {
 		return fmt.Errorf("Bus number %d out of range", busNr)
@@ -146,15 +162,15 @@ func (c *Adaptor) validateI2cBusNumber(busNr int) error {
 	return nil
 }
 
-func (c *Adaptor) translateDigitalPin(id string) (string, int, error) {
-	if val, ok := c.pinmap[id]; ok {
+func (a *Adaptor) translateDigitalPin(id string) (string, int, error) {
+	if val, ok := a.pinmap[id]; ok {
 		return "", val.pin, nil
 	}
 	return "", -1, fmt.Errorf("'%s' is not a valid id for a digital pin", id)
 }
 
-func (c *Adaptor) translatePWMPin(id string) (string, int, error) {
-	sysPin, ok := c.pinmap[id]
+func (a *Adaptor) translatePWMPin(id string) (string, int, error) {
+	sysPin, ok := a.pinmap[id]
 	if !ok {
 		return "", -1, fmt.Errorf("'%s' is not a valid id for a pin", id)
 	}

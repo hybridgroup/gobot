@@ -5,8 +5,9 @@ import (
 	"io"
 	"log"
 
-	"gobot.io/x/gobot/v2"
 	"golang.org/x/net/websocket"
+
+	"gobot.io/x/gobot/v2"
 )
 
 const (
@@ -39,6 +40,7 @@ func NewDriver(a *Adaptor) *Driver {
 		connection: a,
 		Eventer:    gobot.NewEventer(),
 		receive: func(ws io.ReadWriteCloser, msg *[]byte) {
+			//nolint:forcetypeassert // ok here
 			if err := websocket.Message.Receive(ws.(*websocket.Conn), msg); err != nil {
 				panic(err)
 			}
@@ -62,6 +64,7 @@ func (l *Driver) Connection() gobot.Connection { return l.connection }
 
 // adaptor returns leap motion adaptor
 func (l *Driver) adaptor() *Adaptor {
+	//nolint:forcetypeassert // ok here
 	return l.Connection().(*Adaptor)
 }
 

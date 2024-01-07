@@ -115,6 +115,7 @@ func (n *Driver) SetName(name string) { n.name = name }
 
 // adaptor returns neurosky adaptor
 func (n *Driver) adaptor() *Adaptor {
+	//nolint:forcetypeassert // ok here
 	return n.Connection().(*Adaptor)
 }
 
@@ -124,7 +125,7 @@ func (n *Driver) Start() error {
 	go func() {
 		for {
 			buff := make([]byte, 1024)
-			_, err := n.adaptor().sp.Read(buff[:])
+			_, err := n.adaptor().sp.Read(buff)
 			if err != nil {
 				n.Publish(n.Event("error"), err)
 			} else {

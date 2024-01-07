@@ -1,15 +1,5 @@
 package tinkerboard
 
-type cdevPin struct {
-	chip uint8
-	line uint8
-}
-
-type gpioPinDefinition struct {
-	sysfs int
-	cdev  cdevPin
-}
-
 // notes for character device
 // pins: A=0+Nr, B=8+Nr, C=16+Nr
 // tested: armbian Linux, OK: work as input and output, IN: work only as input
@@ -49,4 +39,10 @@ var pwmPinDefinitions = map[string]pwmPinDefinition{
 	"33": {dir: "/sys/devices/platform/ff680020.pwm/pwm/", dirRegexp: "pwmchip[0|1|2]$", channel: 0},
 	// GPIO7_C7_UART2TX_PWM3
 	"32": {dir: "/sys/devices/platform/ff680030.pwm/pwm/", dirRegexp: "pwmchip[0|1|2|3]$", channel: 0},
+}
+
+var analogPinDefinitions = map[string]analogPinDefinition{
+	// +/-273.200 °C need >=7 characters to read: +/-273200 millidegree Celsius
+	"thermal_zone0": {path: "/sys/class/thermal/thermal_zone0/temp", r: true, w: false, bufLen: 7},
+	"thermal_zone1": {path: "/sys/class/thermal/thermal_zone1/temp", r: true, w: false, bufLen: 7},
 }

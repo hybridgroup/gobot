@@ -9,6 +9,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/gpio"
 	"gobot.io/x/gobot/v2/drivers/i2c"
@@ -59,20 +61,17 @@ func TestFinalize(t *testing.T) {
 	_ = a.DigitalWrite("3", 1)
 
 	_, _ = a.GetI2cConnection(0xff, 0)
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.Finalize())
 }
 
 func TestPWMPinsConnect(t *testing.T) {
 	a := NewAdaptor()
-	assert.Equal(t, (map[string]gobot.PWMPinner)(nil), a.pwmPins)
 
 	err := a.PwmWrite("33", 1)
-	assert.ErrorContains(t, err, "not connected")
+	require.ErrorContains(t, err, "not connected")
 
 	err = a.Connect()
-	assert.NoError(t, err)
-	assert.NotEqual(t, (map[string]gobot.PWMPinner)(nil), a.pwmPins)
-	assert.Equal(t, 0, len(a.pwmPins))
+	require.NoError(t, err)
 }
 
 func TestPWMPinsReConnect(t *testing.T) {
@@ -82,18 +81,16 @@ func TestPWMPinsReConnect(t *testing.T) {
 		"/sys/class/pwm/pwmchip0/unexport",
 		"/sys/class/pwm/pwmchip0/pwm2/duty_cycle",
 		"/sys/class/pwm/pwmchip0/pwm2/period",
+		"/sys/class/pwm/pwmchip0/pwm2/polarity",
 		"/sys/class/pwm/pwmchip0/pwm2/enable",
 	}
 	a, _ := initTestAdaptorWithMockedFilesystem(mockPaths)
-	assert.Equal(t, 0, len(a.pwmPins))
-	assert.NoError(t, a.PwmWrite("33", 1))
-	assert.Equal(t, 1, len(a.pwmPins))
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.PwmWrite("33", 1))
+	require.NoError(t, a.Finalize())
 	// act
 	err := a.Connect()
 	// assert
-	assert.NoError(t, err)
-	assert.Equal(t, 0, len(a.pwmPins))
+	require.NoError(t, err)
 }
 
 func TestDigitalIO(t *testing.T) {
@@ -108,17 +105,17 @@ func TestDigitalIO(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem(mockPaths)
 
 	err := a.DigitalWrite("7", 1)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "1", fs.Files["/sys/class/gpio/gpio216/value"].Contents)
 
 	err = a.DigitalWrite("13", 1)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	i, err := a.DigitalRead("13")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, 1, i)
 
-	assert.ErrorContains(t, a.DigitalWrite("notexist", 1), "'notexist' is not a valid id for a digital pin")
-	assert.NoError(t, a.Finalize())
+	require.ErrorContains(t, a.DigitalWrite("notexist", 1), "'notexist' is not a valid id for a digital pin")
+	require.NoError(t, a.Finalize())
 }
 
 func TestDigitalPinConcurrency(t *testing.T) {
@@ -163,16 +160,16 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	a := NewAdaptor()
 	a.sys.UseMockSyscall()
 	fs := a.sys.UseMockFilesystem([]string{"/dev/i2c-1"})
-	assert.NoError(t, a.Connect())
+	require.NoError(t, a.Connect())
 	con, err := a.GetI2cConnection(0xff, 1)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	_, err = con.Write([]byte{0xbf})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	fs.WithCloseError = true
 	// act
 	err = a.Finalize()
 	// assert
-	assert.Contains(t, err.Error(), "close error")
+	require.ErrorContains(t, err, "close error")
 }
 
 func Test_validateSpiBusNumber(t *testing.T) {
@@ -235,6 +232,38 @@ func Test_validateI2cBusNumber(t *testing.T) {
 			err := a.validateI2cBusNumber(tc.busNr)
 			// assert
 			assert.Equal(t, tc.wantErr, err)
+		})
+	}
+}
+
+func Test_translatePWMPin(t *testing.T) {
+	tests := map[string]struct {
+		pin         string
+		wantDir     string
+		wantChannel int
+		wantErr     error
+	}{
+		"32_pwm0": {
+			pin:         "32",
+			wantDir:     "/sys/class/pwm/pwmchip0",
+			wantChannel: 0,
+		},
+		"33_pwm2": {
+			pin:         "33",
+			wantDir:     "/sys/class/pwm/pwmchip0",
+			wantChannel: 2,
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			a := NewAdaptor()
+			// act
+			dir, channel, err := a.translatePWMPin(tc.pin)
+			// assert
+			assert.Equal(t, tc.wantErr, err)
+			assert.Equal(t, tc.wantDir, dir)
+			assert.Equal(t, tc.wantChannel, channel)
 		})
 	}
 }

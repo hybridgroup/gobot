@@ -46,17 +46,17 @@ type i2cConnection struct {
 }
 
 // NewConnection creates and returns a new connection to a specific i2c device on a bus and address.
-func NewConnection(bus gobot.I2cSystemDevicer, address int) (connection *i2cConnection) {
+func NewConnection(bus gobot.I2cSystemDevicer, address int) *i2cConnection {
 	return &i2cConnection{bus: bus, address: address}
 }
 
 // Read data from an i2c device.
-func (c *i2cConnection) Read(data []byte) (read int, err error) {
+func (c *i2cConnection) Read(data []byte) (int, error) {
 	return c.bus.Read(c.address, data)
 }
 
 // Write data to an i2c device.
-func (c *i2cConnection) Write(data []byte) (written int, err error) {
+func (c *i2cConnection) Write(data []byte) (int, error) {
 	return c.bus.Write(c.address, data)
 }
 
@@ -96,17 +96,17 @@ func (c *i2cConnection) WriteByteData(reg uint8, val uint8) error {
 }
 
 // WriteWordData writes a word value to a register on the i2c device.
-func (c *i2cConnection) WriteWordData(reg uint8, val uint16) (err error) {
+func (c *i2cConnection) WriteWordData(reg uint8, val uint16) error {
 	return c.bus.WriteWordData(c.address, reg, val)
 }
 
 // WriteBlockData writes a block of bytes to a register on the i2c device.
-func (c *i2cConnection) WriteBlockData(reg uint8, b []byte) (err error) {
+func (c *i2cConnection) WriteBlockData(reg uint8, b []byte) error {
 	return c.bus.WriteBlockData(c.address, reg, b)
 }
 
 // WriteBytes writes a block of bytes to the current register on the i2c device.
-func (c *i2cConnection) WriteBytes(b []byte) (err error) {
+func (c *i2cConnection) WriteBytes(b []byte) error {
 	return c.bus.WriteBytes(c.address, b)
 }
 

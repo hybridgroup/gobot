@@ -3,9 +3,9 @@ package sphero
 import (
 	"io"
 
-	"gobot.io/x/gobot/v2"
-
 	"go.bug.st/serial"
+
+	"gobot.io/x/gobot/v2"
 )
 
 // Adaptor represents a Connection to a Sphero
@@ -41,21 +41,21 @@ func (a *Adaptor) Port() string { return a.port }
 func (a *Adaptor) SetPort(p string) { a.port = p }
 
 // Connect initiates a connection to the Sphero. Returns true on successful connection.
-func (a *Adaptor) Connect() (err error) {
-	sp, e := a.connect(a.Port())
-	if e != nil {
-		return e
+func (a *Adaptor) Connect() error {
+	sp, err := a.connect(a.Port())
+	if err != nil {
+		return err
 	}
 
 	a.sp = sp
 	a.connected = true
-	return
+	return nil
 }
 
 // Reconnect attempts to reconnect to the Sphero. If the Sphero has an active connection
 // it will first close that connection and then establish a new connection.
 // Returns true on Successful reconnection
-func (a *Adaptor) Reconnect() (err error) {
+func (a *Adaptor) Reconnect() error {
 	if a.connected {
 		if err := a.Disconnect(); err != nil {
 			return err
@@ -67,8 +67,8 @@ func (a *Adaptor) Reconnect() (err error) {
 // Disconnect terminates the connection to the Sphero. Returns true on successful disconnect.
 func (a *Adaptor) Disconnect() error {
 	if a.connected {
-		if e := a.sp.Close(); e != nil {
-			return e
+		if err := a.sp.Close(); err != nil {
+			return err
 		}
 		a.connected = false
 	}

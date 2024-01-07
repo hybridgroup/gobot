@@ -1,11 +1,12 @@
 package edison
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/aio"
 	"gobot.io/x/gobot/v2/drivers/gpio"
@@ -235,7 +236,7 @@ func TestConnect(t *testing.T) {
 
 	assert.Equal(t, 6, a.DefaultI2cBus())
 	assert.Equal(t, "arduino", a.board)
-	assert.NoError(t, a.Connect())
+	require.NoError(t, a.Connect())
 }
 
 func TestArduinoSetupFail263(t *testing.T) {
@@ -243,7 +244,7 @@ func TestArduinoSetupFail263(t *testing.T) {
 	delete(fs.Files, "/sys/class/gpio/gpio263/direction")
 
 	err := a.arduinoSetup()
-	assert.Contains(t, err.Error(), "/sys/class/gpio/gpio263/direction: no such file")
+	require.ErrorContains(t, err, "/sys/class/gpio/gpio263/direction: no such file")
 }
 
 func TestArduinoSetupFail240(t *testing.T) {
@@ -251,7 +252,7 @@ func TestArduinoSetupFail240(t *testing.T) {
 	delete(fs.Files, "/sys/class/gpio/gpio240/direction")
 
 	err := a.arduinoSetup()
-	assert.Contains(t, err.Error(), "/sys/class/gpio/gpio240/direction: no such file")
+	require.ErrorContains(t, err, "/sys/class/gpio/gpio240/direction: no such file")
 }
 
 func TestArduinoSetupFail111(t *testing.T) {
@@ -259,7 +260,7 @@ func TestArduinoSetupFail111(t *testing.T) {
 	delete(fs.Files, "/sys/kernel/debug/gpio_debug/gpio111/current_pinmux")
 
 	err := a.arduinoSetup()
-	assert.Contains(t, err.Error(), "/sys/kernel/debug/gpio_debug/gpio111/current_pinmux: no such file")
+	require.ErrorContains(t, err, "/sys/kernel/debug/gpio_debug/gpio111/current_pinmux: no such file")
 }
 
 func TestArduinoSetupFail131(t *testing.T) {
@@ -267,56 +268,56 @@ func TestArduinoSetupFail131(t *testing.T) {
 	delete(fs.Files, "/sys/kernel/debug/gpio_debug/gpio131/current_pinmux")
 
 	err := a.arduinoSetup()
-	assert.Contains(t, err.Error(), "/sys/kernel/debug/gpio_debug/gpio131/current_pinmux: no such file")
+	require.ErrorContains(t, err, "/sys/kernel/debug/gpio_debug/gpio131/current_pinmux: no such file")
 }
 
 func TestArduinoI2CSetupFailTristate(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
-	assert.NoError(t, a.arduinoSetup())
+	require.NoError(t, a.arduinoSetup())
 
 	fs.WithWriteError = true
 	err := a.arduinoI2CSetup()
-	assert.ErrorContains(t, err, "write error")
+	require.ErrorContains(t, err, "write error")
 }
 
 func TestArduinoI2CSetupFail14(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 
-	assert.NoError(t, a.arduinoSetup())
+	require.NoError(t, a.arduinoSetup())
 	delete(fs.Files, "/sys/class/gpio/gpio14/direction")
 
 	err := a.arduinoI2CSetup()
-	assert.Contains(t, err.Error(), "/sys/class/gpio/gpio14/direction: no such file")
+	require.ErrorContains(t, err, "/sys/class/gpio/gpio14/direction: no such file")
 }
 
 func TestArduinoI2CSetupUnexportFail(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 
-	assert.NoError(t, a.arduinoSetup())
+	require.NoError(t, a.arduinoSetup())
 	delete(fs.Files, "/sys/class/gpio/unexport")
 
 	err := a.arduinoI2CSetup()
-	assert.Contains(t, err.Error(), "/sys/class/gpio/unexport: no such file")
+	require.ErrorContains(t, err, "/sys/class/gpio/unexport: no such file")
 }
 
 func TestArduinoI2CSetupFail236(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 
-	assert.NoError(t, a.arduinoSetup())
+	require.NoError(t, a.arduinoSetup())
 	delete(fs.Files, "/sys/class/gpio/gpio236/direction")
 
 	err := a.arduinoI2CSetup()
-	assert.Contains(t, err.Error(), "/sys/class/gpio/gpio236/direction: no such file")
+	require.ErrorContains(t, err, "/sys/class/gpio/gpio236/direction: no such file")
 }
 
 func TestArduinoI2CSetupFail28(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 
-	assert.NoError(t, a.arduinoSetup())
+	require.NoError(t, a.arduinoSetup())
 	delete(fs.Files, "/sys/kernel/debug/gpio_debug/gpio28/current_pinmux")
 
 	err := a.arduinoI2CSetup()
-	assert.Contains(t, err.Error(), "/sys/kernel/debug/gpio_debug/gpio28/current_pinmux: no such file")
+	require.ErrorContains(t, err, "/sys/kernel/debug/gpio_debug/gpio28/current_pinmux: no such file")
 }
 
 func TestConnectArduinoError(t *testing.T) {
@@ -324,7 +325,7 @@ func TestConnectArduinoError(t *testing.T) {
 	fs.WithWriteError = true
 
 	err := a.Connect()
-	assert.Contains(t, err.Error(), "write error")
+	require.ErrorContains(t, err, "write error")
 }
 
 func TestConnectArduinoWriteError(t *testing.T) {
@@ -332,13 +333,13 @@ func TestConnectArduinoWriteError(t *testing.T) {
 	fs.WithWriteError = true
 
 	err := a.Connect()
-	assert.Contains(t, err.Error(), "write error")
+	require.ErrorContains(t, err, "write error")
 }
 
 func TestConnectSparkfun(t *testing.T) {
 	a, _ := initTestAdaptorWithMockedFilesystem("sparkfun")
 
-	assert.NoError(t, a.Connect())
+	require.NoError(t, a.Connect())
 	assert.Equal(t, 1, a.DefaultI2cBus())
 	assert.Equal(t, "sparkfun", a.board)
 }
@@ -346,7 +347,7 @@ func TestConnectSparkfun(t *testing.T) {
 func TestConnectMiniboard(t *testing.T) {
 	a, _ := initTestAdaptorWithMockedFilesystem("miniboard")
 
-	assert.NoError(t, a.Connect())
+	require.NoError(t, a.Connect())
 	assert.Equal(t, 1, a.DefaultI2cBus())
 	assert.Equal(t, "miniboard", a.board)
 }
@@ -355,52 +356,52 @@ func TestConnectUnknown(t *testing.T) {
 	a := NewAdaptor("wha")
 
 	err := a.Connect()
-	assert.Contains(t, err.Error(), "Unknown board type: wha")
+	require.ErrorContains(t, err, "Unknown board type: wha")
 }
 
 func TestFinalize(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 
 	_ = a.DigitalWrite("3", 1)
-	_ = a.PwmWrite("5", 100)
+	require.NoError(t, a.PwmWrite("5", 100))
 
 	_, _ = a.GetI2cConnection(0xff, 6)
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.Finalize())
 
 	// assert that finalize after finalize is working
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.Finalize())
 
 	// assert that re-connect is working
-	_ = a.Connect()
+	require.NoError(t, a.Connect())
 	// remove one file to force Finalize error
 	delete(fs.Files, "/sys/class/gpio/unexport")
 	err := a.Finalize()
-	assert.Contains(t, err.Error(), "1 error occurred")
-	assert.Contains(t, err.Error(), "/sys/class/gpio/unexport")
+	require.ErrorContains(t, err, "1 error occurred")
+	require.ErrorContains(t, err, "/sys/class/gpio/unexport")
 }
 
 func TestFinalizeError(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 
-	_ = a.PwmWrite("5", 100)
+	require.NoError(t, a.PwmWrite("5", 100))
 
 	fs.WithWriteError = true
 	err := a.Finalize()
-	assert.Contains(t, err.Error(), "6 errors occurred")
-	assert.Contains(t, err.Error(), "write error")
-	assert.Contains(t, err.Error(), "SetEnabled(false) failed for id 1 with write error")
-	assert.Contains(t, err.Error(), "Unexport() failed for id 1 with write error")
+	require.ErrorContains(t, err, "6 errors occurred")
+	require.ErrorContains(t, err, "write error")
+	require.ErrorContains(t, err, "SetEnabled(false) failed for id 1 with write error")
+	require.ErrorContains(t, err, "Unexport() failed for id 1 with write error")
 }
 
 func TestDigitalIO(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 
-	_ = a.DigitalWrite("13", 1)
+	require.NoError(t, a.DigitalWrite("13", 1))
 	assert.Equal(t, "1", fs.Files["/sys/class/gpio/gpio40/value"].Contents)
 
-	_ = a.DigitalWrite("2", 0)
+	require.NoError(t, a.DigitalWrite("2", 0))
 	i, err := a.DigitalRead("2")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, 0, i)
 }
 
@@ -409,10 +410,10 @@ func TestDigitalPinInFileError(t *testing.T) {
 	fs := a.sys.UseMockFilesystem(pwmMockPathsMux40)
 	delete(fs.Files, "/sys/class/gpio/gpio40/value")
 	delete(fs.Files, "/sys/class/gpio/gpio40/direction")
-	_ = a.Connect()
+	_ = a.Connect() // we drop this error
 
 	_, err := a.DigitalPin("13")
-	assert.Contains(t, err.Error(), "no such file")
+	require.ErrorContains(t, err, "no such file")
 }
 
 func TestDigitalPinInResistorFileError(t *testing.T) {
@@ -420,10 +421,10 @@ func TestDigitalPinInResistorFileError(t *testing.T) {
 	fs := a.sys.UseMockFilesystem(pwmMockPathsMux40)
 	delete(fs.Files, "/sys/class/gpio/gpio229/value")
 	delete(fs.Files, "/sys/class/gpio/gpio229/direction")
-	_ = a.Connect()
+	_ = a.Connect() // we drop this error
 
 	_, err := a.DigitalPin("13")
-	assert.Contains(t, err.Error(), "no such file")
+	require.ErrorContains(t, err, "no such file")
 }
 
 func TestDigitalPinInLevelShifterFileError(t *testing.T) {
@@ -431,10 +432,10 @@ func TestDigitalPinInLevelShifterFileError(t *testing.T) {
 	fs := a.sys.UseMockFilesystem(pwmMockPathsMux40)
 	delete(fs.Files, "/sys/class/gpio/gpio261/value")
 	delete(fs.Files, "/sys/class/gpio/gpio261/direction")
-	_ = a.Connect()
+	_ = a.Connect() // we drop this error
 
 	_, err := a.DigitalPin("13")
-	assert.Contains(t, err.Error(), "no such file")
+	require.ErrorContains(t, err, "no such file")
 }
 
 func TestDigitalPinInMuxFileError(t *testing.T) {
@@ -442,10 +443,10 @@ func TestDigitalPinInMuxFileError(t *testing.T) {
 	fs := a.sys.UseMockFilesystem(pwmMockPathsMux40)
 	delete(fs.Files, "/sys/class/gpio/gpio243/value")
 	delete(fs.Files, "/sys/class/gpio/gpio243/direction")
-	_ = a.Connect()
+	_ = a.Connect() // we drop this error
 
 	_, err := a.DigitalPin("13")
-	assert.Contains(t, err.Error(), "no such file")
+	require.ErrorContains(t, err, "no such file")
 }
 
 func TestDigitalWriteError(t *testing.T) {
@@ -453,7 +454,7 @@ func TestDigitalWriteError(t *testing.T) {
 	fs.WithWriteError = true
 
 	err := a.DigitalWrite("13", 1)
-	assert.ErrorContains(t, err, "write error")
+	require.ErrorContains(t, err, "write error")
 }
 
 func TestDigitalReadWriteError(t *testing.T) {
@@ -461,18 +462,18 @@ func TestDigitalReadWriteError(t *testing.T) {
 	fs.WithWriteError = true
 
 	_, err := a.DigitalRead("13")
-	assert.ErrorContains(t, err, "write error")
+	require.ErrorContains(t, err, "write error")
 }
 
 func TestPwm(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 
 	err := a.PwmWrite("5", 100)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "1960", fs.Files["/sys/class/pwm/pwmchip0/pwm1/duty_cycle"].Contents)
 
 	err = a.PwmWrite("7", 100)
-	assert.ErrorContains(t, err, "'7' is not a valid id for a PWM pin")
+	require.ErrorContains(t, err, "'7' is not a valid id for a PWM pin")
 }
 
 func TestPwmExportError(t *testing.T) {
@@ -480,20 +481,20 @@ func TestPwmExportError(t *testing.T) {
 	fs := a.sys.UseMockFilesystem(pwmMockPathsMux13Arduino)
 	delete(fs.Files, "/sys/class/pwm/pwmchip0/export")
 	err := a.Connect()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	err = a.PwmWrite("5", 100)
-	assert.Contains(t, err.Error(), "/sys/class/pwm/pwmchip0/export: no such file")
+	require.ErrorContains(t, err, "/sys/class/pwm/pwmchip0/export: no such file")
 }
 
 func TestPwmEnableError(t *testing.T) {
 	a := NewAdaptor()
 	fs := a.sys.UseMockFilesystem(pwmMockPathsMux13)
 	delete(fs.Files, "/sys/class/pwm/pwmchip0/pwm1/enable")
-	_ = a.Connect()
+	_ = a.Connect() // we drop this error
 
 	err := a.PwmWrite("5", 100)
-	assert.Contains(t, err.Error(), "/sys/class/pwm/pwmchip0/pwm1/enable: no such file")
+	require.ErrorContains(t, err, "/sys/class/pwm/pwmchip0/pwm1/enable: no such file")
 }
 
 func TestPwmWritePinError(t *testing.T) {
@@ -501,7 +502,7 @@ func TestPwmWritePinError(t *testing.T) {
 	fs.WithWriteError = true
 
 	err := a.PwmWrite("5", 100)
-	assert.ErrorContains(t, err, "write error")
+	require.ErrorContains(t, err, "write error")
 }
 
 func TestPwmWriteError(t *testing.T) {
@@ -509,7 +510,7 @@ func TestPwmWriteError(t *testing.T) {
 	fs.WithWriteError = true
 
 	err := a.PwmWrite("5", 100)
-	assert.Contains(t, err.Error(), "write error")
+	require.ErrorContains(t, err, "write error")
 }
 
 func TestPwmReadError(t *testing.T) {
@@ -517,14 +518,15 @@ func TestPwmReadError(t *testing.T) {
 	fs.WithReadError = true
 
 	err := a.PwmWrite("5", 100)
-	assert.Contains(t, err.Error(), "read error")
+	require.ErrorContains(t, err, "read error")
 }
 
 func TestAnalog(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 	fs.Files["/sys/bus/iio/devices/iio:device1/in_voltage0_raw"].Contents = "1000\n"
 
-	i, _ := a.AnalogRead("0")
+	i, err := a.AnalogRead("0")
+	require.NoError(t, err)
 	assert.Equal(t, 250, i)
 }
 
@@ -533,7 +535,7 @@ func TestAnalogError(t *testing.T) {
 	fs.WithReadError = true
 
 	_, err := a.AnalogRead("0")
-	assert.ErrorContains(t, err, "read error")
+	require.ErrorContains(t, err, "read error")
 }
 
 func TestI2cWorkflow(t *testing.T) {
@@ -541,17 +543,17 @@ func TestI2cWorkflow(t *testing.T) {
 	a.sys.UseMockSyscall()
 
 	con, err := a.GetI2cConnection(0xff, 6)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	_, err = con.Write([]byte{0x00, 0x01})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	data := []byte{42, 42}
 	_, err = con.Read(data)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, []byte{0x00, 0x01}, data)
 
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.Finalize())
 }
 
 func TestI2cFinalizeWithErrors(t *testing.T) {
@@ -559,32 +561,32 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	a := NewAdaptor()
 	a.sys.UseMockSyscall()
 	fs := a.sys.UseMockFilesystem(pwmMockPathsMux13ArduinoI2c)
-	assert.NoError(t, a.Connect())
+	require.NoError(t, a.Connect())
 	con, err := a.GetI2cConnection(0xff, 6)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	_, err = con.Write([]byte{0x0A})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	fs.WithCloseError = true
 	// act
 	err = a.Finalize()
 	// assert
-	assert.NotNil(t, err)
-	assert.Contains(t, err.Error(), "close error")
+	require.Error(t, err)
+	require.ErrorContains(t, err, "close error")
 }
 
 func Test_validateI2cBusNumber(t *testing.T) {
 	tests := map[string]struct {
 		board   string
 		busNr   int
-		wantErr error
+		wantErr string
 	}{
 		"arduino_number_negative_error": {
 			busNr:   -1,
-			wantErr: fmt.Errorf("Unsupported I2C bus '-1'"),
+			wantErr: "Unsupported I2C bus '-1'",
 		},
 		"arduino_number_1_error": {
 			busNr:   1,
-			wantErr: fmt.Errorf("Unsupported I2C bus '1'"),
+			wantErr: "Unsupported I2C bus '1'",
 		},
 		"arduino_number_6_ok": {
 			busNr: 6,
@@ -592,7 +594,7 @@ func Test_validateI2cBusNumber(t *testing.T) {
 		"sparkfun_number_negative_error": {
 			board:   "sparkfun",
 			busNr:   -1,
-			wantErr: fmt.Errorf("Unsupported I2C bus '-1'"),
+			wantErr: "Unsupported I2C bus '-1'",
 		},
 		"sparkfun_number_1_ok": {
 			board: "sparkfun",
@@ -601,7 +603,7 @@ func Test_validateI2cBusNumber(t *testing.T) {
 		"miniboard_number_6_error": {
 			board:   "miniboard",
 			busNr:   6,
-			wantErr: fmt.Errorf("Unsupported I2C bus '6'"),
+			wantErr: "Unsupported I2C bus '6'",
 		},
 	}
 	for name, tc := range tests {
@@ -613,7 +615,11 @@ func Test_validateI2cBusNumber(t *testing.T) {
 			// act
 			err := a.validateAndSetupI2cBusNumber(tc.busNr)
 			// assert
-			assert.Equal(t, tc.wantErr, err)
+			if tc.wantErr != "" {
+				require.EqualError(t, err, tc.wantErr)
+			} else {
+				require.NoError(t, err)
+			}
 		})
 	}
 }

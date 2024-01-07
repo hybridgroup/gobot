@@ -80,12 +80,9 @@ func checkTravis(robot *gobot.Robot) {
 func main() {
 	master := gobot.NewMaster()
 	firmataAdaptor := firmata.NewAdaptor(os.Args[1])
-	red := gpio.NewLedDriver(firmataAdaptor, "7")
-	red.SetName("red")
-	green := gpio.NewLedDriver(firmataAdaptor, "6")
-	green.SetName("green")
-	blue := gpio.NewLedDriver(firmataAdaptor, "5")
-	blue.SetName("blue")
+	red := gpio.NewLedDriver(firmataAdaptor, "7", gpio.WithName("red"))
+	green := gpio.NewLedDriver(firmataAdaptor, "6", gpio.WithName("green"))
+	blue := gpio.NewLedDriver(firmataAdaptor, "5", gpio.WithName("blue"))
 
 	work := func() {
 		checkTravis(master.Robot("travis"))

@@ -8,8 +8,8 @@ import (
 
 type UDPConnection interface {
 	Close() error
-	ReadFromUDP([]byte) (int, *net.UDPAddr, error)
-	WriteTo([]byte, net.Addr) (int, error)
+	ReadFromUDP(b []byte) (int, *net.UDPAddr, error)
+	WriteTo(b []byte, a net.Addr) (int, error)
 }
 
 type UDPAdaptor struct {
@@ -61,7 +61,7 @@ func (m *UDPAdaptor) close() error {
 }
 
 // Finalize returns true if connection to devices is closed successfully
-func (m *UDPAdaptor) Finalize() (err error) {
+func (m *UDPAdaptor) Finalize() error {
 	return m.close()
 }
 

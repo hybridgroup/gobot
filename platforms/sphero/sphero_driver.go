@@ -70,6 +70,7 @@ func NewSpheroDriver(a *Adaptor) *SpheroDriver {
 	s.AddEvent(Collision)
 	s.AddEvent(SensorData)
 
+	//nolint:forcetypeassert // ok here
 	s.AddCommand("SetRGB", func(params map[string]interface{}) interface{} {
 		r := uint8(params["r"].(float64))
 		g := uint8(params["g"].(float64))
@@ -78,6 +79,7 @@ func NewSpheroDriver(a *Adaptor) *SpheroDriver {
 		return nil
 	})
 
+	//nolint:forcetypeassert // ok here
 	s.AddCommand("Roll", func(params map[string]interface{}) interface{} {
 		speed := uint8(params["speed"].(float64))
 		heading := uint16(params["heading"].(float64))
@@ -98,30 +100,31 @@ func NewSpheroDriver(a *Adaptor) *SpheroDriver {
 		return s.ReadLocator()
 	})
 
+	//nolint:forcetypeassert // ok here
 	s.AddCommand("SetBackLED", func(params map[string]interface{}) interface{} {
 		level := uint8(params["level"].(float64))
 		s.SetBackLED(level)
 		return nil
 	})
-
+	//nolint:forcetypeassert // ok here
 	s.AddCommand("SetRotationRate", func(params map[string]interface{}) interface{} {
 		level := uint8(params["level"].(float64))
 		s.SetRotationRate(level)
 		return nil
 	})
-
+	//nolint:forcetypeassert // ok here
 	s.AddCommand("SetHeading", func(params map[string]interface{}) interface{} {
 		heading := uint16(params["heading"].(float64))
 		s.SetHeading(heading)
 		return nil
 	})
-
+	//nolint:forcetypeassert // ok here
 	s.AddCommand("SetStabilization", func(params map[string]interface{}) interface{} {
 		on := params["enable"].(bool)
 		s.SetStabilization(on)
 		return nil
 	})
-
+	//nolint:forcetypeassert // ok here
 	s.AddCommand("SetDataStreaming", func(params map[string]interface{}) interface{} {
 		N := uint16(params["N"].(float64))
 		M := uint16(params["M"].(float64))
@@ -132,7 +135,7 @@ func NewSpheroDriver(a *Adaptor) *SpheroDriver {
 		s.SetDataStreaming(DataStreamingConfig{N: N, M: M, Mask2: Mask2, Pcnt: Pcnt, Mask: Mask})
 		return nil
 	})
-
+	//nolint:forcetypeassert // ok here
 	s.AddCommand("ConfigureLocator", func(params map[string]interface{}) interface{} {
 		Flags := uint8(params["Flags"].(float64))
 		X := int16(params["X"].(float64))
@@ -156,6 +159,7 @@ func (s *SpheroDriver) SetName(n string) { s.name = n }
 func (s *SpheroDriver) Connection() gobot.Connection { return s.connection }
 
 func (s *SpheroDriver) adaptor() *Adaptor {
+	//nolint:forcetypeassert // ok here
 	return s.Connection().(*Adaptor)
 }
 
@@ -167,7 +171,7 @@ func (s *SpheroDriver) adaptor() *Adaptor {
 //	Collision  sphero.CollisionPacket - On Collision Detected
 //	SensorData sphero.DataStreamingPacket - On Data Streaming event
 //	Error      error- On error while processing asynchronous response
-func (s *SpheroDriver) Start() (err error) {
+func (s *SpheroDriver) Start() error {
 	go func() {
 		for {
 			packet := <-s.packetChannel
@@ -223,19 +227,19 @@ func (s *SpheroDriver) Start() (err error) {
 	s.ConfigureCollisionDetection(DefaultCollisionConfig())
 	s.enableStopOnDisconnect()
 
-	return
+	return nil
 }
 
 // Halt halts the SpheroDriver and sends a SpheroDriver.Stop command to the Sphero.
 // Returns true on successful halt.
-func (s *SpheroDriver) Halt() (err error) {
+func (s *SpheroDriver) Halt() error {
 	if s.adaptor().connected {
 		gobot.Every(10*time.Millisecond, func() {
 			s.Stop()
 		})
 		time.Sleep(1 * time.Second)
 	}
-	return
+	return nil
 }
 
 // SetRGB sets the Sphero to the given r, g, and b values
@@ -414,7 +418,7 @@ func (s *SpheroDriver) craftPacket(body []uint8, did byte, cid byte) *packet { /
 	return packet
 }
 
-func (s *SpheroDriver) write(packet *packet) (err error) {
+func (s *SpheroDriver) write(packet *packet) error {
 	s.mtx.Lock()
 	defer s.mtx.Unlock()
 	buf := append(packet.header, packet.body...)
@@ -422,11 +426,13 @@ func (s *SpheroDriver) write(packet *packet) (err error) {
 	length, err := s.adaptor().sp.Write(buf)
 	if err != nil {
 		return err
-	} else if length != len(buf) {
+	}
+
+	if length != len(buf) {
 		return errors.New("Not enough bytes written")
 	}
 	s.seq++
-	return
+	return nil
 }
 
 func (s *SpheroDriver) calculateChecksum(packet *packet) uint8 {

@@ -5,6 +5,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -16,8 +18,8 @@ func TestMqttDriver(t *testing.T) {
 	assert.True(t, strings.HasPrefix(d.Name(), "MQTT"))
 	assert.True(t, strings.HasPrefix(d.Connection().Name(), "MQTT"))
 
-	assert.NoError(t, d.Start())
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
 }
 
 func TestMqttDriverName(t *testing.T) {

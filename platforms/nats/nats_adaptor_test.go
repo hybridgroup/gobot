@@ -8,6 +8,8 @@ import (
 
 	"github.com/nats-io/nats.go"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -74,7 +76,7 @@ func TestNatsAdapterSetsRootCAs(t *testing.T) {
 	_ = a.Connect()
 	o := a.client.Opts
 	casPool, err := o.RootCAsCB()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, casPool)
 	assert.True(t, o.Secure)
 }
@@ -84,18 +86,19 @@ func TestNatsAdapterSetsClientCerts(t *testing.T) {
 	assert.Equal(t, "tls://localhost:4242", a.Host)
 	_ = a.Connect()
 	cert, err := a.client.Opts.TLSCertCB()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, cert)
 	assert.NotNil(t, cert.Leaf)
 	assert.True(t, a.client.Opts.Secure)
 }
 
 func TestNatsAdapterSetsClientCertsWithUserInfo(t *testing.T) {
-	a := initTestNatsAdaptorTLS(nats.ClientCert("test_certs/client-cert.pem", "test_certs/client-key.pem"), nats.UserInfo("test", "testwd"))
+	a := initTestNatsAdaptorTLS(nats.ClientCert("test_certs/client-cert.pem", "test_certs/client-key.pem"),
+		nats.UserInfo("test", "testwd"))
 	assert.Equal(t, "tls://localhost:4242", a.Host)
 	_ = a.Connect()
 	cert, err := a.client.Opts.TLSCertCB()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, cert)
 	assert.NotNil(t, cert.Leaf)
 	assert.True(t, a.client.Opts.Secure)
@@ -148,12 +151,12 @@ func TestNatsAdaptorFailedConnect(t *testing.T) {
 	if err != nil && strings.Contains(err.Error(), "cannot assign requested address") {
 		t.Skip("FLAKY: Can not test, because IP or port is in use.")
 	}
-	assert.ErrorContains(t, err, "nats: no servers available for connection")
+	require.ErrorContains(t, err, "nats: no servers available for connection")
 }
 
 func TestNatsAdaptorFinalize(t *testing.T) {
 	a := NewAdaptor("localhost:9999", 79999)
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.Finalize())
 }
 
 func TestNatsAdaptorCannotPublishUnlessConnected(t *testing.T) {

@@ -8,6 +8,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -69,12 +71,12 @@ func TestNeuroskyAdaptorName(t *testing.T) {
 
 func TestNeuroskyAdaptorConnect(t *testing.T) {
 	a := initTestNeuroskyAdaptor()
-	assert.NoError(t, a.Connect())
+	require.NoError(t, a.Connect())
 
 	a.connect = func(n *Adaptor) (io.ReadWriteCloser, error) {
 		return nil, errors.New("connection error")
 	}
-	assert.ErrorContains(t, a.Connect(), "connection error")
+	require.ErrorContains(t, a.Connect(), "connection error")
 }
 
 func TestNeuroskyAdaptorFinalize(t *testing.T) {
@@ -84,9 +86,9 @@ func TestNeuroskyAdaptorFinalize(t *testing.T) {
 		return rwc, nil
 	}
 	_ = a.Connect()
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.Finalize())
 
 	rwc.CloseError(errors.New("close error"))
 	_ = a.Connect()
-	assert.ErrorContains(t, a.Finalize(), "close error")
+	require.ErrorContains(t, a.Finalize(), "close error")
 }

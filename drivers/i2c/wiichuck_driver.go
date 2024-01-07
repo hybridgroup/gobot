@@ -158,7 +158,7 @@ func (w *WiichuckDriver) parse(value []byte) {
 }
 
 // reads from adaptor using specified interval to update with new value
-func (w *WiichuckDriver) initialize() (err error) {
+func (w *WiichuckDriver) initialize() error {
 	go func() {
 		for {
 			if _, err := w.connection.Write([]byte{0x40, 0x00}); err != nil {
@@ -186,5 +186,5 @@ func (w *WiichuckDriver) initialize() (err error) {
 			time.Sleep(w.interval)
 		}
 	}()
-	return
+	return nil
 }

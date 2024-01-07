@@ -113,11 +113,12 @@ func newADS1x15Driver(c Connector, name string, drs map[int]uint16, ddr int, opt
 	}
 
 	d.AddCommand("ReadDifferenceWithDefaults", func(params map[string]interface{}) interface{} {
-		channel := params["channel"].(int)
+		channel := params["channel"].(int) //nolint:forcetypeassert // ok here
 		val, err := d.ReadDifferenceWithDefaults(channel)
 		return map[string]interface{}{"val": val, "err": err}
 	})
 
+	//nolint:forcetypeassert // ok here
 	d.AddCommand("ReadDifference", func(params map[string]interface{}) interface{} {
 		channel := params["channel"].(int)
 		gain := params["gain"].(int)
@@ -127,11 +128,12 @@ func newADS1x15Driver(c Connector, name string, drs map[int]uint16, ddr int, opt
 	})
 
 	d.AddCommand("ReadWithDefaults", func(params map[string]interface{}) interface{} {
-		channel := params["channel"].(int)
+		channel := params["channel"].(int) //nolint:forcetypeassert // ok here
 		val, err := d.ReadWithDefaults(channel)
 		return map[string]interface{}{"val": val, "err": err}
 	})
 
+	//nolint:forcetypeassert // ok here
 	d.AddCommand("Read", func(params map[string]interface{}) interface{} {
 		channel := params["channel"].(int)
 		gain := params["gain"].(int)
@@ -141,7 +143,7 @@ func newADS1x15Driver(c Connector, name string, drs map[int]uint16, ddr int, opt
 	})
 
 	d.AddCommand("AnalogRead", func(params map[string]interface{}) interface{} {
-		pin := params["pin"].(string)
+		pin := params["pin"].(string) //nolint:forcetypeassert // ok here
 		val, err := d.AnalogRead(pin)
 		return map[string]interface{}{"val": val, "err": err}
 	})
@@ -281,12 +283,12 @@ func WithADS1x15WaitSingleCycle() func(Config) {
 // * 1: Channel 0 - channel 3
 // * 2: Channel 1 - channel 3
 // * 3: Channel 2 - channel 3
-func (d *ADS1x15Driver) ReadDifferenceWithDefaults(diff int) (value float64, err error) {
+func (d *ADS1x15Driver) ReadDifferenceWithDefaults(diff int) (float64, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	if err = d.checkChannel(diff); err != nil {
-		return
+	if err := d.checkChannel(diff); err != nil {
+		return 0, err
 	}
 	return d.readVoltage(diff, 0, d.channelCfgs[diff].gain, d.channelCfgs[diff].dataRate)
 }
@@ -297,41 +299,41 @@ func (d *ADS1x15Driver) ReadDifferenceWithDefaults(diff int) (value float64, err
 // * 1: Channel 0 - channel 3
 // * 2: Channel 1 - channel 3
 // * 3: Channel 2 - channel 3
-func (d *ADS1x15Driver) ReadDifference(diff int, gain int, dataRate int) (value float64, err error) {
+func (d *ADS1x15Driver) ReadDifference(diff int, gain int, dataRate int) (float64, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	if err = d.checkChannel(diff); err != nil {
-		return
+	if err := d.checkChannel(diff); err != nil {
+		return 0, err
 	}
 	return d.readVoltage(diff, 0, gain, dataRate)
 }
 
 // ReadWithDefaults reads the voltage at the specified channel (between 0 and 3).
 // Default values are used for the gain and data rate. The result is in V.
-func (d *ADS1x15Driver) ReadWithDefaults(channel int) (value float64, err error) {
+func (d *ADS1x15Driver) ReadWithDefaults(channel int) (float64, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	if err = d.checkChannel(channel); err != nil {
-		return
+	if err := d.checkChannel(channel); err != nil {
+		return 0, err
 	}
 	return d.readVoltage(channel, 0x04, d.channelCfgs[channel].gain, d.channelCfgs[channel].dataRate)
 }
 
 // Read reads the voltage at the specified channel (between 0 and 3). The result is in V.
-func (d *ADS1x15Driver) Read(channel int, gain int, dataRate int) (value float64, err error) {
+func (d *ADS1x15Driver) Read(channel int, gain int, dataRate int) (float64, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	if err = d.checkChannel(channel); err != nil {
-		return
+	if err := d.checkChannel(channel); err != nil {
+		return 0, err
 	}
 	return d.readVoltage(channel, 0x04, gain, dataRate)
 }
 
 // AnalogRead returns value from analog reading of specified pin using the default values.
-func (d *ADS1x15Driver) AnalogRead(pin string) (value int, err error) {
+func (d *ADS1x15Driver) AnalogRead(pin string) (int, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
@@ -350,41 +352,40 @@ func (d *ADS1x15Driver) AnalogRead(pin string) (value int, err error) {
 		channel = 3
 	default:
 		// read the voltage at a specific pin, compared to the ground
+		var err error
 		channel, err = strconv.Atoi(pin)
 		if err != nil {
-			return
+			return 0, err
 		}
 		channelOffset = 0x04
 	}
 
-	if err = d.checkChannel(channel); err != nil {
-		return
+	if err := d.checkChannel(channel); err != nil {
+		return 0, err
 	}
 
-	value, err = d.rawRead(channel, channelOffset, d.channelCfgs[channel].gain, d.channelCfgs[channel].dataRate)
-
-	return
+	return d.rawRead(channel, channelOffset, d.channelCfgs[channel].gain, d.channelCfgs[channel].dataRate)
 }
 
-func (d *ADS1x15Driver) readVoltage(channel int, channelOffset int, gain int, dataRate int) (value float64, err error) {
+func (d *ADS1x15Driver) readVoltage(channel int, channelOffset int, gain int, dataRate int) (float64, error) {
 	fsr, err := ads1x15GetFullScaleRange(gain)
 	if err != nil {
-		return
+		return 0, err
 	}
 
 	rawValue, err := d.rawRead(channel, channelOffset, gain, dataRate)
 
 	// Calculate return value in V
-	value = float64(rawValue) / float64(1<<15) * fsr
+	value := float64(rawValue) / float64(1<<15) * fsr
 
-	return
+	return value, err
 }
 
-func (d *ADS1x15Driver) rawRead(channel int, channelOffset int, gain int, dataRate int) (data int, err error) {
+func (d *ADS1x15Driver) rawRead(channel int, channelOffset int, gain int, dataRate int) (int, error) {
 	// Validate the passed in data rate (differs between ADS1015 and ADS1115).
 	dataRateBits, err := ads1x15GetDataRateBits(d.dataRates, dataRate)
 	if err != nil {
-		return
+		return 0, err
 	}
 
 	var config uint16
@@ -408,35 +409,35 @@ func (d *ADS1x15Driver) rawRead(channel int, channelOffset int, gain int, dataRa
 	config |= ads1x15ConfigCompQueDisable
 
 	// Send the config value to start the ADC conversion.
-	if err = d.writeWordBigEndian(ads1x15PointerConfig, config); err != nil {
-		return
+	if err := d.writeWordBigEndian(ads1x15PointerConfig, config); err != nil {
+		return 0, err
 	}
 
 	// Wait for the ADC sample to finish based on the sample rate plus a
 	// small offset to be sure (0.1 millisecond).
 	delay := time.Duration(1000000/dataRate+100) * time.Microsecond
-	if err = d.waitForConversionFinished(delay); err != nil {
-		return
+	if err := d.waitForConversionFinished(delay); err != nil {
+		return 0, err
 	}
 
 	// Retrieve the result.
 	udata, err := d.readWordBigEndian(ads1x15PointerConversion)
 	if err != nil {
-		return
+		return 0, err
 	}
 
 	// Handle negative values as two's complement
 	return int(twosComplement16Bit(udata)), nil
 }
 
-func (d *ADS1x15Driver) checkChannel(channel int) (err error) {
+func (d *ADS1x15Driver) checkChannel(channel int) error {
 	if channel < 0 || channel > 3 {
-		err = fmt.Errorf("Invalid channel (%d), must be between 0 and 3", channel)
+		return fmt.Errorf("Invalid channel (%d), must be between 0 and 3", channel)
 	}
-	return
+	return nil
 }
 
-func (d *ADS1x15Driver) waitForConversionFinished(delay time.Duration) (err error) {
+func (d *ADS1x15Driver) waitForConversionFinished(delay time.Duration) error {
 	start := time.Now()
 
 	for i := 0; i < ads1x15WaitMaxCount; i++ {
@@ -444,9 +445,10 @@ func (d *ADS1x15Driver) waitForConversionFinished(delay time.Duration) (err erro
 			// most likely the last try will also not finish, so we stop with an error
 			return fmt.Errorf("The conversion is not finished within %s", time.Since(start))
 		}
-		var data uint16
-		if data, err = d.readWordBigEndian(ads1x15PointerConfig); err != nil {
-			return
+
+		data, err := d.readWordBigEndian(ads1x15PointerConfig)
+		if err != nil {
+			return err
 		}
 		if ads1x15Debug {
 			log.Printf("ADS1x15Driver: config register state: 0x%X\n", data)
@@ -466,16 +468,17 @@ func (d *ADS1x15Driver) waitForConversionFinished(delay time.Duration) (err erro
 		log.Printf("conversion takes %s", elapsed)
 	}
 
-	return
+	return nil
 }
 
 func (d *ADS1x15Driver) writeWordBigEndian(reg uint8, val uint16) error {
 	return d.connection.WriteWordData(reg, swapBytes(val))
 }
 
-func (d *ADS1x15Driver) readWordBigEndian(reg uint8) (data uint16, err error) {
-	if data, err = d.connection.ReadWordData(reg); err != nil {
-		return
+func (d *ADS1x15Driver) readWordBigEndian(reg uint8) (uint16, error) {
+	data, err := d.connection.ReadWordData(reg)
+	if err != nil {
+		return 0, err
 	}
 	return swapBytes(data), err
 }
@@ -492,10 +495,9 @@ func (d *ADS1x15Driver) setChannelGains(gain int) {
 	}
 }
 
-func ads1x15GetFullScaleRange(gain int) (fsr float64, err error) {
-	fsr, ok := ads1x15FullScaleRange[gain]
-	if ok {
-		return
+func ads1x15GetFullScaleRange(gain int) (float64, error) {
+	if fsr, ok := ads1x15FullScaleRange[gain]; ok {
+		return fsr, nil
 	}
 
 	keys := []int{}
@@ -503,14 +505,13 @@ func ads1x15GetFullScaleRange(gain int) (fsr float64, err error) {
 		keys = append(keys, k)
 	}
 	sort.Ints(keys)
-	err = fmt.Errorf("Gain (%d) must be one of: %d", gain, keys)
-	return
+
+	return 0, fmt.Errorf("Gain (%d) must be one of: %d", gain, keys)
 }
 
-func ads1x15GetDataRateBits(dataRates map[int]uint16, dataRate int) (bits uint16, err error) {
-	bits, ok := dataRates[dataRate]
-	if ok {
-		return
+func ads1x15GetDataRateBits(dataRates map[int]uint16, dataRate int) (uint16, error) {
+	if bits, ok := dataRates[dataRate]; ok {
+		return bits, nil
 	}
 
 	keys := []int{}
@@ -518,12 +519,12 @@ func ads1x15GetDataRateBits(dataRates map[int]uint16, dataRate int) (bits uint16
 		keys = append(keys, k)
 	}
 	sort.Ints(keys)
-	err = fmt.Errorf("Invalid data rate (%d). Accepted values: %d", dataRate, keys)
-	return
+
+	return 0, fmt.Errorf("Invalid data rate (%d). Accepted values: %d", dataRate, keys)
 }
 
 // ads1x15BestGainForVoltage returns the gain the most adapted to read up to the specified difference of potential.
-func ads1x15BestGainForVoltage(voltage float64) (bestGain int, err error) {
+func ads1x15BestGainForVoltage(voltage float64) (int, error) {
 	var max float64
 	difference := math.MaxFloat64
 	currentBestGain := -1
@@ -538,10 +539,8 @@ func ads1x15BestGainForVoltage(voltage float64) (bestGain int, err error) {
 	}
 
 	if currentBestGain < 0 {
-		err = fmt.Errorf("The maximum voltage which can be read is %f", max)
-		return
+		return 0, fmt.Errorf("The maximum voltage which can be read is %f", max)
 	}
 
-	bestGain = currentBestGain
-	return
+	return currentBestGain, nil
 }

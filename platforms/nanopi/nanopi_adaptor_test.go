@@ -2,13 +2,18 @@ package nanopi
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/aio"
 	"gobot.io/x/gobot/v2/drivers/gpio"
 	"gobot.io/x/gobot/v2/drivers/i2c"
+	"gobot.io/x/gobot/v2/platforms/adaptors"
 	"gobot.io/x/gobot/v2/system"
 )
 
@@ -19,13 +24,15 @@ const (
 
 const (
 	pwmDir           = "/sys/devices/platform/soc/1c21400.pwm/pwm/pwmchip0/" //nolint:gosec // false positive
-	pwmPwmDir        = pwmDir + "pwm0/"
 	pwmExportPath    = pwmDir + "export"
 	pwmUnexportPath  = pwmDir + "unexport"
+	pwmPwmDir        = pwmDir + "pwm0/"
 	pwmEnablePath    = pwmPwmDir + "enable"
 	pwmPeriodPath    = pwmPwmDir + "period"
 	pwmDutyCyclePath = pwmPwmDir + "duty_cycle"
 	pwmPolarityPath  = pwmPwmDir + "polarity"
+
+	pwmInvertedIdentifier = "inversed"
 )
 
 var pwmMockPaths = []string{
@@ -55,6 +62,7 @@ var (
 	_ gpio.DigitalWriter          = (*Adaptor)(nil)
 	_ gpio.PwmWriter              = (*Adaptor)(nil)
 	_ gpio.ServoWriter            = (*Adaptor)(nil)
+	_ aio.AnalogReader            = (*Adaptor)(nil)
 	_ i2c.Connector               = (*Adaptor)(nil)
 )
 
@@ -92,8 +100,31 @@ func TestDigitalIO(t *testing.T) {
 	i, _ := a.DigitalRead("10")
 	assert.Equal(t, 1, i)
 
-	assert.ErrorContains(t, a.DigitalWrite("99", 1), "'99' is not a valid id for a digital pin")
-	assert.NoError(t, a.Finalize())
+	require.ErrorContains(t, a.DigitalWrite("99", 1), "'99' is not a valid id for a digital pin")
+	require.NoError(t, a.Finalize())
+}
+
+func TestAnalog(t *testing.T) {
+	mockPaths := []string{
+		"/sys/class/thermal/thermal_zone0/temp",
+	}
+
+	a, fs := initTestAdaptorWithMockedFilesystem(mockPaths)
+
+	fs.Files["/sys/class/thermal/thermal_zone0/temp"].Contents = "567\n"
+	got, err := a.AnalogRead("thermal_zone0")
+	require.NoError(t, err)
+	assert.Equal(t, 567, got)
+
+	_, err = a.AnalogRead("thermal_zone10")
+	require.ErrorContains(t, err, "'thermal_zone10' is not a valid id for a analog pin")
+
+	fs.WithReadError = true
+	_, err = a.AnalogRead("thermal_zone0")
+	require.ErrorContains(t, err, "read error")
+	fs.WithReadError = false
+
+	require.NoError(t, a.Finalize())
 }
 
 func TestInvalidPWMPin(t *testing.T) {
@@ -101,41 +132,60 @@ func TestInvalidPWMPin(t *testing.T) {
 	preparePwmFs(fs)
 
 	err := a.PwmWrite("666", 42)
-	assert.ErrorContains(t, err, "'666' is not a valid id for a PWM pin")
+	require.ErrorContains(t, err, "'666' is not a valid id for a PWM pin")
 
 	err = a.ServoWrite("666", 120)
-	assert.ErrorContains(t, err, "'666' is not a valid id for a PWM pin")
+	require.ErrorContains(t, err, "'666' is not a valid id for a PWM pin")
 
 	err = a.PwmWrite("3", 42)
-	assert.ErrorContains(t, err, "'3' is not a valid id for a PWM pin")
+	require.ErrorContains(t, err, "'3' is not a valid id for a PWM pin")
 
 	err = a.ServoWrite("3", 120)
-	assert.ErrorContains(t, err, "'3' is not a valid id for a PWM pin")
+	require.ErrorContains(t, err, "'3' is not a valid id for a PWM pin")
 }
 
 func TestPwmWrite(t *testing.T) {
+	// arrange
 	a, fs := initTestAdaptorWithMockedFilesystem(pwmMockPaths)
 	preparePwmFs(fs)
-
+	// act
 	err := a.PwmWrite("PWM", 100)
-	assert.NoError(t, err)
-
+	// assert
+	require.NoError(t, err)
 	assert.Equal(t, "0", fs.Files[pwmExportPath].Contents)
 	assert.Equal(t, "1", fs.Files[pwmEnablePath].Contents)
-	assert.Equal(t, fmt.Sprintf("%d", 10000000), fs.Files[pwmPeriodPath].Contents)
+	assert.Equal(t, strconv.Itoa(10000000), fs.Files[pwmPeriodPath].Contents)
 	assert.Equal(t, "3921568", fs.Files[pwmDutyCyclePath].Contents)
 	assert.Equal(t, "normal", fs.Files[pwmPolarityPath].Contents)
 
-	err = a.ServoWrite("PWM", 0)
-	assert.NoError(t, err)
+	require.NoError(t, a.Finalize())
+}
 
+func TestServoWrite(t *testing.T) {
+	// arrange: prepare 50Hz for servos
+	const (
+		pin         = "PWM"
+		fiftyHzNano = 20000000
+	)
+	a := NewNeoAdaptor(adaptors.WithPWMDefaultPeriodForPin(pin, fiftyHzNano))
+	fs := a.sys.UseMockFilesystem(pwmMockPaths)
+	preparePwmFs(fs)
+	require.NoError(t, a.Connect())
+	// act & assert for 0° (min default value)
+	err := a.ServoWrite(pin, 0)
+	require.NoError(t, err)
+	assert.Equal(t, strconv.Itoa(fiftyHzNano), fs.Files[pwmPeriodPath].Contents)
 	assert.Equal(t, "500000", fs.Files[pwmDutyCyclePath].Contents)
+	// act & assert for 180° (max default value)
+	err = a.ServoWrite(pin, 180)
+	require.NoError(t, err)
+	assert.Equal(t, strconv.Itoa(fiftyHzNano), fs.Files[pwmPeriodPath].Contents)
+	assert.Equal(t, "2500000", fs.Files[pwmDutyCyclePath].Contents)
+	// act & assert invalid pins
+	err = a.ServoWrite("3", 120)
+	require.ErrorContains(t, err, "'3' is not a valid id for a PWM pin")
 
-	err = a.ServoWrite("PWM", 180)
-	assert.NoError(t, err)
-
-	assert.Equal(t, "2000000", fs.Files[pwmDutyCyclePath].Contents)
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.Finalize())
 }
 
 func TestSetPeriod(t *testing.T) {
@@ -147,25 +197,25 @@ func TestSetPeriod(t *testing.T) {
 	// act
 	err := a.SetPeriod("PWM", newPeriod)
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "0", fs.Files[pwmExportPath].Contents)
 	assert.Equal(t, "1", fs.Files[pwmEnablePath].Contents)
-	assert.Equal(t, fmt.Sprintf("%d", newPeriod), fs.Files[pwmPeriodPath].Contents)
+	assert.Equal(t, fmt.Sprintf("%d", newPeriod), fs.Files[pwmPeriodPath].Contents) //nolint:perfsprint // ok here
 	assert.Equal(t, "0", fs.Files[pwmDutyCyclePath].Contents)
 	assert.Equal(t, "normal", fs.Files[pwmPolarityPath].Contents)
 
 	// arrange test for automatic adjustment of duty cycle to lower value
 	err = a.PwmWrite("PWM", 127) // 127 is a little bit smaller than 50% of period
-	assert.NoError(t, err)
-	assert.Equal(t, fmt.Sprintf("%d", 1270000), fs.Files[pwmDutyCyclePath].Contents)
+	require.NoError(t, err)
+	assert.Equal(t, strconv.Itoa(1270000), fs.Files[pwmDutyCyclePath].Contents)
 	newPeriod = newPeriod / 10
 
 	// act
 	err = a.SetPeriod("PWM", newPeriod)
 
 	// assert
-	assert.NoError(t, err)
-	assert.Equal(t, fmt.Sprintf("%d", 127000), fs.Files[pwmDutyCyclePath].Contents)
+	require.NoError(t, err)
+	assert.Equal(t, strconv.Itoa(127000), fs.Files[pwmDutyCyclePath].Contents)
 
 	// arrange test for automatic adjustment of duty cycle to higher value
 	newPeriod = newPeriod * 20
@@ -174,31 +224,31 @@ func TestSetPeriod(t *testing.T) {
 	err = a.SetPeriod("PWM", newPeriod)
 
 	// assert
-	assert.NoError(t, err)
-	assert.Equal(t, fmt.Sprintf("%d", 2540000), fs.Files[pwmDutyCyclePath].Contents)
+	require.NoError(t, err)
+	assert.Equal(t, strconv.Itoa(2540000), fs.Files[pwmDutyCyclePath].Contents)
 }
 
 func TestFinalizeErrorAfterGPIO(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem(gpioMockPaths)
 
-	assert.NoError(t, a.DigitalWrite("7", 1))
+	require.NoError(t, a.DigitalWrite("7", 1))
 
 	fs.WithWriteError = true
 
 	err := a.Finalize()
-	assert.Contains(t, err.Error(), "write error")
+	require.ErrorContains(t, err, "write error")
 }
 
 func TestFinalizeErrorAfterPWM(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem(pwmMockPaths)
 	preparePwmFs(fs)
 
-	assert.NoError(t, a.PwmWrite("PWM", 1))
+	require.NoError(t, a.PwmWrite("PWM", 1))
 
 	fs.WithWriteError = true
 
 	err := a.Finalize()
-	assert.Contains(t, err.Error(), "write error")
+	require.ErrorContains(t, err, "write error")
 }
 
 func TestSpiDefaultValues(t *testing.T) {
@@ -221,16 +271,16 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	a := NewNeoAdaptor()
 	a.sys.UseMockSyscall()
 	fs := a.sys.UseMockFilesystem([]string{"/dev/i2c-1"})
-	assert.NoError(t, a.Connect())
+	require.NoError(t, a.Connect())
 	con, err := a.GetI2cConnection(0xff, 1)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	_, err = con.Write([]byte{0xbf})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	fs.WithCloseError = true
 	// act
 	err = a.Finalize()
 	// assert
-	assert.Contains(t, err.Error(), "close error")
+	require.ErrorContains(t, err, "close error")
 }
 
 func Test_validateSpiBusNumber(t *testing.T) {
@@ -335,6 +385,49 @@ func Test_translateDigitalPin(t *testing.T) {
 			assert.Equal(t, tc.wantErr, err)
 			assert.Equal(t, tc.wantChip, chip)
 			assert.Equal(t, tc.wantLine, line)
+		})
+	}
+}
+
+func Test_translateAnalogPin(t *testing.T) {
+	mockedPaths := []string{
+		"/sys/class/thermal/thermal_zone0/temp",
+		"/sys/class/thermal/thermal_zone1/temp",
+	}
+	tests := map[string]struct {
+		id           string
+		wantPath     string
+		wantReadable bool
+		wantBufLen   uint16
+		wantErr      string
+	}{
+		"translate_thermal_zone0": {
+			id:           "thermal_zone0",
+			wantPath:     "/sys/class/thermal/thermal_zone0/temp",
+			wantReadable: true,
+			wantBufLen:   7,
+		},
+		"unknown_id": {
+			id:      "thermal_zone1",
+			wantErr: "'thermal_zone1' is not a valid id for a analog pin",
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			a, _ := initTestAdaptorWithMockedFilesystem(mockedPaths)
+			// act
+			path, r, w, buf, err := a.translateAnalogPin(tc.id)
+			// assert
+			if tc.wantErr != "" {
+				require.EqualError(t, err, tc.wantErr)
+			} else {
+				require.NoError(t, err)
+			}
+			assert.Equal(t, tc.wantPath, path)
+			assert.Equal(t, tc.wantReadable, r)
+			assert.False(t, w)
+			assert.Equal(t, tc.wantBufLen, buf)
 		})
 	}
 }

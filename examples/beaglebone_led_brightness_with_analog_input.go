@@ -8,6 +8,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/aio"
@@ -17,7 +18,7 @@ import (
 
 func main() {
 	beagleboneAdaptor := beaglebone.NewAdaptor()
-	sensor := aio.NewAnalogSensorDriver(beagleboneAdaptor, "P9_33")
+	sensor := aio.NewAnalogSensorDriver(beagleboneAdaptor, "P9_33", aio.WithSensorCyclicRead(500*time.Millisecond))
 	led := gpio.NewLedDriver(beagleboneAdaptor, "P9_14")
 
 	work := func() {

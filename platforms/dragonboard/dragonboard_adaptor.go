@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	multierror "github.com/hashicorp/go-multierror"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/platforms/adaptors"
 	"gobot.io/x/gobot/v2/system"
@@ -49,7 +50,7 @@ var fixedPins = map[string]int{
 //
 //	adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs
 //	adaptors.WithSpiGpioAccess(sclk, nss, mosi, miso):	use GPIO's instead of /dev/spidev#.#
-func NewAdaptor(opts ...func(adaptors.Optioner)) *Adaptor {
+func NewAdaptor(opts ...func(adaptors.DigitalPinsOptioner)) *Adaptor {
 	sys := system.NewAccesser()
 	c := &Adaptor{
 		name: gobot.DefaultName("DragonBoard"),

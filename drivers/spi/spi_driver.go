@@ -1,6 +1,7 @@
 package spi
 
 import (
+	"log"
 	"sync"
 
 	"gobot.io/x/gobot/v2"
@@ -43,31 +44,31 @@ type Connection gobot.SpiOperations
 // optional SPI params such as which SPI bus it wants to use.
 type Config interface {
 	// SetBusNumber sets which bus to use
-	SetBusNumber(int)
+	SetBusNumber(bus int)
 
 	// GetBusNumberOrDefault gets which bus to use
 	GetBusNumberOrDefault(def int) int
 
 	// SetChipNumber sets which chip to use
-	SetChipNumber(int)
+	SetChipNumber(chip int)
 
 	// GetChipNumberOrDefault gets which chip to use
 	GetChipNumberOrDefault(def int) int
 
 	// SetMode sets which mode to use
-	SetMode(int)
+	SetMode(mode int)
 
 	// GetModeOrDefault gets which mode to use
 	GetModeOrDefault(def int) int
 
 	// SetUsedBits sets how many bits to use
-	SetBitCount(int)
+	SetBitCount(count int)
 
 	// GetBitCountOrDefault gets how many bits to use
 	GetBitCountOrDefault(def int) int
 
 	// SetSpeed sets which speed to use (in Hz)
-	SetSpeed(int64)
+	SetSpeed(speed int64)
 
 	// GetSpeedOrDefault gets which speed to use (in Hz)
 	GetSpeedOrDefault(def int64) int64
@@ -108,7 +109,14 @@ func (d *Driver) Name() string { return d.name }
 func (d *Driver) SetName(n string) { d.name = n }
 
 // Connection returns the Connection of the device.
-func (d *Driver) Connection() gobot.Connection { return d.connector.(gobot.Connection) }
+func (d *Driver) Connection() gobot.Connection {
+	if conn, ok := d.connector.(gobot.Connection); ok {
+		return conn
+	}
+
+	log.Printf("%s has no gobot connection\n", d.name)
+	return nil
+}
 
 // Start initializes the driver.
 func (d *Driver) Start() error {
@@ -130,7 +138,7 @@ func (d *Driver) Start() error {
 }
 
 // Halt stops the driver.
-func (d *Driver) Halt() (err error) {
+func (d *Driver) Halt() error {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 

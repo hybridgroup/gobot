@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -102,8 +104,8 @@ func TestTH02FastMode(t *testing.T) {
 			// act
 			got, err := d.FastMode()
 			// assert
-			assert.NoError(t, err)
-			assert.Equal(t, 1, len(a.written))
+			require.NoError(t, err)
+			assert.Len(t, a.written, 1)
 			assert.Equal(t, uint8(0x03), a.written[0])
 			assert.Equal(t, tc.want, got)
 		})
@@ -130,9 +132,9 @@ func TestTH02SetHeater(t *testing.T) {
 			// act
 			err := d.SetHeater(tc.heater)
 			// assert
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, tc.heater, d.heating)
-			assert.Equal(t, 2, len(a.written))
+			assert.Len(t, a.written, 2)
 			assert.Equal(t, uint8(0x03), a.written[0])
 			assert.Equal(t, tc.want, a.written[1])
 		})
@@ -162,8 +164,8 @@ func TestTH02Heater(t *testing.T) {
 			// act
 			got, err := d.Heater()
 			// assert
-			assert.NoError(t, err)
-			assert.Equal(t, 1, len(a.written))
+			require.NoError(t, err)
+			assert.Len(t, a.written, 1)
 			assert.Equal(t, uint8(0x03), a.written[0])
 			assert.Equal(t, tc.want, got)
 		})
@@ -186,8 +188,8 @@ func TestTH02SerialNumber(t *testing.T) {
 	// act
 	sn, err := d.SerialNumber()
 	// assert
-	assert.NoError(t, err)
-	assert.Equal(t, 1, len(a.written))
+	require.NoError(t, err)
+	assert.Len(t, a.written, 1)
 	assert.Equal(t, uint8(0x11), a.written[0])
 	assert.Equal(t, want, sn)
 }
@@ -297,9 +299,9 @@ func TestTH02Sample(t *testing.T) {
 			// act
 			temp, rh, err := d.Sample()
 			// assert
-			assert.NoError(t, err)
-			assert.Equal(t, tc.wantRH, rh)
-			assert.Equal(t, tc.wantT, temp)
+			require.NoError(t, err)
+			assert.InDelta(t, tc.wantRH, rh, 0.0)
+			assert.InDelta(t, tc.wantT, temp, 0.0)
 		})
 	}
 }
@@ -485,7 +487,7 @@ func TestTH02_createConfig(t *testing.T) {
 			d.fastMode = tc.fast
 			d.heating = tc.heating
 			got := d.createConfig(tc.meas, tc.readTemp)
-			assert.Equal(t, got, tc.want)
+			assert.Equal(t, tc.want, got)
 		})
 	}
 }

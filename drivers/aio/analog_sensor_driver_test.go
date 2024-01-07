@@ -1,61 +1,119 @@
+//nolint:forcetypeassert // ok here
 package aio
 
 import (
-	"errors"
+	"fmt"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
 var _ gobot.Driver = (*AnalogSensorDriver)(nil)
 
-func TestAnalogSensorDriver(t *testing.T) {
+func TestNewAnalogSensorDriver(t *testing.T) {
+	// arrange
+	const pin = "5"
 	a := newAioTestAdaptor()
-	d := NewAnalogSensorDriver(a, "1")
-	assert.NotNil(t, d.Connection())
-
-	// default interval
-	assert.Equal(t, 10*time.Millisecond, d.interval)
-
-	// commands
-	a = newAioTestAdaptor()
-	d = NewAnalogSensorDriver(a, "42", 30*time.Second)
-	d.SetScaler(func(input int) float64 { return 2.5*float64(input) - 3 })
-	assert.Equal(t, "42", d.Pin())
-	assert.Equal(t, 30*time.Second, d.interval)
-
-	a.analogReadFunc = func() (val int, err error) {
-		val = 100
-		return
-	}
-
-	ret := d.Command("ReadRaw")(nil).(map[string]interface{})
-	assert.Equal(t, 100, ret["val"].(int))
-	assert.Nil(t, ret["err"])
-
-	ret = d.Command("Read")(nil).(map[string]interface{})
-	assert.Equal(t, 247.0, ret["val"].(float64))
-	assert.Nil(t, ret["err"])
-
-	// refresh value on read
-	a = newAioTestAdaptor()
-	d = NewAnalogSensorDriver(a, "3")
-	a.analogReadFunc = func() (val int, err error) {
-		val = 150
-		return
-	}
-	assert.Equal(t, 0.0, d.Value())
-	val, err := d.Read()
-	assert.NoError(t, err)
-	assert.Equal(t, 150.0, val)
-	assert.Equal(t, 150.0, d.Value())
-	assert.Equal(t, 150, d.RawValue())
+	// act
+	d := NewAnalogSensorDriver(a, pin)
+	// assert: driver attributes
+	assert.IsType(t, &AnalogSensorDriver{}, d)
+	assert.NotNil(t, d.driverCfg)
+	assert.True(t, strings.HasPrefix(d.Name(), "AnalogSensor"))
+	assert.Equal(t, a, d.Connection())
+	require.NoError(t, d.afterStart())
+	require.NoError(t, d.beforeHalt())
+	assert.NotNil(t, d.Commander)
+	assert.NotNil(t, d.mutex)
+	// assert: sensor attributes
+	assert.Equal(t, pin, d.Pin())
+	assert.InDelta(t, 0.0, d.lastValue, 0, 0)
+	assert.Equal(t, 0, d.lastRawValue)
+	assert.Nil(t, d.halt) // will be created on initialize, if cyclic reading is on
+	assert.NotNil(t, d.Eventer)
+	require.NotNil(t, d.sensorCfg)
+	assert.Equal(t, time.Duration(0), d.sensorCfg.readInterval)
+	assert.NotNil(t, d.sensorCfg.scale)
 }
 
-func TestAnalogSensorDriverWithLinearScaler(t *testing.T) {
+func TestNewAnalogSensorDriver_options(t *testing.T) {
+	// This is a general test, that options are applied in constructor by using the common WithName() option, least one
+	// option of this driver and one of another driver (which should lead to panic). Further tests for options can also
+	// be done by call of "WithOption(val).apply(cfg)".
+	// arrange
+	const (
+		myName     = "voltage 1"
+		cycReadDur = 10 * time.Millisecond
+	)
+	panicFunc := func() {
+		NewAnalogSensorDriver(newAioTestAdaptor(), "1", WithName("crazy"), WithActuatorScaler(func(float64) int { return 0 }))
+	}
+	// act
+	d := NewAnalogSensorDriver(newAioTestAdaptor(), "1", WithName(myName), WithSensorCyclicRead(cycReadDur))
+	// assert
+	assert.Equal(t, cycReadDur, d.sensorCfg.readInterval)
+	assert.Equal(t, myName, d.Name())
+	assert.PanicsWithValue(t, "'scaler option for analog actuators' can not be applied on 'crazy'", panicFunc)
+}
+
+func TestAnalogSensor_WithSensorScaler(t *testing.T) {
+	// arrange
+	myScaler := func(input int) float64 { return float64(input) / 2 }
+	cfg := sensorConfiguration{}
+	// act
+	WithSensorScaler(myScaler).apply(&cfg)
+	// assert
+	assert.InDelta(t, 1.5, cfg.scale(3), 0.0)
+}
+
+func TestAnalogSensorDriverReadRaw(t *testing.T) {
+	tests := map[string]struct {
+		simulateReadErr bool
+		wantVal         int
+		wantErr         string
+	}{
+		"read_raw":   {wantVal: analogReadReturnValue},
+		"error_read": {wantVal: 0, simulateReadErr: true, wantErr: "read error"},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			const pin = "47"
+			a := newAioTestAdaptor()
+			d := NewAnalogSensorDriver(a, pin)
+			a.simulateReadError = tc.simulateReadErr
+			a.written = nil // reset previous writes
+			// act
+			got, err := d.ReadRaw()
+			// assert
+			if tc.wantErr != "" {
+				require.EqualError(t, err, tc.wantErr)
+				assert.Empty(t, a.written)
+			} else {
+				require.NoError(t, err)
+			}
+			assert.Equal(t, tc.wantVal, got)
+		})
+	}
+}
+
+func TestAnalogSensorDriverReadRaw_AnalogWriteNotSupported(t *testing.T) {
+	// arrange
+	d := NewAnalogSensorDriver(newAioTestAdaptor(), "1")
+	d.connection = &aioTestBareAdaptor{}
+	// act & assert
+	got, err := d.ReadRaw()
+	require.EqualError(t, err, "AnalogRead is not supported by the platform 'bare'")
+	assert.Equal(t, 0, got)
+}
+
+func TestAnalogSensorRead_SetScaler(t *testing.T) {
 	// the input scales per default from 0...255
 	tests := map[string]struct {
 		toMin float64
@@ -75,116 +133,143 @@ func TestAnalogSensorDriverWithLinearScaler(t *testing.T) {
 	}
 	a := newAioTestAdaptor()
 	d := NewAnalogSensorDriver(a, "7")
-	for name, tt := range tests {
+	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			d.SetScaler(AnalogSensorLinearScaler(0, 255, tt.toMin, tt.toMax))
-			a.analogReadFunc = func() (val int, err error) {
-				return tt.input, nil
+			d.SetScaler(AnalogSensorLinearScaler(0, 255, tc.toMin, tc.toMax))
+			a.analogReadFunc = func() (int, error) {
+				return tc.input, nil
 			}
 			// act
 			got, err := d.Read()
 			// assert
-			assert.NoError(t, err)
-			assert.Equal(t, tt.want, got)
+			require.NoError(t, err)
+			assert.InDelta(t, tc.want, got, 0.0)
 		})
 	}
 }
 
-func TestAnalogSensorDriverStart(t *testing.T) {
-	sem := make(chan bool, 1)
+func TestAnalogSensor_WithSensorCyclicRead(t *testing.T) {
+	// arrange
 	a := newAioTestAdaptor()
-	d := NewAnalogSensorDriver(a, "1")
+	d := NewAnalogSensorDriver(a, "1", WithSensorCyclicRead(10*time.Millisecond))
 	d.SetScaler(func(input int) float64 { return float64(input * input) })
-
-	// expect data to be received
-	_ = d.Once(d.Event(Data), func(data interface{}) {
-		assert.Equal(t, 100, data.(int))
-		sem <- true
-	})
-
-	_ = d.Once(d.Event(Value), func(data interface{}) {
-		assert.Equal(t, 10000.0, data.(float64))
-		sem <- true
-	})
-
-	// send data
-	a.analogReadFunc = func() (val int, err error) {
-		val = 100
-		return
+	semData := make(chan bool)
+	semDone := make(chan bool)
+	nextVal := make(chan int)
+	readTimeout := 1 * time.Second
+	a.analogReadFunc = func() (int, error) {
+		val := 100
+		var err error
+		select {
+		case val = <-nextVal:
+			if val < 0 {
+				err = fmt.Errorf("analog read error")
+			}
+			return val, err
+		default:
+			return val, nil
+		}
 	}
 
-	assert.NoError(t, d.Start())
+	// act (start cyclic reading)
+	require.NoError(t, d.Start())
 
+	// arrange: expect raw value to be received
+	_ = d.Once(d.Event(Data), func(data interface{}) {
+		assert.Equal(t, 100, data.(int))
+		semData <- true
+	})
+
+	// arrange: expect scaled value to be received
+	_ = d.Once(d.Event(Value), func(value interface{}) {
+		assert.InDelta(t, 10000.0, value.(float64), 0.0)
+		<-semData // wait for data is finished
+		semDone <- true
+		nextVal <- -1 // arrange: error in read function
+	})
+
+	// assert: both events within timeout
 	select {
-	case <-sem:
-	case <-time.After(1 * time.Second):
+	case <-semDone:
+	case <-time.After(readTimeout):
 		t.Errorf("AnalogSensor Event \"Data\" was not published")
 	}
 
-	// expect error to be received
-	_ = d.Once(d.Event(Error), func(data interface{}) {
-		assert.Equal(t, "read error", data.(error).Error())
-		sem <- true
+	// arrange: for error to be received
+	_ = d.Once(d.Event(Error), func(err interface{}) {
+		assert.Equal(t, "analog read error", err.(error).Error())
+		semDone <- true
 	})
 
-	// send error
-	a.analogReadFunc = func() (val int, err error) {
-		err = errors.New("read error")
-		return
-	}
-
+	// assert: error
 	select {
-	case <-sem:
-	case <-time.After(1 * time.Second):
+	case <-semDone:
+	case <-time.After(readTimeout):
 		t.Errorf("AnalogSensor Event \"Error\" was not published")
 	}
 
-	// send a halt message
+	// arrange: for halt message
 	_ = d.Once(d.Event(Data), func(data interface{}) {
-		sem <- true
+		semData <- true
 	})
 
-	_ = d.Once(d.Event(Value), func(data interface{}) {
-		sem <- true
+	_ = d.Once(d.Event(Value), func(value interface{}) {
+		semDone <- true
 	})
 
-	a.analogReadFunc = func() (val int, err error) {
-		val = 200
-		return
-	}
+	// act: send the halt message
+	require.NoError(t, d.Halt())
 
-	d.halt <- true
-
+	// assert: no event
 	select {
-	case <-sem:
-		t.Errorf("AnalogSensor Event should not published")
-	case <-time.After(1 * time.Second):
+	case <-semData:
+		t.Errorf("AnalogSensor Event for data should not published")
+	case <-semDone:
+		t.Errorf("AnalogSensor Event for value should not published")
+	case <-time.After(readTimeout):
 	}
 }
 
-func TestAnalogSensorDriverHalt(t *testing.T) {
-	d := NewAnalogSensorDriver(newAioTestAdaptor(), "1")
-	done := make(chan struct{})
+func TestAnalogSensorHalt_WithSensorCyclicRead(t *testing.T) {
+	// arrange
+	d := NewAnalogSensorDriver(newAioTestAdaptor(), "1", WithSensorCyclicRead(10*time.Millisecond))
+	require.NoError(t, d.Start())
+	timeout := 2 * d.sensorCfg.readInterval
+	wg := sync.WaitGroup{}
+	wg.Add(1)
 	go func() {
-		<-d.halt
-		close(done)
+		defer wg.Done()
+		select {
+		case <-d.halt: // wait until halt is broadcasted by close the channel
+		case <-time.After(timeout): // otherwise run into the timeout
+			assert.Fail(t, "halt was not received within %s", timeout)
+		}
 	}()
-	assert.NoError(t, d.Halt())
-	select {
-	case <-done:
-	case <-time.After(100 * time.Millisecond):
-		t.Errorf("AnalogSensor was not halted")
+	// act & assert
+	require.NoError(t, d.Halt())
+	wg.Wait() // wait until the go function was really finished
+}
+
+func TestAnalogSensorCommands_WithSensorScaler(t *testing.T) {
+	// arrange
+	a := newAioTestAdaptor()
+	d := NewAnalogSensorDriver(a, "42", WithSensorScaler(func(input int) float64 { return 2.5*float64(input) - 3 }))
+	var readReturn int
+	a.analogReadFunc = func() (int, error) {
+		readReturn += 100
+		return readReturn, nil
 	}
-}
-
-func TestAnalogSensorDriverDefaultName(t *testing.T) {
-	d := NewAnalogSensorDriver(newAioTestAdaptor(), "1")
-	assert.True(t, strings.HasPrefix(d.Name(), "AnalogSensor"))
-}
-
-func TestAnalogSensorDriverSetName(t *testing.T) {
-	d := NewAnalogSensorDriver(newAioTestAdaptor(), "1")
-	d.SetName("mybot")
-	assert.Equal(t, "mybot", d.Name())
+	// act & assert: ReadRaw
+	ret := d.Command("ReadRaw")(nil).(map[string]interface{})
+	assert.Equal(t, 100, ret["val"].(int))
+	assert.Nil(t, ret["err"])
+	assert.Equal(t, 100, d.RawValue())
+	assert.InDelta(t, 247.0, d.Value(), 0.0)
+	// act & assert: Read
+	ret = d.Command("Read")(nil).(map[string]interface{})
+	assert.InDelta(t, 497.0, ret["val"].(float64), 0.0)
+	assert.Nil(t, ret["err"])
+	assert.Equal(t, 200, d.RawValue())
+	assert.InDelta(t, 497.0, d.Value(), 0.0)
 }

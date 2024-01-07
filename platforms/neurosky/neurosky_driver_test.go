@@ -1,3 +1,4 @@
+//nolint:forcetypeassert // ok here
 package neurosky
 
 import (
@@ -9,6 +10,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -52,7 +55,7 @@ func TestNeuroskyDriverStart(t *testing.T) {
 		sem <- true
 	})
 
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 
 	time.Sleep(50 * time.Millisecond)
 	rwc.ReadError(e)
@@ -69,7 +72,7 @@ func TestNeuroskyDriverStart(t *testing.T) {
 
 func TestNeuroskyDriverHalt(t *testing.T) {
 	d := initTestNeuroskyDriver()
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 }
 
 func TestNeuroskyDriverParse(t *testing.T) {

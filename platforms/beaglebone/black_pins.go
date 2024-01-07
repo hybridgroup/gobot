@@ -49,23 +49,36 @@ var bbbPinMap = map[string]int{
 	"P9_31": 110,
 }
 
-var bbbPwmPinMap = map[string]pwmPinData{
-	"P8_13": {dir: "/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/", dirRegexp: "pwmchip[0-9]+$", channel: 1},
-	"P8_19": {dir: "/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/", dirRegexp: "pwmchip[0-9]+$", channel: 0},
-
-	"P9_14": {dir: "/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/", dirRegexp: "pwmchip[0-9]+$", channel: 0},
-	"P9_16": {dir: "/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/", dirRegexp: "pwmchip[0-9]+$", channel: 1},
-	"P9_21": {dir: "/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/", dirRegexp: "pwmchip[0-9]+$", channel: 1},
-	"P9_22": {dir: "/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/", dirRegexp: "pwmchip[0-9]+$", channel: 0},
-	"P9_42": {dir: "/sys/devices/platform/ocp/48300000.epwmss/48300100.ecap/pwm/", dirRegexp: "pwmchip[0-9]+$", channel: 0},
+var bbbPwmPinMap = map[string]pwmPinDefinition{
+	"P8_13": {
+		dir: "/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/", dirRegexp: "pwmchip[0-9]+$", channel: 1,
+	},
+	"P8_19": {
+		dir: "/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/", dirRegexp: "pwmchip[0-9]+$", channel: 0,
+	},
+	"P9_14": {
+		dir: "/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/", dirRegexp: "pwmchip[0-9]+$", channel: 0,
+	},
+	"P9_16": {
+		dir: "/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/", dirRegexp: "pwmchip[0-9]+$", channel: 1,
+	},
+	"P9_21": {
+		dir: "/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/", dirRegexp: "pwmchip[0-9]+$", channel: 1,
+	},
+	"P9_22": {
+		dir: "/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/", dirRegexp: "pwmchip[0-9]+$", channel: 0,
+	},
+	"P9_42": {
+		dir: "/sys/devices/platform/ocp/48300000.epwmss/48300100.ecap/pwm/", dirRegexp: "pwmchip[0-9]+$", channel: 0,
+	},
 }
 
-var bbbAnalogPinMap = map[string]string{
-	"P9_39": "in_voltage0_raw",
-	"P9_40": "in_voltage1_raw",
-	"P9_37": "in_voltage2_raw",
-	"P9_38": "in_voltage3_raw",
-	"P9_33": "in_voltage4_raw",
-	"P9_36": "in_voltage5_raw",
-	"P9_35": "in_voltage6_raw",
+var bbbAnalogPinMap = map[string]analogPinDefinition{
+	"P9_39": {path: "/sys/bus/iio/devices/iio:device0/in_voltage0_raw", r: true, w: false, bufLen: 1024},
+	"P9_40": {path: "/sys/bus/iio/devices/iio:device0/in_voltage1_raw", r: true, w: false, bufLen: 1024},
+	"P9_37": {path: "/sys/bus/iio/devices/iio:device0/in_voltage2_raw", r: true, w: false, bufLen: 1024},
+	"P9_38": {path: "/sys/bus/iio/devices/iio:device0/in_voltage3_raw", r: true, w: false, bufLen: 1024},
+	"P9_33": {path: "/sys/bus/iio/devices/iio:device0/in_voltage4_raw", r: true, w: false, bufLen: 1024},
+	"P9_36": {path: "/sys/bus/iio/devices/iio:device0/in_voltage5_raw", r: true, w: false, bufLen: 1024},
+	"P9_35": {path: "/sys/bus/iio/devices/iio:device0/in_voltage6_raw", r: true, w: false, bufLen: 1024},
 }

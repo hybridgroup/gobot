@@ -6,23 +6,28 @@ import (
 	"unsafe"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
 const dev = "/dev/i2c-1"
 
-func getSyscallFuncImpl(errorMask byte) func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno) {
+func getSyscallFuncImpl(
+	errorMask byte,
+) func(trap, a1, a2 uintptr, a3 unsafe.Pointer) (r1, r2 uintptr, err SyscallErrno) {
 	// bit 0: error on function query
 	// bit 1: error on set address
 	// bit 2: error on command
-	return func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno) {
+	//nolint:nonamedreturns // useful here
+	return func(trap, a1, a2 uintptr, a3 unsafe.Pointer) (r1, r2 uintptr, err SyscallErrno) {
 		// function query
 		if (trap == Syscall_SYS_IOCTL) && (a2 == I2C_FUNCS) {
 			if errorMask&0x01 == 0x01 {
 				return 0, 0, 1
 			}
 
-			var funcPtr *uint64 = (*uint64)(unsafe.Pointer(a3))
+			var funcPtr *uint64 = (*uint64)(a3)
 			*funcPtr = I2C_FUNC_SMBUS_READ_BYTE | I2C_FUNC_SMBUS_READ_BYTE_DATA |
 				I2C_FUNC_SMBUS_READ_WORD_DATA |
 				I2C_FUNC_SMBUS_WRITE_BYTE | I2C_FUNC_SMBUS_WRITE_BYTE_DATA |
@@ -79,11 +84,11 @@ func TestNewI2cDevice(t *testing.T) {
 			d, err := a.NewI2cDevice(tc.dev)
 			// assert
 			if tc.wantErr != "" {
-				assert.ErrorContains(t, err, tc.wantErr)
+				require.ErrorContains(t, err, tc.wantErr)
 				assert.Equal(t, (*i2cDevice)(nil), d)
 			} else {
 				var _ gobot.I2cSystemDevicer = d
-				assert.NoError(t, err)
+				require.NoError(t, err)
 			}
 		})
 	}
@@ -93,7 +98,7 @@ func TestClose(t *testing.T) {
 	// arrange
 	d, _ := initTestI2cDeviceWithMockedSys()
 	// act & assert
-	assert.NoError(t, d.Close())
+	require.NoError(t, d.Close())
 }
 
 func TestWriteRead(t *testing.T) {
@@ -105,17 +110,17 @@ func TestWriteRead(t *testing.T) {
 	wn, werr := d.Write(1, wbuf)
 	rn, rerr := d.Read(1, rbuf)
 	// assert
-	assert.NoError(t, werr)
-	assert.NoError(t, rerr)
-	assert.Equal(t, len(wbuf), wn)
-	assert.Equal(t, len(wbuf), rn) // will read only the written values
+	require.NoError(t, werr)
+	require.NoError(t, rerr)
+	assert.Len(t, wbuf, wn)
+	assert.Len(t, wbuf, rn) // will read only the written values
 	assert.Equal(t, rbuf[:len(wbuf)], wbuf)
 }
 
 func TestReadByte(t *testing.T) {
 	tests := map[string]struct {
 		funcs       uint64
-		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
+		syscallImpl func(trap, a1, a2 uintptr, a3 unsafe.Pointer) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
 	}{
 		"read_byte_ok": {
@@ -124,7 +129,8 @@ func TestReadByte(t *testing.T) {
 		"error_syscall": {
 			funcs:       I2C_FUNC_SMBUS_READ_BYTE,
 			syscallImpl: getSyscallFuncImpl(0x04),
-			wantErr:     "SMBus access r/w: 1, command: 0, protocol: 1, address: 2 failed with syscall.Errno operation not permitted",
+			wantErr: "SMBus access r/w: 1, command: 0, protocol: 1, address: 2 " +
+				"failed with syscall.Errno operation not permitted",
 		},
 		"error_not_supported": {
 			wantErr: "SMBus read byte not supported",
@@ -142,9 +148,9 @@ func TestReadByte(t *testing.T) {
 			got, err := d.ReadByte(2)
 			// assert
 			if tc.wantErr != "" {
-				assert.ErrorContains(t, err, tc.wantErr)
+				require.ErrorContains(t, err, tc.wantErr)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, want, got)
 				assert.Equal(t, d.file, msc.lastFile)
 				assert.Equal(t, uintptr(I2C_SMBUS), msc.lastSignal)
@@ -159,7 +165,7 @@ func TestReadByte(t *testing.T) {
 func TestReadByteData(t *testing.T) {
 	tests := map[string]struct {
 		funcs       uint64
-		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
+		syscallImpl func(trap, a1, a2 uintptr, a3 unsafe.Pointer) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
 	}{
 		"read_byte_data_ok": {
@@ -168,7 +174,8 @@ func TestReadByteData(t *testing.T) {
 		"error_syscall": {
 			funcs:       I2C_FUNC_SMBUS_READ_BYTE_DATA,
 			syscallImpl: getSyscallFuncImpl(0x04),
-			wantErr:     "SMBus access r/w: 1, command: 1, protocol: 2, address: 3 failed with syscall.Errno operation not permitted",
+			wantErr: "SMBus access r/w: 1, command: 1, protocol: 2, address: 3 " +
+				"failed with syscall.Errno operation not permitted",
 		},
 		"error_not_supported": {
 			wantErr: "SMBus read byte data not supported",
@@ -189,9 +196,9 @@ func TestReadByteData(t *testing.T) {
 			got, err := d.ReadByteData(3, reg)
 			// assert
 			if tc.wantErr != "" {
-				assert.ErrorContains(t, err, tc.wantErr)
+				require.ErrorContains(t, err, tc.wantErr)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, want, got)
 				assert.Equal(t, d.file, msc.lastFile)
 				assert.Equal(t, uintptr(I2C_SMBUS), msc.lastSignal)
@@ -206,7 +213,7 @@ func TestReadByteData(t *testing.T) {
 func TestReadWordData(t *testing.T) {
 	tests := map[string]struct {
 		funcs       uint64
-		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
+		syscallImpl func(trap, a1, a2 uintptr, a3 unsafe.Pointer) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
 	}{
 		"read_word_data_ok": {
@@ -215,7 +222,8 @@ func TestReadWordData(t *testing.T) {
 		"error_syscall": {
 			funcs:       I2C_FUNC_SMBUS_READ_WORD_DATA,
 			syscallImpl: getSyscallFuncImpl(0x04),
-			wantErr:     "SMBus access r/w: 1, command: 2, protocol: 3, address: 4 failed with syscall.Errno operation not permitted",
+			wantErr: "SMBus access r/w: 1, command: 2, protocol: 3, address: 4 " +
+				"failed with syscall.Errno operation not permitted",
 		},
 		"error_not_supported": {
 			wantErr: "SMBus read word data not supported",
@@ -239,9 +247,9 @@ func TestReadWordData(t *testing.T) {
 			got, err := d.ReadWordData(4, reg)
 			// assert
 			if tc.wantErr != "" {
-				assert.ErrorContains(t, err, tc.wantErr)
+				require.ErrorContains(t, err, tc.wantErr)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, want, got)
 				assert.Equal(t, d.file, msc.lastFile)
 				assert.Equal(t, uintptr(I2C_SMBUS), msc.lastSignal)
@@ -270,7 +278,7 @@ func TestReadBlockData(t *testing.T) {
 	)
 	tests := map[string]struct {
 		funcs       uint64
-		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
+		syscallImpl func(trap, a1, a2 uintptr, a3 unsafe.Pointer) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
 	}{
 		"read_block_data_ok": {
@@ -279,7 +287,8 @@ func TestReadBlockData(t *testing.T) {
 		"error_syscall": {
 			funcs:       I2C_FUNC_SMBUS_READ_I2C_BLOCK,
 			syscallImpl: getSyscallFuncImpl(0x04),
-			wantErr:     "SMBus access r/w: 1, command: 3, protocol: 8, address: 5 failed with syscall.Errno operation not permitted",
+			wantErr: "SMBus access r/w: 1, command: 3, protocol: 8, address: 5 " +
+				"failed with syscall.Errno operation not permitted",
 		},
 		"error_from_used_fallback_if_not_supported": {
 			wantErr: "Read 1 bytes from device by sysfs, expected 10",
@@ -297,9 +306,9 @@ func TestReadBlockData(t *testing.T) {
 			err := d.ReadBlockData(5, reg, buf)
 			// assert
 			if tc.wantErr != "" {
-				assert.ErrorContains(t, err, tc.wantErr)
+				require.ErrorContains(t, err, tc.wantErr)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, msc.dataSlice, buf)
 				assert.Equal(t, d.file, msc.lastFile)
 				assert.Equal(t, uintptr(I2C_SMBUS), msc.lastSignal)
@@ -315,7 +324,7 @@ func TestReadBlockData(t *testing.T) {
 func TestWriteByte(t *testing.T) {
 	tests := map[string]struct {
 		funcs       uint64
-		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
+		syscallImpl func(trap, a1, a2 uintptr, a3 unsafe.Pointer) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
 	}{
 		"write_byte_ok": {
@@ -324,7 +333,8 @@ func TestWriteByte(t *testing.T) {
 		"error_syscall": {
 			funcs:       I2C_FUNC_SMBUS_WRITE_BYTE,
 			syscallImpl: getSyscallFuncImpl(0x04),
-			wantErr:     "SMBus access r/w: 0, command: 68, protocol: 1, address: 6 failed with syscall.Errno operation not permitted",
+			wantErr: "SMBus access r/w: 0, command: 68, protocol: 1, address: 6 " +
+				"failed with syscall.Errno operation not permitted",
 		},
 		"error_not_supported": {
 			wantErr: "SMBus write byte not supported",
@@ -341,9 +351,9 @@ func TestWriteByte(t *testing.T) {
 			err := d.WriteByte(6, val)
 			// assert
 			if tc.wantErr != "" {
-				assert.ErrorContains(t, err, tc.wantErr)
+				require.ErrorContains(t, err, tc.wantErr)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, d.file, msc.lastFile)
 				assert.Equal(t, uintptr(I2C_SMBUS), msc.lastSignal)
 				assert.Equal(t, byte(I2C_SMBUS_WRITE), msc.smbus.readWrite)
@@ -357,7 +367,7 @@ func TestWriteByte(t *testing.T) {
 func TestWriteByteData(t *testing.T) {
 	tests := map[string]struct {
 		funcs       uint64
-		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
+		syscallImpl func(trap, a1, a2 uintptr, a3 unsafe.Pointer) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
 	}{
 		"write_byte_data_ok": {
@@ -366,7 +376,8 @@ func TestWriteByteData(t *testing.T) {
 		"error_syscall": {
 			funcs:       I2C_FUNC_SMBUS_WRITE_BYTE_DATA,
 			syscallImpl: getSyscallFuncImpl(0x04),
-			wantErr:     "SMBus access r/w: 0, command: 4, protocol: 2, address: 7 failed with syscall.Errno operation not permitted",
+			wantErr: "SMBus access r/w: 0, command: 4, protocol: 2, address: 7 " +
+				"failed with syscall.Errno operation not permitted",
 		},
 		"error_not_supported": {
 			wantErr: "SMBus write byte data not supported",
@@ -386,15 +397,15 @@ func TestWriteByteData(t *testing.T) {
 			err := d.WriteByteData(7, reg, val)
 			// assert
 			if tc.wantErr != "" {
-				assert.ErrorContains(t, err, tc.wantErr)
+				require.ErrorContains(t, err, tc.wantErr)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, d.file, msc.lastFile)
 				assert.Equal(t, uintptr(I2C_SMBUS), msc.lastSignal)
 				assert.Equal(t, byte(I2C_SMBUS_WRITE), msc.smbus.readWrite)
 				assert.Equal(t, reg, msc.smbus.command)
 				assert.Equal(t, uint32(I2C_SMBUS_BYTE_DATA), msc.smbus.protocol)
-				assert.Equal(t, 1, len(msc.dataSlice))
+				assert.Len(t, msc.dataSlice, 1)
 				assert.Equal(t, val, msc.dataSlice[0])
 			}
 		})
@@ -404,7 +415,7 @@ func TestWriteByteData(t *testing.T) {
 func TestWriteWordData(t *testing.T) {
 	tests := map[string]struct {
 		funcs       uint64
-		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
+		syscallImpl func(trap, a1, a2 uintptr, a3 unsafe.Pointer) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
 	}{
 		"write_word_data_ok": {
@@ -413,7 +424,8 @@ func TestWriteWordData(t *testing.T) {
 		"error_syscall": {
 			funcs:       I2C_FUNC_SMBUS_WRITE_WORD_DATA,
 			syscallImpl: getSyscallFuncImpl(0x04),
-			wantErr:     "SMBus access r/w: 0, command: 5, protocol: 3, address: 8 failed with syscall.Errno operation not permitted",
+			wantErr: "SMBus access r/w: 0, command: 5, protocol: 3, address: 8 " +
+				"failed with syscall.Errno operation not permitted",
 		},
 		"error_not_supported": {
 			wantErr: "SMBus write word data not supported",
@@ -435,15 +447,15 @@ func TestWriteWordData(t *testing.T) {
 			err := d.WriteWordData(8, reg, val)
 			// assert
 			if tc.wantErr != "" {
-				assert.ErrorContains(t, err, tc.wantErr)
+				require.ErrorContains(t, err, tc.wantErr)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, d.file, msc.lastFile)
 				assert.Equal(t, uintptr(I2C_SMBUS), msc.lastSignal)
 				assert.Equal(t, byte(I2C_SMBUS_WRITE), msc.smbus.readWrite)
 				assert.Equal(t, reg, msc.smbus.command)
 				assert.Equal(t, uint32(I2C_SMBUS_WORD_DATA), msc.smbus.protocol)
-				assert.Equal(t, 2, len(msc.dataSlice))
+				assert.Len(t, msc.dataSlice, 2)
 				// all common drivers write LSByte first
 				assert.Equal(t, wantLSByte, msc.dataSlice[0])
 				assert.Equal(t, wantMSByte, msc.dataSlice[1])
@@ -469,7 +481,7 @@ func TestWriteBlockData(t *testing.T) {
 	)
 	tests := map[string]struct {
 		funcs       uint64
-		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
+		syscallImpl func(trap, a1, a2 uintptr, a3 unsafe.Pointer) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
 	}{
 		"write_block_data_ok": {
@@ -478,7 +490,8 @@ func TestWriteBlockData(t *testing.T) {
 		"error_syscall": {
 			funcs:       I2C_FUNC_SMBUS_WRITE_I2C_BLOCK,
 			syscallImpl: getSyscallFuncImpl(0x04),
-			wantErr:     "SMBus access r/w: 0, command: 6, protocol: 8, address: 9 failed with syscall.Errno operation not permitted",
+			wantErr: "SMBus access r/w: 0, command: 6, protocol: 8, address: 9 " +
+				"failed with syscall.Errno operation not permitted",
 		},
 	}
 	for name, tc := range tests {
@@ -492,9 +505,9 @@ func TestWriteBlockData(t *testing.T) {
 			err := d.WriteBlockData(9, reg, data)
 			// assert
 			if tc.wantErr != "" {
-				assert.ErrorContains(t, err, tc.wantErr)
+				require.ErrorContains(t, err, tc.wantErr)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, d.file, msc.lastFile)
 				assert.Equal(t, uintptr(I2C_SMBUS), msc.lastSignal)
 				assert.Equal(t, uint8(len(data)+1), msc.sliceSize) // including size element
@@ -514,7 +527,7 @@ func TestWriteBlockDataTooMuch(t *testing.T) {
 	// act
 	err := d.WriteBlockData(10, 0x01, make([]byte, 33))
 	// assert
-	assert.ErrorContains(t, err, "Writing blocks larger than 32 bytes (33) not supported")
+	require.ErrorContains(t, err, "Writing blocks larger than 32 bytes (33) not supported")
 }
 
 func Test_setAddress(t *testing.T) {
@@ -523,7 +536,7 @@ func Test_setAddress(t *testing.T) {
 	// act
 	err := d.setAddress(0xff)
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, uintptr(0xff), msc.devAddress)
 }
 
@@ -531,7 +544,7 @@ func Test_queryFunctionality(t *testing.T) {
 	tests := map[string]struct {
 		requested   uint64
 		dev         string
-		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
+		syscallImpl func(trap, a1, a2 uintptr, a3 unsafe.Pointer) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
 		wantFile    bool
 		wantFuncs   uint64
@@ -565,9 +578,9 @@ func Test_queryFunctionality(t *testing.T) {
 			err := d.queryFunctionality(tc.requested, "test"+name)
 			// assert
 			if tc.wantErr != "" {
-				assert.ErrorContains(t, err, tc.wantErr)
+				require.ErrorContains(t, err, tc.wantErr)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 			}
 			if tc.wantFile {
 				assert.NotNil(t, d.file)

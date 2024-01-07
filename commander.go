@@ -8,7 +8,7 @@ type commander struct {
 // which exposes API commands.
 type Commander interface {
 	// Command returns a command given a name. Returns nil if the command is not found.
-	Command(string) (command func(map[string]interface{}) interface{})
+	Command(name string) (command func(map[string]interface{}) interface{})
 	// Commands returns a map of commands.
 	Commands() (commands map[string]func(map[string]interface{}) interface{})
 	// AddCommand adds a command given a name.

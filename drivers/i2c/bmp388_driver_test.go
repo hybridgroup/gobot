@@ -8,6 +8,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -72,7 +74,9 @@ func TestBMP388Measurements(t *testing.T) {
 			_ = binary.Write(buf, binary.LittleEndian, uint8(0x50))
 		case bmp388RegCalib00:
 			// Values produced by dumping data from actual sensor
-			buf.Write([]byte{36, 107, 156, 73, 246, 104, 255, 189, 245, 35, 0, 151, 101, 184, 122, 243, 246, 211, 64, 14, 196, 0, 0, 0})
+			buf.Write([]byte{
+				36, 107, 156, 73, 246, 104, 255, 189, 245, 35, 0, 151, 101, 184, 122, 243, 246, 211, 64, 14, 196, 0, 0, 0,
+			})
 		case bmp388RegTempData:
 			buf.Write([]byte{0, 28, 127})
 		case bmp388RegPressureData:
@@ -84,14 +88,14 @@ func TestBMP388Measurements(t *testing.T) {
 	}
 	_ = d.Start()
 	temp, err := d.Temperature(2)
-	assert.NoError(t, err)
-	assert.Equal(t, float32(22.906143), temp)
+	require.NoError(t, err)
+	assert.InDelta(t, float32(22.906143), temp, 0.0)
 	pressure, err := d.Pressure(2)
-	assert.NoError(t, err)
-	assert.Equal(t, float32(98874.85), pressure)
+	require.NoError(t, err)
+	assert.InDelta(t, float32(98874.85), pressure, 0.0)
 	alt, err := d.Altitude(2)
-	assert.NoError(t, err)
-	assert.Equal(t, float32(205.89395), alt)
+	require.NoError(t, err)
+	assert.InDelta(t, float32(205.89395), alt, 0.0)
 }
 
 func TestBMP388TemperatureWriteError(t *testing.T) {
@@ -102,8 +106,8 @@ func TestBMP388TemperatureWriteError(t *testing.T) {
 		return 0, errors.New("write error")
 	}
 	temp, err := d.Temperature(2)
-	assert.ErrorContains(t, err, "write error")
-	assert.Equal(t, float32(0.0), temp)
+	require.ErrorContains(t, err, "write error")
+	assert.InDelta(t, float32(0.0), temp, 0.0)
 }
 
 func TestBMP388TemperatureReadError(t *testing.T) {
@@ -114,8 +118,8 @@ func TestBMP388TemperatureReadError(t *testing.T) {
 		return 0, errors.New("read error")
 	}
 	temp, err := d.Temperature(2)
-	assert.ErrorContains(t, err, "read error")
-	assert.Equal(t, float32(0.0), temp)
+	require.ErrorContains(t, err, "read error")
+	assert.InDelta(t, float32(0.0), temp, 0.0)
 }
 
 func TestBMP388PressureWriteError(t *testing.T) {
@@ -126,8 +130,8 @@ func TestBMP388PressureWriteError(t *testing.T) {
 		return 0, errors.New("write error")
 	}
 	press, err := d.Pressure(2)
-	assert.ErrorContains(t, err, "write error")
-	assert.Equal(t, float32(0.0), press)
+	require.ErrorContains(t, err, "write error")
+	assert.InDelta(t, float32(0.0), press, 0.0)
 }
 
 func TestBMP388PressureReadError(t *testing.T) {
@@ -138,8 +142,8 @@ func TestBMP388PressureReadError(t *testing.T) {
 		return 0, errors.New("read error")
 	}
 	press, err := d.Pressure(2)
-	assert.ErrorContains(t, err, "read error")
-	assert.Equal(t, float32(0.0), press)
+	require.ErrorContains(t, err, "read error")
+	assert.InDelta(t, float32(0.0), press, 0.0)
 }
 
 func TestBMP388_initialization(t *testing.T) {
@@ -162,7 +166,9 @@ func TestBMP388_initialization(t *testing.T) {
 		wantConfRegVal    = uint8(0x00) // no filter
 	)
 	// Values produced by dumping data from actual sensor
-	returnRead := []byte{36, 107, 156, 73, 246, 104, 255, 189, 245, 35, 0, 151, 101, 184, 122, 243, 246, 211, 64, 14, 196, 0, 0, 0}
+	returnRead := []byte{
+		36, 107, 156, 73, 246, 104, 255, 189, 245, 35, 0, 151, 101, 184, 122, 243, 246, 211, 64, 14, 196, 0, 0, 0,
+	}
 	numCallsRead := 0
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		numCallsRead++
@@ -176,25 +182,25 @@ func TestBMP388_initialization(t *testing.T) {
 	// act, assert - initialization() must be called on Start()
 	err := d.Start()
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, 2, numCallsRead)
-	assert.Equal(t, 6, len(a.written))
+	assert.Len(t, a.written, 6)
 	assert.Equal(t, wantChipIDReg, a.written[0])
 	assert.Equal(t, wantCalibReg, a.written[1])
 	assert.Equal(t, wantCommandReg, a.written[2])
 	assert.Equal(t, wantCommandRegVal, a.written[3])
 	assert.Equal(t, wantConfReg, a.written[4])
 	assert.Equal(t, wantConfRegVal, a.written[5])
-	assert.Equal(t, float32(7.021568e+06), d.calCoeffs.t1)
-	assert.Equal(t, float32(1.7549843e-05), d.calCoeffs.t2)
-	assert.Equal(t, float32(-3.5527137e-14), d.calCoeffs.t3)
-	assert.Equal(t, float32(-0.015769958), d.calCoeffs.p1)
-	assert.Equal(t, float32(-3.5410747e-05), d.calCoeffs.p2)
-	assert.Equal(t, float32(8.1490725e-09), d.calCoeffs.p3)
-	assert.Equal(t, float32(0), d.calCoeffs.p4)
-	assert.Equal(t, float32(208056), d.calCoeffs.p5)
-	assert.Equal(t, float32(490.875), d.calCoeffs.p6)
-	assert.Equal(t, float32(-0.05078125), d.calCoeffs.p7)
-	assert.Equal(t, float32(-0.00030517578), d.calCoeffs.p8)
-	assert.Equal(t, float32(5.8957283e-11), d.calCoeffs.p9)
+	assert.InDelta(t, float32(7.021568e+06), d.calCoeffs.t1, 0.0)
+	assert.InDelta(t, float32(1.7549843e-05), d.calCoeffs.t2, 0.0)
+	assert.InDelta(t, float32(-3.5527137e-14), d.calCoeffs.t3, 0.0)
+	assert.InDelta(t, float32(-0.015769958), d.calCoeffs.p1, 0.0)
+	assert.InDelta(t, float32(-3.5410747e-05), d.calCoeffs.p2, 0.0)
+	assert.InDelta(t, float32(8.1490725e-09), d.calCoeffs.p3, 0.0)
+	assert.InDelta(t, float32(0), d.calCoeffs.p4, 0.0)
+	assert.InDelta(t, float32(208056), d.calCoeffs.p5, 0.0)
+	assert.InDelta(t, float32(490.875), d.calCoeffs.p6, 0.0)
+	assert.InDelta(t, float32(-0.05078125), d.calCoeffs.p7, 0.0)
+	assert.InDelta(t, float32(-0.00030517578), d.calCoeffs.p8, 0.0)
+	assert.InDelta(t, float32(5.8957283e-11), d.calCoeffs.p9, 0.0)
 }

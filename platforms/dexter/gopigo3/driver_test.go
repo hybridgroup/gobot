@@ -5,6 +5,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/spi"
 )
@@ -22,235 +24,172 @@ func initTestDriver() *Driver {
 
 func TestDriverStart(t *testing.T) {
 	d := initTestDriver()
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 }
 
 func TestDriverHalt(t *testing.T) {
 	d := initTestDriver()
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 }
 
 func TestDriverManufacturerName(t *testing.T) {
-	expectedName := "Dexter Industries"
+	wantName := "Dexter Industries"
 	d := initTestDriver()
 	name, err := d.GetManufacturerName()
-	if err != nil {
-		t.Error(err)
-	}
-	if name != expectedName {
-		t.Errorf("Expected name: %x, got: %x", expectedName, name)
-	}
+	require.NoError(t, err)
+	assert.Equal(t, wantName, name)
 }
 
 func TestDriverBoardName(t *testing.T) {
-	expectedBoardName := "GoPiGo3"
+	wantBoardName := "GoPiGo3"
 	d := initTestDriver()
 	name, err := d.GetBoardName()
-	if err != nil {
-		t.Error(err)
-	}
-	if name != expectedBoardName {
-		t.Errorf("Expected name: %s, got: %s", expectedBoardName, name)
-	}
+	require.NoError(t, err)
+	assert.Equal(t, wantBoardName, name)
 }
 
 func TestDriverHardwareVersion(t *testing.T) {
-	expectedHwVer := "3.1.3"
+	wantHwVer := "3.1.3"
 	d := initTestDriver()
 	ver, err := d.GetHardwareVersion()
-	if err != nil {
-		t.Error(err)
-	}
-	if ver != expectedHwVer {
-		t.Errorf("Expected hw ver: %s, got: %s", expectedHwVer, ver)
-	}
+	require.NoError(t, err)
+	assert.Equal(t, wantHwVer, ver)
 }
 
 func TestDriverFirmareVersion(t *testing.T) {
-	expectedFwVer := "0.3.4"
+	wantFwVer := "0.3.4"
 	d := initTestDriver()
 	ver, err := d.GetFirmwareVersion()
-	if err != nil {
-		t.Error(err)
-	}
-	if ver != expectedFwVer {
-		t.Errorf("Expected fw ver: %s, got: %s", expectedFwVer, ver)
-	}
+	require.NoError(t, err)
+	assert.Equal(t, wantFwVer, ver)
 }
 
 func TestGetSerialNumber(t *testing.T) {
-	expectedSerialNumber := "E0180A54514E343732202020FF112137"
+	wantSerialNumber := "E0180A54514E343732202020FF112137"
 	d := initTestDriver()
 	serial, err := d.GetSerialNumber()
-	if err != nil {
-		t.Error(err)
-	}
-	if serial != expectedSerialNumber {
-		t.Errorf("Expected serial number: %s, got: %s", expectedSerialNumber, serial)
-	}
+	require.NoError(t, err)
+	assert.Equal(t, wantSerialNumber, serial)
 }
 
 func TestGetFiveVolts(t *testing.T) {
-	expectedVoltage := float32(5.047000)
+	wantVoltage := float32(5.047000)
 	d := initTestDriver()
 	voltage, err := d.Get5vVoltage()
-	if err != nil {
-		t.Error(err)
-	}
-	if voltage != expectedVoltage {
-		t.Errorf("Expected 5v voltage: %f, got: %f", expectedVoltage, voltage)
-	}
+	require.NoError(t, err)
+	assert.InDelta(t, wantVoltage, voltage, 0.0)
 }
 
 func TestGetBatVolts(t *testing.T) {
-	expectedBatVoltage := float32(15.411000)
+	wantBatVoltage := float32(15.411000)
 	d := initTestDriver()
 	voltage, err := d.GetBatteryVoltage()
-	if err != nil {
-		t.Error(err)
-	}
-	if voltage != expectedBatVoltage {
-		t.Errorf("Expected battery voltage: %f, got: %f", expectedBatVoltage, voltage)
-	}
+	require.NoError(t, err)
+	assert.InDelta(t, wantBatVoltage, voltage, 0.0)
 }
 
 func TestGetMotorStatus(t *testing.T) {
-	expectedPower := uint16(65408)
+	wantPower := uint16(65408)
 	d := initTestDriver()
-	_, power, _, _, err := d.GetMotorStatus(MOTOR_LEFT)
-	if err != nil {
-		t.Error(err)
-	}
-	if power != expectedPower {
-		t.Errorf("Expected power: %d, got: %d", expectedPower, power)
-	}
+	f1, power, f2, f3, err := d.GetMotorStatus(MOTOR_LEFT)
+	require.NoError(t, err)
+	assert.Equal(t, wantPower, power)
+	assert.Equal(t, uint8(0), f1)
+	assert.Equal(t, 0, f2)
+	assert.Equal(t, 0, f3)
 }
 
 func TestGetEncoderStatusPos(t *testing.T) {
 	negativeEncoder = false
-	expectedEncoderValue := int64(127)
+	wantEncoderValue := int64(127)
 	d := initTestDriver()
 	encoderValue, err := d.GetMotorEncoder(MOTOR_LEFT)
-	if err != nil {
-		t.Error(err)
-	}
-	if encoderValue != expectedEncoderValue {
-		t.Errorf("Expected encoder value: %d, got: %d", expectedEncoderValue, encoderValue)
-	}
+	require.NoError(t, err)
+	assert.Equal(t, wantEncoderValue, encoderValue)
 }
 
 func TestGetEncoderStatusNeg(t *testing.T) {
 	negativeEncoder = true
-	expectedEncoderValue := int64(-128)
+	wantEncoderValue := int64(-128)
 	d := initTestDriver()
 	encoderValue, err := d.GetMotorEncoder(MOTOR_LEFT)
-	if err != nil {
-		t.Error(err)
-	}
-	if encoderValue != expectedEncoderValue {
-		t.Errorf("Expected encoder value: %d, got: %d", expectedEncoderValue, encoderValue)
-	}
+	require.NoError(t, err)
+	assert.Equal(t, wantEncoderValue, encoderValue)
 }
 
 func TestAnalogRead(t *testing.T) {
-	expectedVal := 160
+	wantVal := 160
 	d := initTestDriver()
 	val, err := d.AnalogRead("AD_1_1")
-	if err != nil {
-		t.Error(err)
-	}
-	if val != expectedVal {
-		t.Errorf("Expected value: %d, got: %d", expectedVal, val)
-	}
+	require.NoError(t, err)
+	assert.Equal(t, wantVal, val)
 }
 
 func TestDigitalRead(t *testing.T) {
-	expectedVal := 1
+	wantVal := 1
 	d := initTestDriver()
 	val, err := d.DigitalRead("AD_1_2")
-	if err != nil {
-		t.Error(err)
-	}
-	if val != expectedVal {
-		t.Errorf("Expected value: %d, got: %d", expectedVal, val)
-	}
+	require.NoError(t, err)
+	assert.Equal(t, wantVal, val)
 }
 
 func TestServoWrite(t *testing.T) {
 	d := initTestDriver()
 	err := d.ServoWrite("SERVO_1", 0x7F)
-	if err != nil {
-		t.Error(err)
-	}
+	require.NoError(t, err)
 }
 
 func TestSetMotorPosition(t *testing.T) {
 	d := initTestDriver()
 	err := d.SetMotorPosition(MOTOR_LEFT, 12.0)
-	if err != nil {
-		t.Error(err)
-	}
+	require.NoError(t, err)
 }
 
 func TestSetMotorPower(t *testing.T) {
 	d := initTestDriver()
 	err := d.SetMotorPower(MOTOR_LEFT, 127)
-	if err != nil {
-		t.Error(err)
-	}
+	require.NoError(t, err)
 }
 
 func TestSetMotorDps(t *testing.T) {
 	d := initTestDriver()
 	err := d.SetMotorDps(MOTOR_LEFT, 12.0)
-	if err != nil {
-		t.Error(err)
-	}
+	require.NoError(t, err)
 }
 
 func TestOffsetMotorEncoder(t *testing.T) {
 	d := initTestDriver()
 	err := d.OffsetMotorEncoder(MOTOR_LEFT, 12.0)
-	if err != nil {
-		t.Error(err)
-	}
+	require.NoError(t, err)
 }
 
 func TestSetPWMDuty(t *testing.T) {
 	d := initTestDriver()
 	err := d.SetPWMDuty(AD_1_1_G, 80)
-	if err != nil {
-		t.Error(err)
-	}
+	require.NoError(t, err)
 }
 
 func TestSetPWMfreq(t *testing.T) {
 	d := initTestDriver()
 	err := d.SetPWMFreq(AD_1_2_G, 100)
-	if err != nil {
-		t.Error(err)
-	}
+	require.NoError(t, err)
 }
 
 func TestPwmWrite(t *testing.T) {
 	d := initTestDriver()
 	err := d.PwmWrite("AD_2_2", 80)
-	if err != nil {
-		t.Error(err)
-	}
+	require.NoError(t, err)
 }
 
 func TestDigitalWrite(t *testing.T) {
 	d := initTestDriver()
 	err := d.DigitalWrite("AD_2_1", 1)
-	if err != nil {
-		t.Error(err)
-	}
+	require.NoError(t, err)
 }
 
 type TestConnector struct{}
 
-func (ctr *TestConnector) GetSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (device spi.Connection, err error) {
+func (ctr *TestConnector) GetSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (spi.Connection, error) {
 	return TestSpiDevice{}, nil
 }
 

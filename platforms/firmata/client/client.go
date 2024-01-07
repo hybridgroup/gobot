@@ -135,11 +135,13 @@ func (b *Client) Disconnect() error {
 
 // Connecting returns true when the client is connecting
 func (b *Client) Connecting() bool {
+	//nolint:forcetypeassert // ok here
 	return b.connecting.Load().(bool)
 }
 
 // Connected returns the current connection state of the Client
 func (b *Client) Connected() bool {
+	//nolint:forcetypeassert // ok here
 	return b.connected.Load().(bool)
 }
 
@@ -371,7 +373,7 @@ func (b *Client) WriteSysex(data []byte) error {
 }
 
 func (b *Client) write(data []byte) error {
-	_, err := b.connection.Write(data[:])
+	_, err := b.connection.Write(data)
 	return err
 }
 
@@ -530,7 +532,7 @@ func (b *Client) process() error {
 					name = append(name, val)
 				}
 			}
-			b.FirmwareName = string(name[:])
+			b.FirmwareName = string(name)
 			b.Publish(b.Event("FirmwareQuery"), b.FirmwareName)
 		case StringData:
 			str := currentBuffer[2:]

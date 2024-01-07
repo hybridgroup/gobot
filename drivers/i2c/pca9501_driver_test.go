@@ -1,3 +1,4 @@
+//nolint:forcetypeassert // ok here
 package i2c
 
 import (
@@ -6,6 +7,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -160,9 +163,9 @@ func TestPCA9501WriteGPIO(t *testing.T) {
 			// act
 			err := d.WriteGPIO(tc.pin, tc.setVal)
 			// assert
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, 2, numCallsRead)
-			assert.Equal(t, 2, len(a.written))
+			assert.Len(t, a.written, 2)
 			assert.Equal(t, tc.wantPin, a.written[0])
 			assert.Equal(t, tc.wantState, a.written[1])
 		})
@@ -193,7 +196,7 @@ func TestPCA9501WriteGPIOErrorAtWriteDirection(t *testing.T) {
 	err := d.WriteGPIO(7, 0)
 	// assert
 	assert.Equal(t, wantErr, err)
-	assert.True(t, numCallsRead < 2)
+	assert.Less(t, numCallsRead, 2)
 	assert.Equal(t, 1, numCallsWrite)
 }
 
@@ -254,10 +257,10 @@ func TestPCA9501ReadGPIO(t *testing.T) {
 			// act
 			got, err := d.ReadGPIO(pin)
 			// assert
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, tc.want, got)
 			assert.Equal(t, 2, numCallsRead)
-			assert.Equal(t, 1, len(a.written))
+			assert.Len(t, a.written, 1)
 			assert.Equal(t, wantCtrlState, a.written[0])
 		})
 	}
@@ -334,7 +337,7 @@ func TestPCA9501WriteEEPROM(t *testing.T) {
 	// act
 	err := d.WriteEEPROM(addressEEPROM, want)
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, 1, numCallsWrite)
 	assert.Equal(t, addressEEPROM, a.written[0])
 	assert.Equal(t, want, a.written[1])
@@ -363,7 +366,7 @@ func TestPCA9501ReadEEPROM(t *testing.T) {
 	// act
 	val, err := d.ReadEEPROM(addressEEPROM)
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, want, val)
 	assert.Equal(t, 1, numCallsWrite)
 	assert.Equal(t, addressEEPROM, a.written[0])
@@ -419,6 +422,6 @@ func TestPCA9501_initialize(t *testing.T) {
 	// act
 	err := d.initialize()
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, want, a.address)
 }

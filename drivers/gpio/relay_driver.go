@@ -1,121 +1,137 @@
 package gpio
 
-import "gobot.io/x/gobot/v2"
+import (
+	"fmt"
+
+	"gobot.io/x/gobot/v2"
+)
+
+// relayOptionApplier needs to be implemented by each configurable option type
+type relayOptionApplier interface {
+	apply(cfg *relayConfiguration)
+}
+
+// relayConfiguration contains all changeable attributes of the driver.
+type relayConfiguration struct {
+	inverted bool
+}
+
+// relayInvertedOption is the type for applying inverted behavior to the configuration
+type relayInvertedOption bool
 
 // RelayDriver represents a digital relay
 type RelayDriver struct {
-	pin        string
-	name       string
-	connection DigitalWriter
-	high       bool
-	Inverted   bool
-	gobot.Commander
+	*driver
+	relayCfg *relayConfiguration
+	high     bool
 }
 
 // NewRelayDriver return a new RelayDriver given a DigitalWriter and pin.
+//
+// Supported options:
+//
+//	"WithName"
+//	"WithRelayInverted"
 //
 // Adds the following API Commands:
 //
 //	"Toggle" - See RelayDriver.Toggle
 //	"On" - See RelayDriver.On
 //	"Off" - See RelayDriver.Off
-func NewRelayDriver(a DigitalWriter, pin string) *RelayDriver {
-	l := &RelayDriver{
-		name:       gobot.DefaultName("Relay"),
-		pin:        pin,
-		connection: a,
-		high:       false,
-		Inverted:   false,
-		Commander:  gobot.NewCommander(),
+func NewRelayDriver(a DigitalWriter, pin string, opts ...interface{}) *RelayDriver {
+	//nolint:forcetypeassert // no error return value, so there is no better way
+	d := &RelayDriver{
+		driver:   newDriver(a.(gobot.Connection), "Relay", withPin(pin)),
+		relayCfg: &relayConfiguration{},
 	}
 
-	l.AddCommand("Toggle", func(params map[string]interface{}) interface{} {
-		return l.Toggle()
+	for _, opt := range opts {
+		switch o := opt.(type) {
+		case optionApplier:
+			o.apply(d.driverCfg)
+		case relayOptionApplier:
+			o.apply(d.relayCfg)
+		default:
+			panic(fmt.Sprintf("'%s' can not be applied on '%s'", opt, d.driverCfg.name))
+		}
+	}
+
+	d.AddCommand("Toggle", func(params map[string]interface{}) interface{} {
+		return d.Toggle()
 	})
 
-	l.AddCommand("On", func(params map[string]interface{}) interface{} {
-		return l.On()
+	d.AddCommand("On", func(params map[string]interface{}) interface{} {
+		return d.On()
 	})
 
-	l.AddCommand("Off", func(params map[string]interface{}) interface{} {
-		return l.Off()
+	d.AddCommand("Off", func(params map[string]interface{}) interface{} {
+		return d.Off()
 	})
 
-	return l
+	return d
 }
 
-// Start implements the Driver interface
-func (l *RelayDriver) Start() (err error) { return }
-
-// Halt implements the Driver interface
-func (l *RelayDriver) Halt() (err error) { return }
-
-// Name returns the RelayDrivers name
-func (l *RelayDriver) Name() string { return l.name }
-
-// SetName sets the RelayDrivers name
-func (l *RelayDriver) SetName(n string) { l.name = n }
-
-// Pin returns the RelayDrivers name
-func (l *RelayDriver) Pin() string { return l.pin }
-
-// Connection returns the RelayDrivers Connection
-func (l *RelayDriver) Connection() gobot.Connection {
-	return l.connection.(gobot.Connection)
+// WithRelayInverted change the relay action to inverted.
+func WithRelayInverted() relayOptionApplier {
+	return relayInvertedOption(true)
 }
 
 // State return true if the relay is On and false if the relay is Off
-func (l *RelayDriver) State() bool {
-	if l.Inverted {
-		return !l.high
+func (d *RelayDriver) State() bool {
+	if d.relayCfg.inverted {
+		return !d.high
 	}
-	return l.high
+	return d.high
 }
 
 // On sets the relay to a high state.
-func (l *RelayDriver) On() (err error) {
+func (d *RelayDriver) On() error {
 	newValue := byte(1)
-	if l.Inverted {
+	if d.relayCfg.inverted {
 		newValue = 0
 	}
-	if err = l.connection.DigitalWrite(l.Pin(), newValue); err != nil {
-		return
+	if err := d.digitalWrite(d.driverCfg.pin, newValue); err != nil {
+		return err
 	}
 
-	if l.Inverted {
-		l.high = false
-	} else {
-		l.high = true
-	}
+	d.high = !d.relayCfg.inverted
 
-	return
+	return nil
 }
 
 // Off sets the relay to a low state.
-func (l *RelayDriver) Off() (err error) {
+func (d *RelayDriver) Off() error {
 	newValue := byte(0)
-	if l.Inverted {
+	if d.relayCfg.inverted {
 		newValue = 1
 	}
-	if err = l.connection.DigitalWrite(l.Pin(), newValue); err != nil {
-		return
+	if err := d.digitalWrite(d.driverCfg.pin, newValue); err != nil {
+		return err
 	}
 
-	if l.Inverted {
-		l.high = true
-	} else {
-		l.high = false
-	}
+	d.high = d.relayCfg.inverted
 
-	return
+	return nil
 }
 
 // Toggle sets the relay to the opposite of it's current state
-func (l *RelayDriver) Toggle() (err error) {
-	if l.State() {
-		err = l.Off()
-	} else {
-		err = l.On()
+func (d *RelayDriver) Toggle() error {
+	if d.State() {
+		return d.Off()
 	}
-	return
+
+	return d.On()
+}
+
+// IsInverted returns true if the relay acts inverted
+func (d *RelayDriver) IsInverted() bool {
+	return d.relayCfg.inverted
+}
+
+func (o relayInvertedOption) String() string {
+	return "relay acts inverted option"
+}
+
+func (o relayInvertedOption) apply(cfg *relayConfiguration) {
+	cfg.inverted = bool(o)
 }

@@ -275,16 +275,16 @@ a shared set of drivers provided using the `gobot/drivers/gpio` package:
   - Buzzer
   - Direct Pin
   - EasyDriver
-  - Grove Button
-  - Grove Buzzer
-  - Grove LED
-  - Grove Magnetic Switch
-  - Grove Relay
-  - Grove Touch Sensor
+  - Grove Button (by using driver for Button)
+  - Grove Buzzer (by using driver for Buzzer)
+  - Grove LED (by using driver for LED)
+  - Grove Magnetic Switch (by using driver for Button)
+  - Grove Relay (by using driver for Relay)
+  - Grove Touch Sensor (by using driver for Button)
   - HC-SR04 Ultrasonic Ranging Module
   - HD44780 LCD controller
   - LED
-  - Makey Button
+  - Makey Button (by using driver for Button)
   - MAX7219 LED Dot Matrix
   - Motor
   - Proximity Infra Red (PIR) Motion Sensor
@@ -298,12 +298,15 @@ Support for many devices that use Analog Input/Output (AIO) have
 a shared set of drivers provided using the `gobot/drivers/aio` package:
 
 - [AIO](https://en.wikipedia.org/wiki/Analog-to-digital_converter) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/aio)
+  - Analog Actuator
   - Analog Sensor
   - Grove Light Sensor
   - Grove Piezo Vibration Sensor
   - Grove Rotary Dial
   - Grove Sound Sensor
   - Grove Temperature Sensor
+  - Temperature Sensor (supports linear and NTC thermistor in normal and inverse mode)
+  - Thermal Zone Temperature Sensor
 
 Support for devices that use Inter-Integrated Circuit (I2C) have a shared set of
 drivers provided using the `gobot/drivers/i2c` package:

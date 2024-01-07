@@ -7,6 +7,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -56,15 +58,18 @@ func TestBME280Measurements(t *testing.T) {
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
 		// Values produced by dumping data from actual sensor
-		if adaptor.written[len(adaptor.written)-1] == bmp280RegCalib00 {
-			buf.Write([]byte{126, 109, 214, 102, 50, 0, 54, 149, 220, 213, 208, 11, 64, 30, 166, 255, 249, 255, 172, 38, 10, 216, 189, 16})
-		} else if adaptor.written[len(adaptor.written)-1] == bme280RegCalibDigH1 {
+		switch {
+		case adaptor.written[len(adaptor.written)-1] == bmp280RegCalib00:
+			buf.Write([]byte{
+				126, 109, 214, 102, 50, 0, 54, 149, 220, 213, 208, 11, 64, 30, 166, 255, 249, 255, 172, 38, 10, 216, 189, 16,
+			})
+		case adaptor.written[len(adaptor.written)-1] == bme280RegCalibDigH1:
 			buf.Write([]byte{75})
-		} else if adaptor.written[len(adaptor.written)-1] == bmp280RegTempData {
+		case adaptor.written[len(adaptor.written)-1] == bmp280RegTempData:
 			buf.Write([]byte{129, 0, 0})
-		} else if adaptor.written[len(adaptor.written)-1] == bme280RegCalibDigH2LSB {
+		case adaptor.written[len(adaptor.written)-1] == bme280RegCalibDigH2LSB:
 			buf.Write([]byte{112, 1, 0, 19, 1, 0, 30})
-		} else if adaptor.written[len(adaptor.written)-1] == bme280RegHumidityMSB {
+		case adaptor.written[len(adaptor.written)-1] == bme280RegHumidityMSB:
 			buf.Write([]byte{111, 83})
 		}
 		copy(b, buf.Bytes())
@@ -72,8 +77,8 @@ func TestBME280Measurements(t *testing.T) {
 	}
 	_ = bme280.Start()
 	hum, err := bme280.Humidity()
-	assert.NoError(t, err)
-	assert.Equal(t, float32(51.20179), hum)
+	require.NoError(t, err)
+	assert.InDelta(t, float32(51.20179), hum, 0.0)
 }
 
 func TestBME280InitH1Error(t *testing.T) {
@@ -81,18 +86,21 @@ func TestBME280InitH1Error(t *testing.T) {
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
 		// Values produced by dumping data from actual sensor
-		if adaptor.written[len(adaptor.written)-1] == bmp280RegCalib00 {
-			buf.Write([]byte{126, 109, 214, 102, 50, 0, 54, 149, 220, 213, 208, 11, 64, 30, 166, 255, 249, 255, 172, 38, 10, 216, 189, 16})
-		} else if adaptor.written[len(adaptor.written)-1] == bme280RegCalibDigH1 {
+		switch {
+		case adaptor.written[len(adaptor.written)-1] == bmp280RegCalib00:
+			buf.Write([]byte{
+				126, 109, 214, 102, 50, 0, 54, 149, 220, 213, 208, 11, 64, 30, 166, 255, 249, 255, 172, 38, 10, 216, 189, 16,
+			})
+		case adaptor.written[len(adaptor.written)-1] == bme280RegCalibDigH1:
 			return 0, errors.New("h1 read error")
-		} else if adaptor.written[len(adaptor.written)-1] == bme280RegCalibDigH2LSB {
+		case adaptor.written[len(adaptor.written)-1] == bme280RegCalibDigH2LSB:
 			buf.Write([]byte{112, 1, 0, 19, 1, 0, 30})
 		}
 		copy(b, buf.Bytes())
 		return buf.Len(), nil
 	}
 
-	assert.ErrorContains(t, bme280.Start(), "h1 read error")
+	require.ErrorContains(t, bme280.Start(), "h1 read error")
 }
 
 func TestBME280InitH2Error(t *testing.T) {
@@ -100,18 +108,21 @@ func TestBME280InitH2Error(t *testing.T) {
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
 		// Values produced by dumping data from actual sensor
-		if adaptor.written[len(adaptor.written)-1] == bmp280RegCalib00 {
-			buf.Write([]byte{126, 109, 214, 102, 50, 0, 54, 149, 220, 213, 208, 11, 64, 30, 166, 255, 249, 255, 172, 38, 10, 216, 189, 16})
-		} else if adaptor.written[len(adaptor.written)-1] == bme280RegCalibDigH1 {
+		switch {
+		case adaptor.written[len(adaptor.written)-1] == bmp280RegCalib00:
+			buf.Write([]byte{
+				126, 109, 214, 102, 50, 0, 54, 149, 220, 213, 208, 11, 64, 30, 166, 255, 249, 255, 172, 38, 10, 216, 189, 16,
+			})
+		case adaptor.written[len(adaptor.written)-1] == bme280RegCalibDigH1:
 			buf.Write([]byte{75})
-		} else if adaptor.written[len(adaptor.written)-1] == bme280RegCalibDigH2LSB {
+		case adaptor.written[len(adaptor.written)-1] == bme280RegCalibDigH2LSB:
 			return 0, errors.New("h2 read error")
 		}
 		copy(b, buf.Bytes())
 		return buf.Len(), nil
 	}
 
-	assert.ErrorContains(t, bme280.Start(), "h2 read error")
+	require.ErrorContains(t, bme280.Start(), "h2 read error")
 }
 
 func TestBME280HumidityWriteError(t *testing.T) {
@@ -122,8 +133,8 @@ func TestBME280HumidityWriteError(t *testing.T) {
 		return 0, errors.New("write error")
 	}
 	hum, err := bme280.Humidity()
-	assert.ErrorContains(t, err, "write error")
-	assert.Equal(t, float32(0.0), hum)
+	require.ErrorContains(t, err, "write error")
+	assert.InDelta(t, float32(0.0), hum, 0.0)
 }
 
 func TestBME280HumidityReadError(t *testing.T) {
@@ -134,8 +145,8 @@ func TestBME280HumidityReadError(t *testing.T) {
 		return 0, errors.New("read error")
 	}
 	hum, err := bme280.Humidity()
-	assert.ErrorContains(t, err, "read error")
-	assert.Equal(t, float32(0.0), hum)
+	require.ErrorContains(t, err, "read error")
+	assert.InDelta(t, float32(0.0), hum, 0.0)
 }
 
 func TestBME280HumidityNotEnabled(t *testing.T) {
@@ -143,15 +154,18 @@ func TestBME280HumidityNotEnabled(t *testing.T) {
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
 		// Values produced by dumping data from actual sensor
-		if adaptor.written[len(adaptor.written)-1] == bmp280RegCalib00 {
-			buf.Write([]byte{126, 109, 214, 102, 50, 0, 54, 149, 220, 213, 208, 11, 64, 30, 166, 255, 249, 255, 172, 38, 10, 216, 189, 16})
-		} else if adaptor.written[len(adaptor.written)-1] == bme280RegCalibDigH1 {
+		switch {
+		case adaptor.written[len(adaptor.written)-1] == bmp280RegCalib00:
+			buf.Write([]byte{
+				126, 109, 214, 102, 50, 0, 54, 149, 220, 213, 208, 11, 64, 30, 166, 255, 249, 255, 172, 38, 10, 216, 189, 16,
+			})
+		case adaptor.written[len(adaptor.written)-1] == bme280RegCalibDigH1:
 			buf.Write([]byte{75})
-		} else if adaptor.written[len(adaptor.written)-1] == bmp280RegTempData {
+		case adaptor.written[len(adaptor.written)-1] == bmp280RegTempData:
 			buf.Write([]byte{129, 0, 0})
-		} else if adaptor.written[len(adaptor.written)-1] == bme280RegCalibDigH2LSB {
+		case adaptor.written[len(adaptor.written)-1] == bme280RegCalibDigH2LSB:
 			buf.Write([]byte{112, 1, 0, 19, 1, 0, 30})
-		} else if adaptor.written[len(adaptor.written)-1] == bme280RegHumidityMSB {
+		case adaptor.written[len(adaptor.written)-1] == bme280RegHumidityMSB:
 			buf.Write([]byte{0x80, 0x00})
 		}
 		copy(b, buf.Bytes())
@@ -159,8 +173,8 @@ func TestBME280HumidityNotEnabled(t *testing.T) {
 	}
 	_ = bme280.Start()
 	hum, err := bme280.Humidity()
-	assert.ErrorContains(t, err, "Humidity disabled")
-	assert.Equal(t, float32(0.0), hum)
+	require.ErrorContains(t, err, "Humidity disabled")
+	assert.InDelta(t, float32(0.0), hum, 0.0)
 }
 
 func TestBME280_initializationBME280(t *testing.T) {
@@ -186,5 +200,5 @@ func TestBME280_initializationBME280(t *testing.T) {
 		}
 		return 0, nil
 	}
-	assert.NoError(t, bme280.Start())
+	require.NoError(t, bme280.Start())
 }

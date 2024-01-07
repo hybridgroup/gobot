@@ -3,6 +3,7 @@ package i2c
 import (
 	"encoding/binary"
 	"fmt"
+	"log"
 	"strconv"
 	"sync"
 
@@ -81,7 +82,12 @@ func (d *Driver) SetName(name string) {
 
 // Connection returns the connection of the i2c device.
 func (d *Driver) Connection() gobot.Connection {
-	return d.connector.(gobot.Connection)
+	if conn, ok := d.connector.(gobot.Connection); ok {
+		return conn
+	}
+
+	log.Printf("%s has no gobot connection\n", d.name)
+	return nil
 }
 
 // Start initializes the i2c device.

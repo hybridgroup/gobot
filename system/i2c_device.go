@@ -111,7 +111,7 @@ func (d *i2cDevice) ReadByte(address int) (byte, error) {
 }
 
 // ReadByteData reads a byte from the given register of an i2c device.
-func (d *i2cDevice) ReadByteData(address int, reg uint8) (val uint8, err error) {
+func (d *i2cDevice) ReadByteData(address int, reg uint8) (uint8, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
@@ -120,12 +120,12 @@ func (d *i2cDevice) ReadByteData(address int, reg uint8) (val uint8, err error) 
 	}
 
 	var data uint8 = 0xFD // set value for debugging purposes
-	err = d.smbusAccess(address, I2C_SMBUS_READ, reg, I2C_SMBUS_BYTE_DATA, unsafe.Pointer(&data))
+	err := d.smbusAccess(address, I2C_SMBUS_READ, reg, I2C_SMBUS_BYTE_DATA, unsafe.Pointer(&data))
 	return data, err
 }
 
 // ReadWordData reads a 16 bit value starting from the given register of an i2c device.
-func (d *i2cDevice) ReadWordData(address int, reg uint8) (val uint16, err error) {
+func (d *i2cDevice) ReadWordData(address int, reg uint8) (uint16, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
@@ -134,7 +134,7 @@ func (d *i2cDevice) ReadWordData(address int, reg uint8) (val uint16, err error)
 	}
 
 	var data uint16 = 0xFFFE // set value for debugging purposes
-	err = d.smbusAccess(address, I2C_SMBUS_READ, reg, I2C_SMBUS_WORD_DATA, unsafe.Pointer(&data))
+	err := d.smbusAccess(address, I2C_SMBUS_READ, reg, I2C_SMBUS_WORD_DATA, unsafe.Pointer(&data))
 	return data, err
 }
 
@@ -160,7 +160,8 @@ func (d *i2cDevice) ReadBlockData(address int, reg uint8, data []byte) error {
 	buf := make([]byte, dataLen+1)
 	buf[0] = byte(dataLen)
 	copy(buf[1:], data)
-	if err := d.smbusAccess(address, I2C_SMBUS_READ, reg, I2C_SMBUS_I2C_BLOCK_DATA, unsafe.Pointer(&buf[0])); err != nil {
+	if err := d.smbusAccess(address, I2C_SMBUS_READ, reg, I2C_SMBUS_I2C_BLOCK_DATA,
+		unsafe.Pointer(&buf[0])); err != nil {
 		return err
 	}
 	// get data from buffer without first size element
@@ -240,7 +241,7 @@ func (d *i2cDevice) WriteBytes(address int, data []byte) error {
 }
 
 // Read implements direct I2C read operations.
-func (d *i2cDevice) Read(address int, b []byte) (n int, err error) {
+func (d *i2cDevice) Read(address int, b []byte) (int, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
@@ -248,7 +249,7 @@ func (d *i2cDevice) Read(address int, b []byte) (n int, err error) {
 }
 
 // Write implements the io.ReadWriteCloser method by direct I2C write operations.
-func (d *i2cDevice) Write(address int, b []byte) (n int, err error) {
+func (d *i2cDevice) Write(address int, b []byte) (int, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
@@ -287,8 +288,8 @@ func (d *i2cDevice) writeBytes(address int, data []byte) error {
 	return nil
 }
 
-func (d *i2cDevice) write(address int, b []byte) (n int, err error) {
-	if err = d.setAddress(address); err != nil {
+func (d *i2cDevice) write(address int, b []byte) (int, error) {
+	if err := d.setAddress(address); err != nil {
 		return 0, err
 	}
 	if err := d.openFileLazy("Write"); err != nil {
@@ -308,8 +309,8 @@ func (d *i2cDevice) readAndCheckCount(address int, data []byte) error {
 	return nil
 }
 
-func (d *i2cDevice) read(address int, b []byte) (n int, err error) {
-	if err = d.setAddress(address); err != nil {
+func (d *i2cDevice) read(address int, b []byte) (int, error) {
+	if err := d.setAddress(address); err != nil {
 		return 0, err
 	}
 	if err := d.openFileLazy("Read"); err != nil {
@@ -322,7 +323,7 @@ func (d *i2cDevice) read(address int, b []byte) (n int, err error) {
 func (d *i2cDevice) queryFunctionality(requested uint64, sender string) error {
 	// lazy initialization
 	if d.funcs == 0 {
-		if err := d.syscallIoctl(I2C_FUNCS, unsafe.Pointer(&d.funcs), "Querying functionality"); err != nil {
+		if err := d.syscallIoctl(I2C_FUNCS, unsafe.Pointer(&d.funcs), 0, "Querying functionality"); err != nil {
 			return err
 		}
 	}
@@ -334,7 +335,13 @@ func (d *i2cDevice) queryFunctionality(requested uint64, sender string) error {
 	return nil
 }
 
-func (d *i2cDevice) smbusAccess(address int, readWrite byte, command byte, protocol uint32, dataStart unsafe.Pointer) error {
+func (d *i2cDevice) smbusAccess(
+	address int,
+	readWrite byte,
+	command byte,
+	protocol uint32,
+	dataStart unsafe.Pointer,
+) error {
 	if err := d.setAddress(address); err != nil {
 		return err
 	}
@@ -346,8 +353,9 @@ func (d *i2cDevice) smbusAccess(address int, readWrite byte, command byte, proto
 		data:      dataStart, // the reflected value of unsafePointer equals uintptr(dataStart),
 	}
 
-	sender := fmt.Sprintf("SMBus access r/w: %d, command: %d, protocol: %d, address: %d", readWrite, command, protocol, d.lastAddress)
-	if err := d.syscallIoctl(I2C_SMBUS, unsafe.Pointer(&smbus), sender); err != nil {
+	sender := fmt.Sprintf("SMBus access r/w: %d, command: %d, protocol: %d, address: %d",
+		readWrite, command, protocol, d.lastAddress)
+	if err := d.syscallIoctl(I2C_SMBUS, unsafe.Pointer(&smbus), 0, sender); err != nil {
 		return err
 	}
 
@@ -362,31 +370,32 @@ func (d *i2cDevice) setAddress(address int) error {
 		}
 		return nil
 	}
-	// for go vet false positives, see: https://github.com/golang/go/issues/41205
-	if err := d.syscallIoctl(I2C_SLAVE, unsafe.Pointer(uintptr(byte(address))), "Setting address"); err != nil {
+
+	if err := d.syscallIoctl(I2C_SLAVE, nil, address, "Setting address"); err != nil {
 		return err
 	}
 	d.lastAddress = address
 	return nil
 }
 
-func (d *i2cDevice) syscallIoctl(signal uintptr, payload unsafe.Pointer, sender string) (err error) {
+func (d *i2cDevice) syscallIoctl(signal uintptr, payload unsafe.Pointer, address int, sender string) error {
 	if err := d.openFileLazy(sender); err != nil {
 		return err
 	}
-	if _, _, errno := d.sys.syscall(Syscall_SYS_IOCTL, d.file, signal, payload); errno != 0 {
+	if _, _, errno := d.sys.syscall(Syscall_SYS_IOCTL, d.file, signal, payload, uint16(address)); errno != 0 {
 		return fmt.Errorf("%s failed with syscall.Errno %v", sender, errno)
 	}
 
 	return nil
 }
 
-func (d *i2cDevice) openFileLazy(sender string) (err error) { //nolint:unparam // useful for debugging
+func (d *i2cDevice) openFileLazy(sender string) error { //nolint:unparam // useful for debugging
 	// lazy initialization
 	// note: "os.ModeExclusive" is undefined without create the file. This means for the existing character device,
 	// a second open will not return an error e.g. due to a busy resource, so most likely "os.ModeExclusive" is not really
 	// helpful and we drop it to the default "0" used by normal Open().
 	if d.file == nil {
+		var err error
 		if d.file, err = d.fs.openFile(d.location, os.O_RDWR, 0); err != nil {
 			return err
 		}

@@ -1,9 +1,11 @@
+//nolint:forcetypeassert // ok here
 package system
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNewAccesser(t *testing.T) {
@@ -34,7 +36,7 @@ func TestNewAccesser_NewSpiDevice(t *testing.T) {
 	// act
 	con, err := a.NewSpiDevice(busNum, chipNum, mode, bits, maxSpeed)
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, con)
 	assert.Equal(t, busNum, spi.busNum)
 	assert.Equal(t, chipNum, spi.chipNum)
@@ -80,7 +82,7 @@ func TestNewAccesser_IsSysfsDigitalPinAccess(t *testing.T) {
 				assert.True(t, got)
 				dpaSys := a.digitalPinAccess.(*sysfsDigitalPinAccess)
 				assert.NotNil(t, dpaSys)
-				assert.Equal(t, a.fs.(*nativeFilesystem), dpaSys.fs)
+				assert.Equal(t, a.fs.(*nativeFilesystem), dpaSys.sfa.fs)
 			} else {
 				assert.False(t, got)
 				dpaGpiod := a.digitalPinAccess.(*gpiodDigitalPinAccess)

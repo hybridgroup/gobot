@@ -23,7 +23,7 @@ jobs:
       - run:
           name: Core and drivers tests
           command:  |
-            go test -v -coverprofile=coverage.txt -covermode=atomic . ./drivers/...
+            go test -race -v -coverprofile=coverage.txt -covermode=atomic . ./drivers/...
       - run:
           name: Code coverage
           command: |
@@ -41,7 +41,7 @@ jobs:
           # digispark needs libusb, opencv needs opencv
           name: Platform tests (except digispark and opencv)
           command: |
-            go test -v $(go list ./platforms/... | grep -v platforms/digispark | grep -v platforms/opencv)
+            go test -race -v $(go list ./platforms/... | grep -v platforms/digispark | grep -v platforms/opencv)
   
   "check_examples":
     docker:

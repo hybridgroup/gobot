@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/hashicorp/go-multierror"
+
 	"gobot.io/x/gobot/v2"
 )
 

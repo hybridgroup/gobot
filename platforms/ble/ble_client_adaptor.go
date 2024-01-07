@@ -6,9 +6,9 @@ import (
 	"sync"
 	"time"
 
-	"gobot.io/x/gobot/v2"
-
 	"tinygo.org/x/bluetooth"
+
+	"gobot.io/x/gobot/v2"
 )
 
 var (
@@ -18,17 +18,16 @@ var (
 
 // BLEConnector is the interface that a BLE ClientAdaptor must implement
 type BLEConnector interface {
-	Connect() error
+	gobot.Adaptor
+
 	Reconnect() error
 	Disconnect() error
-	Finalize() error
-	Name() string
-	SetName(string)
 	Address() string
-	ReadCharacteristic(string) ([]byte, error)
-	WriteCharacteristic(string, []byte) error
-	Subscribe(string, func([]byte, error)) error
-	WithoutResponses(bool)
+
+	ReadCharacteristic(cUUID string) ([]byte, error)
+	WriteCharacteristic(cUUID string, data []byte) error
+	Subscribe(cUUID string, f func([]byte, error)) error
+	WithoutResponses(use bool)
 }
 
 // ClientAdaptor represents a Client Connection to a BLE Peripheral
@@ -155,7 +154,7 @@ func (b *ClientAdaptor) Finalize() error {
 
 // ReadCharacteristic returns bytes from the BLE device for the
 // requested characteristic uuid
-func (b *ClientAdaptor) ReadCharacteristic(cUUID string) (data []byte, err error) {
+func (b *ClientAdaptor) ReadCharacteristic(cUUID string) ([]byte, error) {
 	if !b.connected {
 		return nil, fmt.Errorf("Cannot read from BLE device until connected")
 	}

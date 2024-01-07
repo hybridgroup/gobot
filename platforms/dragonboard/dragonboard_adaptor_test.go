@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/gpio"
 	"gobot.io/x/gobot/v2/drivers/i2c"
@@ -54,8 +56,8 @@ func TestDigitalIO(t *testing.T) {
 	i, _ := a.DigitalRead("GPIO_A")
 	assert.Equal(t, 1, i)
 
-	assert.ErrorContains(t, a.DigitalWrite("GPIO_M", 1), "'GPIO_M' is not a valid id for a digital pin")
-	assert.NoError(t, a.Finalize())
+	require.ErrorContains(t, a.DigitalWrite("GPIO_M", 1), "'GPIO_M' is not a valid id for a digital pin")
+	require.NoError(t, a.Finalize())
 }
 
 func TestFinalizeErrorAfterGPIO(t *testing.T) {
@@ -70,13 +72,13 @@ func TestFinalizeErrorAfterGPIO(t *testing.T) {
 	}
 	fs := a.sys.UseMockFilesystem(mockPaths)
 
-	assert.NoError(t, a.Connect())
-	assert.NoError(t, a.DigitalWrite("GPIO_B", 1))
+	require.NoError(t, a.Connect())
+	require.NoError(t, a.DigitalWrite("GPIO_B", 1))
 
 	fs.WithWriteError = true
 
 	err := a.Finalize()
-	assert.Contains(t, err.Error(), "write error")
+	require.ErrorContains(t, err, "write error")
 }
 
 func TestI2cDefaultBus(t *testing.T) {
@@ -89,16 +91,16 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	a := NewAdaptor()
 	a.sys.UseMockSyscall()
 	fs := a.sys.UseMockFilesystem([]string{"/dev/i2c-1"})
-	assert.NoError(t, a.Connect())
+	require.NoError(t, a.Connect())
 	con, err := a.GetI2cConnection(0xff, 1)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	_, err = con.Write([]byte{0xbf})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	fs.WithCloseError = true
 	// act
 	err = a.Finalize()
 	// assert
-	assert.Contains(t, err.Error(), "close error")
+	require.ErrorContains(t, err, "close error")
 }
 
 func Test_validateI2cBusNumber(t *testing.T) {

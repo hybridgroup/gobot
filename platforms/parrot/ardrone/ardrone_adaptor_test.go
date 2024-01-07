@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -29,12 +31,12 @@ func TestArdroneAdaptor(t *testing.T) {
 
 func TestArdroneAdaptorConnect(t *testing.T) {
 	a := initTestArdroneAdaptor()
-	assert.NoError(t, a.Connect())
+	require.NoError(t, a.Connect())
 
 	a.connect = func(a *Adaptor) (drone, error) {
 		return nil, errors.New("connection error")
 	}
-	assert.ErrorContains(t, a.Connect(), "connection error")
+	require.ErrorContains(t, a.Connect(), "connection error")
 }
 
 func TestArdroneAdaptorName(t *testing.T) {
@@ -46,5 +48,5 @@ func TestArdroneAdaptorName(t *testing.T) {
 
 func TestArdroneAdaptorFinalize(t *testing.T) {
 	a := initTestArdroneAdaptor()
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.Finalize())
 }

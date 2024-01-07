@@ -8,6 +8,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/aio"
@@ -18,7 +19,7 @@ import (
 func main() {
 	raspiAdaptor := raspi.NewAdaptor()
 	gpg3 := gopigo3.NewDriver(raspiAdaptor)
-	sensor := aio.NewGroveLightSensorDriver(gpg3, "AD_1_1")
+	sensor := aio.NewGroveLightSensorDriver(gpg3, "AD_1_1", aio.WithSensorCyclicRead(500*time.Millisecond))
 
 	work := func() {
 		sensor.On(sensor.Event("data"), func(data interface{}) {

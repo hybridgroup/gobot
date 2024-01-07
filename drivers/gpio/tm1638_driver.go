@@ -25,151 +25,54 @@ const (
 	TM1638FixedAddr = 0x04
 )
 
-// TM1638Driver is the gobot driver for modules based on the TM1638, which has 8 7-segment displays, 8 LEDs and 8 buttons
-// Buttons are not supported
+// TM1638Driver is the driver for modules based on the TM1638, which has 8 7-segment displays, 8 LEDs and 8 buttons.
+// Buttons are not supported yet by this driver.
 //
 // Datasheet EN: https://retrocip.cz/files/tm1638.pdf
 // Datasheet CN: http://www.datasheetspdf.com/pdf/775356/TitanMicro/TM1638/1
 //
 // Ported from the Arduino driver https://github.com/rjbatista/tm1638-library
 type TM1638Driver struct {
-	pinClock   *DirectPinDriver
-	pinData    *DirectPinDriver
-	pinStrobe  *DirectPinDriver
-	fonts      map[string]byte
-	name       string
-	connection gobot.Connection
-	gobot.Commander
+	*driver
+	pinClock  *DirectPinDriver
+	pinData   *DirectPinDriver
+	pinStrobe *DirectPinDriver
+	fonts     map[string]byte
 }
 
 // NewTM1638Driver return a new TM1638Driver given a gobot.Connection and the clock, data and strobe pins
-func NewTM1638Driver(a gobot.Connection, clockPin string, dataPin string, strobePin string) *TM1638Driver {
-	t := &TM1638Driver{
-		name:       gobot.DefaultName("TM1638"),
-		pinClock:   NewDirectPinDriver(a, clockPin),
-		pinData:    NewDirectPinDriver(a, dataPin),
-		pinStrobe:  NewDirectPinDriver(a, strobePin),
-		fonts:      NewTM1638Fonts(),
-		connection: a,
-		Commander:  gobot.NewCommander(),
+//
+// Supported options:
+//
+//	"WithName"
+func NewTM1638Driver(a gobot.Connection, clockPin, dataPin, strobePin string, opts ...interface{}) *TM1638Driver {
+	d := &TM1638Driver{
+		driver:    newDriver(a, "TM1638", opts...),
+		pinClock:  NewDirectPinDriver(a, clockPin),
+		pinData:   NewDirectPinDriver(a, dataPin),
+		pinStrobe: NewDirectPinDriver(a, strobePin),
+		fonts:     NewTM1638Fonts(),
 	}
+	d.afterStart = d.initialize
 
 	/* TODO : Add commands */
 
-	return t
-}
-
-// Start initializes the tm1638, it uses a SPI-like communication protocol
-func (t *TM1638Driver) Start() error {
-	if err := t.pinStrobe.On(); err != nil {
-		return err
-	}
-	if err := t.pinClock.On(); err != nil {
-		return err
-	}
-
-	if err := t.sendCommand(TM1638DataCmd); err != nil {
-		return err
-	}
-	if err := t.sendCommand(TM1638DispCtrl | 8 | 7); err != nil {
-		return err
-	}
-
-	if err := t.pinStrobe.Off(); err != nil {
-		return err
-	}
-	if err := t.send(TM1638AddrCmd); err != nil {
-		return err
-	}
-	for i := 0; i < 16; i++ {
-		if err := t.send(TM1638WriteDisp); err != nil {
-			return err
-		}
-	}
-	return t.pinStrobe.On()
-}
-
-// Halt implements the Driver interface
-func (t *TM1638Driver) Halt() error { return nil }
-
-// Name returns the TM1638Drivers name
-func (t *TM1638Driver) Name() string { return t.name }
-
-// SetName sets the TM1638Drivers name
-func (t *TM1638Driver) SetName(n string) { t.name = n }
-
-// Connection returns the TM1638Driver Connection
-func (t *TM1638Driver) Connection() gobot.Connection {
-	return t.connection
-}
-
-// sendCommand is an auxiliary function to send commands to the TM1638 module
-func (t *TM1638Driver) sendCommand(cmd byte) error {
-	if err := t.pinStrobe.Off(); err != nil {
-		return err
-	}
-	if err := t.send(cmd); err != nil {
-		return err
-	}
-	return t.pinStrobe.On()
-}
-
-// send writes data on the module
-func (t *TM1638Driver) send(data byte) error {
-	for i := 0; i < 8; i++ {
-		if err := t.pinClock.Off(); err != nil {
-			return err
-		}
-
-		if (data & 1) > 0 {
-			if err := t.pinData.On(); err != nil {
-				return err
-			}
-		} else {
-			if err := t.pinData.Off(); err != nil {
-				return err
-			}
-		}
-		data >>= 1
-
-		if err := t.pinClock.On(); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// sendData is an auxiliary function to send data to the TM1638 module
-func (t *TM1638Driver) sendData(address byte, data byte) error {
-	if err := t.sendCommand(TM1638DataCmd | TM1638FixedAddr); err != nil {
-		return err
-	}
-	if err := t.pinStrobe.Off(); err != nil {
-		return err
-	}
-	if err := t.send(TM1638AddrCmd | address); err != nil {
-		return err
-	}
-	if err := t.send(data); err != nil {
-		return err
-	}
-	return t.pinStrobe.On()
+	return d
 }
 
 // SetLED changes the color (TM1638None, TM1638Red, TM1638Green) of the specific LED
-func (t *TM1638Driver) SetLED(color byte, pos byte) error {
+func (d *TM1638Driver) SetLED(color byte, pos byte) error {
 	if pos > 7 {
 		return nil
 	}
-	return t.sendData((pos<<1)+1, color)
+	return d.sendData((pos<<1)+1, color)
 }
 
 // SetDisplay cuts and sends a byte array to the display (without dots)
-func (t *TM1638Driver) SetDisplay(data []byte) error {
+func (d *TM1638Driver) SetDisplay(data []byte) error {
 	minLength := int(math.Min(8, float64(len(data))))
 	for i := 0; i < minLength; i++ {
-		if err := t.SendChar(byte(i), data[i], false); err != nil {
+		if err := d.SendChar(byte(i), data[i], false); err != nil {
 			return err
 		}
 	}
@@ -177,11 +80,11 @@ func (t *TM1638Driver) SetDisplay(data []byte) error {
 }
 
 // SetDisplayText cuts and sends a string to the display (without dots)
-func (t *TM1638Driver) SetDisplayText(text string) error {
-	data := t.fromStringToByteArray(text)
+func (d *TM1638Driver) SetDisplayText(text string) error {
+	data := d.fromStringToByteArray(text)
 	minLength := int(math.Min(8, float64(len(data))))
 	for i := 0; i < minLength; i++ {
-		if err := t.SendChar(byte(i), data[i], false); err != nil {
+		if err := d.SendChar(byte(i), data[i], false); err != nil {
 			return err
 		}
 	}
@@ -189,7 +92,7 @@ func (t *TM1638Driver) SetDisplayText(text string) error {
 }
 
 // SendChar sends one byte to the specific position in the display
-func (t *TM1638Driver) SendChar(pos byte, data byte, dot bool) error {
+func (d *TM1638Driver) SendChar(pos byte, data byte, dot bool) error {
 	if pos > 7 {
 		return nil
 	}
@@ -197,33 +100,117 @@ func (t *TM1638Driver) SendChar(pos byte, data byte, dot bool) error {
 	if dot {
 		dotData = TM1638DispCtrl
 	}
-	return t.sendData(pos<<1, data|(dotData))
+	return d.sendData(pos<<1, data|(dotData))
+}
+
+// AddFonts adds new custom fonts or modify the representation of existing ones
+func (d *TM1638Driver) AddFonts(fonts map[string]byte) {
+	for k, v := range fonts {
+		d.fonts[k] = v
+	}
+}
+
+// ClearFonts removes all the fonts from the driver
+func (d *TM1638Driver) ClearFonts() {
+	d.fonts = make(map[string]byte)
+}
+
+// initialize initializes the tm1638, it uses a SPI-like communication protocol
+func (d *TM1638Driver) initialize() error {
+	if err := d.pinStrobe.On(); err != nil {
+		return err
+	}
+	if err := d.pinClock.On(); err != nil {
+		return err
+	}
+
+	if err := d.sendCommand(TM1638DataCmd); err != nil {
+		return err
+	}
+	if err := d.sendCommand(TM1638DispCtrl | 8 | 7); err != nil {
+		return err
+	}
+
+	if err := d.pinStrobe.Off(); err != nil {
+		return err
+	}
+	if err := d.send(TM1638AddrCmd); err != nil {
+		return err
+	}
+	for i := 0; i < 16; i++ {
+		if err := d.send(TM1638WriteDisp); err != nil {
+			return err
+		}
+	}
+	return d.pinStrobe.On()
 }
 
 // fromStringToByteArray translates a string to a byte array with the corresponding representation
 // for the 7-segment LCD, return and empty character if the font is not available
-func (t *TM1638Driver) fromStringToByteArray(str string) []byte {
+func (d *TM1638Driver) fromStringToByteArray(str string) []byte {
 	chars := strings.Split(str, "")
 	data := make([]byte, len(chars))
 
 	for index, char := range chars {
-		if val, ok := t.fonts[char]; ok {
+		if val, ok := d.fonts[char]; ok {
 			data[index] = val
 		}
 	}
 	return data
 }
 
-// AddFonts adds new custom fonts or modify the representation of existing ones
-func (t *TM1638Driver) AddFonts(fonts map[string]byte) {
-	for k, v := range fonts {
-		t.fonts[k] = v
+// sendData is an auxiliary function to send data to the TM1638 module
+func (d *TM1638Driver) sendData(address byte, data byte) error {
+	if err := d.sendCommand(TM1638DataCmd | TM1638FixedAddr); err != nil {
+		return err
 	}
+	if err := d.pinStrobe.Off(); err != nil {
+		return err
+	}
+	if err := d.send(TM1638AddrCmd | address); err != nil {
+		return err
+	}
+	if err := d.send(data); err != nil {
+		return err
+	}
+	return d.pinStrobe.On()
 }
 
-// ClearFonts removes all the fonts from the driver
-func (t *TM1638Driver) ClearFonts() {
-	t.fonts = make(map[string]byte)
+// sendCommand is an auxiliary function to send commands to the TM1638 module
+func (d *TM1638Driver) sendCommand(cmd byte) error {
+	if err := d.pinStrobe.Off(); err != nil {
+		return err
+	}
+	if err := d.send(cmd); err != nil {
+		return err
+	}
+	return d.pinStrobe.On()
+}
+
+// send writes data on the module
+func (d *TM1638Driver) send(data byte) error {
+	for i := 0; i < 8; i++ {
+		if err := d.pinClock.Off(); err != nil {
+			return err
+		}
+
+		if (data & 1) > 0 {
+			if err := d.pinData.On(); err != nil {
+				return err
+			}
+		} else {
+			if err := d.pinData.Off(); err != nil {
+				return err
+			}
+		}
+		data >>= 1
+
+		if err := d.pinClock.On(); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // NewTM1638Fonts returns a map with fonts and their corresponding byte for proper representation on the 7-segment LCD

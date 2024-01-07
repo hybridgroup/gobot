@@ -7,6 +7,7 @@ import (
 	"time"
 
 	js "github.com/0xcafed00d/joystick"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -106,6 +107,7 @@ func (j *Driver) Connection() gobot.Connection { return j.connection }
 
 // adaptor returns joystick adaptor
 func (j *Driver) adaptor() *Adaptor {
+	//nolint:forcetypeassert // ok here
 	return j.Connection().(*Adaptor)
 }
 
@@ -196,9 +198,9 @@ func (j *Driver) initEvents() {
 }
 
 // Halt stops joystick driver
-func (j *Driver) Halt() (err error) {
+func (j *Driver) Halt() error {
 	j.halt <- true
-	return
+	return nil
 }
 
 func (j *Driver) handleButtons(state js.State) error {

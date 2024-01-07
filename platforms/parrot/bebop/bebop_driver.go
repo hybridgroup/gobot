@@ -38,17 +38,18 @@ func (a *Driver) Connection() gobot.Connection { return a.connection }
 
 // adaptor returns ardrone adaptor
 func (a *Driver) adaptor() *Adaptor {
+	//nolint:forcetypeassert // ok here
 	return a.Connection().(*Adaptor)
 }
 
 // Start starts the Bebop Driver
-func (a *Driver) Start() (err error) {
-	return
+func (a *Driver) Start() error {
+	return nil
 }
 
 // Halt halts the Bebop Driver
-func (a *Driver) Halt() (err error) {
-	return
+func (a *Driver) Halt() error {
+	return nil
 }
 
 // TakeOff makes the drone start flying
@@ -131,7 +132,8 @@ func (a *Driver) StopRecording() error {
 	return a.adaptor().drone.StopRecording()
 }
 
-// HullProtection tells the drone if the hull/prop protectors are attached. This is needed to adjust flight characteristics of the Bebop.
+// HullProtection tells the drone if the hull/prop protectors are attached. This is needed to adjust
+// flight characteristics of the Bebop.
 func (a *Driver) HullProtection(protect bool) error {
 	return a.adaptor().drone.HullProtection(protect)
 }

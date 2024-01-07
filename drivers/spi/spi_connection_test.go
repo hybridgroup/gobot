@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/system"
 )
@@ -38,7 +40,7 @@ func TestReadCommandData(t *testing.T) {
 	got := []byte{0x01, 0x02}
 	err := c.ReadCommandData(command, got)
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, command, sysdev.Written())
 	assert.Equal(t, want, got)
 }
@@ -54,7 +56,7 @@ func TestReadByteData(t *testing.T) {
 	// act
 	got, err := c.ReadByteData(reg)
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, []byte{reg, 0x00}, sysdev.Written()) // for read register we need n+1 bytes
 	assert.Equal(t, want, got)
 }
@@ -71,7 +73,7 @@ func TestReadBlockData(t *testing.T) {
 	got := make([]byte, 4)
 	err := c.ReadBlockData(reg, got)
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, []byte{reg, 0x00, 0x00, 0x00, 0x00}, sysdev.Written()) // for read registers we need n+1 bytes
 	assert.Equal(t, want, got)
 }
@@ -83,7 +85,7 @@ func TestWriteByte(t *testing.T) {
 	// act
 	err := c.WriteByte(want)
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, []byte{want}, sysdev.Written())
 }
 
@@ -97,7 +99,7 @@ func TestWriteByteData(t *testing.T) {
 	// act
 	err := c.WriteByteData(reg, val)
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, []byte{reg, val}, sysdev.Written())
 }
 
@@ -109,7 +111,7 @@ func TestWriteBlockData(t *testing.T) {
 	// act
 	err := c.WriteBlockData(reg, data)
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, append([]byte{reg}, data...), sysdev.Written())
 }
 
@@ -120,6 +122,6 @@ func TestWriteBytes(t *testing.T) {
 	// act
 	err := c.WriteBytes(want)
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, want, sysdev.Written())
 }

@@ -8,6 +8,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -60,7 +62,7 @@ func TestTSL2561DriverStart(t *testing.T) {
 	d := NewTSL2561Driver(a)
 	a.i2cReadImpl = testIDReader
 
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 }
 
 func TestTSL2561DriverStartNotFound(t *testing.T) {
@@ -72,12 +74,12 @@ func TestTSL2561DriverStartNotFound(t *testing.T) {
 		copy(b, buf.Bytes())
 		return buf.Len(), nil
 	}
-	assert.ErrorContains(t, d.Start(), "TSL2561 device not found (0x1)")
+	require.ErrorContains(t, d.Start(), "TSL2561 device not found (0x1)")
 }
 
 func TestTSL2561DriverHalt(t *testing.T) {
 	d, _ := initTestTSL2561Driver()
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 }
 
 func TestTSL2561DriverRead16(t *testing.T) {
@@ -93,7 +95,7 @@ func TestTSL2561DriverRead16(t *testing.T) {
 		return buf.Len(), nil
 	}
 	val, err := d.connection.ReadWordData(1)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, uint16(0xAEEA), val)
 }
 
@@ -157,7 +159,7 @@ func TestTSL2561DriverGetDataWriteError(t *testing.T) {
 	}
 
 	_, _, err := d.getData()
-	assert.ErrorContains(t, err, "write error")
+	require.ErrorContains(t, err, "write error")
 }
 
 func TestTSL2561DriverGetDataReadError(t *testing.T) {
@@ -167,7 +169,7 @@ func TestTSL2561DriverGetDataReadError(t *testing.T) {
 	}
 
 	_, _, err := d.getData()
-	assert.ErrorContains(t, err, "read error")
+	require.ErrorContains(t, err, "read error")
 }
 
 func TestTSL2561DriverGetLuminocity(t *testing.T) {
@@ -180,7 +182,7 @@ func TestTSL2561DriverGetLuminocity(t *testing.T) {
 		return buf.Len(), nil
 	}
 	bb, ir, err := d.GetLuminocity()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, uint16(12365), bb)
 	assert.Equal(t, uint16(12365), ir)
 	assert.Equal(t, uint32(72), d.CalculateLux(bb, ir))
@@ -202,7 +204,7 @@ func TestTSL2561DriverGetLuminocityAutoGain(t *testing.T) {
 
 	_ = d.Start()
 	bb, ir, err := d.GetLuminocity()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, uint16(12365), bb)
 	assert.Equal(t, uint16(12365), ir)
 	assert.Equal(t, uint32(72), d.CalculateLux(bb, ir))
@@ -213,7 +215,7 @@ func TestTSL2561SetIntegrationTimeError(t *testing.T) {
 	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}
-	assert.ErrorContains(t, d.SetIntegrationTime(TSL2561IntegrationTime101MS), "write error")
+	require.ErrorContains(t, d.SetIntegrationTime(TSL2561IntegrationTime101MS), "write error")
 }
 
 func TestTSL2561SetGainError(t *testing.T) {
@@ -221,7 +223,7 @@ func TestTSL2561SetGainError(t *testing.T) {
 	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}
-	assert.ErrorContains(t, d.SetGain(TSL2561Gain16X), "write error")
+	require.ErrorContains(t, d.SetGain(TSL2561Gain16X), "write error")
 }
 
 func TestTSL2561getHiLo13MS(t *testing.T) {

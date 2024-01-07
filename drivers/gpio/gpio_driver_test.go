@@ -5,18 +5,20 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
-var _ gobot.Driver = (*Driver)(nil)
+var _ gobot.Driver = (*driver)(nil)
 
-func initTestDriverWithStubbedAdaptor() (*Driver, *gpioTestAdaptor) {
+func initTestDriverWithStubbedAdaptor() (*driver, *gpioTestAdaptor) {
 	a := newGpioTestAdaptor()
-	d := NewDriver(a, "GPIO_BASIC")
+	d := newDriver(a, "GPIO_BASIC")
 	return d, a
 }
 
-func initTestDriver() *Driver {
+func initTestDriver() *driver {
 	d, _ := initTestDriverWithStubbedAdaptor()
 	return d
 }
@@ -25,27 +27,35 @@ func TestNewDriver(t *testing.T) {
 	// arrange
 	a := newGpioTestAdaptor()
 	// act
-	var di interface{} = NewDriver(a, "GPIO_BASIC")
+	d := newDriver(a, "GPIO_BASIC")
 	// assert
-	d, ok := di.(*Driver)
-	if !ok {
-		t.Errorf("NewDriver() should have returned a *Driver")
-	}
-	assert.Contains(t, d.name, "GPIO_BASIC")
+	assert.IsType(t, &driver{}, d)
+	assert.Contains(t, d.driverCfg.name, "GPIO_BASIC")
 	assert.Equal(t, a, d.connection)
-	assert.NoError(t, d.afterStart())
-	assert.NoError(t, d.beforeHalt())
+	require.NoError(t, d.afterStart())
+	require.NoError(t, d.beforeHalt())
 	assert.NotNil(t, d.Commander)
 	assert.NotNil(t, d.mutex)
 }
 
-func TestSetName(t *testing.T) {
+func Test_applyWithName(t *testing.T) {
 	// arrange
-	d := initTestDriver()
+	const name = "mybot"
+	cfg := configuration{name: "oldname"}
 	// act
-	d.SetName("TESTME")
+	WithName(name).apply(&cfg)
 	// assert
-	assert.Equal(t, "TESTME", d.Name())
+	assert.Equal(t, name, cfg.name)
+}
+
+func Test_applywithPin(t *testing.T) {
+	// arrange
+	const pin = "36"
+	cfg := configuration{pin: "oldpin"}
+	// act
+	withPin(pin).apply(&cfg)
+	// assert
+	assert.Equal(t, pin, cfg.pin)
 }
 
 func TestConnection(t *testing.T) {
@@ -59,20 +69,20 @@ func TestStart(t *testing.T) {
 	// arrange
 	d := initTestDriver()
 	// act, assert
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 	// arrange after start function
 	d.afterStart = func() error { return fmt.Errorf("after start error") }
 	// act, assert
-	assert.ErrorContains(t, d.Start(), "after start error")
+	require.EqualError(t, d.Start(), "after start error")
 }
 
 func TestHalt(t *testing.T) {
 	// arrange
 	d := initTestDriver()
 	// act, assert
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 	// arrange after start function
 	d.beforeHalt = func() error { return fmt.Errorf("before halt error") }
 	// act, assert
-	assert.ErrorContains(t, d.Halt(), "before halt error")
+	require.EqualError(t, d.Halt(), "before halt error")
 }

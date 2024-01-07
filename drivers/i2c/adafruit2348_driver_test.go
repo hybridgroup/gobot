@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -52,8 +54,8 @@ func TestAdafruit2348SetDCMotorSpeed(t *testing.T) {
 	// act
 	err := d.SetDCMotorSpeed(dcMotor, speed)
 	// assert
-	assert.NoError(t, err)
-	assert.Equal(t, 8, len(a.written)) // detailed test, see "TestPCA9685SetPWM"
+	require.NoError(t, err)
+	assert.Len(t, a.written, 8) // detailed test, see "TestPCA9685SetPWM"
 }
 
 func TestAdafruit2348SetDCMotorSpeedError(t *testing.T) {
@@ -63,7 +65,7 @@ func TestAdafruit2348SetDCMotorSpeedError(t *testing.T) {
 		return 0, errors.New("write error")
 	}
 	// act & assert
-	assert.ErrorContains(t, d.SetDCMotorSpeed(1, 255), "write error")
+	require.ErrorContains(t, d.SetDCMotorSpeed(1, 255), "write error")
 }
 
 func TestAdafruit2348RunDCMotor(t *testing.T) {
@@ -71,9 +73,9 @@ func TestAdafruit2348RunDCMotor(t *testing.T) {
 	d, _ := initTestAdafruit2348WithStubbedAdaptor()
 	const dcMotor = 1
 	// act & assert
-	assert.NoError(t, d.RunDCMotor(dcMotor, Adafruit2348Forward))
-	assert.NoError(t, d.RunDCMotor(dcMotor, Adafruit2348Backward))
-	assert.NoError(t, d.RunDCMotor(dcMotor, Adafruit2348Release))
+	require.NoError(t, d.RunDCMotor(dcMotor, Adafruit2348Forward))
+	require.NoError(t, d.RunDCMotor(dcMotor, Adafruit2348Backward))
+	require.NoError(t, d.RunDCMotor(dcMotor, Adafruit2348Release))
 }
 
 func TestAdafruit2348RunDCMotorError(t *testing.T) {
@@ -84,9 +86,9 @@ func TestAdafruit2348RunDCMotorError(t *testing.T) {
 	}
 	const dcMotor = 1
 	// act & assert
-	assert.ErrorContains(t, d.RunDCMotor(dcMotor, Adafruit2348Forward), "write error")
-	assert.ErrorContains(t, d.RunDCMotor(dcMotor, Adafruit2348Backward), "write error")
-	assert.ErrorContains(t, d.RunDCMotor(dcMotor, Adafruit2348Release), "write error")
+	require.ErrorContains(t, d.RunDCMotor(dcMotor, Adafruit2348Forward), "write error")
+	require.ErrorContains(t, d.RunDCMotor(dcMotor, Adafruit2348Backward), "write error")
+	require.ErrorContains(t, d.RunDCMotor(dcMotor, Adafruit2348Release), "write error")
 }
 
 func TestAdafruit2348SetStepperMotorSpeed(t *testing.T) {
@@ -97,8 +99,8 @@ func TestAdafruit2348SetStepperMotorSpeed(t *testing.T) {
 		rpm          = 30
 	)
 	// act & assert
-	assert.NoError(t, d.SetStepperMotorSpeed(stepperMotor, rpm))
-	assert.Equal(t, 0.01, d.stepperMotors[stepperMotor].secPerStep) // 60/(revSteps*rpm), revSteps=200
+	require.NoError(t, d.SetStepperMotorSpeed(stepperMotor, rpm))
+	assert.InDelta(t, 0.01, d.stepperMotors[stepperMotor].secPerStep, 0.0) // 60/(revSteps*rpm), revSteps=200
 }
 
 func TestAdafruit2348StepperSingleStep(t *testing.T) {
@@ -113,7 +115,7 @@ func TestAdafruit2348StepperSingleStep(t *testing.T) {
 	// act
 	err := d.Step(stepperMotor, steps, back, single)
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestAdafruit2348StepperDoubleStep(t *testing.T) {
@@ -128,7 +130,7 @@ func TestAdafruit2348StepperDoubleStep(t *testing.T) {
 	// act
 	err := d.Step(stepperMotor, steps, back, double)
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestAdafruit2348StepperInterleaveStep(t *testing.T) {
@@ -143,7 +145,7 @@ func TestAdafruit2348StepperInterleaveStep(t *testing.T) {
 	// act
 	err := d.Step(stepperMotor, steps, back, interleave)
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestAdafruit2348StepperMicroStep(t *testing.T) {
@@ -158,5 +160,5 @@ func TestAdafruit2348StepperMicroStep(t *testing.T) {
 	// act
 	err := d.Step(stepperMotor, steps, back, micro)
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }

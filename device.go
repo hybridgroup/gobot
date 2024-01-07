@@ -53,8 +53,9 @@ func (d *Devices) Each(f func(Device)) {
 }
 
 // Start calls Start on each Device in d
-func (d *Devices) Start() (err error) {
+func (d *Devices) Start() error {
 	log.Println("Starting devices...")
+	var err error
 	for _, device := range *d {
 		info := "Starting device " + device.Name()
 
@@ -71,7 +72,8 @@ func (d *Devices) Start() (err error) {
 }
 
 // Halt calls Halt on each Device in d
-func (d *Devices) Halt() (err error) {
+func (d *Devices) Halt() error {
+	var err error
 	for _, device := range *d {
 		if derr := device.Halt(); derr != nil {
 			err = multierror.Append(err, derr)

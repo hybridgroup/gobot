@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	multierror "github.com/hashicorp/go-multierror"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/platforms/adaptors"
 	"gobot.io/x/gobot/v2/system"
@@ -40,10 +41,10 @@ type Adaptor struct {
 //
 // Optional parameters:
 //
-//	adaptors.WithGpiodAccess():	use character device gpiod driver instead of the default sysfs (does NOT work on RockPi4C+!)
+//	adaptors.WithGpiodAccess():	use character device gpiod driver instead of the default sysfs (NOT work on RockPi4C+!)
 //	adaptors.WithSpiGpioAccess(sclk, nss, mosi, miso):	use GPIO's instead of /dev/spidev#.#
 //	adaptors.WithGpiosActiveLow(pin's): invert the pin behavior
-func NewAdaptor(opts ...func(adaptors.Optioner)) *Adaptor {
+func NewAdaptor(opts ...func(adaptors.DigitalPinsOptioner)) *Adaptor {
 	sys := system.NewAccesser()
 	c := &Adaptor{
 		name: gobot.DefaultName("RockPi"),
@@ -124,14 +125,14 @@ func (c *Adaptor) validateI2cBusNumber(busNr int) error {
 }
 
 func (c *Adaptor) getPinTranslatorFunction() func(string) (string, int, error) {
-	return func(pin string) (chip string, line int, err error) {
+	return func(pin string) (string, int, error) {
+		var line int
 		if val, ok := pins[pin][c.readRevision()]; ok {
 			line = val
 		} else if val, ok := pins[pin]["*"]; ok {
 			line = val
 		} else {
-			err = errors.New("Not a valid pin")
-			return
+			return "", 0, errors.New("Not a valid pin")
 		}
 		return "", line, nil
 	}

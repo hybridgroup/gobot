@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestMockFilesystemOpen(t *testing.T) {
@@ -14,13 +15,13 @@ func TestMockFilesystemOpen(t *testing.T) {
 	assert.False(t, f1.Opened)
 	f2, err := fs.openFile("foo", 0, 0o666)
 	assert.Equal(t, f2, f1)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	err = f2.Sync()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	_, err = fs.openFile("bar", 0, 0o666)
-	assert.ErrorContains(t, err, " : bar: no such file")
+	require.ErrorContains(t, err, " : bar: no such file")
 
 	fs.Add("bar")
 	f4, _ := fs.openFile("bar", 0, 0o666)
@@ -31,15 +32,15 @@ func TestMockFilesystemStat(t *testing.T) {
 	fs := newMockFilesystem([]string{"foo", "bar/baz"})
 
 	fileStat, err := fs.stat("foo")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.False(t, fileStat.IsDir())
 
 	dirStat, err := fs.stat("bar")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.True(t, dirStat.IsDir())
 
 	_, err = fs.stat("plonk")
-	assert.ErrorContains(t, err, " : plonk: no such file")
+	require.ErrorContains(t, err, " : plonk: no such file")
 }
 
 func TestMockFilesystemFind(t *testing.T) {
@@ -61,7 +62,7 @@ func TestMockFilesystemFind(t *testing.T) {
 			// act
 			dirs, err := fs.find(tt.baseDir, tt.pattern)
 			// assert
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			sort.Strings(dirs)
 			assert.Equal(t, tt.want, dirs)
 		})
@@ -73,13 +74,13 @@ func TestMockFilesystemWrite(t *testing.T) {
 	f1 := fs.Files["bar"]
 
 	f2, err := fs.openFile("bar", 0, 0o666)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	// Never been read or written.
-	assert.True(t, f1.Seq <= 0)
+	assert.LessOrEqual(t, f1.Seq, 0)
 
 	_, _ = f2.WriteString("testing")
 	// Was written.
-	assert.True(t, f1.Seq > 0)
+	assert.Greater(t, f1.Seq, 0)
 	assert.Equal(t, "testing", f1.Contents)
 }
 
@@ -89,15 +90,15 @@ func TestMockFilesystemRead(t *testing.T) {
 	f1.Contents = "Yip"
 
 	f2, err := fs.openFile("bar", 0, 0o666)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	// Never been read or written.
-	assert.True(t, f1.Seq <= 0)
+	assert.LessOrEqual(t, f1.Seq, 0)
 
 	buffer := make([]byte, 20)
 	n, _ := f2.Read(buffer)
 
 	// Was read.
-	assert.True(t, f1.Seq > 0)
+	assert.Greater(t, f1.Seq, 0)
 	assert.Equal(t, 3, n)
 	assert.Equal(t, "Yip", string(buffer[:3]))
 

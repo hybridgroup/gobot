@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -148,7 +150,7 @@ func TestCCS811GetTemperature(t *testing.T) {
 			// act
 			temp, err := d.GetTemperature()
 			// assert
-			assert.Equal(t, tc.temp, temp)
+			assert.InDelta(t, tc.temp, temp, 0.0)
 			assert.Equal(t, tc.err, err)
 		})
 	}
@@ -255,9 +257,9 @@ func TestCCS811_initialize(t *testing.T) {
 	// arrange, act - initialize() must be called on Start()
 	err := d.Start()
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, 1, numCallsRead)
-	assert.Equal(t, 9, len(a.written))
+	assert.Len(t, a.written, 9)
 	assert.Equal(t, wantChipIDReg, a.written[0])
 	assert.Equal(t, wantResetReg, a.written[1])
 	assert.Equal(t, wantResetRegSequence, a.written[2:6])

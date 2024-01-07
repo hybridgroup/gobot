@@ -37,7 +37,7 @@ func NewMCP3004Driver(a Connector, options ...func(Config)) *MCP3004Driver {
 }
 
 // Read reads the current analog data for the desired channel.
-func (d *MCP3004Driver) Read(channel int) (result int, err error) {
+func (d *MCP3004Driver) Read(channel int) (int, error) {
 	if channel < 0 || channel > MCP3004DriverMaxChannel-1 {
 		return 0, fmt.Errorf("Invalid channel '%d' for read", channel)
 	}
@@ -49,18 +49,17 @@ func (d *MCP3004Driver) Read(channel int) (result int, err error) {
 
 	rx := make([]byte, 3)
 
-	err = d.connection.ReadCommandData(tx, rx)
-	if err == nil && len(rx) == 3 {
-		result = int((rx[1]&0x3))<<8 + int(rx[2])
+	if err := d.connection.ReadCommandData(tx, rx); err != nil || len(rx) != 3 {
+		return 0, err
 	}
 
-	return result, err
+	result := int((rx[1]&0x3))<<8 + int(rx[2])
+
+	return result, nil
 }
 
 // AnalogRead returns value from analog reading of specified pin
-func (d *MCP3004Driver) AnalogRead(pin string) (value int, err error) {
+func (d *MCP3004Driver) AnalogRead(pin string) (int, error) {
 	channel, _ := strconv.Atoi(pin)
-	value, err = d.Read(channel)
-
-	return
+	return d.Read(channel)
 }

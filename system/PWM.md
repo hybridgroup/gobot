@@ -93,3 +93,5 @@ Now we should measure a value of around 2.3V with the meter, which is the differ
 If we have attached an oscilloscope we can play around with the values for period and duty_cycle and see what happen.
 
 ## Links
+
+* <https://docs.kernel.org/driver-api/pwm.html>

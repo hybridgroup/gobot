@@ -2,15 +2,19 @@ package beaglebone
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/aio"
 	"gobot.io/x/gobot/v2/drivers/gpio"
 	"gobot.io/x/gobot/v2/drivers/i2c"
 	"gobot.io/x/gobot/v2/drivers/spi"
+	"gobot.io/x/gobot/v2/platforms/adaptors"
 	"gobot.io/x/gobot/v2/system"
 )
 
@@ -37,53 +41,123 @@ func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.
 	return a, fs
 }
 
-func TestPWM(t *testing.T) {
-	mockPaths := []string{
-		"/sys/devices/platform/ocp/ocp:P9_22_pinmux/state",
-		"/sys/devices/platform/ocp/ocp:P9_21_pinmux/state",
-		"/sys/bus/iio/devices/iio:device0/in_voltage1_raw",
-		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/export",
-		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/unexport",
-		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/enable",
-		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/period",
-		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/duty_cycle",
-		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/polarity",
-		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/enable",
-		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/period",
-		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/duty_cycle",
-		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/polarity",
-	}
+const (
+	pwmDir               = "/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/" //nolint:gosec // false positive
+	pwmChip0Dir          = pwmDir + "pwmchip0/"
+	pwmChip0ExportPath   = pwmChip0Dir + "export"
+	pwmChip0UnexportPath = pwmChip0Dir + "unexport"
+	pwmChip0Pwm0Dir      = pwmChip0Dir + "pwm0/"
+	pwmChip0Pwm1Dir      = pwmChip0Dir + "pwm1/"
 
-	a, fs := initTestAdaptorWithMockedFilesystem(mockPaths)
-	fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/duty_cycle"].Contents = "0"
-	fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/period"].Contents = "0"
+	pwm0EnablePath    = pwmChip0Pwm0Dir + "enable"
+	pwm0PeriodPath    = pwmChip0Pwm0Dir + "period"
+	pwm0DutyCyclePath = pwmChip0Pwm0Dir + "duty_cycle"
+	pwm0PolarityPath  = pwmChip0Pwm0Dir + "polarity"
 
-	assert.ErrorContains(t, a.PwmWrite("P9_99", 175), "'P9_99' is not a valid id for a PWM pin")
+	pwm1EnablePath    = pwmChip0Pwm1Dir + "enable"
+	pwm1PeriodPath    = pwmChip0Pwm1Dir + "period"
+	pwm1DutyCyclePath = pwmChip0Pwm1Dir + "duty_cycle"
+	pwm1PolarityPath  = pwmChip0Pwm1Dir + "polarity"
+)
+
+var pwmMockPaths = []string{
+	"/sys/devices/platform/ocp/ocp:P9_22_pinmux/state",
+	"/sys/devices/platform/ocp/ocp:P9_21_pinmux/state",
+	"/sys/bus/iio/devices/iio:device0/in_voltage1_raw",
+	pwmChip0ExportPath,
+	pwmChip0UnexportPath,
+	pwm0EnablePath,
+	pwm0PeriodPath,
+	pwm0DutyCyclePath,
+	pwm0PolarityPath,
+	pwm1EnablePath,
+	pwm1PeriodPath,
+	pwm1DutyCyclePath,
+	pwm1PolarityPath,
+}
+
+func TestNewAdaptor(t *testing.T) {
+	// arrange & act
+	a := NewAdaptor()
+	// assert
+	assert.IsType(t, &Adaptor{}, a)
+	assert.True(t, strings.HasPrefix(a.Name(), "Beaglebone"))
+	assert.NotNil(t, a.sys)
+	assert.NotNil(t, a.mutex)
+	assert.NotNil(t, a.AnalogPinsAdaptor)
+	assert.NotNil(t, a.DigitalPinsAdaptor)
+	assert.NotNil(t, a.PWMPinsAdaptor)
+	assert.NotNil(t, a.I2cBusAdaptor)
+	assert.NotNil(t, a.SpiBusAdaptor)
+	assert.Equal(t, bbbPinMap, a.pinMap)
+	assert.Equal(t, bbbPwmPinMap, a.pwmPinMap)
+	assert.Equal(t, bbbAnalogPinMap, a.analogPinMap)
+	assert.Equal(t, "/sys/class/leds/beaglebone:green:", a.usrLed)
+	// act & assert
+	a.SetName("NewName")
+	assert.Equal(t, "NewName", a.Name())
+}
+
+func TestNewPocketBeagleAdaptor(t *testing.T) {
+	// arrange & act
+	a := NewPocketBeagleAdaptor()
+	// assert
+	assert.IsType(t, &PocketBeagleAdaptor{}, a)
+	assert.True(t, strings.HasPrefix(a.Name(), "PocketBeagle"))
+	assert.NotNil(t, a.sys)
+	assert.Equal(t, pocketBeaglePinMap, a.pinMap)
+	assert.Equal(t, pocketBeaglePwmPinMap, a.pwmPinMap)
+	assert.Equal(t, pocketBeagleAnalogPinMap, a.analogPinMap)
+	assert.Equal(t, "/sys/class/leds/beaglebone:green:", a.usrLed)
+}
+
+func TestNewPocketBeagleAdaptorWithOption(t *testing.T) {
+	// arrange & act
+	a := NewPocketBeagleAdaptor(adaptors.WithGpiodAccess())
+	// assert
+	require.NoError(t, a.Connect())
+}
+
+func TestPWMWrite(t *testing.T) {
+	// arrange
+	a, fs := initTestAdaptorWithMockedFilesystem(pwmMockPaths)
+	fs.Files[pwm1DutyCyclePath].Contents = "0"
+	fs.Files[pwm1PeriodPath].Contents = "0"
+	// act & assert wrong pin
+	require.ErrorContains(t, a.PwmWrite("P9_99", 175), "'P9_99' is not a valid id for a PWM pin")
+
+	// act & assert values
 	_ = a.PwmWrite("P9_21", 175)
-	assert.Equal(
-		t,
-		"500000",
-		fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/period"].Contents,
-	)
-	assert.Equal(
-		t,
-		"343137",
-		fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/duty_cycle"].Contents,
-	)
+	assert.Equal(t, "500000", fs.Files[pwm1PeriodPath].Contents)
+	assert.Equal(t, "343137", fs.Files[pwm1DutyCyclePath].Contents)
 
-	_ = a.ServoWrite("P9_21", 100)
-	assert.Equal(
-		t,
-		"500000",
-		fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/period"].Contents,
-	)
-	assert.Equal(
-		t,
-		"66666",
-		fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/duty_cycle"].Contents,
-	)
+	require.NoError(t, a.Finalize())
+}
 
-	assert.NoError(t, a.Finalize())
+func TestServoWrite(t *testing.T) {
+	// arrange: prepare 50Hz for servos
+	const (
+		pin         = "P9_21"
+		fiftyHzNano = 20000000
+	)
+	a := NewAdaptor(adaptors.WithPWMDefaultPeriodForPin(pin, fiftyHzNano))
+	fs := a.sys.UseMockFilesystem(pwmMockPaths)
+	require.NoError(t, a.Connect())
+	// act & assert for 0° (min default value)
+	err := a.ServoWrite(pin, 0)
+	require.NoError(t, err)
+	assert.Equal(t, strconv.Itoa(fiftyHzNano), fs.Files[pwm1PeriodPath].Contents)
+	assert.Equal(t, "500000", fs.Files[pwm1DutyCyclePath].Contents)
+	// act & assert for 180° (max default value)
+	err = a.ServoWrite(pin, 180)
+	require.NoError(t, err)
+	assert.Equal(t, strconv.Itoa(fiftyHzNano), fs.Files[pwm1PeriodPath].Contents)
+	assert.Equal(t, "2500000", fs.Files[pwm1DutyCyclePath].Contents)
+	// act & assert invalid pins
+	err = a.ServoWrite("3", 120)
+	require.ErrorContains(t, err, "'3' is not a valid id for a PWM pin")
+
+	require.NoError(t, a.Finalize())
 }
 
 func TestAnalog(t *testing.T) {
@@ -96,17 +170,17 @@ func TestAnalog(t *testing.T) {
 	fs.Files["/sys/bus/iio/devices/iio:device0/in_voltage1_raw"].Contents = "567\n"
 	i, err := a.AnalogRead("P9_40")
 	assert.Equal(t, 567, i)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	_, err = a.AnalogRead("P9_99")
-	assert.ErrorContains(t, err, "Not a valid analog pin")
+	require.ErrorContains(t, err, "Not a valid analog pin")
 
 	fs.WithReadError = true
 	_, err = a.AnalogRead("P9_40")
-	assert.ErrorContains(t, err, "read error")
+	require.ErrorContains(t, err, "read error")
 	fs.WithReadError = false
 
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.Finalize())
 }
 
 func TestDigitalIO(t *testing.T) {
@@ -138,29 +212,22 @@ func TestDigitalIO(t *testing.T) {
 
 	// no such LED
 	err := a.DigitalWrite("usr10101", 1)
-	assert.ErrorContains(t, err, " : /sys/class/leds/beaglebone:green:usr10101/brightness: no such file")
+	require.ErrorContains(t, err, " : /sys/class/leds/beaglebone:green:usr10101/brightness: no such file")
 
 	_ = a.DigitalWrite("P9_12", 1)
 	assert.Equal(t, "1", fs.Files["/sys/class/gpio/gpio60/value"].Contents)
 
-	assert.ErrorContains(t, a.DigitalWrite("P9_99", 1), "'P9_99' is not a valid id for a digital pin")
+	require.ErrorContains(t, a.DigitalWrite("P9_99", 1), "'P9_99' is not a valid id for a digital pin")
 
 	_, err = a.DigitalRead("P9_99")
-	assert.ErrorContains(t, err, "'P9_99' is not a valid id for a digital pin")
+	require.ErrorContains(t, err, "'P9_99' is not a valid id for a digital pin")
 
 	fs.Files["/sys/class/gpio/gpio66/value"].Contents = "1"
 	i, err := a.DigitalRead("P8_07")
 	assert.Equal(t, 1, i)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
-	assert.NoError(t, a.Finalize())
-}
-
-func TestName(t *testing.T) {
-	a := NewAdaptor()
-	assert.True(t, strings.HasPrefix(a.Name(), "Beaglebone"))
-	a.SetName("NewName")
-	assert.Equal(t, "NewName", a.Name())
+	require.NoError(t, a.Finalize())
 }
 
 func TestAnalogReadFileError(t *testing.T) {
@@ -171,7 +238,7 @@ func TestAnalogReadFileError(t *testing.T) {
 	a, _ := initTestAdaptorWithMockedFilesystem(mockPaths)
 
 	_, err := a.AnalogRead("P9_40")
-	assert.Contains(t, err.Error(), "/sys/bus/iio/devices/iio:device0/in_voltage1_raw: no such file")
+	require.ErrorContains(t, err, "/sys/bus/iio/devices/iio:device0/in_voltage1_raw: no such file")
 }
 
 func TestDigitalPinDirectionFileError(t *testing.T) {
@@ -184,11 +251,11 @@ func TestDigitalPinDirectionFileError(t *testing.T) {
 	a, _ := initTestAdaptorWithMockedFilesystem(mockPaths)
 
 	err := a.DigitalWrite("P9_12", 1)
-	assert.Contains(t, err.Error(), "/sys/class/gpio/gpio60/direction: no such file")
+	require.ErrorContains(t, err, "/sys/class/gpio/gpio60/direction: no such file")
 
 	// no pin added after previous problem, so no pin to unexport in finalize
 	err = a.Finalize()
-	assert.Equal(t, err, nil)
+	require.NoError(t, err)
 }
 
 func TestDigitalPinFinalizeFileError(t *testing.T) {
@@ -202,15 +269,10 @@ func TestDigitalPinFinalizeFileError(t *testing.T) {
 	a, _ := initTestAdaptorWithMockedFilesystem(mockPaths)
 
 	err := a.DigitalWrite("P9_12", 1)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	err = a.Finalize()
-	assert.Contains(t, err.Error(), "/sys/class/gpio/unexport: no such file")
-}
-
-func TestPocketName(t *testing.T) {
-	a := NewPocketBeagleAdaptor()
-	assert.True(t, strings.HasPrefix(a.Name(), "PocketBeagle"))
+	require.ErrorContains(t, err, "/sys/class/gpio/unexport: no such file")
 }
 
 func TestSpiDefaultValues(t *testing.T) {
@@ -233,16 +295,16 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	a := NewAdaptor()
 	a.sys.UseMockSyscall()
 	fs := a.sys.UseMockFilesystem([]string{"/dev/i2c-2"})
-	assert.NoError(t, a.Connect())
+	require.NoError(t, a.Connect())
 	con, err := a.GetI2cConnection(0xff, 2)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	_, err = con.Write([]byte{0xbf})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	fs.WithCloseError = true
 	// act
 	err = a.Finalize()
 	// assert
-	assert.Contains(t, err.Error(), "close error")
+	require.ErrorContains(t, err, "close error")
 }
 
 func Test_validateSpiBusNumber(t *testing.T) {

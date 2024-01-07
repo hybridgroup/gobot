@@ -7,6 +7,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -43,12 +45,12 @@ func TestBH1750Options(t *testing.T) {
 
 func TestBH1750Start(t *testing.T) {
 	d := NewBH1750Driver(newI2cTestAdaptor())
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 }
 
 func TestBH1750Halt(t *testing.T) {
 	d, _ := initTestBH1750DriverWithStubbedAdaptor()
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 }
 
 func TestBH1750NullLux(t *testing.T) {
@@ -96,7 +98,7 @@ func TestBH1750LuxError(t *testing.T) {
 	}
 
 	_, err := d.Lux()
-	assert.ErrorContains(t, err, "wrong number of bytes read")
+	require.ErrorContains(t, err, "wrong number of bytes read")
 }
 
 func TestBH1750RawSensorDataError(t *testing.T) {
@@ -106,5 +108,5 @@ func TestBH1750RawSensorDataError(t *testing.T) {
 	}
 
 	_, err := d.RawSensorData()
-	assert.ErrorContains(t, err, "wrong number of bytes read")
+	require.ErrorContains(t, err, "wrong number of bytes read")
 }

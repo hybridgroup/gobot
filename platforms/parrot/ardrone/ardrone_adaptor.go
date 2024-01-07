@@ -2,6 +2,7 @@ package ardrone
 
 import (
 	client "github.com/hybridgroup/go-ardrone/client"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -54,14 +55,14 @@ func (a *Adaptor) Name() string { return a.name }
 func (a *Adaptor) SetName(n string) { a.name = n }
 
 // Connect establishes a connection to the ardrone
-func (a *Adaptor) Connect() (err error) {
+func (a *Adaptor) Connect() error {
 	d, err := a.connect(a)
 	if err != nil {
 		return err
 	}
 	a.drone = d
-	return
+	return nil
 }
 
 // Finalize terminates the connection to the ardrone
-func (a *Adaptor) Finalize() (err error) { return }
+func (a *Adaptor) Finalize() error { return nil }

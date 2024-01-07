@@ -10,13 +10,13 @@ EXAMPLES := $(EXAMPLES_NO_GOCV)
 # opencv platform currently skipped to prevent install of preconditions
 including_except := $(shell go list ./... | grep -v platforms/opencv)
 
+# Run tests on nearly all directories without test cache, with race detection
+test_race:
+	go test -failfast -count=1 -v -race $(including_except)
+
 # Run tests on nearly all directories without test cache
 test:
-	go test -failfast -count=1 -v $(including_except)
-
-# Run tests with race detection
-test_race:
-	go test -race $(including_except)
+	go test -failfast -count=1 $(including_except)
 
 # Test, generate and show coverage in browser
 test_cover:
@@ -58,6 +58,7 @@ fmt_check:
 fmt_fix: 
 	$(MAKE) version_check || true
 	gofumpt -l -w .
+	golangci-lint run -v --fix
 
 examples: $(EXAMPLES)
 

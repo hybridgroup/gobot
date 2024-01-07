@@ -2,6 +2,7 @@ package system
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"path"
 	"regexp"
@@ -21,16 +22,20 @@ type MockFilesystem struct {
 	WithReadError  bool
 	WithWriteError bool
 	WithCloseError bool
+	numCallsWrite  int
+	numCallsRead   int
 }
 
 // A MockFile represents a mock file that contains a single string.  Any write
 // overwrites, and any read returns from the start.
 type MockFile struct {
-	Contents string
-	Seq      int // When this file was last written or read.
-	Opened   bool
-	Closed   bool
-	fd       uintptr
+	Contents           string
+	Seq                int // When this file was last written or read.
+	Opened             bool
+	Closed             bool
+	fd                 uintptr
+	simulateWriteError error
+	simulateReadError  error
 
 	fs *MockFilesystem
 }
@@ -42,32 +47,34 @@ var (
 )
 
 // Write writes string(b) to f.Contents
-func (f *MockFile) Write(b []byte) (n int, err error) {
+func (f *MockFile) Write(b []byte) (int, error) {
 	if f.fs.WithWriteError {
 		return 0, errWrite
 	}
+
 	return f.WriteString(string(b))
 }
 
 // Seek seeks to a specific offset in a file
-func (f *MockFile) Seek(offset int64, whence int) (ret int64, err error) {
+func (f *MockFile) Seek(offset int64, whence int) (int64, error) {
 	return offset, nil
 }
 
 // WriteString writes s to f.Contents
-func (f *MockFile) WriteString(s string) (ret int, err error) {
+func (f *MockFile) WriteString(s string) (int, error) {
 	f.Contents = s
 	f.Seq = f.fs.next()
-	return len(s), nil
+	f.fs.numCallsWrite++
+	return len(s), f.simulateWriteError
 }
 
 // Sync implements the File interface Sync function
-func (f *MockFile) Sync() (err error) {
+func (f *MockFile) Sync() error {
 	return nil
 }
 
 // Read copies b bytes from f.Contents
-func (f *MockFile) Read(b []byte) (n int, err error) {
+func (f *MockFile) Read(b []byte) (int, error) {
 	if f.fs.WithReadError {
 		return 0, errRead
 	}
@@ -79,11 +86,12 @@ func (f *MockFile) Read(b []byte) (n int, err error) {
 	copy(b, []byte(f.Contents)[:count])
 	f.Seq = f.fs.next()
 
-	return count, nil
+	f.fs.numCallsRead++
+	return count, f.simulateReadError
 }
 
 // ReadAt calls MockFile.Read
-func (f *MockFile) ReadAt(b []byte, off int64) (n int, err error) {
+func (f *MockFile) ReadAt(b []byte, off int64) (int, error) {
 	return f.Read(b)
 }
 
@@ -119,7 +127,7 @@ func newMockFilesystem(items []string) *MockFilesystem {
 }
 
 // OpenFile opens file name from fs.Files, if the file does not exist it returns an os.PathError
-func (fs *MockFilesystem) openFile(name string, _ int, _ os.FileMode) (file File, err error) {
+func (fs *MockFilesystem) openFile(name string, _ int, _ os.FileMode) (File, error) {
 	f, ok := fs.Files[name]
 	if ok {
 		f.Opened = true
@@ -135,9 +143,10 @@ func (fs *MockFilesystem) openFile(name string, _ int, _ os.FileMode) (file File
 func (fs *MockFilesystem) stat(name string) (os.FileInfo, error) {
 	_, ok := fs.Files[name]
 	if ok {
-		// return file based mock FileInfo
-		tmpFile, err := os.CreateTemp("", name)
+		// return file based mock FileInfo, CreateTemp don't like "/" in between
+		tmpFile, err := os.CreateTemp("", strings.ReplaceAll(name, "/", "_"))
 		if err != nil {
+			log.Println("A")
 			return nil, err
 		}
 		defer os.Remove(tmpFile.Name())
@@ -194,6 +203,8 @@ func (fs *MockFilesystem) readFile(name string) ([]byte, error) {
 	if !ok {
 		return nil, &os.PathError{Err: fmt.Errorf("%s: no such file", name)}
 	}
+
+	f.fs.numCallsRead++
 	return []byte(f.Contents), nil
 }
 

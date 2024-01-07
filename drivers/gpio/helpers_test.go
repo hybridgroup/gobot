@@ -9,24 +9,31 @@ import (
 
 type gpioTestBareAdaptor struct{}
 
-func (t *gpioTestBareAdaptor) Connect() (err error)  { return }
-func (t *gpioTestBareAdaptor) Finalize() (err error) { return }
-func (t *gpioTestBareAdaptor) Name() string          { return "" }
-func (t *gpioTestBareAdaptor) SetName(n string)      {}
+func (t *gpioTestBareAdaptor) Connect() error   { return nil }
+func (t *gpioTestBareAdaptor) Finalize() error  { return nil }
+func (t *gpioTestBareAdaptor) Name() string     { return "" }
+func (t *gpioTestBareAdaptor) SetName(n string) {}
 
 type digitalPinMock struct {
-	writeFunc func(val int) (err error)
+	writeFunc func(val int) error
+}
+
+type gpioTestWritten struct {
+	pin string
+	val byte
 }
 
 type gpioTestAdaptor struct {
-	name             string
-	pinMap           map[string]gobot.DigitalPinner
-	port             string
-	mtx              sync.Mutex
-	digitalReadFunc  func(ping string) (val int, err error)
-	digitalWriteFunc func(pin string, val byte) (err error)
-	pwmWriteFunc     func(pin string, val byte) (err error)
-	servoWriteFunc   func(pin string, val byte) (err error)
+	name               string
+	pinMap             map[string]gobot.DigitalPinner
+	port               string
+	written            []gpioTestWritten
+	simulateWriteError bool
+	mtx                sync.Mutex
+	digitalReadFunc    func(ping string) (val int, err error)
+	digitalWriteFunc   func(pin string, val byte) error
+	pwmWriteFunc       func(pin string, val byte) error
+	servoWriteFunc     func(pin string, val byte) error
 }
 
 func newGpioTestAdaptor() *gpioTestAdaptor {
@@ -34,16 +41,16 @@ func newGpioTestAdaptor() *gpioTestAdaptor {
 		name:   "gpio_test_adaptor",
 		pinMap: make(map[string]gobot.DigitalPinner),
 		port:   "/dev/null",
-		digitalWriteFunc: func(pin string, val byte) (err error) {
+		digitalWriteFunc: func(pin string, val byte) error {
 			return nil
 		},
-		servoWriteFunc: func(pin string, val byte) (err error) {
+		servoWriteFunc: func(pin string, val byte) error {
 			return nil
 		},
-		pwmWriteFunc: func(pin string, val byte) (err error) {
+		pwmWriteFunc: func(pin string, val byte) error {
 			return nil
 		},
-		digitalReadFunc: func(pin string) (val int, err error) {
+		digitalReadFunc: func(pin string) (int, error) {
 			return 1, nil
 		},
 	}
@@ -52,38 +59,43 @@ func newGpioTestAdaptor() *gpioTestAdaptor {
 }
 
 // DigitalRead capabilities (interface DigitalReader)
-func (t *gpioTestAdaptor) DigitalRead(pin string) (val int, err error) {
+func (t *gpioTestAdaptor) DigitalRead(pin string) (int, error) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 	return t.digitalReadFunc(pin)
 }
 
 // DigitalWrite capabilities (interface DigitalWriter)
-func (t *gpioTestAdaptor) DigitalWrite(pin string, val byte) (err error) {
+func (t *gpioTestAdaptor) DigitalWrite(pin string, val byte) error {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
+	if t.simulateWriteError {
+		return fmt.Errorf("write error")
+	}
+	w := gpioTestWritten{pin: pin, val: val}
+	t.written = append(t.written, w)
 	return t.digitalWriteFunc(pin, val)
 }
 
 // PwmWrite capabilities (interface PwmWriter)
-func (t *gpioTestAdaptor) PwmWrite(pin string, val byte) (err error) {
+func (t *gpioTestAdaptor) PwmWrite(pin string, val byte) error {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 	return t.pwmWriteFunc(pin, val)
 }
 
 // ServoWrite capabilities (interface ServoWriter)
-func (t *gpioTestAdaptor) ServoWrite(pin string, val byte) (err error) {
+func (t *gpioTestAdaptor) ServoWrite(pin string, val byte) error {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 	return t.servoWriteFunc(pin, val)
 }
 
-func (t *gpioTestAdaptor) Connect() (err error)  { return }
-func (t *gpioTestAdaptor) Finalize() (err error) { return }
-func (t *gpioTestAdaptor) Name() string          { return t.name }
-func (t *gpioTestAdaptor) SetName(n string)      { t.name = n }
-func (t *gpioTestAdaptor) Port() string          { return t.port }
+func (t *gpioTestAdaptor) Connect() error   { return nil }
+func (t *gpioTestAdaptor) Finalize() error  { return nil }
+func (t *gpioTestAdaptor) Name() string     { return t.name }
+func (t *gpioTestAdaptor) SetName(n string) { t.name = n }
+func (t *gpioTestAdaptor) Port() string     { return t.port }
 
 // DigitalPin (interface DigitalPinnerProvider) return a pin object
 func (t *gpioTestAdaptor) DigitalPin(id string) (gobot.DigitalPinner, error) {
@@ -109,8 +121,8 @@ func (d *digitalPinMock) Unexport() error {
 }
 
 // Read (interface DigitalPinner) reads the current value of the pin
-func (d *digitalPinMock) Read() (n int, err error) {
-	return 0, err
+func (d *digitalPinMock) Read() (int, error) {
+	return 0, nil
 }
 
 // Write (interface DigitalPinner) writes to the pin
@@ -120,7 +132,7 @@ func (d *digitalPinMock) Write(b int) error {
 
 func (t *gpioTestAdaptor) addDigitalPin(id string) *digitalPinMock {
 	dpm := &digitalPinMock{
-		writeFunc: func(val int) (err error) { return nil },
+		writeFunc: func(val int) error { return nil },
 	}
 	t.pinMap[id] = dpm
 	return dpm

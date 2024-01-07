@@ -45,7 +45,7 @@ type Adafruit1109Driver struct {
 
 // NewAdafruit1109Driver creates is a new driver for the 2x16 LCD display with RGB backlit and 5 keys.
 //
-// Because HD44780 and MCP23017 are already implemented in gobot, we creates a wrapper for using existing implementation.
+// Because HD44780 and MCP23017 are already implemented in gobot, this is a wrapper for using existing implementation.
 // So, for the documentation of the parameters, have a look at this drivers.
 //
 // Tests are done with a Tinkerboard.
@@ -84,8 +84,9 @@ func NewAdafruit1109Driver(a Connector, options ...func(Config)) *Adafruit1109Dr
 	// but inside the driver the row is used as row and col as column
 	rows := 2
 	columns := 16
-	lcd := gpio.NewHD44780Driver(d, columns, rows, gpio.HD44780_4BITMODE, d.rsPin.String(), d.enPin.String(), dataPins)
-	lcd.SetRWPin(d.rwPin.String())
+	lcd := gpio.NewHD44780Driver(d, columns, rows, gpio.HD44780_4BITMODE, d.rsPin.String(), d.enPin.String(), dataPins,
+		gpio.WithHD44780RWPin(d.rwPin.String()))
+
 	d.HD44780Driver = lcd
 	return d
 }

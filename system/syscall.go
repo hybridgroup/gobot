@@ -21,8 +21,32 @@ const (
 type nativeSyscall struct{}
 
 // Syscall calls the native unix.Syscall, implements the SystemCaller interface
-func (sys *nativeSyscall) syscall(trap uintptr, f File, signal uintptr, payload unsafe.Pointer) (r1, r2 uintptr, err SyscallErrno) {
-	r1, r2, errNo := unix.Syscall(trap, f.Fd(), signal, uintptr(payload))
+// Note: It would be possible to transfer the address as an unsafe.Pointer to e.g. a byte, uint16 or integer variable.
+// The unpack process here would be as follows:
+// * convert the payload back to the pointer: addrPtr := (*byte)(payload)
+// * call with the content converted to uintptr: r1, r2, errNo = unix.Syscall(trap, f.Fd(), signal, uintptr(*addrPtr))
+// This has the main disadvantage, that if someone change the type of the address at caller side, the compiler will not
+// detect this problem and this unpack procedure would cause unpredictable results.
+// So the decision was taken to give the address here as a separate parameter, although it is not used in every call.
+// Note also, that the size of the address variable at Kernel side is u16, therefore uint16 is used here.
+//
+//nolint:nonamedreturns // useful here
+func (sys *nativeSyscall) syscall(
+	trap uintptr,
+	f File,
+	signal uintptr,
+	payload unsafe.Pointer,
+	address uint16,
+) (r1, r2 uintptr, err SyscallErrno) {
+	var errNo unix.Errno
+	if signal == I2C_SLAVE {
+		// this is the setup for the address, it just needs to be converted to an uintptr,
+		// the given payload is not used in this case, see the comment on the function
+		r1, r2, errNo = unix.Syscall(trap, f.Fd(), signal, uintptr(address))
+	} else {
+		r1, r2, errNo = unix.Syscall(trap, f.Fd(), signal, uintptr(payload))
+	}
+
 	return r1, r2, SyscallErrno(errNo)
 }
 

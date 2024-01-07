@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -44,7 +46,7 @@ func TestWiichuckDriverStart(t *testing.T) {
 	d.interval = 1 * time.Millisecond
 	sem := make(chan bool)
 
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 
 	go func() {
 		for {
@@ -67,7 +69,7 @@ func TestWiichuckDriverStart(t *testing.T) {
 
 func TestWiichuckDriverHalt(t *testing.T) {
 	d := initTestWiichuckDriverWithStubbedAdaptor()
-	assert.NoError(t, d.Halt())
+	require.NoError(t, d.Halt())
 }
 
 func TestWiichuckDriverCanParse(t *testing.T) {
@@ -78,10 +80,10 @@ func TestWiichuckDriverCanParse(t *testing.T) {
 	_ = d.update(decryptedValue)
 
 	// - This should be done by WiichuckDriver.parse
-	assert.Equal(t, float64(45), d.data["sx"])
-	assert.Equal(t, float64(44), d.data["sy"])
-	assert.Equal(t, float64(0), d.data["z"])
-	assert.Equal(t, float64(0), d.data["c"])
+	assert.InDelta(t, float64(45), d.data["sx"], 0.0)
+	assert.InDelta(t, float64(44), d.data["sy"], 0.0)
+	assert.InDelta(t, float64(0), d.data["z"], 0.0)
+	assert.InDelta(t, float64(0), d.data["c"], 0.0)
 }
 
 func TestWiichuckDriverCanAdjustOrigins(t *testing.T) {
@@ -92,8 +94,8 @@ func TestWiichuckDriverCanAdjustOrigins(t *testing.T) {
 	_ = d.update(decryptedValue)
 
 	// - This should be done by WiichuckDriver.adjustOrigins
-	assert.Equal(t, float64(45), d.Joystick()["sx_origin"])
-	assert.Equal(t, float64(44), d.Joystick()["sy_origin"])
+	assert.InDelta(t, float64(45), d.Joystick()["sx_origin"], 0.0)
+	assert.InDelta(t, float64(44), d.Joystick()["sy_origin"], 0.0)
 }
 
 func TestWiichuckDriverCButton(t *testing.T) {
@@ -107,7 +109,7 @@ func TestWiichuckDriverCButton(t *testing.T) {
 	done := make(chan bool)
 
 	_ = d.On(d.Event(C), func(data interface{}) {
-		assert.Equal(t, true, data)
+		assert.Equal(t, true, data) //nolint:testifylint // data is an interface
 		done <- true
 	})
 
@@ -130,7 +132,7 @@ func TestWiichuckDriverZButton(t *testing.T) {
 	done := make(chan bool)
 
 	_ = d.On(d.Event(Z), func(data interface{}) {
-		assert.Equal(t, true, data)
+		assert.Equal(t, true, data) //nolint:testifylint // data is an interface
 		done <- true
 	})
 
@@ -177,37 +179,37 @@ func TestWiichuckDriverEncrypted(t *testing.T) {
 
 	_ = d.update(encryptedValue)
 
-	assert.Equal(t, float64(0), d.data["sx"])
-	assert.Equal(t, float64(0), d.data["sy"])
-	assert.Equal(t, float64(0), d.data["z"])
-	assert.Equal(t, float64(0), d.data["c"])
+	assert.InDelta(t, float64(0), d.data["sx"], 0.0)
+	assert.InDelta(t, float64(0), d.data["sy"], 0.0)
+	assert.InDelta(t, float64(0), d.data["z"], 0.0)
+	assert.InDelta(t, float64(0), d.data["c"], 0.0)
 
-	assert.Equal(t, float64(-1), d.Joystick()["sx_origin"])
-	assert.Equal(t, float64(-1), d.Joystick()["sy_origin"])
+	assert.InDelta(t, float64(-1), d.Joystick()["sx_origin"], 0.0)
+	assert.InDelta(t, float64(-1), d.Joystick()["sy_origin"], 0.0)
 }
 
 func TestWiichuckDriverSetJoystickDefaultValue(t *testing.T) {
 	d := initTestWiichuckDriverWithStubbedAdaptor()
 
-	assert.Equal(t, float64(-1), d.Joystick()["sy_origin"])
+	assert.InDelta(t, float64(-1), d.Joystick()["sy_origin"], 0.0)
 
 	d.setJoystickDefaultValue("sy_origin", float64(2))
 
-	assert.Equal(t, float64(2), d.Joystick()["sy_origin"])
+	assert.InDelta(t, float64(2), d.Joystick()["sy_origin"], 0.0)
 
 	// when current default value is not -1 it keeps the current value
 	d.setJoystickDefaultValue("sy_origin", float64(20))
 
-	assert.Equal(t, float64(2), d.Joystick()["sy_origin"])
+	assert.InDelta(t, float64(2), d.Joystick()["sy_origin"], 0.0)
 }
 
 func TestWiichuckDriverCalculateJoystickValue(t *testing.T) {
 	d := initTestWiichuckDriverWithStubbedAdaptor()
 
-	assert.Equal(t, float64(15), d.calculateJoystickValue(float64(20), float64(5)))
-	assert.Equal(t, float64(-1), d.calculateJoystickValue(float64(1), float64(2)))
-	assert.Equal(t, float64(5), d.calculateJoystickValue(float64(10), float64(5)))
-	assert.Equal(t, float64(-5), d.calculateJoystickValue(float64(5), float64(10)))
+	assert.InDelta(t, float64(15), d.calculateJoystickValue(float64(20), float64(5)), 0.0)
+	assert.InDelta(t, float64(-1), d.calculateJoystickValue(float64(1), float64(2)), 0.0)
+	assert.InDelta(t, float64(5), d.calculateJoystickValue(float64(10), float64(5)), 0.0)
+	assert.InDelta(t, float64(-5), d.calculateJoystickValue(float64(5), float64(10)), 0.0)
 }
 
 func TestWiichuckDriverIsEncrypted(t *testing.T) {
@@ -232,49 +234,49 @@ func TestWiichuckDriverIsEncrypted(t *testing.T) {
 func TestWiichuckDriverDecode(t *testing.T) {
 	d := initTestWiichuckDriverWithStubbedAdaptor()
 
-	assert.Equal(t, float64(46), d.decode(byte(0)))
-	assert.Equal(t, float64(138), d.decode(byte(100)))
-	assert.Equal(t, float64(246), d.decode(byte(200)))
-	assert.Equal(t, float64(0), d.decode(byte(254)))
+	assert.InDelta(t, float64(46), d.decode(byte(0)), 0.0)
+	assert.InDelta(t, float64(138), d.decode(byte(100)), 0.0)
+	assert.InDelta(t, float64(246), d.decode(byte(200)), 0.0)
+	assert.InDelta(t, float64(0), d.decode(byte(254)), 0.0)
 }
 
 func TestWiichuckDriverParse(t *testing.T) {
 	d := initTestWiichuckDriverWithStubbedAdaptor()
 
-	assert.Equal(t, float64(0), d.data["sx"])
-	assert.Equal(t, float64(0), d.data["sy"])
-	assert.Equal(t, float64(0), d.data["z"])
-	assert.Equal(t, float64(0), d.data["c"])
+	assert.InDelta(t, float64(0), d.data["sx"], 0.0)
+	assert.InDelta(t, float64(0), d.data["sy"], 0.0)
+	assert.InDelta(t, float64(0), d.data["z"], 0.0)
+	assert.InDelta(t, float64(0), d.data["c"], 0.0)
 
 	// First pass
 	d.parse([]byte{12, 23, 34, 45, 56, 67})
 
-	assert.Equal(t, float64(50), d.data["sx"])
-	assert.Equal(t, float64(23), d.data["sy"])
-	assert.Equal(t, float64(1), d.data["z"])
-	assert.Equal(t, float64(2), d.data["c"])
+	assert.InDelta(t, float64(50), d.data["sx"], 0.0)
+	assert.InDelta(t, float64(23), d.data["sy"], 0.0)
+	assert.InDelta(t, float64(1), d.data["z"], 0.0)
+	assert.InDelta(t, float64(2), d.data["c"], 0.0)
 
 	// Second pass
 	d.parse([]byte{70, 81, 92, 103, 204, 205})
 
-	assert.Equal(t, float64(104), d.data["sx"])
-	assert.Equal(t, float64(93), d.data["sy"])
-	assert.Equal(t, float64(1), d.data["z"])
-	assert.Equal(t, float64(0), d.data["c"])
+	assert.InDelta(t, float64(104), d.data["sx"], 0.0)
+	assert.InDelta(t, float64(93), d.data["sy"], 0.0)
+	assert.InDelta(t, float64(1), d.data["z"], 0.0)
+	assert.InDelta(t, float64(0), d.data["c"], 0.0)
 }
 
 func TestWiichuckDriverAdjustOrigins(t *testing.T) {
 	d := initTestWiichuckDriverWithStubbedAdaptor()
 
-	assert.Equal(t, float64(-1), d.Joystick()["sy_origin"])
-	assert.Equal(t, float64(-1), d.Joystick()["sx_origin"])
+	assert.InDelta(t, float64(-1), d.Joystick()["sy_origin"], 0.0)
+	assert.InDelta(t, float64(-1), d.Joystick()["sx_origin"], 0.0)
 
 	// First pass
 	d.parse([]byte{1, 2, 3, 4, 5, 6})
 	d.adjustOrigins()
 
-	assert.Equal(t, float64(44), d.Joystick()["sy_origin"])
-	assert.Equal(t, float64(45), d.Joystick()["sx_origin"])
+	assert.InDelta(t, float64(44), d.Joystick()["sy_origin"], 0.0)
+	assert.InDelta(t, float64(45), d.Joystick()["sx_origin"], 0.0)
 
 	// Second pass
 	d = initTestWiichuckDriverWithStubbedAdaptor()
@@ -282,8 +284,8 @@ func TestWiichuckDriverAdjustOrigins(t *testing.T) {
 	d.parse([]byte{61, 72, 83, 94, 105, 206})
 	d.adjustOrigins()
 
-	assert.Equal(t, float64(118), d.Joystick()["sy_origin"])
-	assert.Equal(t, float64(65), d.Joystick()["sx_origin"])
+	assert.InDelta(t, float64(118), d.Joystick()["sy_origin"], 0.0)
+	assert.InDelta(t, float64(65), d.Joystick()["sx_origin"], 0.0)
 }
 
 func TestWiichuckDriverSetName(t *testing.T) {

@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 )
 
@@ -48,7 +50,8 @@ func TestBMP180Measurements(t *testing.T) {
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
 		// Values from the datasheet example.
-		if adaptor.written[len(adaptor.written)-1] == bmp180RegisterAC1MSB {
+		switch {
+		case adaptor.written[len(adaptor.written)-1] == bmp180RegisterAC1MSB:
 			_ = binary.Write(buf, binary.BigEndian, int16(408))
 			_ = binary.Write(buf, binary.BigEndian, int16(-72))
 			_ = binary.Write(buf, binary.BigEndian, int16(-14383))
@@ -60,9 +63,11 @@ func TestBMP180Measurements(t *testing.T) {
 			_ = binary.Write(buf, binary.BigEndian, int16(-32768))
 			_ = binary.Write(buf, binary.BigEndian, int16(-8711))
 			_ = binary.Write(buf, binary.BigEndian, int16(2868))
-		} else if adaptor.written[len(adaptor.written)-2] == bmp180CtlTemp && adaptor.written[len(adaptor.written)-1] == bmp180RegisterDataMSB {
+		case adaptor.written[len(adaptor.written)-2] == bmp180CtlTemp &&
+			adaptor.written[len(adaptor.written)-1] == bmp180RegisterDataMSB:
 			_ = binary.Write(buf, binary.BigEndian, int16(27898))
-		} else if adaptor.written[len(adaptor.written)-2] == bmp180CtlPressure && adaptor.written[len(adaptor.written)-1] == bmp180RegisterDataMSB {
+		case adaptor.written[len(adaptor.written)-2] == bmp180CtlPressure &&
+			adaptor.written[len(adaptor.written)-1] == bmp180RegisterDataMSB:
 			_ = binary.Write(buf, binary.BigEndian, int16(23843))
 			// XLSB, not used in this test.
 			buf.WriteByte(0)
@@ -72,11 +77,11 @@ func TestBMP180Measurements(t *testing.T) {
 	}
 	_ = bmp180.Start()
 	temp, err := bmp180.Temperature()
-	assert.NoError(t, err)
-	assert.Equal(t, float32(15.0), temp)
+	require.NoError(t, err)
+	assert.InDelta(t, float32(15.0), temp, 0.0)
 	pressure, err := bmp180.Pressure()
-	assert.NoError(t, err)
-	assert.Equal(t, float32(69964), pressure)
+	require.NoError(t, err)
+	assert.InDelta(t, float32(69964), pressure, 0.0)
 }
 
 func TestBMP180TemperatureError(t *testing.T) {
@@ -84,7 +89,8 @@ func TestBMP180TemperatureError(t *testing.T) {
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
 		// Values from the datasheet example.
-		if adaptor.written[len(adaptor.written)-1] == bmp180RegisterAC1MSB {
+		switch {
+		case adaptor.written[len(adaptor.written)-1] == bmp180RegisterAC1MSB:
 			_ = binary.Write(buf, binary.BigEndian, int16(408))
 			_ = binary.Write(buf, binary.BigEndian, int16(-72))
 			_ = binary.Write(buf, binary.BigEndian, int16(-14383))
@@ -96,9 +102,11 @@ func TestBMP180TemperatureError(t *testing.T) {
 			_ = binary.Write(buf, binary.BigEndian, int16(-32768))
 			_ = binary.Write(buf, binary.BigEndian, int16(-8711))
 			_ = binary.Write(buf, binary.BigEndian, int16(2868))
-		} else if adaptor.written[len(adaptor.written)-2] == bmp180CtlTemp && adaptor.written[len(adaptor.written)-1] == bmp180RegisterDataMSB {
+		case adaptor.written[len(adaptor.written)-2] == bmp180CtlTemp &&
+			adaptor.written[len(adaptor.written)-1] == bmp180RegisterDataMSB:
 			return 0, errors.New("temp error")
-		} else if adaptor.written[len(adaptor.written)-2] == bmp180CtlPressure && adaptor.written[len(adaptor.written)-1] == bmp180RegisterDataMSB {
+		case adaptor.written[len(adaptor.written)-2] == bmp180CtlPressure &&
+			adaptor.written[len(adaptor.written)-1] == bmp180RegisterDataMSB:
 			_ = binary.Write(buf, binary.BigEndian, int16(23843))
 			// XLSB, not used in this test.
 			buf.WriteByte(0)
@@ -108,7 +116,7 @@ func TestBMP180TemperatureError(t *testing.T) {
 	}
 	_ = bmp180.Start()
 	_, err := bmp180.Temperature()
-	assert.ErrorContains(t, err, "temp error")
+	require.ErrorContains(t, err, "temp error")
 }
 
 func TestBMP180PressureError(t *testing.T) {
@@ -116,7 +124,8 @@ func TestBMP180PressureError(t *testing.T) {
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
 		// Values from the datasheet example.
-		if adaptor.written[len(adaptor.written)-1] == bmp180RegisterAC1MSB {
+		switch {
+		case adaptor.written[len(adaptor.written)-1] == bmp180RegisterAC1MSB:
 			_ = binary.Write(buf, binary.BigEndian, int16(408))
 			_ = binary.Write(buf, binary.BigEndian, int16(-72))
 			_ = binary.Write(buf, binary.BigEndian, int16(-14383))
@@ -128,9 +137,11 @@ func TestBMP180PressureError(t *testing.T) {
 			_ = binary.Write(buf, binary.BigEndian, int16(-32768))
 			_ = binary.Write(buf, binary.BigEndian, int16(-8711))
 			_ = binary.Write(buf, binary.BigEndian, int16(2868))
-		} else if adaptor.written[len(adaptor.written)-2] == bmp180CtlTemp && adaptor.written[len(adaptor.written)-1] == bmp180RegisterDataMSB {
+		case adaptor.written[len(adaptor.written)-2] == bmp180CtlTemp &&
+			adaptor.written[len(adaptor.written)-1] == bmp180RegisterDataMSB:
 			_ = binary.Write(buf, binary.BigEndian, int16(27898))
-		} else if adaptor.written[len(adaptor.written)-2] == bmp180CtlPressure && adaptor.written[len(adaptor.written)-1] == bmp180RegisterDataMSB {
+		case adaptor.written[len(adaptor.written)-2] == bmp180CtlPressure &&
+			adaptor.written[len(adaptor.written)-1] == bmp180RegisterDataMSB:
 			return 0, errors.New("press error")
 		}
 		copy(b, buf.Bytes())
@@ -138,7 +149,7 @@ func TestBMP180PressureError(t *testing.T) {
 	}
 	_ = bmp180.Start()
 	_, err := bmp180.Pressure()
-	assert.ErrorContains(t, err, "press error")
+	require.ErrorContains(t, err, "press error")
 }
 
 func TestBMP180PressureWriteError(t *testing.T) {
@@ -150,7 +161,7 @@ func TestBMP180PressureWriteError(t *testing.T) {
 	}
 
 	_, err := bmp180.Pressure()
-	assert.ErrorContains(t, err, "write error")
+	require.ErrorContains(t, err, "write error")
 }
 
 func TestBMP180_initialization(t *testing.T) {
@@ -183,9 +194,9 @@ func TestBMP180_initialization(t *testing.T) {
 	// act, assert - initialization() must be called on Start()
 	err := d.Start()
 	// assert
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, 1, numCallsRead)
-	assert.Equal(t, 1, len(a.written))
+	assert.Len(t, a.written, 1)
 	assert.Equal(t, uint8(0xAA), a.written[0])
 	assert.Equal(t, int16(408), d.calCoeffs.ac1)
 	assert.Equal(t, int16(-72), d.calCoeffs.ac2)

@@ -1,9 +1,12 @@
+//nolint:forcetypeassert // ok here
 package i2c
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/aio"
 )
@@ -99,5 +102,5 @@ func TestADS1x15_ads1x15BestGainForVoltage(t *testing.T) {
 	assert.Equal(t, 2, g)
 
 	_, err := ads1x15BestGainForVoltage(20.0)
-	assert.ErrorContains(t, err, "The maximum voltage which can be read is 6.144000")
+	require.ErrorContains(t, err, "The maximum voltage which can be read is 6.144000")
 }

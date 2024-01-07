@@ -8,6 +8,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"gobot.io/x/gobot/v2"
 	mavlink "gobot.io/x/gobot/v2/platforms/mavlink/common"
 )
@@ -65,8 +67,8 @@ func TestMavlinkUDPAdaptorName(t *testing.T) {
 
 func TestMavlinkUDPAdaptorConnectAndFinalize(t *testing.T) {
 	a := initTestMavlinkUDPAdaptor()
-	assert.NoError(t, a.Connect())
-	assert.NoError(t, a.Finalize())
+	require.NoError(t, a.Connect())
+	require.NoError(t, a.Finalize())
 }
 
 func TestMavlinkUDPAdaptorWrite(t *testing.T) {
@@ -82,7 +84,7 @@ func TestMavlinkUDPAdaptorWrite(t *testing.T) {
 
 	i, err := a.Write([]byte{0x01, 0x02, 0x03})
 	assert.Equal(t, 3, i)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestMavlinkReadMAVLinkReadDefaultPacket(t *testing.T) {
@@ -136,5 +138,5 @@ func TestMavlinkReadMAVLinkPacketReadError(t *testing.T) {
 	a.sock = m
 
 	_, err := a.ReadMAVLinkPacket()
-	assert.ErrorContains(t, err, "read error")
+	require.ErrorContains(t, err, "read error")
 }

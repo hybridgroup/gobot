@@ -35,43 +35,41 @@ func NewLIDARLiteDriver(c Connector, options ...func(Config)) *LIDARLiteDriver {
 }
 
 // Distance returns the current distance in cm
-func (h *LIDARLiteDriver) Distance() (distance int, err error) {
-	if _, err = h.connection.Write([]byte{0x00, 0x04}); err != nil {
-		return
+func (h *LIDARLiteDriver) Distance() (int, error) {
+	if _, err := h.connection.Write([]byte{0x00, 0x04}); err != nil {
+		return 0, err
 	}
 	time.Sleep(20 * time.Millisecond)
 
-	if _, err = h.connection.Write([]byte{0x0F}); err != nil {
-		return
+	if _, err := h.connection.Write([]byte{0x0F}); err != nil {
+		return 0, err
 	}
 
 	upper := []byte{0}
 	bytesRead, err := h.connection.Read(upper)
 	if err != nil {
-		return
+		return 0, err
 	}
 
 	if bytesRead != 1 {
-		err = ErrNotEnoughBytes
-		return
+		return 0, ErrNotEnoughBytes
 	}
 
-	if _, err = h.connection.Write([]byte{0x10}); err != nil {
-		return
+	if _, err := h.connection.Write([]byte{0x10}); err != nil {
+		return 0, err
 	}
 
 	lower := []byte{0}
 	bytesRead, err = h.connection.Read(lower)
 	if err != nil {
-		return
+		return 0, err
 	}
 
 	if bytesRead != 1 {
-		err = ErrNotEnoughBytes
-		return
+		return 0, ErrNotEnoughBytes
 	}
 
-	distance = ((int(upper[0]) & 0xff) << 8) | (int(lower[0]) & 0xff)
+	distance := ((int(upper[0]) & 0xff) << 8) | (int(lower[0]) & 0xff)
 
-	return
+	return distance, nil
 }

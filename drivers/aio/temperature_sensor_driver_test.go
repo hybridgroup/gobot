@@ -1,3 +1,4 @@
+//nolint:forcetypeassert // ok here
 package aio
 
 import (
@@ -8,17 +9,57 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-func TestTemperatureSensorDriver(t *testing.T) {
-	testAdaptor := newAioTestAdaptor()
-	d := NewTemperatureSensorDriver(testAdaptor, "123")
-	assert.Equal(t, testAdaptor, d.Connection())
-	assert.Equal(t, "123", d.Pin())
-	assert.Equal(t, 10*time.Millisecond, d.interval)
+func TestNewTemperatureSensorDriver(t *testing.T) {
+	// arrange
+	const pin = "123"
+	a := newAioTestAdaptor()
+	// act
+	d := NewTemperatureSensorDriver(a, pin)
+	// assert: driver attributes
+	assert.IsType(t, &TemperatureSensorDriver{}, d)
+	assert.NotNil(t, d.driverCfg)
+	assert.True(t, strings.HasPrefix(d.Name(), "TemperatureSensor"))
+	assert.Equal(t, a, d.Connection())
+	require.NoError(t, d.afterStart())
+	require.NoError(t, d.beforeHalt())
+	assert.NotNil(t, d.Commander)
+	assert.NotNil(t, d.mutex)
+	// assert: sensor attributes
+	assert.Equal(t, pin, d.Pin())
+	assert.InDelta(t, 0.0, d.lastValue, 0, 0)
+	assert.Equal(t, 0, d.lastRawValue)
+	assert.Nil(t, d.halt) // will be created on initialize, if cyclic reading is on
+	assert.NotNil(t, d.Eventer)
+	require.NotNil(t, d.sensorCfg)
+	assert.Equal(t, time.Duration(0), d.sensorCfg.readInterval)
+	assert.NotNil(t, d.sensorCfg.scale)
 }
 
-func TestTemperatureSensorDriverNtcScaling(t *testing.T) {
+func TestNewTemperatureSensorDriver_options(t *testing.T) {
+	// This is a general test, that options are applied in constructor by using the common WithName() option, least one
+	// option of this driver and one of another driver (which should lead to panic). Further tests for options can also
+	// be done by call of "WithOption(val).apply(cfg)".
+	// arrange
+	const (
+		myName     = "outlet temperature"
+		cycReadDur = 10 * time.Millisecond
+	)
+	panicFunc := func() {
+		NewTemperatureSensorDriver(newAioTestAdaptor(), "1", WithName("crazy"),
+			WithActuatorScaler(func(float64) int { return 0 }))
+	}
+	// act
+	d := NewTemperatureSensorDriver(newAioTestAdaptor(), "1", WithName(myName), WithSensorCyclicRead(cycReadDur))
+	// assert
+	assert.Equal(t, cycReadDur, d.sensorCfg.readInterval)
+	assert.Equal(t, myName, d.Name())
+	assert.PanicsWithValue(t, "'scaler option for analog actuators' can not be applied on 'crazy'", panicFunc)
+}
+
+func TestTemperatureSensorRead_NtcScaler(t *testing.T) {
 	tests := map[string]struct {
 		input int
 		want  float64
@@ -38,23 +79,22 @@ func TestTemperatureSensorDriverNtcScaling(t *testing.T) {
 	d := NewTemperatureSensorDriver(a, "4")
 	ntc1 := TemperatureSensorNtcConf{TC0: 25, R0: 10000.0, B: 3950} // Ohm, R25=10k, B=3950
 	d.SetNtcScaler(255, 1000, true, ntc1)                           // Ohm, reference value: 3300, series R: 1k
-	for name, tt := range tests {
+	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			a.analogReadFunc = func() (val int, err error) {
-				val = tt.input
-				return
+			a.analogReadFunc = func() (int, error) {
+				return tc.input, nil
 			}
 			// act
 			got, err := d.Read()
 			// assert
-			assert.NoError(t, err)
-			assert.Equal(t, tt.want, got)
+			require.NoError(t, err)
+			assert.InDelta(t, tc.want, got, 0.0)
 		})
 	}
 }
 
-func TestTemperatureSensorDriverLinearScaling(t *testing.T) {
+func TestTemperatureSensorDriver_LinearScaler(t *testing.T) {
 	tests := map[string]struct {
 		input int
 		want  float64
@@ -73,38 +113,38 @@ func TestTemperatureSensorDriverLinearScaling(t *testing.T) {
 	a := newAioTestAdaptor()
 	d := NewTemperatureSensorDriver(a, "4")
 	d.SetLinearScaler(-128, 127, -40, 100)
-	for name, tt := range tests {
+	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			a.analogReadFunc = func() (val int, err error) {
-				val = tt.input
-				return
+			a.analogReadFunc = func() (int, error) {
+				return tc.input, nil
 			}
 			// act
 			got, err := d.Read()
 			// assert
-			assert.NoError(t, err)
-			assert.Equal(t, tt.want, got)
+			require.NoError(t, err)
+			assert.InDelta(t, tc.want, got, 0.0)
 		})
 	}
 }
 
-func TestTempSensorPublishesTemperatureInCelsius(t *testing.T) {
-	sem := make(chan bool, 1)
+func TestTemperatureSensorWithSensorCyclicRead_PublishesTemperatureInCelsius(t *testing.T) {
+	// arrange
+	sem := make(chan bool)
 	a := newAioTestAdaptor()
-	d := NewTemperatureSensorDriver(a, "1")
+	d := NewTemperatureSensorDriver(a, "1", WithSensorCyclicRead(10*time.Millisecond))
 	ntc := TemperatureSensorNtcConf{TC0: 25, R0: 10000.0, B: 3975} // Ohm, R25=10k
 	d.SetNtcScaler(1023, 10000, false, ntc)                        // Ohm, reference value: 1023, series R: 10k
 
-	a.analogReadFunc = func() (val int, err error) {
-		val = 585
-		return
+	a.analogReadFunc = func() (int, error) {
+		return 585, nil
 	}
+
+	require.NoError(t, d.Start())
 	_ = d.Once(d.Event(Value), func(data interface{}) {
 		assert.Equal(t, "31.62", fmt.Sprintf("%.2f", data.(float64)))
 		sem <- true
 	})
-	assert.NoError(t, d.Start())
 
 	select {
 	case <-sem:
@@ -112,21 +152,21 @@ func TestTempSensorPublishesTemperatureInCelsius(t *testing.T) {
 		t.Errorf(" Temperature Sensor Event \"Data\" was not published")
 	}
 
-	assert.Equal(t, 31.61532462352477, d.Value())
+	assert.InDelta(t, 31.61532462352477, d.Value(), 0.0)
 }
 
-func TestTempSensorPublishesError(t *testing.T) {
-	sem := make(chan bool, 1)
+func TestTemperatureSensorWithSensorCyclicRead_PublishesError(t *testing.T) {
+	// arrange
+	sem := make(chan bool)
 	a := newAioTestAdaptor()
-	d := NewTemperatureSensorDriver(a, "1")
+	d := NewTemperatureSensorDriver(a, "1", WithSensorCyclicRead(10*time.Millisecond))
 
 	// send error
-	a.analogReadFunc = func() (val int, err error) {
-		err = errors.New("read error")
-		return
+	a.analogReadFunc = func() (int, error) {
+		return 0, errors.New("read error")
 	}
 
-	assert.NoError(t, d.Start())
+	require.NoError(t, d.Start())
 
 	// expect error
 	_ = d.Once(d.Event(Error), func(data interface{}) {
@@ -141,30 +181,22 @@ func TestTempSensorPublishesError(t *testing.T) {
 	}
 }
 
-func TestTempSensorHalt(t *testing.T) {
-	d := NewTemperatureSensorDriver(newAioTestAdaptor(), "1")
+func TestTemperatureSensorHalt_WithSensorCyclicRead(t *testing.T) {
+	// arrange
+	d := NewTemperatureSensorDriver(newAioTestAdaptor(), "1", WithSensorCyclicRead(10*time.Millisecond))
 	done := make(chan struct{})
+	require.NoError(t, d.Start())
+	// act & assert
 	go func() {
-		<-d.halt
+		require.NoError(t, d.Halt())
 		close(done)
 	}()
-	assert.NoError(t, d.Halt())
+	// test that the halt is not blocked by any deadlock with mutex and/or channel
 	select {
 	case <-done:
 	case <-time.After(100 * time.Millisecond):
-		t.Errorf(" Temperature Sensor was not halted")
+		t.Errorf("Temperature Sensor was not halted")
 	}
-}
-
-func TestTempDriverDefaultName(t *testing.T) {
-	d := NewTemperatureSensorDriver(newAioTestAdaptor(), "1")
-	assert.True(t, strings.HasPrefix(d.Name(), "TemperatureSensor"))
-}
-
-func TestTempDriverSetName(t *testing.T) {
-	d := NewTemperatureSensorDriver(newAioTestAdaptor(), "1")
-	d.SetName("mybot")
-	assert.Equal(t, "mybot", d.Name())
 }
 
 func TestTempDriver_initialize(t *testing.T) {
@@ -194,21 +226,25 @@ func TestTempDriver_initialize(t *testing.T) {
 		},
 		"T1_low": {
 			input: TemperatureSensorNtcConf{TC0: 25, R0: 2500.0, TC1: -13, R1: 10000},
-			want:  TemperatureSensorNtcConf{TC0: 25, R0: 2500.0, TC1: -13, R1: 10000, B: 2829.6355560320544, t0: 298.15, r: 9.490644159087891},
+			want: TemperatureSensorNtcConf{
+				TC0: 25, R0: 2500.0, TC1: -13, R1: 10000, B: 2829.6355560320544, t0: 298.15, r: 9.490644159087891,
+			},
 		},
 		"T1_high": {
 			input: TemperatureSensorNtcConf{TC0: 25, R0: 2500.0, TC1: 100, R1: 371},
-			want:  TemperatureSensorNtcConf{TC0: 25, R0: 2500.0, TC1: 100, R1: 371, B: 2830.087381913779, t0: 298.15, r: 9.49215959052081},
+			want: TemperatureSensorNtcConf{
+				TC0: 25, R0: 2500.0, TC1: 100, R1: 371, B: 2830.087381913779, t0: 298.15, r: 9.49215959052081,
+			},
 		},
 	}
-	for name, tt := range tests {
+	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			ntc := tt.input
+			ntc := tc.input
 			// act
 			ntc.initialize()
 			// assert
-			assert.Equal(t, tt.want, ntc)
+			assert.Equal(t, tc.want, ntc)
 		})
 	}
 }
