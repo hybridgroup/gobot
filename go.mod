@@ -11,7 +11,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/hybridgroup/go-ardrone v0.0.0-20140402002621-b9750d8d7b78
 	github.com/hybridgroup/mjpeg v0.0.0-20140228234708-4680f319790e
-	github.com/nats-io/nats.go v1.31.0
+	github.com/nats-io/nats.go v1.32.0
 	github.com/nsf/termbox-go v1.1.1
 	github.com/sigurn/crc8 v0.0.0-20220107193325-2243fe600f9f
 	github.com/stretchr/testify v1.8.4
@@ -42,7 +42,7 @@ require (
 	github.com/saltosystems/winrt-go v0.0.0-20231011131235-9071442c0c84 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/tinygo-org/cbgo v0.0.4 // indirect
-	golang.org/x/crypto v0.17.0 // indirect
+	golang.org/x/crypto v0.18.0 // indirect
 	golang.org/x/sync v0.6.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
