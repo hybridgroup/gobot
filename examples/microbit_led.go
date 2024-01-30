@@ -31,12 +31,12 @@ import (
 	"time"
 
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/platforms/ble"
-	"gobot.io/x/gobot/v2/platforms/microbit"
+	"gobot.io/x/gobot/v2/drivers/ble/microbit"
+	"gobot.io/x/gobot/v2/platforms/bleclient"
 )
 
 func main() {
-	bleAdaptor := ble.NewClientAdaptor(os.Args[1])
+	bleAdaptor := bleclient.NewAdaptor(os.Args[1])
 	ubit := microbit.NewLEDDriver(bleAdaptor)
 
 	work := func() {

@@ -225,6 +225,20 @@ type Adaptor interface {
 	Finalize() error
 }
 
+// BLEConnector is the interface that a BLE ClientAdaptor must implement
+type BLEConnector interface {
+	Adaptor
+
+	Reconnect() error
+	Disconnect() error
+	Address() string
+
+	ReadCharacteristic(cUUID string) ([]byte, error)
+	WriteCharacteristic(cUUID string, data []byte) error
+	Subscribe(cUUID string, f func([]byte, error)) error
+	WithoutResponses(use bool)
+}
+
 // Porter is the interface that describes an adaptor's port
 type Porter interface {
 	Port() string

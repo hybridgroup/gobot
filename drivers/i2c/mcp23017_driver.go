@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/common/bit"
 )
 
 // default address for device when a2/a1/a0 pins are all tied to ground
@@ -323,9 +324,9 @@ func (m *MCP23017Driver) write(reg uint8, pin uint8, state bitState) error {
 
 	var val uint8
 	if state == clear {
-		val = clearBit(valOrg, pin)
+		val = uint8(bit.Clear(int(valOrg), pin))
 	} else {
-		val = setBit(valOrg, pin)
+		val = uint8(bit.Set(int(valOrg), pin))
 	}
 
 	if val != valOrg || m.mcpBehav.forceRefresh {
