@@ -21,39 +21,39 @@ import (
 	"time"
 
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/platforms/ble"
-	"gobot.io/x/gobot/v2/platforms/parrot/minidrone"
+	"gobot.io/x/gobot/v2/drivers/ble/parrot"
+	"gobot.io/x/gobot/v2/platforms/bleclient"
 )
 
 func main() {
-	bleAdaptor := ble.NewClientAdaptor(os.Args[1])
-	drone := minidrone.NewDriver(bleAdaptor)
+	bleAdaptor := bleclient.NewAdaptor(os.Args[1])
+	drone := parrot.NewMinidroneDriver(bleAdaptor)
 
 	work := func() {
-		drone.On(minidrone.Battery, func(data interface{}) {
+		drone.On(parrot.BatteryEvent, func(data interface{}) {
 			fmt.Printf("battery: %d\n", data)
 		})
 
-		drone.On(minidrone.FlightStatus, func(data interface{}) {
+		drone.On(parrot.FlightStatusEvent, func(data interface{}) {
 			fmt.Printf("flight status: %d\n", data)
 		})
 
-		drone.On(minidrone.Takeoff, func(data interface{}) {
+		drone.On(parrot.TakeoffEvent, func(data interface{}) {
 			fmt.Println("taking off...")
 		})
 
-		drone.On(minidrone.Hovering, func(data interface{}) {
+		drone.On(parrot.HoveringEvent, func(data interface{}) {
 			fmt.Println("hovering!")
 			gobot.After(5*time.Second, func() {
 				drone.Land()
 			})
 		})
 
-		drone.On(minidrone.Landing, func(data interface{}) {
+		drone.On(parrot.LandingEvent, func(data interface{}) {
 			fmt.Println("landing...")
 		})
 
-		drone.On(minidrone.Landed, func(data interface{}) {
+		drone.On(parrot.LandedEvent, func(data interface{}) {
 			fmt.Println("landed.")
 		})
 

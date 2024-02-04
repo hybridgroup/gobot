@@ -190,15 +190,3 @@ func TestI2CWriteBlockDataAddressError(t *testing.T) {
 	err := c.WriteBlockData(0x01, []byte{0x01, 0x02})
 	require.ErrorContains(t, err, "Setting address failed with syscall.Errno operation not permitted")
 }
-
-func Test_setBit(t *testing.T) {
-	var wantVal uint8 = 129
-	gotVal := setBit(1, 7)
-	assert.Equal(t, wantVal, gotVal)
-}
-
-func Test_clearBit(t *testing.T) {
-	var wantVal uint8
-	gotVal := clearBit(128, 7)
-	assert.Equal(t, wantVal, gotVal)
-}
