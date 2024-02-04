@@ -29,20 +29,20 @@ import (
 	"os"
 
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/platforms/ble"
-	"gobot.io/x/gobot/v2/platforms/microbit"
+	"gobot.io/x/gobot/v2/drivers/ble/microbit"
+	"gobot.io/x/gobot/v2/platforms/bleclient"
 )
 
 func main() {
-	bleAdaptor := ble.NewClientAdaptor(os.Args[1])
+	bleAdaptor := bleclient.NewAdaptor(os.Args[1])
 	ubit := microbit.NewButtonDriver(bleAdaptor)
 
 	work := func() {
-		ubit.On(microbit.ButtonA, func(data interface{}) {
+		ubit.On(microbit.ButtonAEvent, func(data interface{}) {
 			fmt.Println("button A", data)
 		})
 
-		ubit.On(microbit.ButtonB, func(data interface{}) {
+		ubit.On(microbit.ButtonBEvent, func(data interface{}) {
 			fmt.Println("button B", data)
 		})
 	}

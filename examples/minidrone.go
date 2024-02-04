@@ -20,13 +20,13 @@ import (
 	"time"
 
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/platforms/ble"
-	"gobot.io/x/gobot/v2/platforms/parrot/minidrone"
+	"gobot.io/x/gobot/v2/drivers/ble/parrot"
+	"gobot.io/x/gobot/v2/platforms/bleclient"
 )
 
 func main() {
-	bleAdaptor := ble.NewClientAdaptor(os.Args[1])
-	drone := minidrone.NewDriver(bleAdaptor)
+	bleAdaptor := bleclient.NewAdaptor(os.Args[1])
+	drone := parrot.NewMinidroneDriver(bleAdaptor)
 
 	work := func() {
 		drone.TakeOff()

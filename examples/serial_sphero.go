@@ -1,0 +1,53 @@
+//go:build example
+// +build example
+
+//
+// Do not build by default.
+
+package main
+
+import (
+	"fmt"
+	"time"
+
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/common/sphero"
+	"gobot.io/x/gobot/v2/drivers/serial"
+	"gobot.io/x/gobot/v2/platforms/serialport"
+)
+
+func main() {
+	adaptor := serialport.NewAdaptor("/dev/rfcomm0")
+	spheroDriver := serial.NewSpheroDriver(adaptor)
+
+	work := func() {
+		spheroDriver.SetDataStreaming(sphero.DefaultDataStreamingConfig())
+
+		spheroDriver.On(sphero.CollisionEvent, func(data interface{}) {
+			fmt.Printf("Collision! %+v\n", data)
+		})
+
+		spheroDriver.On(sphero.SensorDataEvent, func(data interface{}) {
+			fmt.Printf("Streaming Data! %+v\n", data)
+		})
+
+		gobot.Every(3*time.Second, func() {
+			spheroDriver.Roll(30, uint16(gobot.Rand(360)))
+		})
+
+		gobot.Every(1*time.Second, func() {
+			r := uint8(gobot.Rand(255))
+			g := uint8(gobot.Rand(255))
+			b := uint8(gobot.Rand(255))
+			spheroDriver.SetRGB(r, g, b)
+		})
+	}
+
+	robot := gobot.NewRobot("sphero",
+		[]gobot.Connection{adaptor},
+		[]gobot.Device{spheroDriver},
+		work,
+	)
+
+	robot.Start()
+}

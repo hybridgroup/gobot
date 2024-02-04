@@ -30,17 +30,17 @@ import (
 	"os"
 
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/platforms/ble"
-	"gobot.io/x/gobot/v2/platforms/microbit"
+	"gobot.io/x/gobot/v2/drivers/ble/microbit"
+	"gobot.io/x/gobot/v2/platforms/bleclient"
 )
 
 func main() {
-	bleAdaptor := ble.NewClientAdaptor(os.Args[1])
+	bleAdaptor := bleclient.NewAdaptor(os.Args[1])
 	buttons := microbit.NewButtonDriver(bleAdaptor)
 	leds := microbit.NewLEDDriver(bleAdaptor)
 
 	work := func() {
-		buttons.On(microbit.ButtonA, func(data interface{}) {
+		buttons.On(microbit.ButtonAEvent, func(data interface{}) {
 			if data.([]byte)[0] == 1 {
 				leds.UpLeftArrow()
 				return
@@ -49,7 +49,7 @@ func main() {
 			leds.Blank()
 		})
 
-		buttons.On(microbit.ButtonB, func(data interface{}) {
+		buttons.On(microbit.ButtonBEvent, func(data interface{}) {
 			if data.([]byte)[0] == 1 {
 				leds.UpRightArrow()
 				return

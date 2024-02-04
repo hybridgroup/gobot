@@ -28,9 +28,9 @@ import (
 	"time"
 
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/platforms/ble"
+	"gobot.io/x/gobot/v2/drivers/ble/parrot"
+	"gobot.io/x/gobot/v2/platforms/bleclient"
 	"gobot.io/x/gobot/v2/platforms/joystick"
-	"gobot.io/x/gobot/v2/platforms/parrot/minidrone"
 )
 
 type pair struct {
@@ -46,8 +46,8 @@ func main() {
 	joystickAdaptor := joystick.NewAdaptor("0")
 	stick := joystick.NewDriver(joystickAdaptor, "dualshock3")
 
-	droneAdaptor := ble.NewClientAdaptor(os.Args[1])
-	drone := minidrone.NewDriver(droneAdaptor)
+	droneAdaptor := bleclient.NewAdaptor(os.Args[1])
+	drone := parrot.NewMinidroneDriver(droneAdaptor)
 
 	work := func() {
 		leftX.Store(float64(0.0))
@@ -104,18 +104,18 @@ func main() {
 
 			switch {
 			case rightStick.y < -10:
-				drone.Forward(minidrone.ValidatePitch(rightStick.y, offset))
+				drone.Forward(parrot.ValidatePitch(rightStick.y, offset))
 			case rightStick.y > 10:
-				drone.Backward(minidrone.ValidatePitch(rightStick.y, offset))
+				drone.Backward(parrot.ValidatePitch(rightStick.y, offset))
 			default:
 				drone.Forward(0)
 			}
 
 			switch {
 			case rightStick.x > 10:
-				drone.Right(minidrone.ValidatePitch(rightStick.x, offset))
+				drone.Right(parrot.ValidatePitch(rightStick.x, offset))
 			case rightStick.x < -10:
-				drone.Left(minidrone.ValidatePitch(rightStick.x, offset))
+				drone.Left(parrot.ValidatePitch(rightStick.x, offset))
 			default:
 				drone.Right(0)
 			}
@@ -125,18 +125,18 @@ func main() {
 			leftStick := getLeftStick()
 			switch {
 			case leftStick.y < -10:
-				drone.Up(minidrone.ValidatePitch(leftStick.y, offset))
+				drone.Up(parrot.ValidatePitch(leftStick.y, offset))
 			case leftStick.y > 10:
-				drone.Down(minidrone.ValidatePitch(leftStick.y, offset))
+				drone.Down(parrot.ValidatePitch(leftStick.y, offset))
 			default:
 				drone.Up(0)
 			}
 
 			switch {
 			case leftStick.x > 20:
-				drone.Clockwise(minidrone.ValidatePitch(leftStick.x, offset))
+				drone.Clockwise(parrot.ValidatePitch(leftStick.x, offset))
 			case leftStick.x < -20:
-				drone.CounterClockwise(minidrone.ValidatePitch(leftStick.x, offset))
+				drone.CounterClockwise(parrot.ValidatePitch(leftStick.x, offset))
 			default:
 				drone.Clockwise(0)
 			}

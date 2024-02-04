@@ -101,12 +101,13 @@ import (
   "time"
 
   "gobot.io/x/gobot/v2"
-  "gobot.io/x/gobot/v2/platforms/sphero"
+  "gobot.io/x/gobot/v2/drivers/serial"
+  "gobot.io/x/gobot/v2/platforms/serialport"
 )
 
 func main() {
-  adaptor := sphero.NewAdaptor("/dev/rfcomm0")
-  driver := sphero.NewSpheroDriver(adaptor)
+  adaptor := serialport.NewAdaptor("/dev/rfcomm0")
+  driver := serial.NewSpheroDriver(adaptor)
 
   work := func() {
     gobot.Every(3*time.Second, func() {
@@ -166,18 +167,20 @@ import (
 
   "gobot.io/x/gobot/v2"
   "gobot.io/x/gobot/v2/api"
-  "gobot.io/x/gobot/v2/platforms/sphero"
+  "gobot.io/x/gobot/v2/drivers/common/sphero"
+  "gobot.io/x/gobot/v2/drivers/serial"
+  "gobot.io/x/gobot/v2/platforms/serialport"
 )
 
 func NewSwarmBot(port string) *gobot.Robot {
-  spheroAdaptor := sphero.NewAdaptor(port)
-  spheroDriver := sphero.NewSpheroDriver(spheroAdaptor)
+  spheroAdaptor := serialport.NewAdaptor(port)
+  spheroDriver := serial.NewSpheroDriver(spheroAdaptor)
   spheroDriver.SetName("Sphero" + port)
 
   work := func() {
     spheroDriver.Stop()
 
-    spheroDriver.On(sphero.Collision, func(data interface{}) {
+    spheroDriver.On(sphero.CollisionEvent, func(data interface{}) {
       fmt.Println("Collision Detected!")
     })
 
@@ -229,7 +232,7 @@ platforms are currently supported:
 - Audio <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/audio)
 - [Beaglebone Black](http://beagleboard.org/boards) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/beaglebone)
 - [Beaglebone PocketBeagle](http://beagleboard.org/pocket/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/beaglebone)
-- [Bluetooth LE](https://www.bluetooth.com/what-is-bluetooth-technology/bluetooth-technology-basics/low-energy) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/ble)
+- [Bluetooth LE](https://www.bluetooth.com/what-is-bluetooth-technology/bluetooth-technology-basics/low-energy) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/bleclient)
 - [C.H.I.P](http://www.nextthing.co/pages/chip) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/chip)
 - [C.H.I.P Pro](https://docs.getchip.com/chip_pro.html) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/chip)
 - [Digispark](http://digistump.com/products/1) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/digispark)
@@ -259,15 +262,47 @@ platforms are currently supported:
 - [Pebble](https://www.getpebble.com/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/pebble)
 - [Radxa Rock Pi 4](https://wiki.radxa.com/Rock4/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/rockpi)
 - [Raspberry Pi](http://www.raspberrypi.org/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/raspi)
-- [Sphero](http://www.sphero.com/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/sphero)
+- [Serial Port](https://en.wikipedia.org/wiki/Serial_port) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/serialport)
+- [Sphero](http://www.sphero.com/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/sphero/sphero)
 - [Sphero BB-8](http://www.sphero.com/bb8) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/sphero/bb8)
 - [Sphero Ollie](http://www.sphero.com/ollie) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/sphero/ollie)
 - [Sphero SPRK+](http://www.sphero.com/sprk-plus) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/sphero/sprkplus)
 - [Tinker Board](https://www.asus.com/us/Single-Board-Computer/Tinker-Board/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/tinkerboard)
 - [UP2](http://www.up-board.org/upsquared/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/upboard/up2)
 
-Support for many devices that use General Purpose Input/Output (GPIO) have
-a shared set of drivers provided using the `gobot/drivers/gpio` package:
+Support for many devices that use Analog Input/Output (AIO) have a shared set of drivers provided using
+the `gobot/drivers/aio` package:
+
+- [AIO](https://en.wikipedia.org/wiki/Analog-to-digital_converter) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/aio)
+  - Analog Actuator
+  - Analog Sensor
+  - Grove Light Sensor
+  - Grove Piezo Vibration Sensor
+  - Grove Rotary Dial
+  - Grove Sound Sensor
+  - Grove Temperature Sensor
+  - Temperature Sensor (supports linear and NTC thermistor in normal and inverse mode)
+  - Thermal Zone Temperature Sensor
+
+Support for many devices that use Bluetooth LE (BLE) have a shared set of drivers provided using
+the `gobot/drivers/ble` package:
+
+- [BLE](http://en.wikipedia.org/wiki/Bluetooth_low_energy) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/ble)
+  - Battery Service
+  - Device Information Service
+  - Generic Access Service
+  - Microbit: AccelerometerDriver
+  - Microbit: ButtonDriver
+  - Microbit: IOPinDriver
+  - Microbit: LEDDriver
+  - Microbit: MagnetometerDriver
+  - Microbit: TemperatureDriver
+  - Sphero: BB8
+  - Sphero: Ollie
+  - Sphero: SPRK+
+
+Support for many devices that use General Purpose Input/Output (GPIO) have a shared set of drivers provided using
+the `gobot/drivers/gpio` package:
 
 - [GPIO](https://en.wikipedia.org/wiki/General_Purpose_Input/Output) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/gpio)
   - AIP1640 LED Dot Matrix/7 Segment Controller
@@ -294,22 +329,8 @@ a shared set of drivers provided using the `gobot/drivers/gpio` package:
   - Stepper Motor
   - TM1638 LED Controller
 
-Support for many devices that use Analog Input/Output (AIO) have
-a shared set of drivers provided using the `gobot/drivers/aio` package:
-
-- [AIO](https://en.wikipedia.org/wiki/Analog-to-digital_converter) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/aio)
-  - Analog Actuator
-  - Analog Sensor
-  - Grove Light Sensor
-  - Grove Piezo Vibration Sensor
-  - Grove Rotary Dial
-  - Grove Sound Sensor
-  - Grove Temperature Sensor
-  - Temperature Sensor (supports linear and NTC thermistor in normal and inverse mode)
-  - Thermal Zone Temperature Sensor
-
-Support for devices that use Inter-Integrated Circuit (I2C) have a shared set of
-drivers provided using the `gobot/drivers/i2c` package:
+Support for devices that use Inter-Integrated Circuit (I2C) have a shared set of drivers provided using
+the `gobot/drivers/i2c` package:
 
 - [I2C](https://en.wikipedia.org/wiki/I%C2%B2C) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/i2c)
   - Adafruit 1109 2x16 RGB-LCD with 5 keys
@@ -351,6 +372,12 @@ drivers provided using the `gobot/drivers/i2c` package:
   - Wii Nunchuck Controller
   - YL-40 Brightness/Temperature sensor, Potentiometer, analog input, analog output Driver
 
+Support for many devices that use Serial communication (UART) have a shared set of drivers provided using
+the `gobot/drivers/serial` package:
+
+- [UART](https://en.wikipedia.org/wiki/Serial_port) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/serial)
+  - Sphero: Sphero
+
 Support for devices that use Serial Peripheral Interface (SPI) have
 a shared set of drivers provided using the `gobot/drivers/spi` package:
 
@@ -365,8 +392,6 @@ a shared set of drivers provided using the `gobot/drivers/spi` package:
   - MCP3304 Analog/Digital Converter
   - MFRC522 RFID Card Reader
   - SSD1306 OLED Display Controller
-
-More platforms and drivers are coming soon...
 
 ## API
 

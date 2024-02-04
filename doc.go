@@ -70,66 +70,68 @@ pure idiomatic Golang code. For example:
 
 Finally, you can use Master Gobot to add the complete Gobot API or control swarms of Robots:
 
-	package main
+		package main
 
-	import (
-	    "fmt"
-	    "time"
+		import (
+		    "fmt"
+		    "time"
 
-	    "gobot.io/x/gobot/v2"
-	    "gobot.io/x/gobot/v2/api"
-	    "gobot.io/x/gobot/v2/platforms/sphero"
-	)
+		    "gobot.io/x/gobot/v2"
+	  		"gobot.io/x/gobot/v2/api"
+	  		"gobot.io/x/gobot/v2/drivers/common/sphero"
+	  		"gobot.io/x/gobot/v2/drivers/serial"
+	  		"gobot.io/x/gobot/v2/platforms/serialport"
+		)
 
-	func NewSwarmBot(port string) *gobot.Robot {
-	    spheroAdaptor := sphero.NewAdaptor(port)
-	    spheroDriver := sphero.NewSpheroDriver(spheroAdaptor)
-	    spheroDriver.SetName("Sphero" + port)
+		func NewSwarmBot(port string) *gobot.Robot {
+		    spheroAdaptor := serialport.NewAdaptor(port)
+		    spheroDriver := serial.NewSpheroDriver(spheroAdaptor)
+		    spheroDriver.SetName("Sphero" + port)
 
-	    work := func() {
-	        spheroDriver.Stop()
+		    work := func() {
+		        spheroDriver.Stop()
 
-	        spheroDriver.On(sphero.Collision, func(data interface{}) {
-	            fmt.Println("Collision Detected!")
-	        })
+		        spheroDriver.On(sphero.CollisionEvent, func(data interface{}) {
+		            fmt.Println("Collision Detected!")
+		        })
 
-	        gobot.Every(1*time.Second, func() {
-	            spheroDriver.Roll(100, uint16(gobot.Rand(360)))
-	        })
-	        gobot.Every(3*time.Second, func() {
-	            spheroDriver.SetRGB(uint8(gobot.Rand(255)),
-	                uint8(gobot.Rand(255)),
-	                uint8(gobot.Rand(255)),
-	            )
-	        })
-	    }
+		        gobot.Every(1*time.Second, func() {
+		            spheroDriver.Roll(100, uint16(gobot.Rand(360)))
+		        })
+		        gobot.Every(3*time.Second, func() {
+		            spheroDriver.SetRGB(uint8(gobot.Rand(255)),
+		                uint8(gobot.Rand(255)),
+		                uint8(gobot.Rand(255)),
+		            )
+		        })
+		    }
 
-	    robot := gobot.NewRobot("sphero",
-	        []gobot.Connection{spheroAdaptor},
-	        []gobot.Device{spheroDriver},
-	        work,
-	    )
+		    robot := gobot.NewRobot("sphero",
+		        []gobot.Connection{spheroAdaptor},
+		        []gobot.Device{spheroDriver},
+		        work,
+		    )
 
-	    return robot
-	}
+		    return robot
+		}
 
-	func main() {
-	    master := gobot.NewMaster()
-	    api.NewAPI(master).Start()
+		func main() {
+		    master := gobot.NewMaster()
+		    api.NewAPI(master).Start()
 
-	    spheros := []string{
-	        "/dev/rfcomm0",
-	        "/dev/rfcomm1",
-	        "/dev/rfcomm2",
-	        "/dev/rfcomm3",
-	    }
+		    spheros := []string{
+		        "/dev/rfcomm0",
+		        "/dev/rfcomm1",
+		        "/dev/rfcomm2",
+		        "/dev/rfcomm3",
+		    }
 
-	    for _, port := range spheros {
-	        master.AddRobot(NewSwarmBot(port))
-	    }
+		    for _, port := range spheros {
+		        master.AddRobot(NewSwarmBot(port))
+		    }
 
-	    master.Start()
-	}
+		    master.Start()
+		}
 
 Copyright (c) 2013-2018 The Hybrid Group. Licensed under the Apache 2.0 license.
 */

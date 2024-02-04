@@ -12,7 +12,7 @@ including_except := $(shell go list ./... | grep -v platforms/opencv)
 
 # Run tests on nearly all directories without test cache, with race detection
 test_race:
-	go test -failfast -count=1 -v -race $(including_except)
+	go test -failfast -count=1 -race $(including_except)
 
 # Run tests on nearly all directories without test cache
 test:

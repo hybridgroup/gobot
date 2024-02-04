@@ -7,7 +7,8 @@ import (
 	"io"
 
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/platforms/ble"
+	"gobot.io/x/gobot/v2/drivers/ble"
+	"gobot.io/x/gobot/v2/platforms/bleclient"
 )
 
 const (
@@ -40,7 +41,8 @@ func NewBLEAdaptor(args ...interface{}) *BLEAdaptor {
 	a := NewAdaptor(address)
 	a.SetName(gobot.DefaultName("BLEFirmata"))
 	a.PortOpener = func(port string) (io.ReadWriteCloser, error) {
-		sp := ble.NewSerialPort(address, rid, wid)
+		a := bleclient.NewAdaptor(address)
+		sp := ble.NewSerialPortDriver(a, rid, wid)
 		if err := sp.Open(); err != nil {
 			return sp, err
 		}
