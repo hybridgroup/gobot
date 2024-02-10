@@ -18,9 +18,9 @@ type SerialPortDriver struct {
 }
 
 // NewSerialPortDriver returns a new serial over Bluetooth LE connection
-func NewSerialPortDriver(a gobot.BLEConnector, rid string, tid string) *SerialPortDriver {
+func NewSerialPortDriver(a gobot.BLEConnector, rid string, tid string, opts ...OptionApplier) *SerialPortDriver {
 	d := &SerialPortDriver{
-		Driver: NewDriver(a, "BleSerial", nil, nil),
+		Driver: NewDriver(a, "BleSerial", nil, nil, opts...),
 		rid:    rid,
 		tid:    tid,
 	}
@@ -35,7 +35,7 @@ func (p *SerialPortDriver) Open() error {
 	}
 
 	// subscribe to response notifications
-	return p.Adaptor().Subscribe(p.rid, func(data []byte, e error) {
+	return p.Adaptor().Subscribe(p.rid, func(data []byte) {
 		p.responseMutex.Lock()
 		defer p.responseMutex.Unlock()
 		p.responseData = append(p.responseData, data...)

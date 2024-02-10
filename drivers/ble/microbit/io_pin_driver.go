@@ -33,12 +33,12 @@ type pinData struct {
 }
 
 // NewIOPinDriver creates a new driver
-func NewIOPinDriver(a gobot.BLEConnector) *IOPinDriver {
+func NewIOPinDriver(a gobot.BLEConnector, opts ...ble.OptionApplier) *IOPinDriver {
 	d := &IOPinDriver{
 		Eventer: gobot.NewEventer(),
 	}
 
-	d.Driver = ble.NewDriver(a, "Microbit IO Pins", d.initialize, nil)
+	d.Driver = ble.NewDriver(a, "Microbit IO Pins", d.initialize, nil, opts...)
 
 	return d
 }

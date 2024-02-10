@@ -235,7 +235,7 @@ type BLEConnector interface {
 
 	ReadCharacteristic(cUUID string) ([]byte, error)
 	WriteCharacteristic(cUUID string, data []byte) error
-	Subscribe(cUUID string, f func([]byte, error)) error
+	Subscribe(cUUID string, f func(data []byte)) error
 	WithoutResponses(use bool)
 }
 

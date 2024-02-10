@@ -29,8 +29,17 @@ func main() {
 	access := ble.NewGenericAccessDriver(bleAdaptor)
 
 	work := func() {
-		fmt.Println("Device name:", access.GetDeviceName())
-		fmt.Println("Appearance:", access.GetAppearance())
+		devName, err := access.GetDeviceName()
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println("Device name:", devName)
+
+		appearance, err := access.GetAppearance()
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println("Appearance:", appearance)
 	}
 
 	robot := gobot.NewRobot("bleBot",

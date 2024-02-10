@@ -35,8 +35,7 @@ func main() {
 	for _, port := range spheros {
 		spheroAdaptor := serialport.NewAdaptor(port)
 
-		cell := serial.NewSpheroDriver(spheroAdaptor)
-		cell.SetName("Sphero" + port)
+		cell := serial.NewSpheroDriver(spheroAdaptor, serial.WithName("Sphero"+port))
 
 		work := func() {
 			conway := new(conway)

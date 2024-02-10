@@ -37,6 +37,21 @@ func TestNewDriver(t *testing.T) {
 	assert.NotNil(t, d.mutex)
 }
 
+func TestNewDriverWithName(t *testing.T) {
+	// This is a general test, that options are applied in constructor by using the common WithName() option.	Further
+	// tests for options can also be done by call of "WithOption(val).apply(cfg)".
+	// arrange
+	const (
+		name    = "mybot"
+		newName = "overwrite mybot"
+	)
+	a := testutil.NewBleTestAdaptor()
+	// act
+	d := NewDriver(a, name, nil, nil, WithName(newName))
+	// assert
+	assert.Equal(t, newName, d.Name())
+}
+
 func Test_applyWithName(t *testing.T) {
 	// arrange
 	const name = "mybot"
@@ -67,4 +82,19 @@ func TestHalt(t *testing.T) {
 	d.beforeHalt = func() error { return fmt.Errorf("before halt error") }
 	// act, assert
 	require.EqualError(t, d.Halt(), "before halt error")
+}
+
+func TestAdaptor(t *testing.T) {
+	wrongConnectorType := struct {
+		a uint32
+	}{}
+	// arrange
+	a := testutil.NewBleTestAdaptor()
+	d := NewDriver(a, "BLE_BASIC", nil, nil)
+	// act, assert
+	assert.Equal(t, a, d.Adaptor())
+	// arrange wrong connector type
+	d.connection = wrongConnectorType
+	// act, assert
+	assert.Nil(t, d.Adaptor())
 }

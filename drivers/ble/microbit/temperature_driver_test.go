@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/ble"
 	"gobot.io/x/gobot/v2/drivers/ble/testutil"
 )
 
@@ -19,11 +20,23 @@ func initTestTemperatureDriver() *TemperatureDriver {
 	return d
 }
 
-func TestTemperatureDriver(t *testing.T) {
-	d := initTestTemperatureDriver()
+func TestNewTemperatureDriver(t *testing.T) {
+	d := NewTemperatureDriver(testutil.NewBleTestAdaptor())
 	assert.IsType(t, &TemperatureDriver{}, d)
 	assert.True(t, strings.HasPrefix(d.Name(), "Microbit Temperature"))
 	assert.NotNil(t, d.Eventer)
+}
+
+func TestNewTemperatureDriverWithName(t *testing.T) {
+	// This is a general test, that options are applied in constructor by using the common WithName() option.	Further
+	// tests for options can also be done by call of "WithOption(val).apply(cfg)".
+	// arrange
+	const newName = "new name"
+	a := testutil.NewBleTestAdaptor()
+	// act
+	d := NewTemperatureDriver(a, ble.WithName(newName))
+	// assert
+	assert.Equal(t, newName, d.Name())
 }
 
 func TestTemperatureStartAndHalt(t *testing.T) {
@@ -43,7 +56,7 @@ func TestTemperatureReadData(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	a.SendTestDataToSubscriber([]byte{0x22}, nil)
+	a.SendTestDataToSubscriber([]byte{0x22})
 
 	select {
 	case <-sem:

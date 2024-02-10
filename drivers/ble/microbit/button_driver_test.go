@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/ble"
 	"gobot.io/x/gobot/v2/drivers/ble/testutil"
 )
 
@@ -19,6 +20,18 @@ func TestNewButtonDriver(t *testing.T) {
 	assert.IsType(t, &ButtonDriver{}, d)
 	assert.True(t, strings.HasPrefix(d.Name(), "Microbit Button"))
 	assert.NotNil(t, d.Eventer)
+}
+
+func TestNewButtonDriverWithName(t *testing.T) {
+	// This is a general test, that options are applied in constructor by using the common WithName() option.	Further
+	// tests for options can also be done by call of "WithOption(val).apply(cfg)".
+	// arrange
+	const newName = "new name"
+	a := testutil.NewBleTestAdaptor()
+	// act
+	d := NewButtonDriver(a, ble.WithName(newName))
+	// assert
+	assert.Equal(t, newName, d.Name())
 }
 
 func TestButtonStartAndHalt(t *testing.T) {
@@ -38,7 +51,7 @@ func TestButtonReadData(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	a.SendTestDataToSubscriber([]byte{1}, nil)
+	a.SendTestDataToSubscriber([]byte{1})
 
 	select {
 	case <-sem:

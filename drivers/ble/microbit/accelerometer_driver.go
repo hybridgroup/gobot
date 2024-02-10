@@ -28,11 +28,11 @@ type AccelerometerData struct {
 }
 
 // NewAccelerometerDriver creates a  AccelerometerDriver
-func NewAccelerometerDriver(a gobot.BLEConnector) *AccelerometerDriver {
+func NewAccelerometerDriver(a gobot.BLEConnector, opts ...ble.OptionApplier) *AccelerometerDriver {
 	d := &AccelerometerDriver{
 		Eventer: gobot.NewEventer(),
 	}
-	d.Driver = ble.NewDriver(a, "Microbit Accelerometer", d.initialize, nil)
+	d.Driver = ble.NewDriver(a, "Microbit Accelerometer", d.initialize, nil, opts...)
 
 	d.AddEvent(AccelerometerEvent)
 
@@ -42,7 +42,7 @@ func NewAccelerometerDriver(a gobot.BLEConnector) *AccelerometerDriver {
 // initialize tells driver to get ready to do work
 func (d *AccelerometerDriver) initialize() error {
 	// subscribe to accelerometer notifications
-	return d.Adaptor().Subscribe(accelerometerChara, func(data []byte, e error) {
+	return d.Adaptor().Subscribe(accelerometerChara, func(data []byte) {
 		a := struct{ x, y, z int16 }{x: 0, y: 0, z: 0}
 
 		buf := bytes.NewBuffer(data)

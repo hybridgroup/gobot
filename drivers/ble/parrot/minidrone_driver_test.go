@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/ble"
 	"gobot.io/x/gobot/v2/drivers/ble/testutil"
 )
 
@@ -25,6 +26,18 @@ func TestNewMinidroneDriver(t *testing.T) {
 	d := NewMinidroneDriver(testutil.NewBleTestAdaptor())
 	assert.True(t, strings.HasPrefix(d.Name(), "Minidrone"))
 	assert.NotNil(t, d.Eventer)
+}
+
+func TestNewMinidroneDriverWithName(t *testing.T) {
+	// This is a general test, that options are applied in constructor by using the common WithName() option.	Further
+	// tests for options can also be done by call of "WithOption(val).apply(cfg)".
+	// arrange
+	const newName = "new name"
+	a := testutil.NewBleTestAdaptor()
+	// act
+	d := NewMinidroneDriver(a, ble.WithName(newName))
+	// assert
+	assert.Equal(t, newName, d.Name())
 }
 
 func TestMinidroneHalt(t *testing.T) {

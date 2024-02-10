@@ -28,11 +28,11 @@ type MagnetometerData struct {
 }
 
 // NewMagnetometerDriver creates a Microbit MagnetometerDriver
-func NewMagnetometerDriver(a gobot.BLEConnector) *MagnetometerDriver {
+func NewMagnetometerDriver(a gobot.BLEConnector, opts ...ble.OptionApplier) *MagnetometerDriver {
 	d := &MagnetometerDriver{
 		Eventer: gobot.NewEventer(),
 	}
-	d.Driver = ble.NewDriver(a, "Microbit Magnetometer", d.initialize, nil)
+	d.Driver = ble.NewDriver(a, "Microbit Magnetometer", d.initialize, nil, opts...)
 
 	d.AddEvent(MagnetometerEvent)
 
@@ -42,7 +42,7 @@ func NewMagnetometerDriver(a gobot.BLEConnector) *MagnetometerDriver {
 // initialize tells driver to get ready to do work
 func (d *MagnetometerDriver) initialize() error {
 	// subscribe to magnetometer notifications
-	return d.Adaptor().Subscribe(magnetometerChara, func(data []byte, e error) {
+	return d.Adaptor().Subscribe(magnetometerChara, func(data []byte) {
 		a := struct{ x, y, z int16 }{x: 0, y: 0, z: 0}
 
 		buf := bytes.NewBuffer(data)

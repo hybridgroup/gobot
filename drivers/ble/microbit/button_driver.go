@@ -21,12 +21,12 @@ type ButtonDriver struct {
 }
 
 // NewButtonDriver creates a new driver
-func NewButtonDriver(a gobot.BLEConnector) *ButtonDriver {
+func NewButtonDriver(a gobot.BLEConnector, opts ...ble.OptionApplier) *ButtonDriver {
 	d := &ButtonDriver{
 		Eventer: gobot.NewEventer(),
 	}
 
-	d.Driver = ble.NewDriver(a, "Microbit Button", d.initialize, nil)
+	d.Driver = ble.NewDriver(a, "Microbit Button", d.initialize, nil, opts...)
 
 	d.AddEvent(ButtonAEvent)
 	d.AddEvent(ButtonBEvent)
@@ -37,14 +37,14 @@ func NewButtonDriver(a gobot.BLEConnector) *ButtonDriver {
 // initialize tells driver to get ready to do work
 func (d *ButtonDriver) initialize() error {
 	// subscribe to button A notifications
-	if err := d.Adaptor().Subscribe(buttonAChara, func(data []byte, e error) {
+	if err := d.Adaptor().Subscribe(buttonAChara, func(data []byte) {
 		d.Publish(d.Event(ButtonAEvent), data)
 	}); err != nil {
 		return err
 	}
 
 	// subscribe to button B notifications
-	return d.Adaptor().Subscribe(buttonBChara, func(data []byte, e error) {
+	return d.Adaptor().Subscribe(buttonBChara, func(data []byte) {
 		d.Publish(d.Event(ButtonBEvent), data)
 	})
 }

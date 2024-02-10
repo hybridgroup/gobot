@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/ble"
 	"gobot.io/x/gobot/v2/drivers/ble/testutil"
 	"gobot.io/x/gobot/v2/drivers/common/sphero"
 )
@@ -27,6 +28,18 @@ func TestNewOllieDriver(t *testing.T) {
 	assert.NotNil(t, d.Eventer)
 	assert.Equal(t, d.defaultCollisionConfig, ollieDefaultCollisionConfig())
 	assert.NotNil(t, d.packetChannel)
+}
+
+func TestNewOllieDriverWithName(t *testing.T) {
+	// This is a general test, that options are applied in constructor by using the common WithName() option.	Further
+	// tests for options can also be done by call of "WithOption(val).apply(cfg)".
+	// arrange
+	const newName = "new name"
+	a := testutil.NewBleTestAdaptor()
+	// act
+	d := NewOllieDriver(a, ble.WithName(newName))
+	// assert
+	assert.Equal(t, newName, d.Name())
 }
 
 func TestOllieStartAndHalt(t *testing.T) {
@@ -62,7 +75,7 @@ func TestLocatorData(t *testing.T) {
 		d.GetLocatorData(func(p Point2D) {
 			assert.Equal(t, point.y, p.Y)
 		})
-		d.handleResponses(packet, nil)
+		d.handleResponses(packet)
 	}
 }
 
@@ -100,11 +113,11 @@ func TestDataStreaming(t *testing.T) {
 			c := uint16(b)
 			bytes = append(bytes, byte(c))
 		}
-		d.handleResponses(bytes, nil)
+		d.handleResponses(bytes)
 	}
 
 	// send empty packet to indicate start of next message
-	d.handleResponses([]byte{0xFF}, nil)
+	d.handleResponses([]byte{0xFF})
 	select {
 	case <-responseChan:
 	case <-time.After(10 * time.Millisecond):

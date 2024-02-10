@@ -46,7 +46,7 @@ func NewNullReadWriteCloser() *nullReadWriteCloser {
 	}
 }
 
-func initTestSpheroAdaptor() (*Adaptor, *nullReadWriteCloser) {
+func initTestAdaptor() (*Adaptor, *nullReadWriteCloser) {
 	a := NewAdaptor("/dev/null")
 	rwc := NewNullReadWriteCloser()
 
@@ -56,34 +56,34 @@ func initTestSpheroAdaptor() (*Adaptor, *nullReadWriteCloser) {
 	return a, rwc
 }
 
-func TestSpheroAdaptorName(t *testing.T) {
-	a, _ := initTestSpheroAdaptor()
+func TestNewAdaptor(t *testing.T) {
+	a := NewAdaptor("/dev/null")
+	assert.True(t, strings.HasPrefix(a.Name(), "Serial"))
+	assert.Equal(t, "/dev/null", a.Port())
+}
+
+func TestName(t *testing.T) {
+	a, _ := initTestAdaptor()
 	assert.True(t, strings.HasPrefix(a.Name(), "Serial"))
 	a.SetName("NewName")
 	assert.Equal(t, "NewName", a.Name())
 }
 
-func TestSpheroAdaptor(t *testing.T) {
-	a, _ := initTestSpheroAdaptor()
-	assert.True(t, strings.HasPrefix(a.Name(), "Serial"))
-	assert.Equal(t, "/dev/null", a.Port())
-}
-
-func TestSpheroAdaptorReconnect(t *testing.T) {
-	a, _ := initTestSpheroAdaptor()
-	_ = a.Connect()
+func TestReconnect(t *testing.T) {
+	a, _ := initTestAdaptor()
+	require.NoError(t, a.Connect())
 	assert.True(t, a.connected)
-	_ = a.Reconnect()
+	require.NoError(t, a.Reconnect())
 	assert.True(t, a.connected)
-	_ = a.Disconnect()
+	require.NoError(t, a.Disconnect())
 	assert.False(t, a.connected)
-	_ = a.Reconnect()
+	require.NoError(t, a.Reconnect())
 	assert.True(t, a.connected)
 }
 
-func TestSpheroAdaptorFinalize(t *testing.T) {
-	a, rwc := initTestSpheroAdaptor()
-	_ = a.Connect()
+func TestFinalize(t *testing.T) {
+	a, rwc := initTestAdaptor()
+	require.NoError(t, a.Connect())
 	require.NoError(t, a.Finalize())
 
 	rwc.testAdaptorClose = func() error {
@@ -94,8 +94,8 @@ func TestSpheroAdaptorFinalize(t *testing.T) {
 	require.ErrorContains(t, a.Finalize(), "close error")
 }
 
-func TestSpheroAdaptorConnect(t *testing.T) {
-	a, _ := initTestSpheroAdaptor()
+func TestConnect(t *testing.T) {
+	a, _ := initTestAdaptor()
 	require.NoError(t, a.Connect())
 
 	a.connect = func(string) (io.ReadWriteCloser, error) {

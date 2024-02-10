@@ -21,11 +21,11 @@ type TemperatureDriver struct {
 }
 
 // NewTemperatureDriver creates a Microbit TemperatureDriver
-func NewTemperatureDriver(a gobot.BLEConnector) *TemperatureDriver {
+func NewTemperatureDriver(a gobot.BLEConnector, opts ...ble.OptionApplier) *TemperatureDriver {
 	d := &TemperatureDriver{
 		Eventer: gobot.NewEventer(),
 	}
-	d.Driver = ble.NewDriver(a, "Microbit Temperature", d.initialize, nil)
+	d.Driver = ble.NewDriver(a, "Microbit Temperature", d.initialize, nil, opts...)
 
 	d.AddEvent(TemperatureEvent)
 
@@ -35,7 +35,7 @@ func NewTemperatureDriver(a gobot.BLEConnector) *TemperatureDriver {
 // initialize tells driver to get ready to do work
 func (d *TemperatureDriver) initialize() error {
 	// subscribe to temperature notifications
-	return d.Adaptor().Subscribe(temperatureChara, func(data []byte, e error) {
+	return d.Adaptor().Subscribe(temperatureChara, func(data []byte) {
 		var l int8
 		buf := bytes.NewBuffer(data)
 		val, _ := buf.ReadByte()

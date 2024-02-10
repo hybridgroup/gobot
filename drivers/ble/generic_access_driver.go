@@ -3,7 +3,6 @@ package ble
 import (
 	"bytes"
 	"encoding/binary"
-	"log"
 
 	"gobot.io/x/gobot/v2"
 )
@@ -20,9 +19,9 @@ type GenericAccessDriver struct {
 }
 
 // NewGenericAccessDriver creates a GenericAccessDriver
-func NewGenericAccessDriver(a gobot.BLEConnector) *GenericAccessDriver {
+func NewGenericAccessDriver(a gobot.BLEConnector, opts ...OptionApplier) *GenericAccessDriver {
 	d := &GenericAccessDriver{
-		Driver:  NewDriver(a, "GenericAccess", nil, nil),
+		Driver:  NewDriver(a, "GenericAccess", nil, nil, opts...),
 		Eventer: gobot.NewEventer(),
 	}
 
@@ -30,33 +29,31 @@ func NewGenericAccessDriver(a gobot.BLEConnector) *GenericAccessDriver {
 }
 
 // GetDeviceName returns the device name for the BLE Peripheral
-func (d *GenericAccessDriver) GetDeviceName() string {
+func (d *GenericAccessDriver) GetDeviceName() (string, error) {
 	c, err := d.Adaptor().ReadCharacteristic(genericAccessDeviceNameCharaShort)
 	if err != nil {
-		log.Println(err)
-		return ""
+		return "", err
 	}
 
 	buf := bytes.NewBuffer(c)
 	val := buf.String()
-	return val
+	return val, nil
 }
 
 // GetAppearance returns the appearance string for the BLE Peripheral
-func (d *GenericAccessDriver) GetAppearance() string {
+func (d *GenericAccessDriver) GetAppearance() (string, error) {
 	c, err := d.Adaptor().ReadCharacteristic(genericAccessAppearanceCharaShort)
 	if err != nil {
-		log.Println(err)
-		return ""
+		return "", err
 	}
 
 	buf := bytes.NewBuffer(c)
 
 	var val uint16
 	if err := binary.Read(buf, binary.LittleEndian, &val); err != nil {
-		panic(err)
+		return "", err
 	}
-	return appearances[val]
+	return appearances[val], nil
 }
 
 var appearances = map[uint16]string{

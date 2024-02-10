@@ -74,17 +74,20 @@ type OllieDriver struct {
 }
 
 // NewOllieDriver creates a driver for a Sphero Ollie
-func NewOllieDriver(a gobot.BLEConnector) *OllieDriver {
-	return newOllieBaseDriver(a, "Ollie", ollieDefaultCollisionConfig())
+func NewOllieDriver(a gobot.BLEConnector, opts ...ble.OptionApplier) *OllieDriver {
+	return newOllieBaseDriver(a, "Ollie", ollieDefaultCollisionConfig(), opts...)
 }
 
-func newOllieBaseDriver(a gobot.BLEConnector, name string, dcc sphero.CollisionConfig) *OllieDriver {
+func newOllieBaseDriver(
+	a gobot.BLEConnector, name string,
+	dcc sphero.CollisionConfig, opts ...ble.OptionApplier,
+) *OllieDriver {
 	d := &OllieDriver{
 		defaultCollisionConfig: dcc,
 		Eventer:                gobot.NewEventer(),
 		packetChannel:          make(chan *packet, 1024),
 	}
-	d.Driver = ble.NewDriver(a, name, d.initialize, d.shutdown)
+	d.Driver = ble.NewDriver(a, name, d.initialize, d.shutdown, opts...)
 
 	d.AddEvent(sphero.ErrorEvent)
 	d.AddEvent(sphero.CollisionEvent)
@@ -283,7 +286,7 @@ func (d *OllieDriver) shutdown() error {
 }
 
 // handleResponses handles responses returned from Ollie
-func (d *OllieDriver) handleResponses(data []byte, e error) {
+func (d *OllieDriver) handleResponses(data []byte) {
 	// since packets can only be 20 bytes long, we have to puzzle them together
 	newMessage := false
 
