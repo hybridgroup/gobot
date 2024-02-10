@@ -2,6 +2,7 @@ package sphero
 
 import (
 	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/ble"
 	"gobot.io/x/gobot/v2/drivers/common/sphero"
 )
 
@@ -11,8 +12,8 @@ type BB8Driver struct {
 }
 
 // NewBB8Driver creates a driver for a Sphero BB-8
-func NewBB8Driver(a gobot.BLEConnector) *BB8Driver {
-	return &BB8Driver{OllieDriver: newOllieBaseDriver(a, "BB8", bb8DefaultCollisionConfig())}
+func NewBB8Driver(a gobot.BLEConnector, opts ...ble.OptionApplier) *BB8Driver {
+	return &BB8Driver{OllieDriver: newOllieBaseDriver(a, "BB8", bb8DefaultCollisionConfig(), opts...)}
 }
 
 // bb8DefaultCollisionConfig returns a CollisionConfig with sensible collision defaults

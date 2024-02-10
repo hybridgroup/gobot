@@ -81,7 +81,7 @@ type Pcmd struct {
 }
 
 // NewDriver creates a Parrot Minidrone Driver
-func NewMinidroneDriver(a gobot.BLEConnector) *MinidroneDriver {
+func NewMinidroneDriver(a gobot.BLEConnector, opts ...ble.OptionApplier) *MinidroneDriver {
 	d := &MinidroneDriver{
 		Pcmd: Pcmd{
 			Flag:  0,
@@ -93,7 +93,7 @@ func NewMinidroneDriver(a gobot.BLEConnector) *MinidroneDriver {
 		},
 		Eventer: gobot.NewEventer(),
 	}
-	d.Driver = ble.NewDriver(a, "Minidrone", d.initialize, d.shutdown)
+	d.Driver = ble.NewDriver(a, "Minidrone", d.initialize, d.shutdown, opts...)
 
 	d.AddEvent(BatteryEvent)
 	d.AddEvent(FlightStatusEvent)
@@ -349,14 +349,14 @@ func (d *MinidroneDriver) initialize() error {
 	}
 
 	// subscribe to battery notifications
-	if err := d.Adaptor().Subscribe(batteryChara, func(data []byte, e error) {
+	if err := d.Adaptor().Subscribe(batteryChara, func(data []byte) {
 		d.Publish(d.Event(BatteryEvent), data[len(data)-1])
 	}); err != nil {
 		return err
 	}
 
 	// subscribe to flying status notifications
-	if err := d.Adaptor().Subscribe(flightStatusChara, func(data []byte, e error) {
+	if err := d.Adaptor().Subscribe(flightStatusChara, func(data []byte) {
 		d.processFlightStatus(data)
 	}); err != nil {
 		return err

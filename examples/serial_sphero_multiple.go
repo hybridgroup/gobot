@@ -19,8 +19,7 @@ import (
 
 func NewSwarmBot(port string) *gobot.Robot {
 	spheroAdaptor := serialport.NewAdaptor(port)
-	spheroDriver := serial.NewSpheroDriver(spheroAdaptor)
-	spheroDriver.SetName("Sphero" + port)
+	spheroDriver := serial.NewSpheroDriver(spheroAdaptor, serial.WithName("Sphero"+port))
 
 	work := func() {
 		spheroDriver.Stop()

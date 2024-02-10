@@ -39,6 +39,44 @@ import(
 ...
 ```
 
+### BLE client adaptor changed signature for Subscribe()
+
+Since introducing the usage of "github.com/muka/go-bluetooth" in 2020, the callback do not support the given error
+parameter anymore. The switch to usage of "tinygo.org/x/bluetooth" has not changed this. Therefore it is removed now
+from the function.
+
+### BLE generic drivers changed signature for Get*() functions
+
+All those functions log an error only or panic, so the caller gets no nice programmatic feedback. The error is now
+returned instead and the log output needs to be done at caller side.
+
+```go
+// old
+...
+  devName := access.GetDeviceName()
+  appearance := access.GetAppearance()
+  modelNo := info.GetModelNumber()
+  fwRev := info.GetFirmwareRevision()
+  hwRev := info.GetHardwareRevision()
+  manuName := info.GetManufacturerName()
+  pid := info.GetPnPId()
+  level := battery.GetBatteryLevel()
+...
+
+// new
+...
+  devName, err := access.GetDeviceName()
+  if err != nil {
+    fmt.Println(err)
+  }
+  appearance, err := access.GetAppearance()
+  if err != nil {
+    fmt.Println(err)
+  }
+  ...
+...
+```
+
 ### Sphero adaptor split off
 
 The Serial Based Sphero adaptor was split off into a generic serial adaptor and the driver part. With this, the imports

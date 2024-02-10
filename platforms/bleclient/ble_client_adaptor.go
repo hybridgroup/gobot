@@ -181,7 +181,7 @@ func (a *Adaptor) WriteCharacteristic(cUUID string, data []byte) error {
 
 // Subscribe subscribes to notifications from the BLE device for the
 // requested service and characteristic
-func (a *Adaptor) Subscribe(cUUID string, f func([]byte, error)) error {
+func (a *Adaptor) Subscribe(cUUID string, f func([]byte)) error {
 	if !a.connected {
 		return fmt.Errorf("Cannot subscribe to BLE device until connected")
 	}
@@ -189,10 +189,7 @@ func (a *Adaptor) Subscribe(cUUID string, f func([]byte, error)) error {
 	cUUID = convertUUID(cUUID)
 
 	if char, ok := a.characteristics[cUUID]; ok {
-		fn := func(d []byte) {
-			f(d, nil)
-		}
-		return char.EnableNotifications(fn)
+		return char.EnableNotifications(f)
 	}
 
 	return fmt.Errorf("Unknown characteristic: %s", cUUID)

@@ -2,7 +2,6 @@ package ble
 
 import (
 	"bytes"
-	"log"
 
 	"gobot.io/x/gobot/v2"
 )
@@ -22,9 +21,9 @@ type DeviceInformationDriver struct {
 }
 
 // NewDeviceInformationDriver creates a new driver
-func NewDeviceInformationDriver(a gobot.BLEConnector) *DeviceInformationDriver {
+func NewDeviceInformationDriver(a gobot.BLEConnector, opts ...OptionApplier) *DeviceInformationDriver {
 	n := &DeviceInformationDriver{
-		Driver:  NewDriver(a, "DeviceInformation", nil, nil),
+		Driver:  NewDriver(a, "DeviceInformation", nil, nil, opts...),
 		Eventer: gobot.NewEventer(),
 	}
 
@@ -32,61 +31,56 @@ func NewDeviceInformationDriver(a gobot.BLEConnector) *DeviceInformationDriver {
 }
 
 // GetModelNumber returns the model number for the BLE Peripheral
-func (d *DeviceInformationDriver) GetModelNumber() string {
+func (d *DeviceInformationDriver) GetModelNumber() (string, error) {
 	c, err := d.Adaptor().ReadCharacteristic(deviceInformationModelNumberCharaShort)
 	if err != nil {
-		log.Println(err)
-		return ""
+		return "", err
 	}
 	buf := bytes.NewBuffer(c)
 	model := buf.String()
-	return model
+	return model, nil
 }
 
 // GetFirmwareRevision returns the firmware revision for the BLE Peripheral
-func (d *DeviceInformationDriver) GetFirmwareRevision() string {
+func (d *DeviceInformationDriver) GetFirmwareRevision() (string, error) {
 	c, err := d.Adaptor().ReadCharacteristic(deviceInformationFirmwareRevisionCharaShort)
 	if err != nil {
-		log.Println(err)
-		return ""
+		return "", err
 	}
 	buf := bytes.NewBuffer(c)
 	val := buf.String()
-	return val
+	return val, nil
 }
 
 // GetHardwareRevision returns the hardware revision for the BLE Peripheral
-func (d *DeviceInformationDriver) GetHardwareRevision() string {
+func (d *DeviceInformationDriver) GetHardwareRevision() (string, error) {
 	c, err := d.Adaptor().ReadCharacteristic(deviceInformationHardwareRevisionCharaShort)
 	if err != nil {
-		log.Println(err)
-		return ""
+		return "", err
 	}
 	buf := bytes.NewBuffer(c)
 	val := buf.String()
-	return val
+	return val, nil
 }
 
 // GetManufacturerName returns the manufacturer name for the BLE Peripheral
-func (d *DeviceInformationDriver) GetManufacturerName() string {
+func (d *DeviceInformationDriver) GetManufacturerName() (string, error) {
 	c, err := d.Adaptor().ReadCharacteristic(deviceInformationManufacturerNameCharaShort)
 	if err != nil {
-		log.Println(err)
-		return ""
+		return "", err
 	}
 	buf := bytes.NewBuffer(c)
 	val := buf.String()
-	return val
+	return val, nil
 }
 
 // GetPnPId returns the PnP ID for the BLE Peripheral
-func (d *DeviceInformationDriver) GetPnPId() string {
+func (d *DeviceInformationDriver) GetPnPId() (string, error) {
 	c, err := d.Adaptor().ReadCharacteristic(deviceInformationPnPIdCharaShort)
 	if err != nil {
-		log.Println(err)
-		return ""
+		return "", err
 	}
 	buf := bytes.NewBuffer(c)
 	val := buf.String()
-	return val
+	return val, nil
 }

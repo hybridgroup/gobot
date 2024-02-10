@@ -29,11 +29,35 @@ func main() {
 	info := ble.NewDeviceInformationDriver(bleAdaptor)
 
 	work := func() {
-		fmt.Println("Model number:", info.GetModelNumber())
-		fmt.Println("Firmware rev:", info.GetFirmwareRevision())
-		fmt.Println("Hardware rev:", info.GetHardwareRevision())
-		fmt.Println("Manufacturer name:", info.GetManufacturerName())
-		fmt.Println("PnPId:", info.GetPnPId())
+		modelNo, err := info.GetModelNumber()
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println("Model number:", modelNo)
+
+		fwRev, err := info.GetFirmwareRevision()
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println("Firmware rev:", fwRev)
+
+		hwRev, err := info.GetHardwareRevision()
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println("Hardware rev:", hwRev)
+
+		manuName, err := info.GetManufacturerName()
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println("Manufacturer name:", manuName)
+
+		pid, err := info.GetPnPId()
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println("PnPId:", pid)
 	}
 
 	robot := gobot.NewRobot("bleBot",

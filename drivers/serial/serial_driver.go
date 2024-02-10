@@ -39,7 +39,7 @@ type driver struct {
 }
 
 // newDriver creates a new basic serial gobot driver.
-func newDriver(a interface{}, name string) *driver {
+func newDriver(a interface{}, name string, opts ...optionApplier) *driver {
 	d := driver{
 		Commander:  gobot.NewCommander(),
 		connection: a,
@@ -47,6 +47,10 @@ func newDriver(a interface{}, name string) *driver {
 		afterStart: func() error { return nil },
 		beforeHalt: func() error { return nil },
 		mutex:      &sync.Mutex{},
+	}
+
+	for _, o := range opts {
+		o.apply(d.driverCfg)
 	}
 
 	return &d
@@ -63,7 +67,7 @@ func (d *driver) Name() string {
 }
 
 // SetName sets the name of the driver.
-// Deprecated: Please use option [aio.WithName] instead.
+// Deprecated: Please use option [serial.WithName] instead.
 func (d *driver) SetName(name string) {
 	WithName(name).apply(d.driverCfg)
 }

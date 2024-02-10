@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/ble"
 	"gobot.io/x/gobot/v2/drivers/ble/testutil"
 )
 
@@ -23,6 +24,18 @@ func TestNewLEDDriver(t *testing.T) {
 	assert.IsType(t, &LEDDriver{}, d)
 	assert.True(t, strings.HasPrefix(d.Name(), "Microbit LED"))
 	assert.NotNil(t, d.Eventer)
+}
+
+func TestNewLEDDriverWithName(t *testing.T) {
+	// This is a general test, that options are applied in constructor by using the common WithName() option.	Further
+	// tests for options can also be done by call of "WithOption(val).apply(cfg)".
+	// arrange
+	const newName = "new name"
+	a := testutil.NewBleTestAdaptor()
+	// act
+	d := NewLEDDriver(a, ble.WithName(newName))
+	// assert
+	assert.Equal(t, newName, d.Name())
 }
 
 func TestLEDWriteMatrix(t *testing.T) {

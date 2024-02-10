@@ -51,9 +51,9 @@ type SpheroDriver struct {
 //	"SetStabilization" - See SpheroDriver.SetStabilization
 //	"SetDataStreaming" - See SpheroDriver.SetDataStreaming
 //	"SetRotationRate" - See SpheroDriver.SetRotationRate
-func NewSpheroDriver(a spheroSerialAdaptor) *SpheroDriver {
+func NewSpheroDriver(a spheroSerialAdaptor, opts ...optionApplier) *SpheroDriver {
 	d := &SpheroDriver{
-		driver:          newDriver(a, "Sphero"),
+		driver:          newDriver(a, "Sphero", opts...),
 		Eventer:         gobot.NewEventer(),
 		packetChannel:   make(chan *packet, 1024),
 		responseChannel: make(chan []uint8, 1024),
