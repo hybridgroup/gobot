@@ -17,9 +17,9 @@ import (
 )
 
 // Wiring
-// PWR  Tinkerboard: 1 (+3.3V, VCC), 6, 9, 14, 20 (GND)
-// I2C1 Tinkerboard: 3 (SDA), 5 (SCL)
-// PCF8583 DIP package: 1 (OSCI, event), 2 (OSCO, nc), 3 (A0 - GND), 4 (VSS, GND), 5 (SDA), 6 (SCL), 7 (/INT, nc), 8 (VDD, +3.3V)
+// PWR  Tinkerboard: 1(+3.3V,VCC), 6,9,14,20(GND)
+// I2C1 Tinkerboard: 3(SDA), 5(SCL)
+// PCF8583 DIP package: 1(OSCI,event), 2(OSCO,nc), 3(A0-GND), 4(VSS,GND), 5(SDA), 6(SCL), 7(/INT,nc), 8(VDD,+3.3V)
 // Note: event can be created by e.g. an debounced button
 func main() {
 	board := tinkerboard.NewAdaptor()
@@ -59,5 +59,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

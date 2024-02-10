@@ -39,7 +39,10 @@ func main() {
     work,
   )
 
-  robot.Start()
+  err := robot.Start()
+  if err != nil {
+    fmt.Println(err)
+  }
 }
 ```
 

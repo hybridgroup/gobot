@@ -30,17 +30,23 @@ func main() {
 	servo := gpio.NewServoDriver(pca9685, "15")
 
 	work := func() {
-		pca9685.SetPWMFreq(60)
+		if err := pca9685.SetPWMFreq(60); err != nil {
+			fmt.Println(err)
+		}
 
 		for i := 10; i < 150; i += 10 {
 			fmt.Println("Turning", i)
-			servo.Move(uint8(i))
+			if err := servo.Move(uint8(i)); err != nil {
+				fmt.Println(err)
+			}
 			time.Sleep(1 * time.Second)
 		}
 
 		for i := 150; i > 10; i -= 10 {
 			fmt.Println("Turning", i)
-			servo.Move(uint8(i))
+			if err := servo.Move(uint8(i)); err != nil {
+				fmt.Println(err)
+			}
 			time.Sleep(1 * time.Second)
 		}
 	}
@@ -51,5 +57,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

@@ -7,6 +7,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -38,7 +39,9 @@ func main() {
 
 	work := func() {
 		gobot.Every(5*time.Second, func() {
-			adafruitServoMotorRunner(adaFruit)
+			if err := adafruitServoMotorRunner(adaFruit); err != nil {
+				fmt.Println(err)
+			}
 		})
 	}
 
@@ -48,7 +51,9 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }
 
 func adafruitServoMotorRunner(a *i2c.Adafruit2327Driver) error {
@@ -60,26 +65,22 @@ func adafruitServoMotorRunner(a *i2c.Adafruit2327Driver) error {
 	// Do not need to set this every run loop
 	freq := 60.0
 	if err := a.SetServoMotorFreq(freq); err != nil {
-		log.Printf("%s", err.Error())
 		return err
 	}
 	// start in the middle of the 180-deg range
 	pulse := degree2pulse(deg)
 	if err := a.SetServoMotorPulse(channel, 0, pulse); err != nil {
-		log.Printf(err.Error())
 		return err
 	}
 	// INCR
 	pulse = degree2pulse(deg + degIncrease)
 	if err := a.SetServoMotorPulse(channel, 0, pulse); err != nil {
-		log.Printf(err.Error())
 		return err
 	}
 	time.Sleep(2000 * time.Millisecond)
 	// DECR
 	pulse = degree2pulse(deg - degIncrease)
 	if err := a.SetServoMotorPulse(channel, 0, pulse); err != nil {
-		log.Printf(err.Error())
 		return err
 	}
 	return nil

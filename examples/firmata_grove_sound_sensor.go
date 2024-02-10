@@ -21,7 +21,7 @@ func main() {
 	sensor := aio.NewGroveSoundSensorDriver(board, "3", aio.WithSensorCyclicRead(500*time.Millisecond))
 
 	work := func() {
-		sensor.On(aio.Data, func(data interface{}) {
+		_ = sensor.On(aio.Data, func(data interface{}) {
 			fmt.Println("sensor", data)
 		})
 	}
@@ -32,5 +32,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

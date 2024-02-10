@@ -7,6 +7,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"gobot.io/x/gobot/v2/drivers/gpio"
@@ -19,13 +20,19 @@ import (
 // golang library to interact with sensors and other devices.
 func main() {
 	f := firmata.NewAdaptor("/dev/ttyACM0")
-	f.Connect()
+	if err := f.Connect(); err != nil {
+		fmt.Println(err)
+	}
 
 	led := gpio.NewLedDriver(f, "13")
-	led.Start()
+	if err := led.Start(); err != nil {
+		fmt.Println(err)
+	}
 
 	for {
-		led.Toggle()
+		if err := led.Toggle(); err != nil {
+			fmt.Println(err)
+		}
 		time.Sleep(1000 * time.Millisecond)
 	}
 }

@@ -24,7 +24,7 @@ func NewSwarmBot(port string) *gobot.Robot {
 	work := func() {
 		spheroDriver.Stop()
 
-		spheroDriver.On(sphero.CollisionEvent, func(data interface{}) {
+		_ = spheroDriver.On(sphero.CollisionEvent, func(data interface{}) {
 			fmt.Println("Collision Detected!")
 		})
 
@@ -63,5 +63,7 @@ func main() {
 		master.AddRobot(NewSwarmBot(port))
 	}
 
-	master.Start()
+	if err := master.Start(); err != nil {
+		panic(err)
+	}
 }

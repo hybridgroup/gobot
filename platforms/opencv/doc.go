@@ -34,7 +34,9 @@ Example:
 			work,
 		)
 
-		robot.Start()
+		if err := robot.Start(); err != nil {
+			panic(err)
+		}
 	}
 
 For further information refer to opencv README:

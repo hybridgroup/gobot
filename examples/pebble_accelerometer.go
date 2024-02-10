@@ -24,7 +24,7 @@ func main() {
 	pebbleDriver := pebble.NewDriver(pebbleAdaptor)
 
 	work := func() {
-		pebbleDriver.On(pebbleDriver.Event("accel"), func(data interface{}) {
+		_ = pebbleDriver.On(pebbleDriver.Event("accel"), func(data interface{}) {
 			fmt.Println(data.(string))
 		})
 	}
@@ -37,5 +37,7 @@ func main() {
 
 	master.AddRobot(robot)
 
-	master.Start()
+	if err := master.Start(); err != nil {
+		panic(err)
+	}
 }

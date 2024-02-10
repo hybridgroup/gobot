@@ -18,10 +18,10 @@ func main() {
 	mqttAdaptor := mqtt.NewAdaptor("tcp://test.mosquitto.org:1883", "pinger")
 
 	work := func() {
-		mqttAdaptor.On("hello", func(msg mqtt.Message) {
+		_ = mqttAdaptor.On("hello", func(msg mqtt.Message) {
 			fmt.Println("hello")
 		})
-		mqttAdaptor.On("hola", func(msg mqtt.Message) {
+		_ = mqttAdaptor.On("hola", func(msg mqtt.Message) {
 			fmt.Println("hola")
 		})
 		data := []byte("o")
@@ -38,5 +38,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

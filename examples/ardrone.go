@@ -18,7 +18,7 @@ func main() {
 	drone := ardrone.NewDriver(ardroneAdaptor)
 
 	work := func() {
-		drone.On(ardrone.Flying, func(data interface{}) {
+		_ = drone.On(ardrone.Flying, func(data interface{}) {
 			gobot.After(3*time.Second, func() {
 				drone.Land()
 			})
@@ -32,5 +32,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

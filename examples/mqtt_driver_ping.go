@@ -30,11 +30,11 @@ func main() {
 	helloDriver := mqtt.NewDriver(mqttAdaptor, "hello")
 
 	work := func() {
-		helloDriver.On(mqtt.Data, func(data interface{}) {
+		_ = helloDriver.On(mqtt.Data, func(data interface{}) {
 			fmt.Println("hello")
 		})
 
-		holaDriver.On(mqtt.Data, func(data interface{}) {
+		_ = holaDriver.On(mqtt.Data, func(data interface{}) {
 			fmt.Println("hola")
 		})
 
@@ -54,5 +54,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

@@ -61,7 +61,9 @@ func main() {
 	// start capturing
 	go mjpegCapture()
 
-	master.Start()
+	if err := master.Start(); err != nil {
+		panic(err)
+	}
 }
 
 func mjpegCapture() {

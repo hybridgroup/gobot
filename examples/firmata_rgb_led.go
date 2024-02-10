@@ -14,6 +14,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -31,7 +32,9 @@ func main() {
 			r := uint8(gobot.Rand(255))
 			g := uint8(gobot.Rand(255))
 			b := uint8(gobot.Rand(255))
-			led.SetRGB(r, g, b)
+			if err := led.SetRGB(r, g, b); err != nil {
+				fmt.Println(err)
+			}
 		})
 	}
 
@@ -41,5 +44,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

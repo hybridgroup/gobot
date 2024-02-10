@@ -24,8 +24,7 @@ func main() {
 		fadeAmount := uint8(15)
 
 		gobot.Every(100*time.Millisecond, func() {
-			err := led.Brightness(brightness)
-			if err != nil {
+			if err := led.Brightness(brightness); err != nil {
 				fmt.Println(err)
 			}
 			brightness = brightness + fadeAmount
@@ -41,5 +40,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

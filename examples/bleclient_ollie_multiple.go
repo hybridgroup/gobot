@@ -55,5 +55,7 @@ func main() {
 		master.AddRobot(bot)
 	}
 
-	master.Start()
+	if err := master.Start(); err != nil {
+		panic(err)
+	}
 }

@@ -94,7 +94,7 @@ import(
   adaptor := sphero.NewAdaptor("/dev/rfcomm0")
   spheroDriver := sphero.NewSpheroDriver(adaptor)
 ...
-  spheroDriver.On(sphero.Collision, func(data interface{}) {
+  _ = spheroDriver.On(sphero.Collision, func(data interface{}) {
 ...
 
 // new
@@ -109,7 +109,7 @@ import(
   adaptor := serialport.NewAdaptor("/dev/rfcomm0")
   spheroDriver := serial.NewSpheroDriver(adaptor)
 ...
-  spheroDriver.On(sphero.CollisionEvent, func(data interface{}) {
+  _ = spheroDriver.On(sphero.CollisionEvent, func(data interface{}) {
 ...
 ```
 

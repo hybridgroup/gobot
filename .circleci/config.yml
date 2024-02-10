@@ -59,6 +59,22 @@ jobs:
             SOME=$(grep -L 'digispark' $(grep -L 'gocv' ${ALL}))
             for e in ${SOME} ; do go vet "${e}" ; done
 
+  "fmt_check_examples":
+    docker:
+      - image: golangci/golangci-lint:v1.55.2
+    steps:
+      - checkout
+      - run:
+          name: Debug linter version
+          command: golangci-lint --version
+      - run:
+          # digispark needs libusb, opencv needs opencv
+          name: Check examples for linter issues (except digispark, opencv)
+          command: |
+            ALL=$(grep -l -r --include "*.go" 'build example' ./)
+            SOME=$(grep -L 'digispark' $(grep -L 'gocv' ${ALL}))
+            for e in ${SOME} ; do golangci-lint run "${e}" --build-tags example --disable forcetypeassert --disable noctx ; done
+
 workflows:
   version: 2
   build:
@@ -66,3 +82,4 @@ workflows:
         - "test_core_and_drivers_with_coverage"
         - "test_platforms"
         - "check_examples"
+        - "fmt_check_examples"

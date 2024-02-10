@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"go.bug.st/serial"
+
 	"gobot.io/x/gobot/v2/platforms/firmata/client"
 )
 
@@ -24,7 +25,11 @@ func main() {
 
 	fmt.Println("connecting.....")
 	err = board.Connect(sp)
-	defer board.Disconnect()
+	defer func() {
+		if err := board.Disconnect(); err != nil {
+			fmt.Println(err)
+		}
+	}()
 
 	if err != nil {
 		panic(err)

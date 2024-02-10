@@ -18,21 +18,21 @@ import (
 func CCS811BootData(a *i2c.CCS811Driver) {
 	v, err := a.GetHardwareVersion()
 	if err != nil {
-		fmt.Printf(err.Error())
+		fmt.Println(err.Error())
 	}
 
 	fmt.Printf("Hardare Version %#x\n", v)
 
 	d, err := a.GetFirmwareBootVersion()
 	if err != nil {
-		fmt.Printf(err.Error())
+		fmt.Println(err.Error())
 	}
 
 	fmt.Printf("Boot Version %#x\n", d)
 
 	d, err = a.GetFirmwareAppVersion()
 	if err != nil {
-		fmt.Printf(err.Error())
+		fmt.Println(err.Error())
 	}
 
 	fmt.Printf("App Version %#x\n\n", d)
@@ -74,5 +74,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

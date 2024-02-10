@@ -7,6 +7,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"gobot.io/x/gobot/v2"
@@ -22,22 +23,38 @@ func main() {
 	yellow := gpio.NewLedDriver(b, up2.LEDYellow)
 
 	work := func() {
-		red.Off()
-		blue.Off()
-		green.Off()
-		yellow.Off()
+		if err := red.Off(); err != nil {
+			fmt.Println(err)
+		}
+		if err := blue.Off(); err != nil {
+			fmt.Println(err)
+		}
+		if err := green.Off(); err != nil {
+			fmt.Println(err)
+		}
+		if err := yellow.Off(); err != nil {
+			fmt.Println(err)
+		}
 
 		gobot.Every(1*time.Second, func() {
-			red.Toggle()
+			if err := red.Toggle(); err != nil {
+				fmt.Println(err)
+			}
 		})
 		gobot.Every(2*time.Second, func() {
-			green.Toggle()
+			if err := green.Toggle(); err != nil {
+				fmt.Println(err)
+			}
 		})
 		gobot.Every(4*time.Second, func() {
-			yellow.Toggle()
+			if err := yellow.Toggle(); err != nil {
+				fmt.Println(err)
+			}
 		})
 		gobot.Every(8*time.Second, func() {
-			blue.Toggle()
+			if err := blue.Toggle(); err != nil {
+				fmt.Println(err)
+			}
 		})
 	}
 
@@ -47,5 +64,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

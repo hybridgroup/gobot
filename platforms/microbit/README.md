@@ -51,7 +51,9 @@ func main() {
   ubit := microbit.NewLEDDriver(bleAdaptor)
 
   work := func() {
-    ubit.Blank()
+    if err := ubit.Blank(); err != nil {
+      fmt.Println(err)
+    }
     gobot.After(1*time.Second, func() {
       ubit.WriteText("Hello")
     })
@@ -66,7 +68,9 @@ func main() {
     work,
   )
 
-  robot.Start()
+  if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }
 ```
 
@@ -96,11 +100,15 @@ func main() {
   led := gpio.NewLedDriver(ubit, "1")
 
   work := func() {
-    button.On(gpio.ButtonPush, func(data interface{}) {
-      led.On()
+    _ = button.On(gpio.ButtonPush, func(data interface{}) {
+      if err := led.On(); err != nil {
+				fmt.Println(err)
+			}
     })
-    button.On(gpio.ButtonRelease, func(data interface{}) {
-      led.Off()
+    _ = button.On(gpio.ButtonRelease, func(data interface{}) {
+      if err := led.Off(); err != nil {
+		fmt.Println(err)
+	}
     })
   }
 
@@ -110,7 +118,9 @@ func main() {
     work,
   )
 
-  robot.Start()
+  if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }
 ```
 

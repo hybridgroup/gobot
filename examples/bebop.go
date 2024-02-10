@@ -7,6 +7,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"gobot.io/x/gobot/v2"
@@ -18,13 +19,17 @@ func main() {
 	drone := bebop.NewDriver(bebopAdaptor)
 
 	work := func() {
-		drone.On(bebop.Flying, func(data interface{}) {
+		_ = drone.On(bebop.Flying, func(data interface{}) {
 			gobot.After(10*time.Second, func() {
-				drone.Land()
+				if err := drone.Land(); err != nil {
+					fmt.Println(err)
+				}
 			})
 		})
 
-		drone.HullProtection(true)
+		if err := drone.HullProtection(true); err != nil {
+			fmt.Println(err)
+		}
 		drone.TakeOff()
 	}
 
@@ -34,5 +39,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

@@ -14,6 +14,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -30,7 +31,9 @@ func main() {
 		level := byte(1)
 
 		gobot.Every(1*time.Second, func() {
-			pin.DigitalWrite(level)
+			if err := pin.DigitalWrite(level); err != nil {
+				fmt.Println(err)
+			}
 			if level == 1 {
 				level = 0
 			} else {
@@ -45,5 +48,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

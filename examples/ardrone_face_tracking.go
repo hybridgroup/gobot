@@ -41,7 +41,7 @@ func main() {
 				window.WaitKey(1)
 			}
 		})
-		drone.On(ardrone.Flying, func(data interface{}) {
+		_ = drone.On(ardrone.Flying, func(data interface{}) {
 			gobot.After(1*time.Second, func() { drone.Up(0.2) })
 			gobot.After(2*time.Second, func() { drone.Hover() })
 			gobot.After(5*time.Second, func() {
@@ -83,5 +83,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

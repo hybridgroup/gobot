@@ -7,6 +7,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"gobot.io/x/gobot/v2"
@@ -23,7 +24,9 @@ func main() {
 		fadeAmount := uint8(15)
 
 		gobot.Every(100*time.Millisecond, func() {
-			led.Brightness(brightness)
+			if err := led.Brightness(brightness); err != nil {
+				fmt.Println(err)
+			}
 			brightness = brightness + fadeAmount
 			if brightness == 0 || brightness == 255 {
 				fadeAmount = -fadeAmount
@@ -37,5 +40,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

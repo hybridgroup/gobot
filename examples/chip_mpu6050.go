@@ -21,7 +21,9 @@ func main() {
 
 	work := func() {
 		gobot.Every(100*time.Millisecond, func() {
-			mpu6050.GetData()
+			if err := mpu6050.GetData(); err != nil {
+				fmt.Println(err)
+			}
 
 			fmt.Println("Accelerometer", mpu6050.Accelerometer)
 			fmt.Println("Gyroscope", mpu6050.Gyroscope)
@@ -35,5 +37,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

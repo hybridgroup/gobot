@@ -29,7 +29,7 @@ func main() {
 	bb := sphero.NewBB8Driver(bleAdaptor)
 
 	work := func() {
-		bb.On("collision", func(data interface{}) {
+		_ = bb.On("collision", func(data interface{}) {
 			fmt.Printf("collision detected = %+v \n", data)
 			bb.SetRGB(255, 0, 0)
 		})
@@ -44,5 +44,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }
