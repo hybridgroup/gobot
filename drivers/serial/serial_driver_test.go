@@ -36,6 +36,21 @@ func Test_newDriver(t *testing.T) {
 	assert.NotNil(t, d.mutex)
 }
 
+func Test_newDriverWithName(t *testing.T) {
+	// This is a general test, that options are applied in constructor by using the common WithName() option.	Further
+	// tests for options can also be done by call of "WithOption(val).apply(cfg)".
+	// arrange
+	const (
+		name    = "mybot"
+		newName = "overwrite mybot"
+	)
+	a := newSerialTestAdaptor()
+	// act
+	d := newDriver(a, name, WithName(newName))
+	// assert
+	assert.Equal(t, newName, d.Name())
+}
+
 func Test_applyWithName(t *testing.T) {
 	// arrange
 	const name = "mybot"

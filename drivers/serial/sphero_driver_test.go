@@ -27,6 +27,18 @@ func TestNewSpheroDriver(t *testing.T) {
 	assert.NotNil(t, d.Eventer)
 }
 
+func TestNewSpheroDriverWithName(t *testing.T) {
+	// This is a general test, that options are applied in constructor by using the common WithName() option.	Further
+	// tests for options can also be done by call of "WithOption(val).apply(cfg)".
+	// arrange
+	const newName = "new name"
+	a := newSerialTestAdaptor()
+	// act
+	d := NewSpheroDriver(a, WithName(newName))
+	// assert
+	assert.Equal(t, newName, d.Name())
+}
+
 func TestSpheroCommands(t *testing.T) {
 	d := initTestSpheroDriver()
 	var ret interface{}

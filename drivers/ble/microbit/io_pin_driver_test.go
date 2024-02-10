@@ -10,6 +10,7 @@ import (
 
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/aio"
+	"gobot.io/x/gobot/v2/drivers/ble"
 	"gobot.io/x/gobot/v2/drivers/ble/testutil"
 	"gobot.io/x/gobot/v2/drivers/gpio"
 )
@@ -29,6 +30,18 @@ func TestNewIOPinDriver(t *testing.T) {
 	assert.IsType(t, &IOPinDriver{}, d)
 	assert.True(t, strings.HasPrefix(d.Name(), "Microbit IO Pin"))
 	assert.NotNil(t, d.Eventer)
+}
+
+func TestNewIOPinDriverWithName(t *testing.T) {
+	// This is a general test, that options are applied in constructor by using the common WithName() option.	Further
+	// tests for options can also be done by call of "WithOption(val).apply(cfg)".
+	// arrange
+	const newName = "new name"
+	a := testutil.NewBleTestAdaptor()
+	// act
+	d := NewIOPinDriver(a, ble.WithName(newName))
+	// assert
+	assert.Equal(t, newName, d.Name())
 }
 
 func TestIOPinStartAndHalt(t *testing.T) {

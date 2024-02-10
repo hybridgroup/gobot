@@ -19,12 +19,12 @@ type LEDDriver struct {
 }
 
 // NewLEDDriver creates a Microbit LEDDriver
-func NewLEDDriver(a gobot.BLEConnector) *LEDDriver {
+func NewLEDDriver(a gobot.BLEConnector, opts ...ble.OptionApplier) *LEDDriver {
 	d := &LEDDriver{
 		Eventer: gobot.NewEventer(),
 	}
 
-	d.Driver = ble.NewDriver(a, "Microbit LED", nil, nil)
+	d.Driver = ble.NewDriver(a, "Microbit LED", nil, nil, opts...)
 
 	return d
 }

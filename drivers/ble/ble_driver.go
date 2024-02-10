@@ -7,8 +7,8 @@ import (
 	"gobot.io/x/gobot/v2"
 )
 
-// optionApplier needs to be implemented by each configurable option type
-type optionApplier interface {
+// OptionApplier needs to be implemented by each configurable option type
+type OptionApplier interface {
 	apply(cfg *configuration)
 }
 
@@ -31,7 +31,11 @@ type Driver struct {
 }
 
 // NewDriver creates a new basic BLE gobot driver.
-func NewDriver(a interface{}, name string, afterStart func() error, beforeHalt func() error) *Driver {
+func NewDriver(
+	a interface{}, name string,
+	afterStart func() error, beforeHalt func() error,
+	opts ...OptionApplier,
+) *Driver {
 	if afterStart == nil {
 		afterStart = func() error { return nil }
 	}
@@ -49,11 +53,15 @@ func NewDriver(a interface{}, name string, afterStart func() error, beforeHalt f
 		mutex:      &sync.Mutex{},
 	}
 
+	for _, o := range opts {
+		o.apply(d.driverCfg)
+	}
+
 	return &d
 }
 
 // WithName is used to replace the default name of the driver.
-func WithName(name string) optionApplier {
+func WithName(name string) OptionApplier {
 	return nameOption(name)
 }
 
@@ -63,7 +71,7 @@ func (d *Driver) Name() string {
 }
 
 // SetName sets the name of the driver.
-// Deprecated: Please use option [aio.WithName] instead.
+// Deprecated: Please use option [ble.WithName] instead.
 func (d *Driver) SetName(name string) {
 	WithName(name).apply(d.driverCfg)
 }

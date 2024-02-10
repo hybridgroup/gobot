@@ -2,6 +2,7 @@ package sphero
 
 import (
 	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/ble"
 	"gobot.io/x/gobot/v2/drivers/common/sphero"
 )
 
@@ -11,8 +12,8 @@ type SPRKPlusDriver struct {
 }
 
 // NewSPRKPlusDriver creates a driver for a Sphero SPRK+
-func NewSPRKPlusDriver(a gobot.BLEConnector) *SPRKPlusDriver {
-	return &SPRKPlusDriver{OllieDriver: newOllieBaseDriver(a, "SPRKPlus", sprkplusDefaultCollisionConfig())}
+func NewSPRKPlusDriver(a gobot.BLEConnector, opts ...ble.OptionApplier) *SPRKPlusDriver {
+	return &SPRKPlusDriver{OllieDriver: newOllieBaseDriver(a, "SPRKPlus", sprkplusDefaultCollisionConfig(), opts...)}
 }
 
 // sprkplusDefaultCollisionConfig returns a CollisionConfig with sensible collision defaults

@@ -2,7 +2,6 @@ package ble
 
 import (
 	"bytes"
-	"log"
 
 	"gobot.io/x/gobot/v2"
 )
@@ -16,9 +15,9 @@ type BatteryDriver struct {
 }
 
 // NewBatteryDriver creates a new driver
-func NewBatteryDriver(a gobot.BLEConnector) *BatteryDriver {
+func NewBatteryDriver(a gobot.BLEConnector, opts ...OptionApplier) *BatteryDriver {
 	d := &BatteryDriver{
-		Driver:  NewDriver(a, "Battery", nil, nil),
+		Driver:  NewDriver(a, "Battery", nil, nil, opts...),
 		Eventer: gobot.NewEventer(),
 	}
 
@@ -26,14 +25,13 @@ func NewBatteryDriver(a gobot.BLEConnector) *BatteryDriver {
 }
 
 // GetBatteryLevel reads and returns the current battery level
-func (d *BatteryDriver) GetBatteryLevel() uint8 {
+func (d *BatteryDriver) GetBatteryLevel() (uint8, error) {
 	c, err := d.Adaptor().ReadCharacteristic(batteryCharaShort)
 	if err != nil {
-		log.Println(err)
-		return 0
+		return 0, err
 	}
 	buf := bytes.NewBuffer(c)
 	val, _ := buf.ReadByte()
 	level := val
-	return level
+	return level, nil
 }

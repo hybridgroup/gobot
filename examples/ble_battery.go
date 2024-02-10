@@ -31,7 +31,11 @@ func main() {
 
 	work := func() {
 		gobot.Every(5*time.Second, func() {
-			fmt.Println("Battery level:", battery.GetBatteryLevel())
+			level, err := battery.GetBatteryLevel()
+			if err != nil {
+				fmt.Println(err)
+			}
+			fmt.Println("Battery level:", level)
 		})
 	}
 
