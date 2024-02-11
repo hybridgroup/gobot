@@ -14,6 +14,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -38,7 +39,9 @@ func main() {
 		aip1640.Clear()
 		gobot.Every(600*time.Millisecond, func() {
 			aip1640.DrawMatrix(smiles[s])
-			aip1640.Display()
+			if err := aip1640.Display(); err != nil {
+				fmt.Println(err)
+			}
 			s++
 			if s > 2 {
 				s = 0
@@ -52,5 +55,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

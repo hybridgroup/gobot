@@ -26,7 +26,9 @@ Example:
 
 		work := func() {
 			gobot.Every(1*time.Second, func() {
-				led.Toggle()
+				if err := led.Toggle(); err != nil {
+				fmt.Println(err)
+			}
 			})
 		}
 
@@ -36,7 +38,9 @@ Example:
 			work,
 		)
 
-		robot.Start()
+		if err := robot.Start(); err != nil {
+			panic(err)
+		}
 	}
 
 For further information refer to digispark README:

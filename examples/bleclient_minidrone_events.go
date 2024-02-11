@@ -30,35 +30,39 @@ func main() {
 	drone := parrot.NewMinidroneDriver(bleAdaptor)
 
 	work := func() {
-		drone.On(parrot.BatteryEvent, func(data interface{}) {
+		_ = drone.On(parrot.BatteryEvent, func(data interface{}) {
 			fmt.Printf("battery: %d\n", data)
 		})
 
-		drone.On(parrot.FlightStatusEvent, func(data interface{}) {
+		_ = drone.On(parrot.FlightStatusEvent, func(data interface{}) {
 			fmt.Printf("flight status: %d\n", data)
 		})
 
-		drone.On(parrot.TakeoffEvent, func(data interface{}) {
+		_ = drone.On(parrot.TakeoffEvent, func(data interface{}) {
 			fmt.Println("taking off...")
 		})
 
-		drone.On(parrot.HoveringEvent, func(data interface{}) {
+		_ = drone.On(parrot.HoveringEvent, func(data interface{}) {
 			fmt.Println("hovering!")
 			gobot.After(5*time.Second, func() {
-				drone.Land()
+				if err := drone.Land(); err != nil {
+					fmt.Println(err)
+				}
 			})
 		})
 
-		drone.On(parrot.LandingEvent, func(data interface{}) {
+		_ = drone.On(parrot.LandingEvent, func(data interface{}) {
 			fmt.Println("landing...")
 		})
 
-		drone.On(parrot.LandedEvent, func(data interface{}) {
+		_ = drone.On(parrot.LandedEvent, func(data interface{}) {
 			fmt.Println("landed.")
 		})
 
 		time.Sleep(1000 * time.Millisecond)
-		drone.TakeOff()
+		if err := drone.TakeOff(); err != nil {
+			fmt.Println(err)
+		}
 	}
 
 	robot := gobot.NewRobot("minidrone",
@@ -67,5 +71,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

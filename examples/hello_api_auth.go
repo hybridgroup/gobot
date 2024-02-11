@@ -38,5 +38,7 @@ func main() {
 		return fmt.Sprintf("This command is attached to the robot %v", hello.Name)
 	})
 
-	master.Start()
+	if err := master.Start(); err != nil {
+		panic(err)
+	}
 }

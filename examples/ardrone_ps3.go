@@ -37,34 +37,34 @@ func main() {
 	rightY.Store(float64(0.0))
 
 	work := func() {
-		stick.On(joystick.SquarePress, func(data interface{}) {
+		_ = stick.On(joystick.SquarePress, func(data interface{}) {
 			drone.TakeOff()
 		})
 
-		stick.On(joystick.TrianglePress, func(data interface{}) {
+		_ = stick.On(joystick.TrianglePress, func(data interface{}) {
 			drone.Hover()
 		})
 
-		stick.On(joystick.XPress, func(data interface{}) {
+		_ = stick.On(joystick.XPress, func(data interface{}) {
 			drone.Land()
 		})
 
-		stick.On(joystick.LeftX, func(data interface{}) {
+		_ = stick.On(joystick.LeftX, func(data interface{}) {
 			val := float64(data.(int16))
 			leftX.Store(val)
 		})
 
-		stick.On(joystick.LeftY, func(data interface{}) {
+		_ = stick.On(joystick.LeftY, func(data interface{}) {
 			val := float64(data.(int16))
 			leftY.Store(val)
 		})
 
-		stick.On(joystick.RightX, func(data interface{}) {
+		_ = stick.On(joystick.RightX, func(data interface{}) {
 			val := float64(data.(int16))
 			rightX.Store(val)
 		})
 
-		stick.On(joystick.RightY, func(data interface{}) {
+		_ = stick.On(joystick.RightY, func(data interface{}) {
 			val := float64(data.(int16))
 			rightY.Store(val)
 		})
@@ -120,7 +120,9 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }
 
 func getLeftStick() pair {

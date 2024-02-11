@@ -42,7 +42,9 @@ func main() {
 	})
 
 	gbot.AddRobot(r)
-	gbot.Start()
+	if err := gbot.Start(); err != nil {
+		fmt.Println(err)
+	}
 }
 
 var _ gobot.Adaptor = (*loopbackAdaptor)(nil)

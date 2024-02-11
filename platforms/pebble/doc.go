@@ -49,7 +49,9 @@ your computer IP, robot name is 'pebble' and robot api port is 8080
 
 		master.AddRobot(robot)
 
-		master.Start()
+		if err := master.Start(); err != nil {
+		panic(err)
+	}
 	}
 
 For more information refer to the pebble README:

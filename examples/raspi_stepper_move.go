@@ -69,7 +69,6 @@ func main() {
 		if err := stepper.MoveDeg(-360 * countRot); err != nil {
 			log.Println("move backward", err)
 		}
-		return
 	}
 
 	robot := gobot.NewRobot("stepperBot",
@@ -78,5 +77,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

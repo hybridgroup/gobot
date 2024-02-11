@@ -21,7 +21,7 @@ func main() {
 	sensor := aio.NewAnalogSensorDriver(firmataAdaptor, "A0", aio.WithSensorCyclicRead(500*time.Millisecond))
 
 	work := func() {
-		sensor.On(aio.Data, func(data interface{}) {
+		_ = sensor.On(aio.Data, func(data interface{}) {
 			brightness := uint8(
 				gobot.ToScale(gobot.FromScale(float64(data.(int)), 0, 1024), 0, 255),
 			)
@@ -36,5 +36,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

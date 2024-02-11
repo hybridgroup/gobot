@@ -8,7 +8,7 @@
  How to run
  Pass the Bluetooth address or name as the first param:
 
-	go run examples/ble_device_info.go BB-1234
+	go run examples/ble_multiple_info.go BB-1234 BB-1235
 
  NOTE: sudo is required to use BLE in Linux
 */
@@ -20,12 +20,13 @@ import (
 	"os"
 
 	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/api"
 	"gobot.io/x/gobot/v2/drivers/ble"
 	"gobot.io/x/gobot/v2/platforms/bleclient"
 )
 
-func main() {
-	bleAdaptor := bleclient.NewAdaptor(os.Args[1])
+func NewSwarmBot(port string) *gobot.Robot {
+	bleAdaptor := bleclient.NewAdaptor(port)
 	info := ble.NewDeviceInformationDriver(bleAdaptor)
 
 	work := func() {
@@ -60,11 +61,25 @@ func main() {
 		fmt.Println("PnPId:", pid)
 	}
 
-	robot := gobot.NewRobot("bleBot",
+	robot := gobot.NewRobot("bot "+port,
 		[]gobot.Connection{bleAdaptor},
 		[]gobot.Device{info},
 		work,
 	)
 
-	robot.Start()
+	return robot
+}
+
+func main() {
+	master := gobot.NewMaster()
+	api.NewAPI(master).Start()
+
+	for _, port := range os.Args[1:] {
+		bot := NewSwarmBot(port)
+		master.AddRobot(bot)
+	}
+
+	if err := master.Start(); err != nil {
+		panic(err)
+	}
 }

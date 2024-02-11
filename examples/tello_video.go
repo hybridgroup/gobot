@@ -35,16 +35,22 @@ func main() {
 	}
 
 	work := func() {
-		drone.On(tello.ConnectedEvent, func(data interface{}) {
+		_ = drone.On(tello.ConnectedEvent, func(data interface{}) {
 			fmt.Println("Connected")
-			drone.StartVideo()
-			drone.SetVideoEncoderRate(tello.VideoBitRateAuto)
+			if err := drone.StartVideo(); err != nil {
+				fmt.Println(err)
+			}
+			if err := drone.SetVideoEncoderRate(tello.VideoBitRateAuto); err != nil {
+				fmt.Println(err)
+			}
 			gobot.Every(100*time.Millisecond, func() {
-				drone.StartVideo()
+				if err := drone.StartVideo(); err != nil {
+					fmt.Println(err)
+				}
 			})
 		})
 
-		drone.On(tello.VideoFrameEvent, func(data interface{}) {
+		_ = drone.On(tello.VideoFrameEvent, func(data interface{}) {
 			pkt := data.([]byte)
 			if _, err := mplayerIn.Write(pkt); err != nil {
 				fmt.Println(err)
@@ -58,5 +64,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

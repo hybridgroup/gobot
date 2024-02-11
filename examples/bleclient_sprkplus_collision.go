@@ -8,7 +8,7 @@
  How to run
  Pass the Bluetooth address or name as the first param:
 
-	go run examples/bb8.go BB-1234
+	go run examples/bb8-collision.go BB-1234
 
  NOTE: sudo is required to use BLE in Linux
 */
@@ -16,8 +16,8 @@
 package main
 
 import (
+	"fmt"
 	"os"
-	"time"
 
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/ble/sphero"
@@ -26,22 +26,25 @@ import (
 
 func main() {
 	bleAdaptor := bleclient.NewAdaptor(os.Args[1])
-	bb8 := sphero.NewBB8Driver(bleAdaptor)
+	ball := sphero.NewSPRKPlusDriver(bleAdaptor)
 
 	work := func() {
-		gobot.Every(1*time.Second, func() {
-			r := uint8(gobot.Rand(255))
-			g := uint8(gobot.Rand(255))
-			b := uint8(gobot.Rand(255))
-			bb8.SetRGB(r, g, b)
+		_ = ball.On("collision", func(data interface{}) {
+			fmt.Printf("collision detected = %+v \n", data)
+			ball.SetRGB(255, 0, 0)
 		})
+
+		ball.SetRGB(0, 255, 0)
+		ball.Roll(80, 0)
 	}
 
-	robot := gobot.NewRobot("bbBot",
+	robot := gobot.NewRobot("sprkplus",
 		[]gobot.Connection{bleAdaptor},
-		[]gobot.Device{bb8},
+		[]gobot.Device{ball},
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

@@ -5,7 +5,7 @@ EXAMPLES_NO_GOCV := $(shell grep -L 'gocv' $(ALL_EXAMPLES))
 # used examples
 EXAMPLES := $(EXAMPLES_NO_GOCV)
 
-.PHONY: test test_race test_cover robeaux version_check fmt_check fmt_fix examples examples_check $(EXAMPLES)
+.PHONY: test test_race test_cover robeaux version_check fmt_check fmt_fix examples examples_check examples_fmt_fix $(EXAMPLES)
 
 # opencv platform currently skipped to prevent install of preconditions
 including_except := $(shell go list ./... | grep -v platforms/opencv)
@@ -65,9 +65,15 @@ examples: $(EXAMPLES)
 examples_check: 
 	$(MAKE) CHECK=ON examples
 
+examples_fmt_fix: 
+	$(MAKE) CHECK=FMT examples
+
 $(EXAMPLES):
 ifeq ($(CHECK),ON)
 	go vet ./$@
+else ifeq ($(CHECK),FMT)
+	gofumpt -l -w ./$@
+	golangci-lint run ./$@ --fix --build-tags example --disable forcetypeassert --disable noctx
 else
 	go build -o /tmp/gobot_examples/$@ ./$@
 endif

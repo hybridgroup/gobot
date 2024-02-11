@@ -25,11 +25,11 @@ func main() {
 
 	work := func() {
 		pebbleDriver.SendNotification("Hello Pebble!")
-		pebbleDriver.On(pebbleDriver.Event("button"), func(data interface{}) {
+		_ = pebbleDriver.On(pebbleDriver.Event("button"), func(data interface{}) {
 			fmt.Println("Button pushed: " + data.(string))
 		})
 
-		pebbleDriver.On(pebbleDriver.Event("tap"), func(data interface{}) {
+		_ = pebbleDriver.On(pebbleDriver.Event("tap"), func(data interface{}) {
 			fmt.Println("Tap event detected")
 		})
 	}
@@ -42,5 +42,7 @@ func main() {
 
 	master.AddRobot(robot)
 
-	master.Start()
+	if err := master.Start(); err != nil {
+		panic(err)
+	}
 }

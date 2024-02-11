@@ -7,6 +7,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"gobot.io/x/gobot/v2"
@@ -24,7 +25,9 @@ func main() {
 		fadeAmount := int16(30)
 
 		gobot.Every(100*time.Millisecond, func() {
-			motor.Speed(speed)
+			if err := motor.Speed(speed); err != nil {
+				fmt.Println(err)
+			}
 			speed = speed + fadeAmount
 			if speed == 0 || speed == 300 {
 				fadeAmount = -fadeAmount
@@ -38,5 +41,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

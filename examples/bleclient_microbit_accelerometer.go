@@ -12,14 +12,14 @@
  More info:
  https://gobot.io/documentation/platforms/microbit/#how-to-install
 
- This example uses the Microbit's built-in buttons and
- built-in LED matrix. You run the Go program on your computer and
- communicate wirelessly with the Microbit.
+ This example uses the Microbit's built-in accelerometer.
+ You run the Go program on your computer and communicate
+ wirelessly with the Microbit.
 
  How to run
  Pass the Bluetooth name or address as first param:
 
-	go run examples/microbit_buttons_led.go "BBC micro:bit [yowza]"
+	go run examples/microbit_accelerometer.go "BBC micro:bit [yowza]"
 
  NOTE: sudo is required to use BLE in Linux
 */
@@ -27,6 +27,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"gobot.io/x/gobot/v2"
@@ -36,34 +37,21 @@ import (
 
 func main() {
 	bleAdaptor := bleclient.NewAdaptor(os.Args[1])
-	buttons := microbit.NewButtonDriver(bleAdaptor)
-	leds := microbit.NewLEDDriver(bleAdaptor)
+	ubit := microbit.NewAccelerometerDriver(bleAdaptor)
 
 	work := func() {
-		buttons.On(microbit.ButtonAEvent, func(data interface{}) {
-			if data.([]byte)[0] == 1 {
-				leds.UpLeftArrow()
-				return
-			}
-
-			leds.Blank()
-		})
-
-		buttons.On(microbit.ButtonBEvent, func(data interface{}) {
-			if data.([]byte)[0] == 1 {
-				leds.UpRightArrow()
-				return
-			}
-
-			leds.Blank()
+		_ = ubit.On(microbit.AccelerometerEvent, func(data interface{}) {
+			fmt.Println("Accelerometer", data)
 		})
 	}
 
 	robot := gobot.NewRobot("buttonBot",
 		[]gobot.Connection{bleAdaptor},
-		[]gobot.Device{buttons, leds},
+		[]gobot.Device{ubit},
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

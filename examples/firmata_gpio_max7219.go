@@ -18,6 +18,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -37,8 +38,12 @@ func main() {
 
 	work := func() {
 		gobot.Every(100*time.Millisecond, func() {
-			max.ClearAll()
-			max.One(module, digit, bits)
+			if err := max.ClearAll(); err != nil {
+				fmt.Println(err)
+			}
+			if err := max.One(module, digit, bits); err != nil {
+				fmt.Println(err)
+			}
 			bits = bits << 1
 
 			count++
@@ -64,5 +69,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

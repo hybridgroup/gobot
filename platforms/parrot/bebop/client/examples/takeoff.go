@@ -21,7 +21,10 @@ func main() {
 		return
 	}
 
-	bebop.HullProtection(true)
+	if err := bebop.HullProtection(true); err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	fmt.Println("takeoff")
 	if err := bebop.TakeOff(); err != nil {

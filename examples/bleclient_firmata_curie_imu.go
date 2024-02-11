@@ -16,6 +16,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -33,26 +34,34 @@ func main() {
 	imu := curie.NewIMUDriver(firmataAdaptor)
 
 	work := func() {
-		imu.On("Accelerometer", func(data interface{}) {
+		_ = imu.On("Accelerometer", func(data interface{}) {
 			log.Println("Accelerometer", data)
 		})
 
-		imu.On("Gyroscope", func(data interface{}) {
+		_ = imu.On("Gyroscope", func(data interface{}) {
 			log.Println("Gyroscope", data)
 		})
 
-		imu.On("Temperature", func(data interface{}) {
+		_ = imu.On("Temperature", func(data interface{}) {
 			log.Println("Temperature", data)
 		})
 
 		gobot.Every(1*time.Second, func() {
-			led.Toggle()
+			if err := led.Toggle(); err != nil {
+				fmt.Println(err)
+			}
 		})
 
 		gobot.Every(100*time.Millisecond, func() {
-			imu.ReadAccelerometer()
-			imu.ReadGyroscope()
-			imu.ReadTemperature()
+			if err := imu.ReadAccelerometer(); err != nil {
+				fmt.Println(err)
+			}
+			if err := imu.ReadGyroscope(); err != nil {
+				fmt.Println(err)
+			}
+			if err := imu.ReadTemperature(); err != nil {
+				fmt.Println(err)
+			}
 		})
 	}
 
@@ -62,5 +71,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

@@ -23,6 +23,8 @@ http://localhost:8090/bebop.mjpeg in a web browser.
 package main
 
 import (
+	"fmt"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/platforms/parrot/bebop"
 )
@@ -32,7 +34,9 @@ func main() {
 	drone := bebop.NewDriver(bebopAdaptor)
 
 	work := func() {
-		drone.VideoEnable(true)
+		if err := drone.VideoEnable(true); err != nil {
+			fmt.Println(err)
+		}
 	}
 
 	robot := gobot.NewRobot("drone",
@@ -41,5 +45,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

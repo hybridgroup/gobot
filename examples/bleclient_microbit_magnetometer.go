@@ -12,14 +12,14 @@
  More info:
  https://gobot.io/documentation/platforms/microbit/#how-to-install
 
- This example uses the Microbit's built-in LED matrix.
+ This example uses the Microbit's built-in magnetometer.
  You run the Go program on your computer and communicate
  wirelessly with the Microbit.
 
  How to run
  Pass the Bluetooth name or address as first param:
 
-	go run examples/microbit_led.go "BBC micro:bit [yowza]"
+	go run examples/microbit_magnetometer.go "BBC micro:bit [yowza]"
 
  NOTE: sudo is required to use BLE in Linux
 */
@@ -27,8 +27,8 @@
 package main
 
 import (
+	"fmt"
 	"os"
-	"time"
 
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/ble/microbit"
@@ -37,23 +37,21 @@ import (
 
 func main() {
 	bleAdaptor := bleclient.NewAdaptor(os.Args[1])
-	ubit := microbit.NewLEDDriver(bleAdaptor)
+	ubit := microbit.NewMagnetometerDriver(bleAdaptor)
 
 	work := func() {
-		ubit.Blank()
-		gobot.After(1*time.Second, func() {
-			ubit.WriteText("Hello")
-		})
-		gobot.After(7*time.Second, func() {
-			ubit.Smile()
+		_ = ubit.On(microbit.MagnetometerEvent, func(data interface{}) {
+			fmt.Println("Magnetometer", data)
 		})
 	}
 
-	robot := gobot.NewRobot("blinkBot",
+	robot := gobot.NewRobot("magnetoBot",
 		[]gobot.Connection{bleAdaptor},
 		[]gobot.Device{ubit},
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

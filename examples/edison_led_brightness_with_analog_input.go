@@ -22,13 +22,15 @@ func main() {
 	led := gpio.NewLedDriver(e, "3")
 
 	work := func() {
-		sensor.On(aio.Data, func(data interface{}) {
+		_ = sensor.On(aio.Data, func(data interface{}) {
 			brightness := uint8(
 				gobot.ToScale(gobot.FromScale(float64(data.(int)), 0, 4096), 0, 255),
 			)
 			fmt.Println("sensor", data)
 			fmt.Println("brightness", brightness)
-			led.Brightness(brightness)
+			if err := led.Brightness(brightness); err != nil {
+				fmt.Println(err)
+			}
 		})
 	}
 
@@ -38,5 +40,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

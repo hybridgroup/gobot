@@ -19,11 +19,11 @@ func main() {
 	touch := gpio.NewButtonDriver(e, "2")
 
 	work := func() {
-		touch.On(gpio.ButtonPush, func(data interface{}) {
+		_ = touch.On(gpio.ButtonPush, func(data interface{}) {
 			fmt.Println("On!")
 		})
 
-		touch.On(gpio.ButtonRelease, func(data interface{}) {
+		_ = touch.On(gpio.ButtonRelease, func(data interface{}) {
 			fmt.Println("Off!")
 		})
 	}
@@ -34,5 +34,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

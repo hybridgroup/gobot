@@ -47,8 +47,7 @@ func main() {
 		work,
 	)
 
-	err := robot.Start()
-	if err != nil {
-		fmt.Println(err)
+	if err := robot.Start(); err != nil {
+		panic(err)
 	}
 }

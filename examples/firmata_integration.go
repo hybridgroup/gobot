@@ -33,18 +33,26 @@ func main() {
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {
-			led1.Toggle()
+			if err := led1.Toggle(); err != nil {
+				fmt.Println(err)
+			}
 		})
 		gobot.Every(2*time.Second, func() {
-			led2.Toggle()
+			if err := led2.Toggle(); err != nil {
+				fmt.Println(err)
+			}
 		})
-		button.On(gpio.ButtonPush, func(data interface{}) {
-			led2.On()
+		_ = button.On(gpio.ButtonPush, func(data interface{}) {
+			if err := led2.On(); err != nil {
+				fmt.Println(err)
+			}
 		})
-		button.On(gpio.ButtonRelease, func(data interface{}) {
-			led2.Off()
+		_ = button.On(gpio.ButtonRelease, func(data interface{}) {
+			if err := led2.Off(); err != nil {
+				fmt.Println(err)
+			}
 		})
-		sensor.On(aio.Data, func(data interface{}) {
+		_ = sensor.On(aio.Data, func(data interface{}) {
 			fmt.Println("sensor", data)
 		})
 	}
@@ -55,5 +63,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

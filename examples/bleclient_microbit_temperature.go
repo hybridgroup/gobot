@@ -12,14 +12,16 @@
  More info:
  https://gobot.io/documentation/platforms/microbit/#how-to-install
 
- This example uses the Microbit's built-in buttons. You run
- the Go program on your computer and communicate wirelessly
- with the Microbit.
+ This example uses the Microbit's built-in thermometer.
+ You run the Go program on your computer and communicate
+ wirelessly with the Microbit.
 
  How to run
  Pass the Bluetooth name or address as first param:
 
-	go run examples/microbit_buttons_led.go "BBC micro:bit [yowza]"
+	go run examples/microbit_temperature.go "BBC micro:bit [yowza]"
+
+ NOTE: sudo is required to use BLE in Linux
 */
 
 package main
@@ -35,23 +37,21 @@ import (
 
 func main() {
 	bleAdaptor := bleclient.NewAdaptor(os.Args[1])
-	ubit := microbit.NewButtonDriver(bleAdaptor)
+	ubit := microbit.NewTemperatureDriver(bleAdaptor)
 
 	work := func() {
-		ubit.On(microbit.ButtonAEvent, func(data interface{}) {
-			fmt.Println("button A", data)
-		})
-
-		ubit.On(microbit.ButtonBEvent, func(data interface{}) {
-			fmt.Println("button B", data)
+		_ = ubit.On(microbit.TemperatureEvent, func(data interface{}) {
+			fmt.Println("Temperature", data)
 		})
 	}
 
-	robot := gobot.NewRobot("buttonBot",
+	robot := gobot.NewRobot("thermoBot",
 		[]gobot.Connection{bleAdaptor},
 		[]gobot.Device{ubit},
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

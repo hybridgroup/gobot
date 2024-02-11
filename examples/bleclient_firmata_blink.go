@@ -16,6 +16,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -30,7 +31,9 @@ func main() {
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {
-			led.Toggle()
+			if err := led.Toggle(); err != nil {
+				fmt.Println(err)
+			}
 		})
 	}
 
@@ -40,5 +43,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

@@ -7,6 +7,8 @@
 package main
 
 import (
+	"fmt"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/gpio"
 	"gobot.io/x/gobot/v2/platforms/firmata"
@@ -27,21 +29,41 @@ func main() {
 
 	work := func() {
 		fist := false
-		l.On(leap.MessageEvent, func(data interface{}) {
+		_ = l.On(leap.MessageEvent, func(data interface{}) {
 			handIsOpen := len(data.(leap.Frame).Pointables) > 0
 			if handIsOpen && fist {
-				servo1.Move(0)
-				servo2.Move(0)
-				servo3.Move(0)
-				servo4.Move(0)
-				servo5.Move(0)
+				if err := servo1.Move(0); err != nil {
+					fmt.Println(err)
+				}
+				if err := servo2.Move(0); err != nil {
+					fmt.Println(err)
+				}
+				if err := servo3.Move(0); err != nil {
+					fmt.Println(err)
+				}
+				if err := servo4.Move(0); err != nil {
+					fmt.Println(err)
+				}
+				if err := servo5.Move(0); err != nil {
+					fmt.Println(err)
+				}
 				fist = false
 			} else if !handIsOpen && !fist {
-				servo1.Move(120)
-				servo2.Move(120)
-				servo3.Move(120)
-				servo4.Move(120)
-				servo5.Move(120)
+				if err := servo1.Move(120); err != nil {
+					fmt.Println(err)
+				}
+				if err := servo2.Move(120); err != nil {
+					fmt.Println(err)
+				}
+				if err := servo3.Move(120); err != nil {
+					fmt.Println(err)
+				}
+				if err := servo4.Move(120); err != nil {
+					fmt.Println(err)
+				}
+				if err := servo5.Move(120); err != nil {
+					fmt.Println(err)
+				}
 				fist = true
 			}
 		})
@@ -53,5 +75,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

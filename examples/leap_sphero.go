@@ -23,7 +23,7 @@ func main() {
 	spheroDriver := serial.NewSpheroDriver(spheroAdaptor)
 
 	work := func() {
-		leapDriver.On(leap.MessageEvent, func(data interface{}) {
+		_ = leapDriver.On(leap.MessageEvent, func(data interface{}) {
 			hands := data.(leap.Frame).Hands
 
 			if len(hands) > 0 {
@@ -41,7 +41,9 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }
 
 func scale(position float64) uint8 {

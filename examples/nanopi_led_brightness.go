@@ -18,7 +18,7 @@ import (
 // Wiring
 // PWR  NanoPi: 1, 17 (+3.3V, VCC); 2, 4 (+5V, VDD); 6, 9, 14, 20 (GND)
 // GPIO NanoPi: the fourth header pin at inner USB side, count from USB side, is the PWM output
-// LED: the PWM output is NOT able to drive a 20mA LED with full brightness, so a custom driver or low current LED is needed
+// LED: the PWM output is NOT able to drive a 20mA LED with full brightness (custom driver or low current LED is needed)
 // Expected behavior: the LED fades in and out
 func main() {
 	r := nanopi.NewNeoAdaptor()
@@ -45,5 +45,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

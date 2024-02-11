@@ -37,7 +37,9 @@ func main() {
 				}
 			}
 			stage = !stage
-			oled.Display()
+			if err := oled.Display(); err != nil {
+				fmt.Println(err)
+			}
 		})
 	}
 
@@ -47,5 +49,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

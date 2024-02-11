@@ -20,7 +20,7 @@ func main() {
 	sensor := aio.NewGrovePiezoVibrationSensorDriver(board, "0", aio.WithSensorCyclicRead(500*time.Millisecond))
 
 	work := func() {
-		sensor.On(aio.Vibration, func(data interface{}) {
+		_ = sensor.On(aio.Vibration, func(data interface{}) {
 			fmt.Println("got one!")
 		})
 	}
@@ -31,5 +31,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

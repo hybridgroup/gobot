@@ -21,7 +21,9 @@ func main() {
 
 	work := func() {
 		sht3x.Units = "F"
-		sht3x.Start()
+		if err := sht3x.Start(); err != nil {
+			fmt.Println(err)
+		}
 		sn, err := sht3x.SerialNumber()
 		fmt.Printf("Serial Number: 0x%08x, err: %v\n", sn, err)
 
@@ -37,5 +39,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

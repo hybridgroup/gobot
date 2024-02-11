@@ -17,22 +17,23 @@ import (
 
 func main() {
 	bleAdaptor := bleclient.NewAdaptor(os.Args[1])
-	ollie := sphero.NewOllieDriver(bleAdaptor)
+	ollieBot := sphero.NewOllieDriver(bleAdaptor)
 
 	work := func() {
+		ollieBot.SetRGB(255, 0, 255)
 		gobot.Every(1*time.Second, func() {
-			r := uint8(gobot.Rand(255))
-			g := uint8(gobot.Rand(255))
-			b := uint8(gobot.Rand(255))
-			ollie.SetRGB(r, g, b)
+			// Ollie performs 'crazy-ollie' trick
+			ollieBot.SetRawMotorValues(sphero.Forward, uint8(255), sphero.Forward, uint8(255))
 		})
 	}
 
 	robot := gobot.NewRobot("ollieBot",
 		[]gobot.Connection{bleAdaptor},
-		[]gobot.Device{ollie},
+		[]gobot.Device{ollieBot},
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

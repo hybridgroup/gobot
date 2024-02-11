@@ -23,11 +23,11 @@ func main() {
 	work := func() {
 		spheroDriver.SetDataStreaming(sphero.DefaultDataStreamingConfig())
 
-		spheroDriver.On(sphero.CollisionEvent, func(data interface{}) {
+		_ = spheroDriver.On(sphero.CollisionEvent, func(data interface{}) {
 			fmt.Printf("Collision! %+v\n", data)
 		})
 
-		spheroDriver.On(sphero.SensorDataEvent, func(data interface{}) {
+		_ = spheroDriver.On(sphero.SensorDataEvent, func(data interface{}) {
 			fmt.Printf("Streaming Data! %+v\n", data)
 		})
 
@@ -49,5 +49,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

@@ -26,24 +26,40 @@ func main() {
 	work := func() {
 		// set a custom character
 		smiley := [8]byte{0, 0, 10, 0, 0, 17, 14, 0}
-		ada.CreateChar(0, smiley)
+		if err := ada.CreateChar(0, smiley); err != nil {
+			fmt.Println(err)
+		}
 
-		ada.Clear()
-		ada.SetRGB(true, false, false)
-		ada.Write("   Hello from   \n  Tinker Board ")
+		if err := ada.Clear(); err != nil {
+			fmt.Println(err)
+		}
+		if err := ada.SetRGB(true, false, false); err != nil {
+			fmt.Println(err)
+		}
+		if err := ada.Write("   Hello from   \n  Tinker Board "); err != nil {
+			fmt.Println(err)
+		}
 		// add the custom character at the end of the string
-		ada.Write(string(byte(0)))
+		if err := ada.Write(string(byte(0))); err != nil {
+			fmt.Println(err)
+		}
 
 		// after 1 sec. activate rotation
 		direction := 1
 		gobot.After(1*time.Second, func() {
-			ada.SetRGB(false, true, false)
+			if err := ada.SetRGB(false, true, false); err != nil {
+				fmt.Println(err)
+			}
 			gobot.Every(400*time.Millisecond, func() {
 				if direction == 1 {
-					ada.ScrollLeft()
+					if err := ada.ScrollLeft(); err != nil {
+						fmt.Println(err)
+					}
 				}
 				if direction == 2 {
-					ada.ScrollRight()
+					if err := ada.ScrollRight(); err != nil {
+						fmt.Println(err)
+					}
 				}
 			})
 		})
@@ -52,62 +68,92 @@ func main() {
 		gobot.After(7*time.Second, func() {
 			direction = 0
 			time.Sleep(1 * time.Second)
-			ada.LeftToRight()
-			ada.Clear()
-			ada.SetRGB(false, false, true)
-			ada.Write("Try the buttons!")
+			if err := ada.LeftToRight(); err != nil {
+				fmt.Println(err)
+			}
+			if err := ada.Clear(); err != nil {
+				fmt.Println(err)
+			}
+			if err := ada.SetRGB(false, false, true); err != nil {
+				fmt.Println(err)
+			}
+			if err := ada.Write("Try the buttons!"); err != nil {
+				fmt.Println(err)
+			}
 
 			gobot.Every(500*time.Millisecond, func() {
 				if val, err := ada.SelectButton(); err != nil {
 					fmt.Println(err)
-				} else {
-					if val != 0 {
-						ada.Clear()
-						ada.Write("-Select Button-\nclear the screen")
-						ada.Blink(false)
-						direction = 0
+				} else if val != 0 {
+					if err := ada.Clear(); err != nil {
+						fmt.Println(err)
 					}
+					if err := ada.Write("-Select Button-\nclear the screen"); err != nil {
+						fmt.Println(err)
+					}
+					if err := ada.Blink(false); err != nil {
+						fmt.Println(err)
+					}
+					direction = 0
 				}
 				if val, err := ada.UpButton(); err != nil {
 					fmt.Println(err)
-				} else {
-					if val != 0 {
-						ada.Clear()
-						ada.Write("  -Up Button-   \nset RGB to white")
-						ada.Blink(false)
-						ada.SetRGB(true, true, true)
-						direction = 0
+				} else if val != 0 {
+					if err := ada.Clear(); err != nil {
+						fmt.Println(err)
 					}
+					if err := ada.Write("  -Up Button-   \nset RGB to white"); err != nil {
+						fmt.Println(err)
+					}
+					if err := ada.Blink(false); err != nil {
+						fmt.Println(err)
+					}
+					if err := ada.SetRGB(true, true, true); err != nil {
+						fmt.Println(err)
+					}
+					direction = 0
 				}
 				if val, err := ada.DownButton(); err != nil {
 					fmt.Println(err)
-				} else {
-					if val != 0 {
-						ada.Clear()
-						ada.Write(" -Down Button-  \nset blink on")
-						ada.Blink(true)
-						direction = 0
+				} else if val != 0 {
+					if err := ada.Clear(); err != nil {
+						fmt.Println(err)
 					}
+					if err := ada.Write(" -Down Button-  \nset blink on"); err != nil {
+						fmt.Println(err)
+					}
+					if err := ada.Blink(true); err != nil {
+						fmt.Println(err)
+					}
+					direction = 0
 				}
 				if val, err := ada.LeftButton(); err != nil {
 					fmt.Println(err)
-				} else {
-					if val != 0 {
-						ada.Clear()
-						ada.Write("   -Left Button-  \nrotate left")
-						ada.Blink(false)
-						direction = 1
+				} else if val != 0 {
+					if err := ada.Clear(); err != nil {
+						fmt.Println(err)
 					}
+					if err := ada.Write("   -Left Button-  \nrotate left"); err != nil {
+						fmt.Println(err)
+					}
+					if err := ada.Blink(false); err != nil {
+						fmt.Println(err)
+					}
+					direction = 1
 				}
 				if val, err := ada.RightButton(); err != nil {
 					fmt.Println(err)
-				} else {
-					if val != 0 {
-						ada.Clear()
-						ada.Write("   -Right Button-  \nrotate right")
-						ada.Blink(false)
-						direction = 2
+				} else if val != 0 {
+					if err := ada.Clear(); err != nil {
+						fmt.Println(err)
 					}
+					if err := ada.Write("   -Right Button-  \nrotate right"); err != nil {
+						fmt.Println(err)
+					}
+					if err := ada.Blink(false); err != nil {
+						fmt.Println(err)
+					}
+					direction = 2
 				}
 			})
 		})
@@ -119,5 +165,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

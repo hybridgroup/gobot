@@ -48,23 +48,21 @@ var leftX, leftY, rightX, rightY atomic.Value
 
 const offset = 32767.0
 
-func ffmpeg() (stdin io.WriteCloser, stderr io.ReadCloser, err error) {
+func ffmpeg() (io.WriteCloser, io.ReadCloser, error) {
 	ffmpeg := exec.Command("ffmpeg", "-i", "pipe:0", "http://localhost:8090/bebop.ffm")
 
-	stderr, err = ffmpeg.StderrPipe()
-
+	stderr, err := ffmpeg.StderrPipe()
 	if err != nil {
-		return
+		return nil, stderr, err
 	}
 
-	stdin, err = ffmpeg.StdinPipe()
-
+	stdin, err := ffmpeg.StdinPipe()
 	if err != nil {
-		return
+		return stdin, stderr, err
 	}
 
-	if err = ffmpeg.Start(); err != nil {
-		return
+	if err := ffmpeg.Start(); err != nil {
+		return stdin, stderr, err
 	}
 
 	go func() {
@@ -90,7 +88,9 @@ func main() {
 	drone := bebop.NewDriver(bebopAdaptor)
 
 	work := func() {
-		drone.VideoEnable(true)
+		if err := drone.VideoEnable(true); err != nil {
+			fmt.Println(err)
+		}
 		video, _, _ := ffmpeg()
 
 		go func() {
@@ -109,41 +109,51 @@ func main() {
 
 		recording := false
 
-		stick.On(joystick.CirclePress, func(data interface{}) {
+		_ = stick.On(joystick.CirclePress, func(data interface{}) {
 			if recording {
-				drone.StopRecording()
+				if err := drone.StopRecording(); err != nil {
+					fmt.Println(err)
+				}
 			} else {
-				drone.StartRecording()
+				if err := drone.StartRecording(); err != nil {
+					fmt.Println(err)
+				}
 			}
 			recording = !recording
 		})
 
-		stick.On(joystick.SquarePress, func(data interface{}) {
-			drone.HullProtection(true)
+		_ = stick.On(joystick.SquarePress, func(data interface{}) {
+			if err := drone.HullProtection(true); err != nil {
+				fmt.Println(err)
+			}
 			drone.TakeOff()
 		})
-		stick.On(joystick.TrianglePress, func(data interface{}) {
-			drone.Stop()
+		_ = stick.On(joystick.TrianglePress, func(data interface{}) {
+			if err := drone.Stop(); err != nil {
+				fmt.Println(err)
+			}
 		})
-		stick.On(joystick.XPress, func(data interface{}) {
-			drone.Land()
+		_ = stick.On(joystick.XPress, func(data interface{}) {
+			if err := drone.Land(); err != nil {
+				fmt.Println(err)
+			}
 		})
-		stick.On(joystick.LeftX, func(data interface{}) {
+		_ = stick.On(joystick.LeftX, func(data interface{}) {
 			val := float64(data.(int16))
 			leftX.Store(val)
 		})
 
-		stick.On(joystick.LeftY, func(data interface{}) {
+		_ = stick.On(joystick.LeftY, func(data interface{}) {
 			val := float64(data.(int16))
 			leftY.Store(val)
 		})
 
-		stick.On(joystick.RightX, func(data interface{}) {
+		_ = stick.On(joystick.RightX, func(data interface{}) {
 			val := float64(data.(int16))
 			rightX.Store(val)
 		})
 
-		stick.On(joystick.RightY, func(data interface{}) {
+		_ = stick.On(joystick.RightY, func(data interface{}) {
 			val := float64(data.(int16))
 			rightY.Store(val)
 		})
@@ -153,20 +163,32 @@ func main() {
 
 			switch {
 			case leftStick.y < -10:
-				drone.Forward(bebop.ValidatePitch(leftStick.y, offset))
+				if err := drone.Forward(bebop.ValidatePitch(leftStick.y, offset)); err != nil {
+					fmt.Println(err)
+				}
 			case leftStick.y > 10:
-				drone.Backward(bebop.ValidatePitch(leftStick.y, offset))
+				if err := drone.Backward(bebop.ValidatePitch(leftStick.y, offset)); err != nil {
+					fmt.Println(err)
+				}
 			default:
-				drone.Forward(0)
+				if err := drone.Forward(0); err != nil {
+					fmt.Println(err)
+				}
 			}
 
 			switch {
 			case leftStick.x > 10:
-				drone.Right(bebop.ValidatePitch(leftStick.x, offset))
+				if err := drone.Right(bebop.ValidatePitch(leftStick.x, offset)); err != nil {
+					fmt.Println(err)
+				}
 			case leftStick.x < -10:
-				drone.Left(bebop.ValidatePitch(leftStick.x, offset))
+				if err := drone.Left(bebop.ValidatePitch(leftStick.x, offset)); err != nil {
+					fmt.Println(err)
+				}
 			default:
-				drone.Right(0)
+				if err := drone.Right(0); err != nil {
+					fmt.Println(err)
+				}
 			}
 		})
 
@@ -174,20 +196,32 @@ func main() {
 			rightStick := getRightStick()
 			switch {
 			case rightStick.y < -10:
-				drone.Up(bebop.ValidatePitch(rightStick.y, offset))
+				if err := drone.Up(bebop.ValidatePitch(rightStick.y, offset)); err != nil {
+					fmt.Println(err)
+				}
 			case rightStick.y > 10:
-				drone.Down(bebop.ValidatePitch(rightStick.y, offset))
+				if err := drone.Down(bebop.ValidatePitch(rightStick.y, offset)); err != nil {
+					fmt.Println(err)
+				}
 			default:
-				drone.Up(0)
+				if err := drone.Up(0); err != nil {
+					fmt.Println(err)
+				}
 			}
 
 			switch {
 			case rightStick.x > 20:
-				drone.Clockwise(bebop.ValidatePitch(rightStick.x, offset))
+				if err := drone.Clockwise(bebop.ValidatePitch(rightStick.x, offset)); err != nil {
+					fmt.Println(err)
+				}
 			case rightStick.x < -20:
-				drone.CounterClockwise(bebop.ValidatePitch(rightStick.x, offset))
+				if err := drone.CounterClockwise(bebop.ValidatePitch(rightStick.x, offset)); err != nil {
+					fmt.Println(err)
+				}
 			default:
-				drone.Clockwise(0)
+				if err := drone.Clockwise(0); err != nil {
+					fmt.Println(err)
+				}
 			}
 		})
 	}
@@ -198,7 +232,9 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }
 
 func getLeftStick() pair {

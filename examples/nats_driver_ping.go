@@ -29,11 +29,11 @@ func main() {
 	helloDriver := nats.NewDriver(natsAdaptor, "hello")
 
 	work := func() {
-		helloDriver.On(nats.Data, func(msg nats.Message) {
+		_ = helloDriver.On(nats.Data, func(msg nats.Message) {
 			fmt.Println("hello")
 		})
 
-		holaDriver.On(nats.Data, func(msg nats.Message) {
+		_ = holaDriver.On(nats.Data, func(msg nats.Message) {
 			fmt.Println("hola")
 		})
 
@@ -53,5 +53,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

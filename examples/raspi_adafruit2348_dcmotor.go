@@ -7,6 +7,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -24,7 +25,9 @@ func main() {
 	work := func() {
 		gobot.Every(5*time.Second, func() {
 			dcMotor := 2 // 0-based
-			adafruitDCMotorRunner(adaFruit, dcMotor)
+			if err := adafruitDCMotorRunner(adaFruit, dcMotor); err != nil {
+				fmt.Println(err)
+			}
 		})
 	}
 
@@ -34,7 +37,9 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }
 
 func adafruitDCMotorRunner(a *i2c.Adafruit2348Driver, dcMotor int) error {

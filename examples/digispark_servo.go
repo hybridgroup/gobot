@@ -23,7 +23,9 @@ func main() {
 		gobot.Every(1*time.Second, func() {
 			i := uint8(gobot.Rand(180))
 			fmt.Println("Turning", i)
-			servo.Move(i)
+			if err := servo.Move(i); err != nil {
+				fmt.Println(err)
+			}
 		})
 	}
 
@@ -33,5 +35,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

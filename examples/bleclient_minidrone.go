@@ -16,6 +16,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -29,10 +30,14 @@ func main() {
 	drone := parrot.NewMinidroneDriver(bleAdaptor)
 
 	work := func() {
-		drone.TakeOff()
+		if err := drone.TakeOff(); err != nil {
+			fmt.Println(err)
+		}
 
 		gobot.After(5*time.Second, func() {
-			drone.Land()
+			if err := drone.Land(); err != nil {
+				fmt.Println(err)
+			}
 		})
 	}
 
@@ -42,5 +47,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }
