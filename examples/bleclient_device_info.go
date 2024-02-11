@@ -18,6 +18,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/ble"
@@ -25,7 +26,7 @@ import (
 )
 
 func main() {
-	bleAdaptor := bleclient.NewAdaptor(os.Args[1])
+	bleAdaptor := bleclient.NewAdaptor(os.Args[1], bleclient.WithScanTimeout(30*time.Second), bleclient.WithDebug())
 	info := ble.NewDeviceInformationDriver(bleAdaptor)
 
 	work := func() {
