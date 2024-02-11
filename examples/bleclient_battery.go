@@ -26,7 +26,7 @@ import (
 )
 
 func main() {
-	bleAdaptor := bleclient.NewAdaptor(os.Args[1])
+	bleAdaptor := bleclient.NewAdaptor(os.Args[1], bleclient.WithScanTimeout(30*time.Second))
 	battery := ble.NewBatteryDriver(bleAdaptor)
 
 	work := func() {
