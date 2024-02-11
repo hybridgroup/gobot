@@ -40,7 +40,9 @@ func main() {
     work,
   )
 
-  robot.Start()
+  if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }
 ```
 

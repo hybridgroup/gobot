@@ -18,7 +18,7 @@ func main() {
 	l := leap.NewDriver(leapMotionAdaptor)
 
 	work := func() {
-		l.On(leap.GestureEvent, func(data interface{}) {
+		_ = l.On(leap.GestureEvent, func(data interface{}) {
 			printGesture(data.(leap.Gesture))
 		})
 	}
@@ -29,7 +29,9 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }
 
 func printGesture(gesture leap.Gesture) {

@@ -23,20 +23,30 @@ import (
 
 func main() {
 	f := firmata.NewAdaptor(os.Args[1])
-	f.Connect()
+	if err := f.Connect(); err != nil {
+		fmt.Println(err)
+	}
 
 	led := gpio.NewLedDriver(f, "2")
-	led.Start()
-	led.Off()
+	if err := led.Start(); err != nil {
+		fmt.Println(err)
+	}
+	if err := led.Off(); err != nil {
+		fmt.Println(err)
+	}
 
 	button := gpio.NewButtonDriver(f, "3")
-	button.Start()
+	if err := button.Start(); err != nil {
+		fmt.Println(err)
+	}
 
 	buttonEvents := button.Subscribe()
 	for event := range buttonEvents {
 		fmt.Println("Event:", event.Name, event.Data)
 		if event.Name == gpio.ButtonPush {
-			led.Toggle()
+			if err := led.Toggle(); err != nil {
+				fmt.Println(err)
+			}
 		}
 	}
 }

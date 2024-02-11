@@ -94,22 +94,30 @@ func init() {
 			return
 		}
 
-		drone.On(tello.FlightDataEvent, func(data interface{}) {
+		_ = drone.On(tello.FlightDataEvent, func(data interface{}) {
 			// TODO: protect flight data from race condition
 			flightData = data.(*tello.FlightData)
 		})
 
-		drone.On(tello.ConnectedEvent, func(data interface{}) {
+		_ = drone.On(tello.ConnectedEvent, func(data interface{}) {
 			fmt.Println("Connected")
-			drone.StartVideo()
-			drone.SetVideoEncoderRate(tello.VideoBitRateAuto)
-			drone.SetExposure(0)
+			if err := drone.StartVideo(); err != nil {
+				fmt.Println(err)
+			}
+			if err := drone.SetVideoEncoderRate(tello.VideoBitRateAuto); err != nil {
+				fmt.Println(err)
+			}
+			if err := drone.SetExposure(0); err != nil {
+				fmt.Println(err)
+			}
 			gobot.Every(100*time.Millisecond, func() {
-				drone.StartVideo()
+				if err := drone.StartVideo(); err != nil {
+					fmt.Println(err)
+				}
 			})
 		})
 
-		drone.On(tello.VideoFrameEvent, func(data interface{}) {
+		_ = drone.On(tello.VideoFrameEvent, func(data interface{}) {
 			pkt := data.([]byte)
 			if _, err := ffmpegIn.Write(pkt); err != nil {
 				fmt.Println(err)
@@ -121,7 +129,10 @@ func init() {
 			[]gobot.Device{drone, stick},
 		)
 
-		robot.Start()
+		err := robot.Start()
+		if err != nil {
+			fmt.Println(err)
+		}
 	}()
 }
 
@@ -257,7 +268,7 @@ func dist(x1, y1, x2, y2 float64) float64 {
 }
 
 func handleJoystick() {
-	stick.On(joystick.CirclePress, func(data interface{}) {
+	_ = stick.On(joystick.CirclePress, func(data interface{}) {
 		drone.Forward(0)
 		drone.Up(0)
 		drone.Clockwise(0)
@@ -270,33 +281,33 @@ func handleJoystick() {
 			println("not tracking")
 		}
 	})
-	stick.On(joystick.SquarePress, func(data interface{}) {
+	_ = stick.On(joystick.SquarePress, func(data interface{}) {
 		fmt.Println("battery:", flightData.BatteryPercentage)
 	})
-	stick.On(joystick.TrianglePress, func(data interface{}) {
+	_ = stick.On(joystick.TrianglePress, func(data interface{}) {
 		drone.TakeOff()
 		println("Takeoff")
 	})
-	stick.On(joystick.XPress, func(data interface{}) {
+	_ = stick.On(joystick.XPress, func(data interface{}) {
 		drone.Land()
 		println("Land")
 	})
-	stick.On(joystick.LeftX, func(data interface{}) {
+	_ = stick.On(joystick.LeftX, func(data interface{}) {
 		val := float64(data.(int16))
 		leftX.Store(val)
 	})
 
-	stick.On(joystick.LeftY, func(data interface{}) {
+	_ = stick.On(joystick.LeftY, func(data interface{}) {
 		val := float64(data.(int16))
 		leftY.Store(val)
 	})
 
-	stick.On(joystick.RightX, func(data interface{}) {
+	_ = stick.On(joystick.RightX, func(data interface{}) {
 		val := float64(data.(int16))
 		rightX.Store(val)
 	})
 
-	stick.On(joystick.RightY, func(data interface{}) {
+	_ = stick.On(joystick.RightY, func(data interface{}) {
 		val := float64(data.(int16))
 		rightY.Store(val)
 	})
@@ -305,20 +316,32 @@ func handleJoystick() {
 
 		switch {
 		case rightStick.y < -10:
-			drone.Forward(tello.ValidatePitch(rightStick.y, offset))
+			if err := drone.Forward(tello.ValidatePitch(rightStick.y, offset)); err != nil {
+				fmt.Println(err)
+			}
 		case rightStick.y > 10:
-			drone.Backward(tello.ValidatePitch(rightStick.y, offset))
+			if err := drone.Backward(tello.ValidatePitch(rightStick.y, offset)); err != nil {
+				fmt.Println(err)
+			}
 		default:
-			drone.Forward(0)
+			if err := drone.Forward(0); err != nil {
+				fmt.Println(err)
+			}
 		}
 
 		switch {
 		case rightStick.x > 10:
-			drone.Right(tello.ValidatePitch(rightStick.x, offset))
+			if err := drone.Right(tello.ValidatePitch(rightStick.x, offset)); err != nil {
+				fmt.Println(err)
+			}
 		case rightStick.x < -10:
-			drone.Left(tello.ValidatePitch(rightStick.x, offset))
+			if err := drone.Left(tello.ValidatePitch(rightStick.x, offset)); err != nil {
+				fmt.Println(err)
+			}
 		default:
-			drone.Right(0)
+			if err := drone.Right(0); err != nil {
+				fmt.Println(err)
+			}
 		}
 	})
 
@@ -326,20 +349,32 @@ func handleJoystick() {
 		leftStick := getLeftStick()
 		switch {
 		case leftStick.y < -10:
-			drone.Up(tello.ValidatePitch(leftStick.y, offset))
+			if err := drone.Up(tello.ValidatePitch(leftStick.y, offset)); err != nil {
+				fmt.Println(err)
+			}
 		case leftStick.y > 10:
-			drone.Down(tello.ValidatePitch(leftStick.y, offset))
+			if err := drone.Down(tello.ValidatePitch(leftStick.y, offset)); err != nil {
+				fmt.Println(err)
+			}
 		default:
-			drone.Up(0)
+			if err := drone.Up(0); err != nil {
+				fmt.Println(err)
+			}
 		}
 
 		switch {
 		case leftStick.x > 20:
-			drone.Clockwise(tello.ValidatePitch(leftStick.x, offset))
+			if err := drone.Clockwise(tello.ValidatePitch(leftStick.x, offset)); err != nil {
+				fmt.Println(err)
+			}
 		case leftStick.x < -20:
-			drone.CounterClockwise(tello.ValidatePitch(leftStick.x, offset))
+			if err := drone.CounterClockwise(tello.ValidatePitch(leftStick.x, offset)); err != nil {
+				fmt.Println(err)
+			}
 		default:
-			drone.Clockwise(0)
+			if err := drone.Clockwise(0); err != nil {
+				fmt.Println(err)
+			}
 		}
 	})
 }

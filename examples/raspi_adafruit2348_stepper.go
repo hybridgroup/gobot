@@ -7,6 +7,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -24,7 +25,9 @@ func main() {
 	work := func() {
 		gobot.Every(5*time.Second, func() {
 			motor := 0 // 0-based
-			adafruitStepperMotorRunner(adaFruit, motor)
+			if err := adafruitStepperMotorRunner(adaFruit, motor); err != nil {
+				fmt.Println(err)
+			}
 		})
 	}
 
@@ -34,7 +37,9 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }
 
 func adafruitStepperMotorRunner(a *i2c.Adafruit2348Driver, motor int) error {
@@ -44,15 +49,17 @@ func adafruitStepperMotorRunner(a *i2c.Adafruit2348Driver, motor int) error {
 	style := i2c.Adafruit2348Double
 	steps := 20
 
-	a.SetStepperMotorSpeed(motor, speed)
+	if err := a.SetStepperMotorSpeed(motor, speed); err != nil {
+		return err
+	}
 
 	if err := a.Step(motor, steps, i2c.Adafruit2348Forward, style); err != nil {
-		log.Printf(err.Error())
 		return err
 	}
+
 	if err := a.Step(motor, steps, i2c.Adafruit2348Backward, style); err != nil {
-		log.Printf(err.Error())
 		return err
 	}
+
 	return nil
 }

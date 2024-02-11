@@ -19,7 +19,7 @@ func main() {
 	iris := mavlink.NewDriver(adaptor)
 
 	work := func() {
-		iris.Once(mavlink.PacketEvent, func(data interface{}) {
+		_ = iris.Once(mavlink.PacketEvent, func(data interface{}) {
 			packet := data.(*common.MAVLinkPacket)
 
 			dataStream := common.NewRequestDataStream(100,
@@ -28,13 +28,13 @@ func main() {
 				4,
 				1,
 			)
-			iris.SendPacket(common.CraftMAVLinkPacket(packet.SystemID,
-				packet.ComponentID,
-				dataStream,
-			))
+			if err := iris.SendPacket(
+				common.CraftMAVLinkPacket(packet.SystemID, packet.ComponentID, dataStream)); err != nil {
+				fmt.Println(err)
+			}
 		})
 
-		iris.On(mavlink.MessageEvent, func(data interface{}) {
+		_ = iris.On(mavlink.MessageEvent, func(data interface{}) {
 			if data.(common.MAVLinkMessage).Id() == 30 {
 				message := data.(*common.Attitude)
 				fmt.Println("Attitude")
@@ -56,5 +56,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

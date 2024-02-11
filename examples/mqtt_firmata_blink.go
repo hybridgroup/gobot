@@ -7,6 +7,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"gobot.io/x/gobot/v2"
@@ -21,11 +22,15 @@ func main() {
 	led := gpio.NewLedDriver(firmataAdaptor, "13")
 
 	work := func() {
-		mqttAdaptor.On("lights/on", func(msg mqtt.Message) {
-			led.On()
+		_ = mqttAdaptor.On("lights/on", func(msg mqtt.Message) {
+			if err := led.On(); err != nil {
+				fmt.Println(err)
+			}
 		})
-		mqttAdaptor.On("lights/off", func(msg mqtt.Message) {
-			led.Off()
+		_ = mqttAdaptor.On("lights/off", func(msg mqtt.Message) {
+			if err := led.Off(); err != nil {
+				fmt.Println(err)
+			}
 		})
 		data := []byte("")
 		gobot.Every(1*time.Second, func() {
@@ -42,5 +47,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

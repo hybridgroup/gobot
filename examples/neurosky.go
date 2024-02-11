@@ -18,25 +18,25 @@ func main() {
 	neuro := neurosky.NewDriver(adaptor)
 
 	work := func() {
-		neuro.On(neuro.Event("extended"), func(data interface{}) {
+		_ = neuro.On(neuro.Event("extended"), func(data interface{}) {
 			fmt.Println("Extended", data)
 		})
-		neuro.On(neuro.Event("signal"), func(data interface{}) {
+		_ = neuro.On(neuro.Event("signal"), func(data interface{}) {
 			fmt.Println("Signal", data)
 		})
-		neuro.On(neuro.Event("attention"), func(data interface{}) {
+		_ = neuro.On(neuro.Event("attention"), func(data interface{}) {
 			fmt.Println("Attention", data)
 		})
-		neuro.On(neuro.Event("meditation"), func(data interface{}) {
+		_ = neuro.On(neuro.Event("meditation"), func(data interface{}) {
 			fmt.Println("Meditation", data)
 		})
-		neuro.On(neuro.Event("blink"), func(data interface{}) {
+		_ = neuro.On(neuro.Event("blink"), func(data interface{}) {
 			fmt.Println("Blink", data)
 		})
-		neuro.On(neuro.Event("wave"), func(data interface{}) {
+		_ = neuro.On(neuro.Event("wave"), func(data interface{}) {
 			fmt.Println("Wave", data)
 		})
-		neuro.On(neuro.Event("eeg"), func(data interface{}) {
+		_ = neuro.On(neuro.Event("eeg"), func(data interface{}) {
 			eeg := data.(neurosky.EEGData)
 			fmt.Println("Delta", eeg.Delta)
 			fmt.Println("Theta", eeg.Theta)
@@ -56,5 +56,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

@@ -42,13 +42,21 @@ type TravisResponse struct {
 }
 
 func turnOn(robot *gobot.Robot, device string) {
-	robot.Device(device).(*gpio.LedDriver).On()
+	if err := robot.Device(device).(*gpio.LedDriver).On(); err != nil {
+		fmt.Println(err)
+	}
 }
 
 func resetLeds(robot *gobot.Robot) {
-	robot.Device("red").(*gpio.LedDriver).Off()
-	robot.Device("green").(*gpio.LedDriver).Off()
-	robot.Device("blue").(*gpio.LedDriver).Off()
+	if err := robot.Device("red").(*gpio.LedDriver).Off(); err != nil {
+		fmt.Println(err)
+	}
+	if err := robot.Device("green").(*gpio.LedDriver).Off(); err != nil {
+		fmt.Println(err)
+	}
+	if err := robot.Device("blue").(*gpio.LedDriver).Off(); err != nil {
+		fmt.Println(err)
+	}
 }
 
 func checkTravis(robot *gobot.Robot) {
@@ -68,7 +76,9 @@ func checkTravis(robot *gobot.Robot) {
 		panic(err)
 	}
 	var travis TravisResponse
-	json.Unmarshal(body, &travis)
+	if err := json.Unmarshal(body, &travis); err != nil {
+		fmt.Println(err)
+	}
 	resetLeds(robot)
 	if travis.LastBuildStatus == 0 {
 		turnOn(robot, "green")
@@ -98,5 +108,7 @@ func main() {
 	)
 
 	master.AddRobot(robot)
-	master.Start()
+	if err := master.Start(); err != nil {
+		panic(err)
+	}
 }

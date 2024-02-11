@@ -22,13 +22,17 @@ func main() {
 	button := gpio.NewButtonDriver(gpg3, "AD_2_1")
 
 	work := func() {
-		button.On(gpio.ButtonPush, func(data interface{}) {
+		_ = button.On(gpio.ButtonPush, func(data interface{}) {
 			fmt.Println("On!")
-			led.On()
+			if err := led.On(); err != nil {
+				fmt.Println(err)
+			}
 		})
-		button.On(gpio.ButtonRelease, func(data interface{}) {
+		_ = button.On(gpio.ButtonRelease, func(data interface{}) {
 			fmt.Println("Off!")
-			led.Off()
+			if err := led.Off(); err != nil {
+				fmt.Println(err)
+			}
 		})
 	}
 
@@ -38,5 +42,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

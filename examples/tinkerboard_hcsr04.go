@@ -92,6 +92,6 @@ func main() {
 	)
 
 	if err := robot.Start(); err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 }

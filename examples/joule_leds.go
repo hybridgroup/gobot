@@ -7,6 +7,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"gobot.io/x/gobot/v2"
@@ -22,22 +23,38 @@ func main() {
 	led3 := gpio.NewLedDriver(e, "GP103")
 
 	work := func() {
-		led0.Off()
-		led1.Off()
-		led2.Off()
-		led3.Off()
+		if err := led0.Off(); err != nil {
+			fmt.Println(err)
+		}
+		if err := led1.Off(); err != nil {
+			fmt.Println(err)
+		}
+		if err := led2.Off(); err != nil {
+			fmt.Println(err)
+		}
+		if err := led3.Off(); err != nil {
+			fmt.Println(err)
+		}
 
 		gobot.Every(1*time.Second, func() {
-			led0.Toggle()
+			if err := led0.Toggle(); err != nil {
+				fmt.Println(err)
+			}
 		})
 		gobot.Every(2*time.Second, func() {
-			led1.Toggle()
+			if err := led1.Toggle(); err != nil {
+				fmt.Println(err)
+			}
 		})
 		gobot.Every(4*time.Second, func() {
-			led2.Toggle()
+			if err := led2.Toggle(); err != nil {
+				fmt.Println(err)
+			}
 		})
 		gobot.Every(8*time.Second, func() {
-			led3.Toggle()
+			if err := led3.Toggle(); err != nil {
+				fmt.Println(err)
+			}
 		})
 	}
 
@@ -47,5 +64,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

@@ -14,6 +14,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -46,10 +47,18 @@ func main() {
 	work := func() {
 		gobot.Every(400*time.Millisecond, func() {
 			// Enable and change the color of the LEDs
-			modules[0].SetLED(color, ledInt)
-			modules[1].SetLED(color, ledInt)
-			modules[2].SetLED(color, ledInt)
-			modules[3].SetLED(color, ledInt)
+			if err := modules[0].SetLED(color, ledInt); err != nil {
+				fmt.Println(err)
+			}
+			if err := modules[1].SetLED(color, ledInt); err != nil {
+				fmt.Println(err)
+			}
+			if err := modules[2].SetLED(color, ledInt); err != nil {
+				fmt.Println(err)
+			}
+			if err := modules[3].SetLED(color, ledInt); err != nil {
+				fmt.Println(err)
+			}
 
 			ledInt++
 			if ledInt > 7 {
@@ -62,7 +71,9 @@ func main() {
 
 			// Scroll the text
 			for i := 0; i < 4; i++ {
-				modules[i].SetDisplayText(text[offset+8*i : offset+8*i+8])
+				if err := modules[i].SetDisplayText(text[offset+8*i : offset+8*i+8]); err != nil {
+					fmt.Println(err)
+				}
 			}
 			offset++
 			if offset >= len(showText) {
@@ -77,5 +88,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

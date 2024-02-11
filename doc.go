@@ -27,7 +27,9 @@ Here is a "Classic Gobot" program that blinks an LED using an Arduino:
 
 	    work := func() {
 	        gobot.Every(1*time.Second, func() {
-	            led.Toggle()
+	            if err := led.Toggle(); err != nil {
+				fmt.Println(err)
+			}
 	        })
 	    }
 
@@ -37,7 +39,9 @@ Here is a "Classic Gobot" program that blinks an LED using an Arduino:
 	        work,
 	    )
 
-	    robot.Start()
+	    if err := robot.Start(); err != nil {
+				panic(err)
+			}
 	}
 
 # Metal Gobot
@@ -55,13 +59,19 @@ pure idiomatic Golang code. For example:
 
 	func main() {
 	    e := edison.NewAdaptor()
-	    e.Connect()
+	    if err := e.Connect(); err != nil {
+		fmt.Println(err)
+	}
 
 	    led := gpio.NewLedDriver(e, "13")
-	    led.Start()
+	    if err := led.Start(); err != nil {
+		fmt.Println(err)
+	}
 
 	    for {
-	        led.Toggle()
+	        if err := led.Toggle(); err != nil {
+				fmt.Println(err)
+			}
 	        time.Sleep(1000 * time.Millisecond)
 	    }
 	}
@@ -90,7 +100,7 @@ Finally, you can use Master Gobot to add the complete Gobot API or control swarm
 		    work := func() {
 		        spheroDriver.Stop()
 
-		        spheroDriver.On(sphero.CollisionEvent, func(data interface{}) {
+		        _ = spheroDriver.On(sphero.CollisionEvent, func(data interface{}) {
 		            fmt.Println("Collision Detected!")
 		        })
 
@@ -129,7 +139,9 @@ Finally, you can use Master Gobot to add the complete Gobot API or control swarm
 		        master.AddRobot(NewSwarmBot(port))
 		    }
 
-		    master.Start()
+		    if err := master.Start(); err != nil {
+		panic(err)
+	}
 		}
 
 Copyright (c) 2013-2018 The Hybrid Group. Licensed under the Apache 2.0 license.

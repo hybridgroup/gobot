@@ -17,7 +17,7 @@ func main() {
 	keys := keyboard.NewDriver()
 
 	work := func() {
-		keys.On(keyboard.Key, func(data interface{}) {
+		_ = keys.On(keyboard.Key, func(data interface{}) {
 			key := data.(keyboard.KeyEvent)
 
 			if key.Key == keyboard.A {
@@ -34,5 +34,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

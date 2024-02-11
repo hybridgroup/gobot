@@ -12,6 +12,7 @@ package main
 // 2. if end pin configure, reboot Jetson nano.
 // 3. run gobot
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -29,7 +30,9 @@ func main() {
 	work := func() {
 		gobot.Every(100*time.Millisecond, func() {
 			log.Println("Turning", counter)
-			servo.Move(uint8(counter))
+			if err := servo.Move(uint8(counter)); err != nil {
+				fmt.Println(err)
+			}
 			if counter == 140 {
 				flg = false
 			} else if counter == 30 {
@@ -50,5 +53,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

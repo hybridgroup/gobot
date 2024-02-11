@@ -48,50 +48,62 @@ func main() {
 		rightX.Store(float64(0.0))
 		rightY.Store(float64(0.0))
 
-		stick.On(joystick.TrianglePress, func(data interface{}) {
-			drone.TakeOff()
+		_ = stick.On(joystick.TrianglePress, func(data interface{}) {
+			if err := drone.TakeOff(); err != nil {
+				fmt.Println(err)
+			}
 		})
 
-		stick.On(joystick.XPress, func(data interface{}) {
-			drone.Land()
+		_ = stick.On(joystick.XPress, func(data interface{}) {
+			if err := drone.Land(); err != nil {
+				fmt.Println(err)
+			}
 		})
 
-		stick.On(joystick.UpPress, func(data interface{}) {
+		_ = stick.On(joystick.UpPress, func(data interface{}) {
 			fmt.Println("FrontFlip")
-			drone.FrontFlip()
+			if err := drone.FrontFlip(); err != nil {
+				fmt.Println(err)
+			}
 		})
 
-		stick.On(joystick.DownPress, func(data interface{}) {
+		_ = stick.On(joystick.DownPress, func(data interface{}) {
 			fmt.Println("BackFlip")
-			drone.BackFlip()
+			if err := drone.BackFlip(); err != nil {
+				fmt.Println(err)
+			}
 		})
 
-		stick.On(joystick.RightPress, func(data interface{}) {
+		_ = stick.On(joystick.RightPress, func(data interface{}) {
 			fmt.Println("RightFlip")
-			drone.RightFlip()
+			if err := drone.RightFlip(); err != nil {
+				fmt.Println(err)
+			}
 		})
 
-		stick.On(joystick.LeftPress, func(data interface{}) {
+		_ = stick.On(joystick.LeftPress, func(data interface{}) {
 			fmt.Println("LeftFlip")
-			drone.LeftFlip()
+			if err := drone.LeftFlip(); err != nil {
+				fmt.Println(err)
+			}
 		})
 
-		stick.On(joystick.LeftX, func(data interface{}) {
+		_ = stick.On(joystick.LeftX, func(data interface{}) {
 			val := float64(data.(int16))
 			leftX.Store(val)
 		})
 
-		stick.On(joystick.LeftY, func(data interface{}) {
+		_ = stick.On(joystick.LeftY, func(data interface{}) {
 			val := float64(data.(int16))
 			leftY.Store(val)
 		})
 
-		stick.On(joystick.RightX, func(data interface{}) {
+		_ = stick.On(joystick.RightX, func(data interface{}) {
 			val := float64(data.(int16))
 			rightX.Store(val)
 		})
 
-		stick.On(joystick.RightY, func(data interface{}) {
+		_ = stick.On(joystick.RightY, func(data interface{}) {
 			val := float64(data.(int16))
 			rightY.Store(val)
 		})
@@ -101,20 +113,32 @@ func main() {
 
 			switch {
 			case rightStick.y < -10:
-				drone.Forward(tello.ValidatePitch(rightStick.y, offset))
+				if err := drone.Forward(tello.ValidatePitch(rightStick.y, offset)); err != nil {
+					fmt.Println(err)
+				}
 			case rightStick.y > 10:
-				drone.Backward(tello.ValidatePitch(rightStick.y, offset))
+				if err := drone.Backward(tello.ValidatePitch(rightStick.y, offset)); err != nil {
+					fmt.Println(err)
+				}
 			default:
-				drone.Forward(0)
+				if err := drone.Forward(0); err != nil {
+					fmt.Println(err)
+				}
 			}
 
 			switch {
 			case rightStick.x > 10:
-				drone.Right(tello.ValidatePitch(rightStick.x, offset))
+				if err := drone.Right(tello.ValidatePitch(rightStick.x, offset)); err != nil {
+					fmt.Println(err)
+				}
 			case rightStick.x < -10:
-				drone.Left(tello.ValidatePitch(rightStick.x, offset))
+				if err := drone.Left(tello.ValidatePitch(rightStick.x, offset)); err != nil {
+					fmt.Println(err)
+				}
 			default:
-				drone.Right(0)
+				if err := drone.Right(0); err != nil {
+					fmt.Println(err)
+				}
 			}
 		})
 
@@ -122,20 +146,32 @@ func main() {
 			leftStick := getLeftStick()
 			switch {
 			case leftStick.y < -10:
-				drone.Up(tello.ValidatePitch(leftStick.y, offset))
+				if err := drone.Up(tello.ValidatePitch(leftStick.y, offset)); err != nil {
+					fmt.Println(err)
+				}
 			case leftStick.y > 10:
-				drone.Down(tello.ValidatePitch(leftStick.y, offset))
+				if err := drone.Down(tello.ValidatePitch(leftStick.y, offset)); err != nil {
+					fmt.Println(err)
+				}
 			default:
-				drone.Up(0)
+				if err := drone.Up(0); err != nil {
+					fmt.Println(err)
+				}
 			}
 
 			switch {
 			case leftStick.x > 20:
-				drone.Clockwise(tello.ValidatePitch(leftStick.x, offset))
+				if err := drone.Clockwise(tello.ValidatePitch(leftStick.x, offset)); err != nil {
+					fmt.Println(err)
+				}
 			case leftStick.x < -20:
-				drone.CounterClockwise(tello.ValidatePitch(leftStick.x, offset))
+				if err := drone.CounterClockwise(tello.ValidatePitch(leftStick.x, offset)); err != nil {
+					fmt.Println(err)
+				}
 			default:
-				drone.Clockwise(0)
+				if err := drone.Clockwise(0); err != nil {
+					fmt.Println(err)
+				}
 			}
 		})
 	}
@@ -146,7 +182,9 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }
 
 func getLeftStick() pair {

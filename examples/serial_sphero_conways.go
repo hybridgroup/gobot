@@ -43,7 +43,7 @@ func main() {
 
 			conway.birth()
 
-			cell.On(sphero.CollisionEvent, func(data interface{}) {
+			_ = cell.On(sphero.CollisionEvent, func(data interface{}) {
 				conway.contact()
 			})
 
@@ -69,7 +69,9 @@ func main() {
 		master.AddRobot(robot)
 	}
 
-	master.Start()
+	if err := master.Start(); err != nil {
+		panic(err)
+	}
 }
 
 func (c *conway) resetContacts() {

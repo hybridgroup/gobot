@@ -7,6 +7,8 @@
 package main
 
 import (
+	"fmt"
+
 	"gobot.io/x/gobot/v2/drivers/gpio"
 	"gobot.io/x/gobot/v2/platforms/beaglebone"
 )
@@ -17,11 +19,15 @@ func main() {
 	gpioPin := gpio.NewDirectPinDriver(beagleboneAdaptor, "P9_12")
 
 	// Initialize the internal representation of the pinout
-	beagleboneAdaptor.Connect()
+	if err := beagleboneAdaptor.Connect(); err != nil {
+		fmt.Println(err)
+	}
 
 	// Cast to byte because we are returning an int from a function
 	// and not passing in an int literal.
-	gpioPin.DigitalWrite(byte(myStateFunction()))
+	if err := gpioPin.DigitalWrite(byte(myStateFunction())); err != nil {
+		fmt.Println(err)
+	}
 }
 
 // myStateFunction determines what the GPIO state should be

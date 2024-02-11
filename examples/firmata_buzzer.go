@@ -14,6 +14,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -50,7 +51,9 @@ func main() {
 		}
 
 		for _, val := range song {
-			buzzer.Tone(val.tone, val.duration)
+			if err := buzzer.Tone(val.tone, val.duration); err != nil {
+				fmt.Println(err)
+			}
 			time.Sleep(10 * time.Millisecond)
 		}
 	}
@@ -61,5 +64,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

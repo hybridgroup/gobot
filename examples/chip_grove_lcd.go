@@ -7,6 +7,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"gobot.io/x/gobot/v2"
@@ -19,26 +20,47 @@ func main() {
 	screen := i2c.NewGroveLcdDriver(board)
 
 	work := func() {
-		screen.Write("hello")
+		if err := screen.Write("hello"); err != nil {
+			fmt.Println(err)
+		}
 
-		screen.SetRGB(255, 0, 0)
+		if err := screen.SetRGB(255, 0, 0); err != nil {
+			fmt.Println(err)
+		}
 
 		gobot.After(5*time.Second, func() {
-			screen.Clear()
-			screen.Home()
-			screen.SetRGB(0, 255, 0)
+			if err := screen.Clear(); err != nil {
+				fmt.Println(err)
+			}
+			if err := screen.Home(); err != nil {
+				fmt.Println(err)
+			}
+			if err := screen.SetRGB(0, 255, 0); err != nil {
+				fmt.Println(err)
+			}
 			// set a custom character in the first position
-			screen.SetCustomChar(0, i2c.CustomLCDChars["smiley"])
+			if err := screen.SetCustomChar(0, i2c.CustomLCDChars["smiley"]); err != nil {
+				fmt.Println(err)
+			}
 			// add the custom character at the end of the string
-			screen.Write("goodbye\nhave a nice day " + string(byte(0)))
+			if err := screen.Write("goodbye\nhave a nice day " + string(byte(0))); err != nil {
+				fmt.Println(err)
+			}
+
 			gobot.Every(500*time.Millisecond, func() {
-				screen.Scroll(false)
+				if err := screen.Scroll(false); err != nil {
+					fmt.Println(err)
+				}
 			})
 		})
 
-		screen.Home()
+		if err := screen.Home(); err != nil {
+			fmt.Println(err)
+		}
 		time.Sleep(1 * time.Second)
-		screen.SetRGB(0, 0, 255)
+		if err := screen.SetRGB(0, 0, 255); err != nil {
+			fmt.Println(err)
+		}
 	}
 
 	robot := gobot.NewRobot("screenBot",
@@ -47,5 +69,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

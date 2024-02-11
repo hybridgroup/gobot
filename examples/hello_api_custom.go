@@ -21,11 +21,15 @@ func main() {
 
 	// creates routes/handlers for the custom API
 	a.Get("/", func(res http.ResponseWriter, req *http.Request) {
-		res.Write([]byte("OK"))
+		if _, err := res.Write([]byte("OK")); err != nil {
+			fmt.Println(err)
+		}
 	})
 	a.Get("/api/hello", func(res http.ResponseWriter, req *http.Request) {
 		msg := fmt.Sprintf("This command is attached to the robot %v", master.Robot("hello").Name)
-		res.Write([]byte(msg))
+		if _, err := res.Write([]byte(msg)); err != nil {
+			fmt.Println(err)
+		}
 	})
 
 	// starts the API without the default C2PIO API and Robeaux web interface.
@@ -33,5 +37,7 @@ func main() {
 
 	master.AddRobot(gobot.NewRobot("hello"))
 
-	master.Start()
+	if err := master.Start(); err != nil {
+		panic(err)
+	}
 }

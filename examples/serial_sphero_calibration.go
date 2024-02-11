@@ -27,7 +27,7 @@ func main() {
 	calibrating := false
 
 	work := func() {
-		keys.On(keyboard.Key, func(data interface{}) {
+		_ = keys.On(keyboard.Key, func(data interface{}) {
 			key := data.(keyboard.KeyEvent)
 
 			switch key.Key {
@@ -64,5 +64,7 @@ func main() {
 
 	master.AddRobot(robot)
 
-	master.Start()
+	if err := master.Start(); err != nil {
+		panic(err)
+	}
 }
