@@ -111,7 +111,7 @@ import (
 
 func main() {
   adaptor := serialport.NewAdaptor("/dev/rfcomm0")
-  driver := serial.NewSpheroDriver(adaptor)
+  driver := sphero.NewSpheroDriver(adaptor)
 
   work := func() {
     gobot.Every(3*time.Second, func() {
@@ -179,14 +179,14 @@ import (
 
   "gobot.io/x/gobot/v2"
   "gobot.io/x/gobot/v2/api"
-  "gobot.io/x/gobot/v2/drivers/common/sphero"
+  "gobot.io/x/gobot/v2/drivers/common/spherocommon"
   "gobot.io/x/gobot/v2/drivers/serial"
   "gobot.io/x/gobot/v2/platforms/serialport"
 )
 
 func NewSwarmBot(port string) *gobot.Robot {
   spheroAdaptor := serialport.NewAdaptor(port)
-  spheroDriver := serial.NewSpheroDriver(spheroAdaptor, serial.WithName("Sphero" + port))
+  spheroDriver := sphero.NewSpheroDriver(spheroAdaptor, serial.WithName("Sphero" + port))
 
   work := func() {
     spheroDriver.Stop()
@@ -390,6 +390,7 @@ the `gobot/drivers/serial` package:
 
 - [UART](https://en.wikipedia.org/wiki/Serial_port) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/serial)
   - Sphero: Sphero
+  - Neurosky: MindWave
 
 Support for devices that use Serial Peripheral Interface (SPI) have
 a shared set of drivers provided using the `gobot/drivers/spi` package:

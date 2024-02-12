@@ -57,7 +57,7 @@ func NewAdaptor(opts ...func(adaptors.DigitalPinsOptioner)) *Adaptor {
 	return c
 }
 
-// Name returns the Adaptor's name
+// Name returns the adaptors name
 func (c *Adaptor) Name() string {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
@@ -65,7 +65,7 @@ func (c *Adaptor) Name() string {
 	return c.name
 }
 
-// SetName sets the Adaptor's name
+// SetName sets the adaptors name
 func (c *Adaptor) SetName(n string) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()

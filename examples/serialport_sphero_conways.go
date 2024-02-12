@@ -11,8 +11,9 @@ import (
 	"time"
 
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/drivers/common/sphero"
+	"gobot.io/x/gobot/v2/drivers/common/spherocommon"
 	"gobot.io/x/gobot/v2/drivers/serial"
+	"gobot.io/x/gobot/v2/drivers/serial/sphero"
 	"gobot.io/x/gobot/v2/platforms/serialport"
 )
 
@@ -20,7 +21,7 @@ type conway struct {
 	alive    bool
 	age      int
 	contacts int
-	cell     *serial.SpheroDriver
+	cell     *sphero.SpheroDriver
 }
 
 func main() {
@@ -35,7 +36,7 @@ func main() {
 	for _, port := range spheros {
 		spheroAdaptor := serialport.NewAdaptor(port)
 
-		cell := serial.NewSpheroDriver(spheroAdaptor, serial.WithName("Sphero"+port))
+		cell := sphero.NewSpheroDriver(spheroAdaptor, serial.WithName("Sphero"+port))
 
 		work := func() {
 			conway := new(conway)
@@ -43,7 +44,7 @@ func main() {
 
 			conway.birth()
 
-			_ = cell.On(sphero.CollisionEvent, func(data interface{}) {
+			_ = cell.On(spherocommon.CollisionEvent, func(data interface{}) {
 				conway.contact()
 			})
 

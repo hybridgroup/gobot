@@ -1,4 +1,4 @@
-package sphero
+package spherocommon
 
 import "testing"
 

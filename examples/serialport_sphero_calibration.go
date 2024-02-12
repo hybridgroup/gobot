@@ -9,7 +9,7 @@ package main
 import (
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/api"
-	"gobot.io/x/gobot/v2/drivers/serial"
+	"gobot.io/x/gobot/v2/drivers/serial/sphero"
 	"gobot.io/x/gobot/v2/platforms/keyboard"
 	"gobot.io/x/gobot/v2/platforms/serialport"
 )
@@ -20,7 +20,7 @@ func main() {
 	a.Start()
 
 	ballConn := serialport.NewAdaptor("/dev/rfcomm0")
-	ball := serial.NewSpheroDriver(ballConn)
+	ball := sphero.NewSpheroDriver(ballConn)
 
 	keys := keyboard.NewDriver()
 

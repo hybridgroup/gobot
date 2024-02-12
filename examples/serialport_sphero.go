@@ -11,23 +11,23 @@ import (
 	"time"
 
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/drivers/common/sphero"
-	"gobot.io/x/gobot/v2/drivers/serial"
+	"gobot.io/x/gobot/v2/drivers/common/spherocommon"
+	"gobot.io/x/gobot/v2/drivers/serial/sphero"
 	"gobot.io/x/gobot/v2/platforms/serialport"
 )
 
 func main() {
 	adaptor := serialport.NewAdaptor("/dev/rfcomm0")
-	spheroDriver := serial.NewSpheroDriver(adaptor)
+	spheroDriver := sphero.NewSpheroDriver(adaptor)
 
 	work := func() {
-		spheroDriver.SetDataStreaming(sphero.DefaultDataStreamingConfig())
+		spheroDriver.SetDataStreaming(spherocommon.DefaultDataStreamingConfig())
 
-		_ = spheroDriver.On(sphero.CollisionEvent, func(data interface{}) {
+		_ = spheroDriver.On(spherocommon.CollisionEvent, func(data interface{}) {
 			fmt.Printf("Collision! %+v\n", data)
 		})
 
-		_ = spheroDriver.On(sphero.SensorDataEvent, func(data interface{}) {
+		_ = spheroDriver.On(spherocommon.SensorDataEvent, func(data interface{}) {
 			fmt.Printf("Streaming Data! %+v\n", data)
 		})
 

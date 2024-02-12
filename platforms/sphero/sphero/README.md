@@ -70,7 +70,7 @@ import (
 
 func main() {
   adaptor := serialport.NewAdaptor("/dev/rfcomm0")
-  driver := serial.NewSpheroDriver(adaptor)
+  driver := sphero.NewSpheroDriver(adaptor)
 
   work := func() {
     gobot.Every(3*time.Second, func() {

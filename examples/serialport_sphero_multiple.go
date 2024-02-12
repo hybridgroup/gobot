@@ -12,19 +12,20 @@ import (
 
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/api"
-	"gobot.io/x/gobot/v2/drivers/common/sphero"
+	"gobot.io/x/gobot/v2/drivers/common/spherocommon"
 	"gobot.io/x/gobot/v2/drivers/serial"
+	"gobot.io/x/gobot/v2/drivers/serial/sphero"
 	"gobot.io/x/gobot/v2/platforms/serialport"
 )
 
 func NewSwarmBot(port string) *gobot.Robot {
 	spheroAdaptor := serialport.NewAdaptor(port)
-	spheroDriver := serial.NewSpheroDriver(spheroAdaptor, serial.WithName("Sphero"+port))
+	spheroDriver := sphero.NewSpheroDriver(spheroAdaptor, serial.WithName("Sphero"+port))
 
 	work := func() {
 		spheroDriver.Stop()
 
-		_ = spheroDriver.On(sphero.CollisionEvent, func(data interface{}) {
+		_ = spheroDriver.On(spherocommon.CollisionEvent, func(data interface{}) {
 			fmt.Println("Collision Detected!")
 		})
 

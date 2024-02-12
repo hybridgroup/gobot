@@ -37,10 +37,10 @@ func NewAdaptor() *Adaptor {
 	}
 }
 
-// Name returns the Digispark Adaptors name
+// Name returns the Digispark adaptors name
 func (d *Adaptor) Name() string { return d.name }
 
-// SetName sets the Digispark Adaptors name
+// SetName sets the Digispark adaptors name
 func (d *Adaptor) SetName(n string) { d.name = n }
 
 // Connect starts a connection to the digispark

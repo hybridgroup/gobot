@@ -1,4 +1,4 @@
-package sphero
+package spherocommon
 
 const (
 	// ErrorEvent event when error encountered

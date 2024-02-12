@@ -80,7 +80,7 @@ returned instead and the log output needs to be done at caller side.
 ### Sphero adaptor split off
 
 The Serial Based Sphero adaptor was split off into a generic serial adaptor and the driver part. With this, the imports
-needs to be adjusted. In addition all events now have a postfix "Event", see below.
+needs to be adjusted. In addition all events now have a suffix "Event", see below.
 
 ```go
 // old
@@ -100,16 +100,51 @@ import(
 // new
 import(
   ...
-  "gobot.io/x/gobot/v2/drivers/common/sphero"
+  "gobot.io/x/gobot/v2/drivers/common/spherocommon"
   "gobot.io/x/gobot/v2/drivers/serial"
   "gobot.io/x/gobot/v2/platforms/serialport"
   ...
 )
 ...
   adaptor := serialport.NewAdaptor("/dev/rfcomm0")
-  spheroDriver := serial.NewSpheroDriver(adaptor)
+  spheroDriver := sphero.NewSpheroDriver(adaptor)
 ...
   _ = spheroDriver.On(sphero.CollisionEvent, func(data interface{}) {
+...
+```
+
+### Neurosky adaptor split off
+
+The Neurosky adaptor now us the generic serial adaptor. The driver part was moved. With this, the imports needs to be
+adjusted. In addition all events now have a suffix "Event", see below.
+
+```go
+// old
+import(
+  ...
+  "gobot.io/x/gobot/v2/platforms/neurosky"
+  ...
+)
+
+...
+  adaptor := neurosky.NewAdaptor("/dev/rfcomm0")
+  neuro := neurosky.NewDriver(adaptor)
+...
+  _ = neuro.On(neurosky.Extended, func(data interface{}) {
+...
+
+// new
+import(
+  ...
+  "gobot.io/x/gobot/v2/drivers/serial/neurosky"
+  "gobot.io/x/gobot/v2/platforms/serialport"
+  ...
+)
+...
+  adaptor := serialport.NewAdaptor("/dev/rfcomm0", serialport.WithName("Neurosky"), serialport.WithBaudRate(57600))
+  neuro := neurosky.NewMindWaveDriver(adaptor)
+...
+  _ = neuro.On(neurosky.ExtendedEvent, func(data interface{}) {
 ...
 ```
 

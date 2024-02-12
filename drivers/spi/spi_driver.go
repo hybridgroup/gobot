@@ -12,7 +12,7 @@ const (
 	NotInitialized = -1
 )
 
-// Connector lets Adaptors provide the interface for Drivers
+// Connector lets adaptors provide the interface for Drivers
 // to get access to the SPI buses on platforms that support SPI.
 type Connector interface {
 	// GetSpiConnection returns a connection to a SPI device at the specified bus and chip.

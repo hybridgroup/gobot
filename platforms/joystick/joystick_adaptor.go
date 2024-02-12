@@ -40,10 +40,10 @@ func NewAdaptor(id string) *Adaptor {
 	}
 }
 
-// Name returns the Adaptors name
+// Name returns the adaptors name
 func (j *Adaptor) Name() string { return j.name }
 
-// SetName sets the Adaptors name
+// SetName sets the adaptors name
 func (j *Adaptor) SetName(n string) { j.name = n }
 
 // Connect connects to the joystick

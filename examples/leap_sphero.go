@@ -10,7 +10,7 @@ import (
 	"math"
 
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/drivers/serial"
+	"gobot.io/x/gobot/v2/drivers/serial/sphero"
 	"gobot.io/x/gobot/v2/platforms/leap"
 	"gobot.io/x/gobot/v2/platforms/serialport"
 )
@@ -20,7 +20,7 @@ func main() {
 	spheroAdaptor := serialport.NewAdaptor("/dev/tty.Sphero-YBW-RN-SPP")
 
 	leapDriver := leap.NewDriver(leapAdaptor)
-	spheroDriver := serial.NewSpheroDriver(spheroAdaptor)
+	spheroDriver := sphero.NewSpheroDriver(spheroAdaptor)
 
 	work := func() {
 		_ = leapDriver.On(leap.MessageEvent, func(data interface{}) {

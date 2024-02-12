@@ -12,7 +12,7 @@ import (
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/ble"
 	"gobot.io/x/gobot/v2/drivers/ble/testutil"
-	"gobot.io/x/gobot/v2/drivers/common/sphero"
+	"gobot.io/x/gobot/v2/drivers/common/spherocommon"
 )
 
 var _ gobot.Driver = (*OllieDriver)(nil)
@@ -82,12 +82,12 @@ func TestLocatorData(t *testing.T) {
 func TestDataStreaming(t *testing.T) {
 	d := initTestOllieDriver()
 
-	err := d.SetDataStreamingConfig(sphero.DefaultDataStreamingConfig())
+	err := d.SetDataStreamingConfig(spherocommon.DefaultDataStreamingConfig())
 	require.NoError(t, err)
 
 	responseChan := make(chan bool)
 	err = d.On("sensordata", func(data interface{}) {
-		cont := data.(sphero.DataStreamingPacket)
+		cont := data.(spherocommon.DataStreamingPacket)
 		// fmt.Printf("got streaming packet: %+v \n", cont)
 		assert.Equal(t, int16(10), cont.RawAccX)
 		responseChan <- true

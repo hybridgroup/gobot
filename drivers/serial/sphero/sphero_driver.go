@@ -1,4 +1,4 @@
-package serial
+package sphero
 
 import (
 	"bytes"
@@ -8,13 +8,14 @@ import (
 	"time"
 
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/drivers/common/sphero"
+	"gobot.io/x/gobot/v2/drivers/common/spherocommon"
+	"gobot.io/x/gobot/v2/drivers/serial"
 )
 
 type spheroSerialAdaptor interface {
 	gobot.Adaptor
-	SerialReader
-	SerialWriter
+	serial.SerialReader
+	serial.SerialWriter
 
 	IsConnected() bool
 }
@@ -27,14 +28,15 @@ type packet struct {
 
 // SpheroDriver Represents a Sphero 2.0
 type SpheroDriver struct {
-	*driver
+	*serial.Driver
 	gobot.Eventer
-	seq             uint8
-	asyncResponse   [][]uint8
-	syncResponse    [][]uint8
-	packetChannel   chan *packet
-	responseChannel chan []uint8
-	originalColor   []uint8 // Only used for calibration.
+	seq              uint8
+	asyncResponse    [][]uint8
+	syncResponse     [][]uint8
+	packetChannel    chan *packet
+	responseChannel  chan []uint8
+	originalColor    []uint8 // Only used for calibration.
+	shutdownWaitTime time.Duration
 }
 
 // NewSpheroDriver returns a new SpheroDriver given a Sphero Adaptor.
@@ -51,19 +53,18 @@ type SpheroDriver struct {
 //	"SetStabilization" - See SpheroDriver.SetStabilization
 //	"SetDataStreaming" - See SpheroDriver.SetDataStreaming
 //	"SetRotationRate" - See SpheroDriver.SetRotationRate
-func NewSpheroDriver(a spheroSerialAdaptor, opts ...optionApplier) *SpheroDriver {
+func NewSpheroDriver(a spheroSerialAdaptor, opts ...serial.OptionApplier) *SpheroDriver {
 	d := &SpheroDriver{
-		driver:          newDriver(a, "Sphero", opts...),
-		Eventer:         gobot.NewEventer(),
-		packetChannel:   make(chan *packet, 1024),
-		responseChannel: make(chan []uint8, 1024),
+		Eventer:          gobot.NewEventer(),
+		packetChannel:    make(chan *packet, 1024),
+		responseChannel:  make(chan []uint8, 1024),
+		shutdownWaitTime: 1 * time.Second,
 	}
-	d.afterStart = d.initialize
-	d.beforeHalt = d.shutdown
+	d.Driver = serial.NewDriver(a, "Sphero", d.initialize, d.shutdown, opts...)
 
-	d.AddEvent(sphero.ErrorEvent)
-	d.AddEvent(sphero.CollisionEvent)
-	d.AddEvent(sphero.SensorDataEvent)
+	d.AddEvent(spherocommon.ErrorEvent)
+	d.AddEvent(spherocommon.CollisionEvent)
+	d.AddEvent(spherocommon.SensorDataEvent)
 
 	//nolint:forcetypeassert // ok here
 	d.AddCommand("SetRGB", func(params map[string]interface{}) interface{} {
@@ -127,7 +128,7 @@ func NewSpheroDriver(a spheroSerialAdaptor, opts ...optionApplier) *SpheroDriver
 		Pcnt := uint8(params["Pcnt"].(float64))
 		Mask2 := uint32(params["Mask2"].(float64))
 
-		d.SetDataStreaming(sphero.DataStreamingConfig{N: N, M: M, Mask2: Mask2, Pcnt: Pcnt, Mask: Mask})
+		d.SetDataStreaming(spherocommon.DataStreamingConfig{N: N, M: M, Mask2: Mask2, Pcnt: Pcnt, Mask: Mask})
 		return nil
 	})
 	//nolint:forcetypeassert // ok here
@@ -137,7 +138,7 @@ func NewSpheroDriver(a spheroSerialAdaptor, opts ...optionApplier) *SpheroDriver
 		Y := int16(params["Y"].(float64))
 		YawTare := int16(params["YawTare"].(float64))
 
-		d.ConfigureLocator(sphero.LocatorConfig{Flags: Flags, X: X, Y: Y, YawTare: YawTare})
+		d.ConfigureLocator(spherocommon.LocatorConfig{Flags: Flags, X: X, Y: Y, YawTare: YawTare})
 		return nil
 	})
 
@@ -200,7 +201,7 @@ func (d *SpheroDriver) Roll(speed uint8, heading uint16) {
 }
 
 // ConfigureLocator configures and enables the Locator
-func (d *SpheroDriver) ConfigureLocator(lc sphero.LocatorConfig) {
+func (d *SpheroDriver) ConfigureLocator(lc spherocommon.LocatorConfig) {
 	buf := new(bytes.Buffer)
 	if err := binary.Write(buf, binary.BigEndian, lc); err != nil {
 		panic(err)
@@ -210,7 +211,7 @@ func (d *SpheroDriver) ConfigureLocator(lc sphero.LocatorConfig) {
 }
 
 // SetDataStreaming enables sensor data streaming
-func (d *SpheroDriver) SetDataStreaming(dsc sphero.DataStreamingConfig) {
+func (d *SpheroDriver) SetDataStreaming(dsc spherocommon.DataStreamingConfig) {
 	buf := new(bytes.Buffer)
 	if err := binary.Write(buf, binary.BigEndian, dsc); err != nil {
 		panic(err)
@@ -225,7 +226,7 @@ func (d *SpheroDriver) Stop() {
 }
 
 // ConfigureCollisionDetection configures the sensitivity of the detection.
-func (d *SpheroDriver) ConfigureCollisionDetection(cc sphero.CollisionConfig) {
+func (d *SpheroDriver) ConfigureCollisionDetection(cc spherocommon.CollisionConfig) {
 	d.sendCraftPacket([]uint8{cc.Method, cc.Xt, cc.Yt, cc.Xs, cc.Ys, cc.Dead}, 0x12)
 }
 
@@ -264,16 +265,18 @@ func (d *SpheroDriver) FinishCalibration() {
 //
 // Emits the Events:
 //
-//	Collision  sphero.CollisionPacket - On Collision Detected
-//	SensorData sphero.DataStreamingPacket - On Data Streaming event
+//	Collision  spherocommon.CollisionPacket - On Collision Detected
+//	SensorData spherocommon.DataStreamingPacket - On Data Streaming event
 //	Error      error- On error while processing asynchronous response
+//
+// TODO: stop the go routines gracefully on shutdown()
 func (d *SpheroDriver) initialize() error {
 	go func() {
 		for {
 			packet := <-d.packetChannel
 			err := d.write(packet)
 			if err != nil {
-				d.Publish(sphero.ErrorEvent, err)
+				d.Publish(spherocommon.ErrorEvent, err)
 			}
 		}
 	}()
@@ -292,7 +295,7 @@ func (d *SpheroDriver) initialize() error {
 				body := d.readBody(header[4])
 				data := append(header, body...)
 				checksum := data[len(data)-1]
-				if checksum != sphero.CalculateChecksum(data[2:len(data)-1]) {
+				if checksum != spherocommon.CalculateChecksum(data[2:len(data)-1]) {
 					continue
 				}
 				switch header[1] {
@@ -327,13 +330,12 @@ func (d *SpheroDriver) initialize() error {
 }
 
 // shutdown halts the SpheroDriver and sends a SpheroDriver.Stop command to the Sphero.
-// Returns true on successful halt.
 func (d *SpheroDriver) shutdown() error {
 	if d.adaptor().IsConnected() {
 		gobot.Every(10*time.Millisecond, func() {
 			d.Stop()
 		})
-		time.Sleep(1 * time.Second)
+		time.Sleep(d.shutdownWaitTime)
 	}
 	return nil
 }
@@ -347,12 +349,12 @@ func (d *SpheroDriver) handleCollisionDetected(data []uint8) {
 	if len(data) != 22 || data[4] != 17 {
 		return
 	}
-	var collision sphero.CollisionPacket
+	var collision spherocommon.CollisionPacket
 	buffer := bytes.NewBuffer(data[5:]) // skip header
 	if err := binary.Read(buffer, binary.BigEndian, &collision); err != nil {
 		panic(err)
 	}
-	d.Publish(sphero.CollisionEvent, collision)
+	d.Publish(spherocommon.CollisionEvent, collision)
 }
 
 func (d *SpheroDriver) handleDataStreaming(data []uint8) {
@@ -360,12 +362,12 @@ func (d *SpheroDriver) handleDataStreaming(data []uint8) {
 	if len(data) != 90 {
 		return
 	}
-	var dataPacket sphero.DataStreamingPacket
+	var dataPacket spherocommon.DataStreamingPacket
 	buffer := bytes.NewBuffer(data[5:]) // skip header
 	if err := binary.Read(buffer, binary.BigEndian, &dataPacket); err != nil {
 		panic(err)
 	}
-	d.Publish(sphero.SensorDataEvent, dataPacket)
+	d.Publish(spherocommon.SensorDataEvent, dataPacket)
 }
 
 func (d *SpheroDriver) getSyncResponse(packet *packet) []byte {
@@ -397,15 +399,15 @@ func (d *SpheroDriver) craftPacket(body []uint8, cid byte) *packet {
 	packet := &packet{
 		body:     body,
 		header:   hdr,
-		checksum: sphero.CalculateChecksum(buf[2:]),
+		checksum: spherocommon.CalculateChecksum(buf[2:]),
 	}
 
 	return packet
 }
 
 func (d *SpheroDriver) write(packet *packet) error {
-	d.mutex.Lock()
-	defer d.mutex.Unlock()
+	d.Mutex().Lock()
+	defer d.Mutex().Unlock()
 
 	buf := append(packet.header, packet.body...)
 	buf = append(buf, packet.checksum)
@@ -445,17 +447,17 @@ func (d *SpheroDriver) readNextChunk(length int) []uint8 {
 }
 
 func (d *SpheroDriver) adaptor() spheroSerialAdaptor {
-	if a, ok := d.connection.(spheroSerialAdaptor); ok {
+	if a, ok := d.Connection().(spheroSerialAdaptor); ok {
 		return a
 	}
 
-	log.Printf("%s has no Sphere serial connector\n", d.driverCfg.name)
+	log.Printf("%s has no Sphero serial connector\n", d.Name())
 	return nil
 }
 
 // spheroDefaultCollisionConfig returns a CollisionConfig with sensible collision defaults
-func spheroDefaultCollisionConfig() sphero.CollisionConfig {
-	return sphero.CollisionConfig{
+func spheroDefaultCollisionConfig() spherocommon.CollisionConfig {
+	return spherocommon.CollisionConfig{
 		Method: 0x01,
 		Xt:     0x80,
 		Yt:     0x80,
@@ -466,8 +468,8 @@ func spheroDefaultCollisionConfig() sphero.CollisionConfig {
 }
 
 // spheroDefaultLocatorConfig returns a LocatorConfig with defaults
-func spheroDefaultLocatorConfig() sphero.LocatorConfig {
-	return sphero.LocatorConfig{
+func spheroDefaultLocatorConfig() spherocommon.LocatorConfig {
+	return spherocommon.LocatorConfig{
 		Flags:   0x01,
 		X:       0x00,
 		Y:       0x00,

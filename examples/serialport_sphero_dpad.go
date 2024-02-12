@@ -11,7 +11,7 @@ import (
 
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/api"
-	"gobot.io/x/gobot/v2/drivers/serial"
+	"gobot.io/x/gobot/v2/drivers/serial/sphero"
 	"gobot.io/x/gobot/v2/platforms/serialport"
 )
 
@@ -21,7 +21,7 @@ func main() {
 	a.Start()
 
 	conn := serialport.NewAdaptor("/dev/rfcomm0")
-	ball := serial.NewSpheroDriver(conn)
+	ball := sphero.NewSpheroDriver(conn)
 
 	robot := gobot.NewRobot("sphero-dpad",
 		[]gobot.Connection{conn},

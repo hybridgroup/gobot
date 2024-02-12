@@ -1,6 +1,7 @@
 package serialport
 
 import (
+	"fmt"
 	"io"
 
 	"go.bug.st/serial"
@@ -8,35 +9,72 @@ import (
 	"gobot.io/x/gobot/v2"
 )
 
+// configuration contains all changeable attributes of the driver.
+type configuration struct {
+	name     string
+	baudRate int
+}
+
 // Adaptor represents a Gobot Adaptor for the Serial Communication
 type Adaptor struct {
-	name      string
-	port      string
-	sp        io.ReadWriteCloser
-	connected bool
-	connect   func(string) (io.ReadWriteCloser, error)
+	port string
+	cfg  *configuration
+
+	sp          io.ReadWriteCloser
+	connected   bool
+	connectFunc func(string, int) (io.ReadWriteCloser, error)
 }
 
 // NewAdaptor returns a new adaptor given a port for the serial communication
-func NewAdaptor(port string) *Adaptor {
-	return &Adaptor{
-		name: gobot.DefaultName("Serial"),
+func NewAdaptor(port string, opts ...optionApplier) *Adaptor {
+	cfg := configuration{
+		name:     gobot.DefaultName("Serial"),
+		baudRate: 115200,
+	}
+
+	a := Adaptor{
+		cfg:  &cfg,
 		port: port,
-		connect: func(port string) (io.ReadWriteCloser, error) {
-			return serial.Open(port, &serial.Mode{BaudRate: 115200})
+		connectFunc: func(port string, baudRate int) (io.ReadWriteCloser, error) {
+			return serial.Open(port, &serial.Mode{BaudRate: baudRate})
 		},
 	}
+
+	for _, o := range opts {
+		o.apply(a.cfg)
+	}
+
+	return &a
 }
 
-// Name returns the Adaptor's name
-func (a *Adaptor) Name() string { return a.name }
+// WithName is used to replace the default name of the driver.
+func WithName(name string) optionApplier {
+	return nameOption(name)
+}
 
-// SetName sets the Adaptor's name
-func (a *Adaptor) SetName(n string) { a.name = n }
+// WithName is used to replace the default name of the driver.
+func WithBaudRate(baudRate int) optionApplier {
+	return baudRateOption(baudRate)
+}
+
+// Name returns the adaptors name
+func (a *Adaptor) Name() string {
+	return a.cfg.name
+}
+
+// SetName sets the adaptors name
+// Deprecated: Please use option [serialport.WithName] instead.
+func (a *Adaptor) SetName(n string) {
+	WithName(n).apply(a.cfg)
+}
 
 // Connect initiates a connection to the serial port.
 func (a *Adaptor) Connect() error {
-	sp, err := a.connect(a.Port())
+	if a.connected {
+		return fmt.Errorf("serial port is already connected, try reconnect or run disconnect first")
+	}
+
+	sp, err := a.connectFunc(a.port, a.cfg.baudRate)
 	if err != nil {
 		return err
 	}
@@ -73,7 +111,7 @@ func (a *Adaptor) Reconnect() error {
 	return a.Connect()
 }
 
-// Port returns the Adaptor's port
+// Port returns the adaptors port
 func (a *Adaptor) Port() string { return a.port }
 
 // IsConnected returns the connection state
@@ -81,12 +119,12 @@ func (a *Adaptor) IsConnected() bool {
 	return a.connected
 }
 
-// SerialRead reads from the port
-func (a *Adaptor) SerialRead(p []byte) (int, error) {
-	return a.sp.Read(p)
+// SerialRead reads from the port to the given reference
+func (a *Adaptor) SerialRead(pData []byte) (int, error) {
+	return a.sp.Read(pData)
 }
 
 // SerialWrite writes to the port
-func (a *Adaptor) SerialWrite(p []byte) (int, error) {
-	return a.sp.Write(p)
+func (a *Adaptor) SerialWrite(data []byte) (int, error) {
+	return a.sp.Write(data)
 }
