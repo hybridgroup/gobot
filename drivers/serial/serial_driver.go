@@ -15,8 +15,8 @@ type SerialWriter interface {
 	SerialWrite(b []byte) (n int, err error)
 }
 
-// optionApplier needs to be implemented by each configurable option type
-type optionApplier interface {
+// OptionApplier needs to be implemented by each configurable option type
+type OptionApplier interface {
 	apply(cfg *configuration)
 }
 
@@ -29,7 +29,7 @@ type configuration struct {
 type nameOption string
 
 // Driver implements the interface gobot.Driver.
-type driver struct {
+type Driver struct {
 	gobot.Commander
 	connection interface{}
 	driverCfg  *configuration
@@ -38,14 +38,24 @@ type driver struct {
 	mutex      *sync.Mutex
 }
 
-// newDriver creates a new basic serial gobot driver.
-func newDriver(a interface{}, name string, opts ...optionApplier) *driver {
-	d := driver{
+// NewDriver creates a new basic serial gobot driver.
+func NewDriver(a interface{}, name string,
+	afterStart func() error, beforeHalt func() error,
+	opts ...OptionApplier,
+) *Driver {
+	if afterStart == nil {
+		afterStart = func() error { return nil }
+	}
+
+	if beforeHalt == nil {
+		beforeHalt = func() error { return nil }
+	}
+	d := Driver{
 		Commander:  gobot.NewCommander(),
 		connection: a,
 		driverCfg:  &configuration{name: gobot.DefaultName(name)},
-		afterStart: func() error { return nil },
-		beforeHalt: func() error { return nil },
+		afterStart: afterStart,
+		beforeHalt: beforeHalt,
 		mutex:      &sync.Mutex{},
 	}
 
@@ -57,23 +67,23 @@ func newDriver(a interface{}, name string, opts ...optionApplier) *driver {
 }
 
 // WithName is used to replace the default name of the driver.
-func WithName(name string) optionApplier {
+func WithName(name string) OptionApplier {
 	return nameOption(name)
 }
 
 // Name returns the name of the driver.
-func (d *driver) Name() string {
+func (d *Driver) Name() string {
 	return d.driverCfg.name
 }
 
 // SetName sets the name of the driver.
 // Deprecated: Please use option [serial.WithName] instead.
-func (d *driver) SetName(name string) {
+func (d *Driver) SetName(name string) {
 	WithName(name).apply(d.driverCfg)
 }
 
 // Connection returns the connection of the driver.
-func (d *driver) Connection() gobot.Connection {
+func (d *Driver) Connection() gobot.Connection {
 	if conn, ok := d.connection.(gobot.Connection); ok {
 		return conn
 	}
@@ -83,7 +93,7 @@ func (d *driver) Connection() gobot.Connection {
 }
 
 // Start initializes the driver.
-func (d *driver) Start() error {
+func (d *Driver) Start() error {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
@@ -93,13 +103,17 @@ func (d *driver) Start() error {
 }
 
 // Halt halts the driver.
-func (d *driver) Halt() error {
+func (d *Driver) Halt() error {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
 	// currently there is nothing to do after halt for the driver
 
 	return d.beforeHalt()
+}
+
+func (d *Driver) Mutex() *sync.Mutex {
+	return d.mutex
 }
 
 // apply change the name in the configuration.

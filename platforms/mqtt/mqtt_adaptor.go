@@ -60,10 +60,10 @@ func NewAdaptorWithAuth(host, clientID, username, password string) *Adaptor {
 	}
 }
 
-// Name returns the MQTT Adaptor's name
+// Name returns the MQTT adaptors name
 func (a *Adaptor) Name() string { return a.name }
 
-// SetName sets the MQTT Adaptor's name
+// SetName sets the MQTT adaptors name
 func (a *Adaptor) SetName(n string) { a.name = n }
 
 // Port returns the Host name

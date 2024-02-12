@@ -116,13 +116,13 @@ func (f *Adaptor) Finalize() error {
 	return f.Disconnect()
 }
 
-// Port returns the Firmata Adaptors port
+// Port returns the Firmata adaptors port
 func (f *Adaptor) Port() string { return f.port }
 
-// Name returns the Firmata Adaptors name
+// Name returns the Firmata adaptors name
 func (f *Adaptor) Name() string { return f.name }
 
-// SetName sets the Firmata Adaptors name
+// SetName sets the Firmata adaptors name
 func (f *Adaptor) SetName(n string) { f.name = n }
 
 // ServoConfig sets the pulse width in microseconds for a pin attached to a servo

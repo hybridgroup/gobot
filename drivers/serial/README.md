@@ -13,3 +13,4 @@ Please refer to the main [README.md](https://github.com/hybridgroup/gobot/blob/r
 Gobot has a extensible system for connecting to hardware devices. The following Serial devices are currently supported:
 
 - Sphero: Sphero
+- Neurosky: MindWave

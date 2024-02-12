@@ -83,7 +83,7 @@ func NewAdaptor(opts ...interface{}) *Adaptor {
 	return a
 }
 
-// Name returns the Adaptor's name
+// Name returns the adaptors name
 func (a *Adaptor) Name() string {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
@@ -91,7 +91,7 @@ func (a *Adaptor) Name() string {
 	return a.name
 }
 
-// SetName sets the Adaptor's name
+// SetName sets the adaptors name
 func (a *Adaptor) SetName(n string) {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()

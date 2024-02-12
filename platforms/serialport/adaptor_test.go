@@ -14,93 +14,142 @@ import (
 
 var _ gobot.Adaptor = (*Adaptor)(nil)
 
-type nullReadWriteCloser struct {
-	testAdaptorRead  func(p []byte) (int, error)
-	testAdaptorWrite func(b []byte) (int, error)
-	testAdaptorClose func() error
-}
-
-func (n *nullReadWriteCloser) Write(p []byte) (int, error) {
-	return n.testAdaptorWrite(p)
-}
-
-func (n *nullReadWriteCloser) Read(b []byte) (int, error) {
-	return n.testAdaptorRead(b)
-}
-
-func (n *nullReadWriteCloser) Close() error {
-	return n.testAdaptorClose()
-}
-
-func NewNullReadWriteCloser() *nullReadWriteCloser {
-	return &nullReadWriteCloser{
-		testAdaptorRead: func(p []byte) (int, error) {
-			return len(p), nil
-		},
-		testAdaptorWrite: func(b []byte) (int, error) {
-			return len(b), nil
-		},
-		testAdaptorClose: func() error {
-			return nil
-		},
-	}
-}
-
 func initTestAdaptor() (*Adaptor, *nullReadWriteCloser) {
 	a := NewAdaptor("/dev/null")
-	rwc := NewNullReadWriteCloser()
+	rwc := newNullReadWriteCloser()
 
-	a.connect = func(string) (io.ReadWriteCloser, error) {
+	a.connectFunc = func(string, int) (io.ReadWriteCloser, error) {
 		return rwc, nil
+	}
+
+	if err := a.Connect(); err != nil {
+		panic(err)
 	}
 	return a, rwc
 }
 
 func TestNewAdaptor(t *testing.T) {
+	// arrange
 	a := NewAdaptor("/dev/null")
-	assert.True(t, strings.HasPrefix(a.Name(), "Serial"))
 	assert.Equal(t, "/dev/null", a.Port())
+	require.NotNil(t, a.cfg)
+	assert.Equal(t, 115200, a.cfg.baudRate)
+	assert.True(t, strings.HasPrefix(a.Name(), "Serial"))
 }
 
-func TestName(t *testing.T) {
+func TestSerialRead(t *testing.T) {
+	tests := map[string]struct {
+		readDataBuffer []byte
+		simReadErr     bool
+		wantCount      int
+		wantErr        string
+	}{
+		"read_ok": {
+			readDataBuffer: []byte{0, 0},
+			wantCount:      2,
+		},
+		"error_read": {
+			readDataBuffer: []byte{},
+			simReadErr:     true,
+			wantErr:        "read error",
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			a, rwc := initTestAdaptor()
+			rwc.simulateReadErr = tc.simReadErr
+			// act
+			gotCount, err := a.SerialRead(tc.readDataBuffer)
+			// assert
+			if tc.wantErr == "" {
+				require.NoError(t, err)
+			} else {
+				require.EqualError(t, err, tc.wantErr)
+			}
+			assert.Equal(t, tc.wantCount, gotCount)
+		})
+	}
+}
+
+func TestSerialWrite(t *testing.T) {
+	tests := map[string]struct {
+		writeDataBuffer []byte
+		simWriteErr     bool
+		wantCount       int
+		wantWritten     []byte
+		wantErr         string
+	}{
+		"write_ok": {
+			writeDataBuffer: []byte{1, 3, 6},
+			wantWritten:     []byte{1, 3, 6},
+			wantCount:       3,
+		},
+		"error_write": {
+			writeDataBuffer: []byte{},
+			simWriteErr:     true,
+			wantErr:         "write error",
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			a, rwc := initTestAdaptor()
+			rwc.simulateWriteErr = tc.simWriteErr
+			// act
+			gotCount, err := a.SerialWrite(tc.writeDataBuffer)
+			// assert
+			if tc.wantErr == "" {
+				require.NoError(t, err)
+				assert.Equal(t, tc.wantWritten, rwc.written)
+			} else {
+				require.EqualError(t, err, tc.wantErr)
+			}
+			assert.Equal(t, tc.wantCount, gotCount)
+		})
+	}
+}
+
+func TestConnect(t *testing.T) {
+	// arrange
 	a, _ := initTestAdaptor()
-	assert.True(t, strings.HasPrefix(a.Name(), "Serial"))
-	a.SetName("NewName")
-	assert.Equal(t, "NewName", a.Name())
+	require.True(t, a.IsConnected())
+	// act & assert
+	require.EqualError(t, a.Connect(), "serial port is already connected, try reconnect or run disconnect first")
+	// re-arrange error
+	a.connected = false
+	a.connectFunc = func(string, int) (io.ReadWriteCloser, error) {
+		return nil, errors.New("connect error")
+	}
+	// act & assert
+	require.ErrorContains(t, a.Connect(), "connect error")
+	assert.False(t, a.IsConnected())
 }
 
 func TestReconnect(t *testing.T) {
+	// arrange
 	a, _ := initTestAdaptor()
-	require.NoError(t, a.Connect())
-	assert.True(t, a.connected)
+	require.True(t, a.connected)
+	// act & assert
 	require.NoError(t, a.Reconnect())
 	assert.True(t, a.connected)
+	// act & assert
 	require.NoError(t, a.Disconnect())
 	assert.False(t, a.connected)
+	// act & assert
 	require.NoError(t, a.Reconnect())
 	assert.True(t, a.connected)
 }
 
 func TestFinalize(t *testing.T) {
+	// arrange
 	a, rwc := initTestAdaptor()
-	require.NoError(t, a.Connect())
+	// act & assert
 	require.NoError(t, a.Finalize())
-
-	rwc.testAdaptorClose = func() error {
-		return errors.New("close error")
-	}
-
+	assert.False(t, a.IsConnected())
+	// re-arrange error
+	rwc.simulateCloseErr = true
 	a.connected = true
+	// act & assert
 	require.ErrorContains(t, a.Finalize(), "close error")
-}
-
-func TestConnect(t *testing.T) {
-	a, _ := initTestAdaptor()
-	require.NoError(t, a.Connect())
-
-	a.connect = func(string) (io.ReadWriteCloser, error) {
-		return nil, errors.New("connect error")
-	}
-
-	require.ErrorContains(t, a.Connect(), "connect error")
 }

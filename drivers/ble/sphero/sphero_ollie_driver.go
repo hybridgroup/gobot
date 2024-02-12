@@ -8,7 +8,7 @@ import (
 
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/ble"
-	"gobot.io/x/gobot/v2/drivers/common/sphero"
+	"gobot.io/x/gobot/v2/drivers/common/spherocommon"
 )
 
 // MotorModes is used to configure the motor
@@ -63,14 +63,14 @@ type Point2D struct {
 type OllieDriver struct {
 	*ble.Driver
 	gobot.Eventer
-	defaultCollisionConfig sphero.CollisionConfig
+	defaultCollisionConfig spherocommon.CollisionConfig
 	seq                    uint8
 	collisionResponse      []uint8
 	packetChannel          chan *packet
 	asyncBuffer            []byte
 	asyncMessage           []byte
 	locatorCallback        func(p Point2D)
-	powerstateCallback     func(p sphero.PowerStatePacket)
+	powerstateCallback     func(p spherocommon.PowerStatePacket)
 }
 
 // NewOllieDriver creates a driver for a Sphero Ollie
@@ -80,7 +80,7 @@ func NewOllieDriver(a gobot.BLEConnector, opts ...ble.OptionApplier) *OllieDrive
 
 func newOllieBaseDriver(
 	a gobot.BLEConnector, name string,
-	dcc sphero.CollisionConfig, opts ...ble.OptionApplier,
+	dcc spherocommon.CollisionConfig, opts ...ble.OptionApplier,
 ) *OllieDriver {
 	d := &OllieDriver{
 		defaultCollisionConfig: dcc,
@@ -89,8 +89,8 @@ func newOllieBaseDriver(
 	}
 	d.Driver = ble.NewDriver(a, name, d.initialize, d.shutdown, opts...)
 
-	d.AddEvent(sphero.ErrorEvent)
-	d.AddEvent(sphero.CollisionEvent)
+	d.AddEvent(spherocommon.ErrorEvent)
+	d.AddEvent(spherocommon.CollisionEvent)
 
 	return d
 }
@@ -118,7 +118,7 @@ func (d *OllieDriver) Wake() error {
 }
 
 // ConfigureCollisionDetection configures the sensitivity of the detection.
-func (d *OllieDriver) ConfigureCollisionDetection(cc sphero.CollisionConfig) {
+func (d *OllieDriver) ConfigureCollisionDetection(cc spherocommon.CollisionConfig) {
 	d.sendCraftPacket([]uint8{cc.Method, cc.Xt, cc.Yt, cc.Xs, cc.Ys, cc.Dead}, 0x02, 0x12)
 }
 
@@ -130,7 +130,7 @@ func (d *OllieDriver) GetLocatorData(f func(p Point2D)) {
 }
 
 // GetPowerState calls the passed function with the Power State information from the sphero
-func (d *OllieDriver) GetPowerState(f func(p sphero.PowerStatePacket)) {
+func (d *OllieDriver) GetPowerState(f func(p spherocommon.PowerStatePacket)) {
 	// CID 0x20 is the code for the power state
 	d.sendCraftPacket([]uint8{}, 0x00, 0x20)
 	d.powerstateCallback = f
@@ -194,7 +194,7 @@ func (d *OllieDriver) Sleep() {
 }
 
 // SetDataStreamingConfig passes the config to the sphero to stream sensor data
-func (d *OllieDriver) SetDataStreamingConfig(dsc sphero.DataStreamingConfig) error {
+func (d *OllieDriver) SetDataStreamingConfig(dsc spherocommon.DataStreamingConfig) error {
 	buf := new(bytes.Buffer)
 	if err := binary.Write(buf, binary.BigEndian, dsc); err != nil {
 		return err
@@ -225,7 +225,7 @@ func (d *OllieDriver) initialize() error {
 			packet := <-d.packetChannel
 			err := d.writeCommand(packet)
 			if err != nil {
-				d.Publish(d.Event(sphero.ErrorEvent), err)
+				d.Publish(d.Event(spherocommon.ErrorEvent), err)
 			}
 		}
 	}()
@@ -331,13 +331,13 @@ func (d *OllieDriver) handleDataStreaming(data []byte) {
 
 	// data packet is the same as for the normal sphero, since the same communication api is used
 	// only difference in communication is that the "newer" spheros use BLE for communications
-	var dataPacket sphero.DataStreamingPacket
+	var dataPacket spherocommon.DataStreamingPacket
 	buffer := bytes.NewBuffer(data[5:]) // skip header
 	if err := binary.Read(buffer, binary.BigEndian, &dataPacket); err != nil {
 		panic(err)
 	}
 
-	d.Publish(sphero.SensorDataEvent, dataPacket)
+	d.Publish(spherocommon.SensorDataEvent, dataPacket)
 }
 
 func (d *OllieDriver) handleLocatorDetected(data []uint8) {
@@ -368,7 +368,7 @@ func (d *OllieDriver) handleLocatorDetected(data []uint8) {
 }
 
 func (d *OllieDriver) handlePowerStateDetected(data []uint8) {
-	var dataPacket sphero.PowerStatePacket
+	var dataPacket spherocommon.PowerStatePacket
 	buffer := bytes.NewBuffer(data[5:]) // skip header
 	if err := binary.Read(buffer, binary.BigEndian, &dataPacket); err != nil {
 		panic(err)
@@ -404,18 +404,18 @@ func (d *OllieDriver) handleCollisionDetected(data []uint8) {
 	// confirm checksum
 	size := len(d.collisionResponse)
 	chk := d.collisionResponse[size-1] // last byte is checksum
-	if chk != sphero.CalculateChecksum(d.collisionResponse[2:size-1]) {
+	if chk != spherocommon.CalculateChecksum(d.collisionResponse[2:size-1]) {
 		return
 	}
 
-	var collision sphero.CollisionPacket
+	var collision spherocommon.CollisionPacket
 	buffer := bytes.NewBuffer(d.collisionResponse[5:]) // skip header
 	if err := binary.Read(buffer, binary.BigEndian, &collision); err != nil {
 		panic(err)
 	}
 	d.collisionResponse = nil // clear the current response
 
-	d.Publish(sphero.CollisionEvent, collision)
+	d.Publish(spherocommon.CollisionEvent, collision)
 }
 
 func (d *OllieDriver) sendCraftPacket(body []uint8, did byte, cid byte) {
@@ -430,15 +430,15 @@ func (d *OllieDriver) craftPacket(body []uint8, did byte, cid byte) *packet {
 	packet := &packet{
 		body:     body,
 		header:   hdr,
-		checksum: sphero.CalculateChecksum(buf[2:]),
+		checksum: spherocommon.CalculateChecksum(buf[2:]),
 	}
 
 	return packet
 }
 
 // ollieDefaultCollisionConfig returns a CollisionConfig with sensible collision defaults
-func ollieDefaultCollisionConfig() sphero.CollisionConfig {
-	return sphero.CollisionConfig{
+func ollieDefaultCollisionConfig() spherocommon.CollisionConfig {
+	return spherocommon.CollisionConfig{
 		Method: 0x01,
 		Xt:     0x20,
 		Yt:     0x20,
