@@ -14,3 +14,4 @@ Gobot has a extensible system for connecting to hardware devices. The following 
 
 - Sphero: Sphero
 - Neurosky: MindWave
+- MegaPi: MotorDriver
