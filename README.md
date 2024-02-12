@@ -391,6 +391,7 @@ the `gobot/drivers/serial` package:
 - [UART](https://en.wikipedia.org/wiki/Serial_port) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/serial)
   - Sphero: Sphero
   - Neurosky: MindWave
+  - MegaPi: MotorDriver
 
 Support for devices that use Serial Peripheral Interface (SPI) have
 a shared set of drivers provided using the `gobot/drivers/spi` package:

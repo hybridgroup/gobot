@@ -21,7 +21,6 @@ type Adaptor struct {
 	cfg  *configuration
 
 	sp          io.ReadWriteCloser
-	connected   bool
 	connectFunc func(string, int) (io.ReadWriteCloser, error)
 }
 
@@ -70,7 +69,7 @@ func (a *Adaptor) SetName(n string) {
 
 // Connect initiates a connection to the serial port.
 func (a *Adaptor) Connect() error {
-	if a.connected {
+	if a.sp != nil {
 		return fmt.Errorf("serial port is already connected, try reconnect or run disconnect first")
 	}
 
@@ -80,7 +79,6 @@ func (a *Adaptor) Connect() error {
 	}
 
 	a.sp = sp
-	a.connected = true
 	return nil
 }
 
@@ -91,11 +89,11 @@ func (a *Adaptor) Finalize() error {
 
 // Disconnect terminates the connection to the port.
 func (a *Adaptor) Disconnect() error {
-	if a.connected {
+	if a.sp != nil {
 		if err := a.sp.Close(); err != nil {
 			return err
 		}
-		a.connected = false
+		a.sp = nil
 	}
 	return nil
 }
@@ -103,7 +101,7 @@ func (a *Adaptor) Disconnect() error {
 // Reconnect attempts to reconnect to the port. If the port is connected it will first close
 // that connection and then establish a new connection.
 func (a *Adaptor) Reconnect() error {
-	if a.connected {
+	if a.sp != nil {
 		if err := a.Disconnect(); err != nil {
 			return err
 		}
@@ -116,7 +114,7 @@ func (a *Adaptor) Port() string { return a.port }
 
 // IsConnected returns the connection state
 func (a *Adaptor) IsConnected() bool {
-	return a.connected
+	return a.sp != nil
 }
 
 // SerialRead reads from the port to the given reference
