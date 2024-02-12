@@ -10,12 +10,13 @@ import (
 	"fmt"
 
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/platforms/neurosky"
+	"gobot.io/x/gobot/v2/drivers/serial/neurosky"
+	"gobot.io/x/gobot/v2/platforms/serialport"
 )
 
 func main() {
-	adaptor := neurosky.NewAdaptor("/dev/rfcomm0")
-	neuro := neurosky.NewDriver(adaptor)
+	adaptor := serialport.NewAdaptor("/dev/rfcomm0", serialport.WithName("Neurosky"), serialport.WithBaudRate(57600))
+	neuro := neurosky.NewMindWaveDriver(adaptor)
 
 	work := func() {
 		_ = neuro.On(neuro.Event("extended"), func(data interface{}) {
@@ -37,7 +38,7 @@ func main() {
 			fmt.Println("Wave", data)
 		})
 		_ = neuro.On(neuro.Event("eeg"), func(data interface{}) {
-			eeg := data.(neurosky.EEGData)
+			eeg := data.(neurosky.MindWaveEEGData)
 			fmt.Println("Delta", eeg.Delta)
 			fmt.Println("Theta", eeg.Theta)
 			fmt.Println("LoAlpha", eeg.LoAlpha)

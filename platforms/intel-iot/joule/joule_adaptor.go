@@ -62,10 +62,10 @@ func NewAdaptor(opts ...interface{}) *Adaptor {
 	return a
 }
 
-// Name returns the Adaptors name
+// Name returns the adaptors name
 func (a *Adaptor) Name() string { return a.name }
 
-// SetName sets the Adaptors name
+// SetName sets the adaptors name
 func (a *Adaptor) SetName(n string) { a.name = n }
 
 // Connect create new connection to board and pins.

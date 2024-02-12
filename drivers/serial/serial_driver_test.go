@@ -9,24 +9,25 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/serial/testutil"
 )
 
-var _ gobot.Driver = (*driver)(nil)
+var _ gobot.Driver = (*Driver)(nil)
 
-func initTestDriver() *driver {
-	a := newSerialTestAdaptor()
-	d := newDriver(a, "SERIAL_BASIC")
+func initTestDriver() *Driver {
+	a := testutil.NewSerialTestAdaptor()
+	d := NewDriver(a, "SERIAL_BASIC", nil, nil)
 	return d
 }
 
-func Test_newDriver(t *testing.T) {
+func TestNewDriver(t *testing.T) {
 	// arrange
 	const name = "mybot"
-	a := newSerialTestAdaptor()
+	a := testutil.NewSerialTestAdaptor()
 	// act
-	d := newDriver(a, name)
+	d := NewDriver(a, name, nil, nil)
 	// assert
-	assert.IsType(t, &driver{}, d)
+	assert.IsType(t, &Driver{}, d)
 	assert.NotNil(t, d.driverCfg)
 	assert.True(t, strings.HasPrefix(d.Name(), name))
 	assert.Equal(t, a, d.Connection())
@@ -44,9 +45,9 @@ func Test_newDriverWithName(t *testing.T) {
 		name    = "mybot"
 		newName = "overwrite mybot"
 	)
-	a := newSerialTestAdaptor()
+	a := testutil.NewSerialTestAdaptor()
 	// act
-	d := newDriver(a, name, WithName(newName))
+	d := NewDriver(a, name, nil, nil, WithName(newName))
 	// assert
 	assert.Equal(t, newName, d.Name())
 }

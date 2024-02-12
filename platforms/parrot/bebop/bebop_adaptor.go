@@ -46,10 +46,10 @@ func NewAdaptor() *Adaptor {
 	}
 }
 
-// Name returns the Bebop Adaptors Name
+// Name returns the Bebop adaptors Name
 func (a *Adaptor) Name() string { return a.name }
 
-// SetName sets the Bebop Adaptors Name
+// SetName sets the Bebop adaptors Name
 func (a *Adaptor) SetName(n string) { a.name = n }
 
 // Connect establishes a connection to the ardrone

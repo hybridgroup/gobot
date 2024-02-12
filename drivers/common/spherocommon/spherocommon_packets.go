@@ -1,4 +1,4 @@
-package sphero
+package spherocommon
 
 // LocatorConfig provides configuration for the Location api.
 // https://github.com/orbotix/DeveloperResources/blob/master/docs/Sphero_API_1.50.pdf

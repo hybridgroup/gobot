@@ -8,4 +8,5 @@ Please refer to the main [README.md](https://github.com/hybridgroup/gobot/blob/r
 
 ## How to Use
 
-See documentation for [Sphero](https://github.com/hybridgroup/gobot/blob/master/platforms/sphero/sphero/README.md)
+See documentation for [Sphero](https://github.com/hybridgroup/gobot/blob/master/platforms/sphero/sphero/README.md) or
+[Neurosky MindWave](https://github.com/hybridgroup/gobot/blob/master/platforms/neurosky/README.md).
