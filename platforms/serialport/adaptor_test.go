@@ -117,7 +117,7 @@ func TestConnect(t *testing.T) {
 	// act & assert
 	require.EqualError(t, a.Connect(), "serial port is already connected, try reconnect or run disconnect first")
 	// re-arrange error
-	a.connected = false
+	a.sp = nil
 	a.connectFunc = func(string, int) (io.ReadWriteCloser, error) {
 		return nil, errors.New("connect error")
 	}
@@ -129,16 +129,16 @@ func TestConnect(t *testing.T) {
 func TestReconnect(t *testing.T) {
 	// arrange
 	a, _ := initTestAdaptor()
-	require.True(t, a.connected)
+	require.NotNil(t, a.sp)
 	// act & assert
 	require.NoError(t, a.Reconnect())
-	assert.True(t, a.connected)
+	require.NotNil(t, a.sp)
 	// act & assert
 	require.NoError(t, a.Disconnect())
-	assert.False(t, a.connected)
+	require.Nil(t, a.sp)
 	// act & assert
 	require.NoError(t, a.Reconnect())
-	assert.True(t, a.connected)
+	require.NotNil(t, a.sp)
 }
 
 func TestFinalize(t *testing.T) {
@@ -149,7 +149,7 @@ func TestFinalize(t *testing.T) {
 	assert.False(t, a.IsConnected())
 	// re-arrange error
 	rwc.simulateCloseErr = true
-	a.connected = true
+	require.NoError(t, a.Connect())
 	// act & assert
 	require.ErrorContains(t, a.Finalize(), "close error")
 }

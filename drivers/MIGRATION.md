@@ -115,7 +115,7 @@ import(
 
 ### Neurosky adaptor split off
 
-The Neurosky adaptor now us the generic serial adaptor. The driver part was moved. With this, the imports needs to be
+The Neurosky adaptor now use the generic serial adaptor. The driver part was moved. With this, the imports needs to be
 adjusted. In addition all events now have a suffix "Event", see below.
 
 ```go
@@ -145,6 +145,37 @@ import(
   neuro := neurosky.NewMindWaveDriver(adaptor)
 ...
   _ = neuro.On(neurosky.ExtendedEvent, func(data interface{}) {
+...
+```
+
+### MegaPi adaptor split off
+
+The MegaPi adaptor now use the generic serial adaptor. The driver part was moved. With this, the imports needs to be
+adjusted.
+
+```go
+// old
+import(
+  ...
+  "gobot.io/x/gobot/v2/platforms/megapi"
+  ...
+)
+
+...
+  megaPiAdaptor := megapi.NewAdaptor("/dev/ttyS0")
+  motor := megapi.NewMotorDriver(megaPiAdaptor, 1)
+...
+
+// new
+import(
+  ...
+  "gobot.io/x/gobot/v2/drivers/serial/megapi"
+  "gobot.io/x/gobot/v2/platforms/serialport"
+  ...
+)
+...
+  adaptor := serialport.NewAdaptor("/dev/ttyS0", serialport.WithName("MegaPi"))
+  motor := megapi.NewMotorDriver(adaptor, 1)
 ...
 ```
 
