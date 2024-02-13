@@ -19,7 +19,7 @@ import (
 
 func initTestAPI() *API {
 	log.SetOutput(NullReadWriteCloser{})
-	g := gobot.NewMaster()
+	g := gobot.NewManager()
 	a := NewAPI(g)
 	a.start = func(m *API) {}
 	a.Start()
@@ -38,7 +38,7 @@ func initTestAPI() *API {
 
 func TestStartWithoutDefaults(t *testing.T) {
 	log.SetOutput(NullReadWriteCloser{})
-	g := gobot.NewMaster()
+	g := gobot.NewManager()
 	a := NewAPI(g)
 	a.start = func(m *API) {}
 
@@ -396,13 +396,13 @@ func TestRobotDeviceEvent(t *testing.T) {
 		respc <- resp
 	}()
 
-	event := a.master.Robot("Robot1").
+	event := a.manager.Robot("Robot1").
 		Device("Device1").(gobot.Eventer).
 		Event("TestEvent")
 
 	go func() {
 		time.Sleep(time.Millisecond * 5)
-		a.master.Robot("Robot1").
+		a.manager.Robot("Robot1").
 			Device("Device1").(gobot.Eventer).Publish(event, "event-data")
 	}()
 

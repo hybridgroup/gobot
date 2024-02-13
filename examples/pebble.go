@@ -15,8 +15,8 @@ import (
 )
 
 func main() {
-	master := gobot.NewMaster()
-	api := api.NewAPI(master)
+	manager := gobot.NewManager()
+	api := api.NewAPI(manager)
 	api.Port = "8080"
 	api.Start()
 
@@ -40,9 +40,9 @@ func main() {
 		work,
 	)
 
-	master.AddRobot(robot)
+	manager.AddRobot(robot)
 
-	if err := master.Start(); err != nil {
+	if err := manager.Start(); err != nil {
 		panic(err)
 	}
 }

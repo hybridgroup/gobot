@@ -50,8 +50,8 @@ func NewSwarmBot(port string) *gobot.Robot {
 }
 
 func main() {
-	master := gobot.NewMaster()
-	api.NewAPI(master).Start()
+	manager := gobot.NewManager()
+	api.NewAPI(manager).Start()
 
 	spheros := []string{
 		"/dev/rfcomm0",
@@ -61,10 +61,10 @@ func main() {
 	}
 
 	for _, port := range spheros {
-		master.AddRobot(NewSwarmBot(port))
+		manager.AddRobot(NewSwarmBot(port))
 	}
 
-	if err := master.Start(); err != nil {
+	if err := manager.Start(); err != nil {
 		panic(err)
 	}
 }
