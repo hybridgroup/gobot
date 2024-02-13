@@ -51,7 +51,7 @@ func TestADS1x15CommandsReadDifferenceWithDefaults(t *testing.T) {
 	result := d.Command("ReadDifferenceWithDefaults")(ads1x15TestChannel)
 	// assert
 	assert.Nil(t, result.(map[string]interface{})["err"])
-	assert.Equal(t, -4.096, result.(map[string]interface{})["val"])
+	assert.InDelta(t, -4.096, result.(map[string]interface{})["val"], 0.0)
 }
 
 func TestADS1x15CommandsReadDifference(t *testing.T) {
@@ -61,7 +61,7 @@ func TestADS1x15CommandsReadDifference(t *testing.T) {
 	result := d.Command("ReadDifference")(ads1x15TestChannelGainDataRate)
 	// assert
 	assert.Nil(t, result.(map[string]interface{})["err"])
-	assert.Equal(t, -2.048, result.(map[string]interface{})["val"])
+	assert.InDelta(t, -2.048, result.(map[string]interface{})["val"], 0.0)
 }
 
 func TestADS1x15CommandsReadWithDefaults(t *testing.T) {
@@ -71,7 +71,7 @@ func TestADS1x15CommandsReadWithDefaults(t *testing.T) {
 	result := d.Command("ReadWithDefaults")(ads1x15TestChannel)
 	// assert
 	assert.Nil(t, result.(map[string]interface{})["err"])
-	assert.Equal(t, -4.096, result.(map[string]interface{})["val"])
+	assert.InDelta(t, -4.096, result.(map[string]interface{})["val"], 0.0)
 }
 
 func TestADS1x15CommandsRead(t *testing.T) {
@@ -81,7 +81,7 @@ func TestADS1x15CommandsRead(t *testing.T) {
 	result := d.Command("Read")(ads1x15TestChannelGainDataRate)
 	// assert
 	assert.Nil(t, result.(map[string]interface{})["err"])
-	assert.Equal(t, -2.048, result.(map[string]interface{})["val"])
+	assert.InDelta(t, -2.048, result.(map[string]interface{})["val"], 0.0)
 }
 
 func TestADS1x15CommandsAnalogRead(t *testing.T) {

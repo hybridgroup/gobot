@@ -189,8 +189,8 @@ func (j *Driver) initConfig() error {
 
 func (j *Driver) initEvents() {
 	for _, value := range j.config.Buttons {
-		j.AddEvent(fmt.Sprintf("%s_press", value.Name))
-		j.AddEvent(fmt.Sprintf("%s_release", value.Name))
+		j.AddEvent(fmt.Sprintf("%s_press", value.Name))   //nolint:perfsprint // ok here
+		j.AddEvent(fmt.Sprintf("%s_release", value.Name)) //nolint:perfsprint // ok here
 	}
 	for _, value := range j.config.Axis {
 		j.AddEvent(value.Name)
@@ -214,9 +214,9 @@ func (j *Driver) handleButtons(state js.State) error {
 			}
 
 			if buttonPressed {
-				j.Publish(j.Event(fmt.Sprintf("%s_press", name)), nil)
+				j.Publish(j.Event(fmt.Sprintf("%s_press", name)), nil) //nolint:perfsprint // ok here
 			} else {
-				j.Publish(j.Event(fmt.Sprintf("%s_release", name)), nil)
+				j.Publish(j.Event(fmt.Sprintf("%s_release", name)), nil) //nolint:perfsprint // ok here
 			}
 		}
 	}

@@ -61,7 +61,7 @@ jobs:
 
   "fmt_check_examples":
     docker:
-      - image: golangci/golangci-lint:v1.55.2
+      - image: golangci/golangci-lint:v1.56.1
     steps:
       - checkout
       - run:

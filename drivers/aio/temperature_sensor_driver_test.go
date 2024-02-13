@@ -184,16 +184,17 @@ func TestTemperatureSensorWithSensorCyclicRead_PublishesError(t *testing.T) {
 func TestTemperatureSensorHalt_WithSensorCyclicRead(t *testing.T) {
 	// arrange
 	d := NewTemperatureSensorDriver(newAioTestAdaptor(), "1", WithSensorCyclicRead(10*time.Millisecond))
-	done := make(chan struct{})
 	require.NoError(t, d.Start())
+	errChan := make(chan error, 1)
 	// act & assert
 	go func() {
-		require.NoError(t, d.Halt())
-		close(done)
+		errChan <- d.Halt()
 	}()
+
 	// test that the halt is not blocked by any deadlock with mutex and/or channel
 	select {
-	case <-done:
+	case err := <-errChan:
+		require.NoError(t, err)
 	case <-time.After(100 * time.Millisecond):
 		require.Fail(t, "Temperature Sensor was not halted")
 	}

@@ -99,7 +99,7 @@ func main() {
 
 		case <-ticker.C:
 			printAt(1, 0, "-- Press 'q' to Exit --")
-			printAt(1, 1, fmt.Sprintf("Joystick Name: %s", js.Name()))
+			printAt(1, 1, fmt.Sprintf("Joystick Name: %s", js.Name())) //nolint:perfsprint // ok here
 			printAt(1, 2, fmt.Sprintf("   Axis Count: %d", js.AxisCount()))
 			printAt(1, 3, fmt.Sprintf(" Button Count: %d", js.ButtonCount()))
 			readJoystick(js)
