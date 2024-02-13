@@ -339,7 +339,7 @@ void spi_init(littleWire* lwHandle);
 void spi_sendMessage(littleWire* lwHandle, unsigned char * sendBuffer, unsigned char * inputBuffer, unsigned char length ,unsigned char mode);
 
 /**
-  * Send one byte SPI message over MOSI pin. Slightly slower than the actual one.
+  * Send one byte SPI message over SDO pin. Slightly slower than the actual one.
   * \n There isn't any chip select control involved. Useful for debug console app
   *
   * @param lwHandle littleWire device pointer
@@ -376,7 +376,7 @@ void i2c_init(littleWire* lwHandle);
   * Start the i2c communication
   *
   * @param lwHandle littleWire device pointer
-  * @param address 7 bit slave address.
+  * @param address 7 bit target address.
   * @param direction ( \b READ or \b WRITE )
   * @return 1 if received ACK
   */
