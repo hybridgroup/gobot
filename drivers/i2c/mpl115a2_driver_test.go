@@ -24,7 +24,7 @@ func TestNewMPL115A2Driver(t *testing.T) {
 	var di interface{} = NewMPL115A2Driver(newI2cTestAdaptor())
 	d, ok := di.(*MPL115A2Driver)
 	if !ok {
-		t.Errorf("NewMPL115A2Driver() should have returned a *MPL115A2Driver")
+		require.Fail(t, "NewMPL115A2Driver() should have returned a *MPL115A2Driver")
 	}
 	assert.NotNil(t, d.Connection())
 	assert.True(t, strings.HasPrefix(d.Name(), "MPL115A2"))

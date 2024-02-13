@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNewConfig(t *testing.T) {
@@ -13,7 +14,7 @@ func TestNewConfig(t *testing.T) {
 	// assert
 	c, ok := ci.(*i2cConfig)
 	if !ok {
-		t.Errorf("NewConfig() should have returned a *i2cConfig")
+		require.Fail(t, "NewConfig() should have returned a *i2cConfig")
 	}
 	assert.Equal(t, BusNotInitialized, c.bus)
 	assert.Equal(t, AddressNotInitialized, c.address)

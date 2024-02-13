@@ -123,12 +123,12 @@ func Test_handleResponse(t *testing.T) {
 						t.Error("subscription channel is closed")
 					}
 					if ev.Name != tc.wantEvent {
-						t.Errorf("\ngot: %s\nwant: %s\n", ev.Name, tc.wantEvent)
+						require.Fail(t, "\ngot: %s\nwant: %s\n", ev.Name, tc.wantEvent)
 					}
 					got := fmt.Sprintf("%T %+[1]v", ev.Data)
 					want := fmt.Sprintf("%T %+[1]v", tc.wantData)
 					if got != want {
-						t.Errorf("\ngot: %s\nwant: %s\n", got, want)
+						require.Fail(t, "\ngot: %s\nwant: %s\n", got, want)
 					}
 				case <-time.After(time.Millisecond):
 					t.Error("subscription channel seems empty")

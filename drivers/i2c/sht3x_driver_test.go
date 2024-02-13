@@ -28,7 +28,7 @@ func TestNewSHT3xDriver(t *testing.T) {
 	var di interface{} = NewSHT3xDriver(newI2cTestAdaptor())
 	d, ok := di.(*SHT3xDriver)
 	if !ok {
-		t.Errorf("NewSHT3xDriver() should have returned a *SHT3xDriver")
+		require.Fail(t, "NewSHT3xDriver() should have returned a *SHT3xDriver")
 	}
 	assert.NotNil(t, d.Driver)
 	assert.True(t, strings.HasPrefix(d.Name(), "SHT3x"))

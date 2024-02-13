@@ -56,6 +56,6 @@ func TestButtonReadData(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(100 * time.Millisecond):
-		t.Errorf("Microbit Event \"ButtonB\" was not published")
+		require.Fail(t, "Microbit Event \"ButtonB\" was not published")
 	}
 }

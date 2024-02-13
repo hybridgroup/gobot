@@ -153,7 +153,7 @@ func TestGroveDriverHalt_WithSensorCyclicRead(t *testing.T) {
 		time.Sleep(20 * time.Millisecond)
 		// note: if a reading is already in progress, it will be finished before halt have an impact
 		if atomic.LoadInt32(&callCount) > lastCallCount+1 {
-			t.Errorf("AnalogRead was called more than once after driver was halted")
+			require.Fail(t, "AnalogRead was called more than once after driver was halted")
 		}
 	}
 }
@@ -188,7 +188,7 @@ func TestGroveDriverWithSensorCyclicReadPublishesError(t *testing.T) {
 		select {
 		case <-sem:
 		case <-time.After(time.Second):
-			t.Errorf("%s Event \"Error\" was not published", groveGetType(driver))
+			require.Fail(t, "%s Event \"Error\" was not published", groveGetType(driver))
 		}
 
 		// Cleanup

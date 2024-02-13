@@ -42,7 +42,7 @@ func TestNewGrovePiDriver(t *testing.T) {
 	var di interface{} = NewGrovePiDriver(newI2cTestAdaptor())
 	d, ok := di.(*GrovePiDriver)
 	if !ok {
-		t.Errorf("NewGrovePiDriver() should have returned a *GrovePiDriver")
+		require.Fail(t, "NewGrovePiDriver() should have returned a *GrovePiDriver")
 	}
 	assert.NotNil(t, d.Driver)
 	assert.True(t, strings.HasPrefix(d.Name(), "GrovePi"))
@@ -165,7 +165,7 @@ func TestGrovePiSomeRead(t *testing.T) {
 			case strings.Contains(name, "DHTRead"):
 				gotF1, gotF2, err = g.DHTRead(strconv.Itoa(tc.usedPin), 1, 2)
 			default:
-				t.Errorf("unknown command %s", name)
+				require.Fail(t, "unknown command %s", name)
 				return
 			}
 			// assert
@@ -218,7 +218,7 @@ func TestGrovePiSomeWrite(t *testing.T) {
 			case "AnalogWrite":
 				err = g.AnalogWrite(strconv.Itoa(tc.usedPin), tc.usedValue)
 			default:
-				t.Errorf("unknown command %s", name)
+				require.Fail(t, "unknown command %s", name)
 				return
 			}
 			// assert
