@@ -65,6 +65,6 @@ Example:
 	}
 
 For further information refer to mavlink README:
-https://github.com/hybridgroup/gobot/blob/master/platforms/mavlink/README.md
+https://github.com/hybridgroup/gobot/blob/release/platforms/mavlink/README.md
 */
 package mavlink // import "gobot.io/x/gobot/v2/platforms/mavlink"

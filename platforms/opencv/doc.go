@@ -40,6 +40,6 @@ Example:
 	}
 
 For further information refer to opencv README:
-https://github.com/hybridgroup/gobot/blob/master/platforms/opencv/README.md
+https://github.com/hybridgroup/gobot/blob/release/platforms/opencv/README.md
 */
 package opencv // import "gobot.io/x/gobot/v2/platforms/opencv"

@@ -55,6 +55,6 @@ your computer IP, robot name is 'pebble' and robot api port is 8080
 	}
 
 For more information refer to the pebble README:
-https://github.com/hybridgroup/gobot/blob/master/platforms/pebble/README.md
+https://github.com/hybridgroup/gobot/blob/release/platforms/pebble/README.md
 */
 package pebble // import "gobot.io/x/gobot/v2/platforms/pebble"
