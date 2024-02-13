@@ -1183,7 +1183,7 @@
 
 ### core
 
-* Add Running() methods for Master and Robot and increase test coverage accordingly
+* Add Running() methods for Manager and Robot and increase test coverage accordingly
 
 ### sysfs
 
@@ -1647,9 +1647,9 @@
 ### core
 
 * Refactoring to allow 'Metal' development using Gobot packages
-* Able to run robots without being part of a Master.
+* Able to run robots without being part of a Manager.
 * Now running all work in separate goroutines
-* Rename internal name of Master type
+* Rename internal name of Manager type
 * Refactor events to use channels all the way down.
 * Eliminate potential race conditions from Events and Every functions
 * Add Unsubscribe() to Eventer, now Once() works as expected
@@ -1657,7 +1657,7 @@
 * Ranges over event channels instead of using select
 * No longer return non-standard slices of errors, instead use hashicorp/go-multierror
 * Ensure that all drivers have default names
-* Now both Robot and Master operate using AutoRun as expected
+* Now both Robot and Manager operate using AutoRun as expected
 * Use canonical import domain of gobot.io for all code
 * Use time.Sleep unless waiting for a timeout in a select
 * Uses time.NewTimer() instead of time.After() to be more efficient
@@ -2456,7 +2456,7 @@
 * Replaced ginkgo/gomega with system testing package
 * Refactor gobot/robot/device commands
 * Added Event type
-* Replaced Master type with Gobot type
+* Replaced Manager type with Gobot type
 * Every` and `After` now accept `time.Duration`
 * Removed reflection helper methods
 
@@ -2580,7 +2580,7 @@
 * Finalize on SIGINT
 * Publish function for driver events
 * device test coverage
-* master and robot test coverage
+* manager and robot test coverage
 
 ### Clean
 
@@ -2600,7 +2600,7 @@
 
 ### Refactor
 
-* robot and master
+* robot and manager
 
 ### Remove
 
@@ -2636,8 +2636,8 @@
 * Travis banner to README
 * api commands
 * POST command
-* master example
-* robot master
+* manager example
+* robot manager
 * Sphero example
 * Digispark to list of supported platforms
 * helper functions
@@ -2737,11 +2737,11 @@
 
 ### Rename
 
-* Gobot struct to Master
+* Gobot struct to Manager
 
 ### Set
 
-* GOMAXPROCS property in GobotMaster
+* GOMAXPROCS property in GobotManager
 
 ### Skeleton
 

@@ -17,8 +17,8 @@ import (
 )
 
 func main() {
-	master := gobot.NewMaster()
-	a := api.NewAPI(master)
+	manager := gobot.NewManager()
+	a := api.NewAPI(manager)
 	a.Start()
 
 	board := edison.NewAdaptor()
@@ -103,9 +103,9 @@ func main() {
 		return enabled
 	})
 
-	master.AddRobot(robot)
+	manager.AddRobot(robot)
 
-	if err := master.Start(); err != nil {
+	if err := manager.Start(); err != nil {
 		panic(err)
 	}
 }

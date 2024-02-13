@@ -25,7 +25,7 @@ type conway struct {
 }
 
 func main() {
-	master := gobot.NewMaster()
+	manager := gobot.NewManager()
 
 	spheros := []string{
 		"/dev/rfcomm0",
@@ -67,10 +67,10 @@ func main() {
 			work,
 		)
 
-		master.AddRobot(robot)
+		manager.AddRobot(robot)
 	}
 
-	if err := master.Start(); err != nil {
+	if err := manager.Start(); err != nil {
 		panic(err)
 	}
 }

@@ -13,9 +13,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func initTestMaster() *Master {
+func initTestManager() *Manager {
 	log.SetOutput(&NullReadWriteCloser{})
-	g := NewMaster()
+	g := NewManager()
 	g.trap = func(c chan os.Signal) {
 		c <- os.Interrupt
 	}
@@ -25,9 +25,9 @@ func initTestMaster() *Master {
 	return g
 }
 
-func initTestMaster1Robot() *Master {
+func initTestManager1Robot() *Manager {
 	log.SetOutput(&NullReadWriteCloser{})
-	g := NewMaster()
+	g := NewManager()
 	g.trap = func(c chan os.Signal) {
 		c <- os.Interrupt
 	}
@@ -45,8 +45,8 @@ func TestNullReadWriteCloser(t *testing.T) {
 	require.NoError(t, n.Close())
 }
 
-func TestMasterRobot(t *testing.T) {
-	g := initTestMaster()
+func TestManagerRobot(t *testing.T) {
+	g := initTestManager()
 	assert.Equal(t, "Robot1", g.Robot("Robot1").Name)
 	assert.Equal(t, (*Robot)(nil), g.Robot("Robot4"))
 	assert.Equal(t, (Device)(nil), g.Robot("Robot4").Device("Device1"))
@@ -58,25 +58,25 @@ func TestMasterRobot(t *testing.T) {
 	assert.Equal(t, 3, g.Robot("Robot1").Connections().Len())
 }
 
-func TestMasterToJSON(t *testing.T) {
-	g := initTestMaster()
+func TestManagerToJSON(t *testing.T) {
+	g := initTestManager()
 	g.AddCommand("test_function", func(params map[string]interface{}) interface{} {
 		return nil
 	})
-	json := NewJSONMaster(g)
+	json := NewJSONManager(g)
 	assert.Len(t, json.Robots, g.Robots().Len())
 	assert.Len(t, json.Commands, len(g.Commands()))
 }
 
-func TestMasterStart(t *testing.T) {
-	g := initTestMaster()
+func TestManagerStart(t *testing.T) {
+	g := initTestManager()
 	require.NoError(t, g.Start())
 	require.NoError(t, g.Stop())
 	assert.False(t, g.Running())
 }
 
-func TestMasterStartAutoRun(t *testing.T) {
-	g := NewMaster()
+func TestManagerStartAutoRun(t *testing.T) {
+	g := NewManager()
 	g.AddRobot(newTestRobot("Robot99"))
 	go func() { _ = g.Start() }()
 	time.Sleep(10 * time.Millisecond)
@@ -87,8 +87,8 @@ func TestMasterStartAutoRun(t *testing.T) {
 	assert.False(t, g.Running())
 }
 
-func TestMasterStartDriverErrors(t *testing.T) {
-	g := initTestMaster1Robot()
+func TestManagerStartDriverErrors(t *testing.T) {
+	g := initTestManager1Robot()
 	e := errors.New("driver start error 1")
 	testDriverStart = func() error {
 		return e
@@ -105,8 +105,8 @@ func TestMasterStartDriverErrors(t *testing.T) {
 	testDriverStart = func() error { return nil }
 }
 
-func TestMasterHaltFromRobotDriverErrors(t *testing.T) {
-	g := initTestMaster1Robot()
+func TestManagerHaltFromRobotDriverErrors(t *testing.T) {
+	g := initTestManager1Robot()
 	var ec int
 	testDriverHalt = func() error {
 		ec++
@@ -123,8 +123,8 @@ func TestMasterHaltFromRobotDriverErrors(t *testing.T) {
 	assert.Equal(t, want, g.Start())
 }
 
-func TestMasterStartRobotAdaptorErrors(t *testing.T) {
-	g := initTestMaster1Robot()
+func TestManagerStartRobotAdaptorErrors(t *testing.T) {
+	g := initTestManager1Robot()
 	var ec int
 	testAdaptorConnect = func() error {
 		ec++
@@ -144,8 +144,8 @@ func TestMasterStartRobotAdaptorErrors(t *testing.T) {
 	testAdaptorConnect = func() error { return nil }
 }
 
-func TestMasterFinalizeErrors(t *testing.T) {
-	g := initTestMaster1Robot()
+func TestManagerFinalizeErrors(t *testing.T) {
+	g := initTestManager1Robot()
 	var ec int
 	testAdaptorFinalize = func() error {
 		ec++

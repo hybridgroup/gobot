@@ -15,9 +15,9 @@ import (
 )
 
 func main() {
-	master := gobot.NewMaster()
+	manager := gobot.NewManager()
 
-	a := api.NewAPI(master)
+	a := api.NewAPI(manager)
 
 	// creates routes/handlers for the custom API
 	a.Get("/", func(res http.ResponseWriter, req *http.Request) {
@@ -26,7 +26,7 @@ func main() {
 		}
 	})
 	a.Get("/api/hello", func(res http.ResponseWriter, req *http.Request) {
-		msg := fmt.Sprintf("This command is attached to the robot %v", master.Robot("hello").Name)
+		msg := fmt.Sprintf("This command is attached to the robot %v", manager.Robot("hello").Name)
 		if _, err := res.Write([]byte(msg)); err != nil {
 			fmt.Println(err)
 		}
@@ -35,9 +35,9 @@ func main() {
 	// starts the API without the default C2PIO API and Robeaux web interface.
 	a.StartWithoutDefaults()
 
-	master.AddRobot(gobot.NewRobot("hello"))
+	manager.AddRobot(gobot.NewRobot("hello"))
 
-	if err := master.Start(); err != nil {
+	if err := manager.Start(); err != nil {
 		panic(err)
 	}
 }

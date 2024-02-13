@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	master := gobot.NewMaster()
+	manager := gobot.NewManager()
 
 	spheros := map[string]string{
 		"Sphero-BPO": "/dev/rfcomm0",
@@ -35,13 +35,13 @@ func main() {
 			work,
 		)
 
-		master.AddRobot(robot)
+		manager.AddRobot(robot)
 	}
 
 	robot := gobot.NewRobot("",
 		func() {
 			gobot.Every(1*time.Second, func() {
-				sphero := master.Robot("Sphero-BPO").Device("sphero").(*sphero.SpheroDriver)
+				sphero := manager.Robot("Sphero-BPO").Device("sphero").(*sphero.SpheroDriver)
 				sphero.SetRGB(uint8(gobot.Rand(255)),
 					uint8(gobot.Rand(255)),
 					uint8(gobot.Rand(255)),
@@ -50,9 +50,9 @@ func main() {
 		},
 	)
 
-	master.AddRobot(robot)
+	manager.AddRobot(robot)
 
-	if err := master.Start(); err != nil {
+	if err := manager.Start(); err != nil {
 		panic(err)
 	}
 }

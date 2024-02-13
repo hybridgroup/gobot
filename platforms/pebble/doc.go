@@ -24,8 +24,8 @@ your computer IP, robot name is 'pebble' and robot api port is 8080
 	)
 
 	func main() {
-		master := gobot.NewMaster()
-		api.NewAPI(master).Start()
+		manager := gobot.NewManager()
+		api.NewAPI(manager).Start()
 
 		pebbleAdaptor := pebble.NewAdaptor()
 		watch := pebble.NewDriver(pebbleAdaptor)
@@ -47,9 +47,9 @@ your computer IP, robot name is 'pebble' and robot api port is 8080
 			work,
 		)
 
-		master.AddRobot(robot)
+		manager.AddRobot(robot)
 
-		if err := master.Start(); err != nil {
+		if err := manager.Start(); err != nil {
 		panic(err)
 	}
 	}

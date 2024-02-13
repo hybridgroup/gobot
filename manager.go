@@ -6,15 +6,15 @@ import (
 	"sync/atomic"
 )
 
-// JSONMaster is a JSON representation of a Gobot Master.
-type JSONMaster struct {
+// JSONManager is a JSON representation of a Gobot Manager.
+type JSONManager struct {
 	Robots   []*JSONRobot `json:"robots"`
 	Commands []string     `json:"commands"`
 }
 
-// NewJSONMaster returns a JSONMaster given a Gobot Master.
-func NewJSONMaster(gobot *Master) *JSONMaster {
-	jsonGobot := &JSONMaster{
+// NewJSONManager returns a JSONManager given a Gobot Manager.
+func NewJSONManager(gobot *Manager) *JSONManager {
+	jsonGobot := &JSONManager{
 		Robots:   []*JSONRobot{},
 		Commands: []string{},
 	}
@@ -29,9 +29,9 @@ func NewJSONMaster(gobot *Master) *JSONMaster {
 	return jsonGobot
 }
 
-// Master is the main type of your Gobot application and contains a collection of
-// Robots, API commands that apply to the Master, and Events that apply to the Master.
-type Master struct {
+// Manager is the main type of your Gobot application and contains a collection of
+// Robots, API commands that apply to the Manager, and Events that apply to the Manager.
+type Manager struct {
 	robots  *Robots
 	trap    func(chan os.Signal)
 	AutoRun bool
@@ -40,9 +40,9 @@ type Master struct {
 	Eventer
 }
 
-// NewMaster returns a new Gobot Master
-func NewMaster() *Master {
-	m := &Master{
+// NewManager returns a new Gobot Manager
+func NewManager() *Manager {
+	m := &Manager{
 		robots: &Robots{},
 		trap: func(c chan os.Signal) {
 			signal.Notify(c, os.Interrupt)
@@ -58,7 +58,7 @@ func NewMaster() *Master {
 // Start calls the Start method on each robot in its collection of robots. On
 // error, call Stop to ensure that all robots are returned to a sane, stopped
 // state.
-func (g *Master) Start() error {
+func (g *Manager) Start() error {
 	if err := g.robots.Start(!g.AutoRun); err != nil {
 		return err
 	}
@@ -80,31 +80,31 @@ func (g *Master) Start() error {
 }
 
 // Stop calls the Stop method on each robot in its collection of robots.
-func (g *Master) Stop() error {
+func (g *Manager) Stop() error {
 	err := g.robots.Stop()
 	g.running.Store(false)
 	return err
 }
 
-// Running returns if the Master is currently started or not
-func (g *Master) Running() bool {
+// Running returns if the Manager is currently started or not
+func (g *Manager) Running() bool {
 	return g.running.Load().(bool) //nolint:forcetypeassert // no error return value, so there is no better way
 }
 
-// Robots returns all robots associated with this Gobot Master.
-func (g *Master) Robots() *Robots {
+// Robots returns all robots associated with this Gobot Manager.
+func (g *Manager) Robots() *Robots {
 	return g.robots
 }
 
 // AddRobot adds a new robot to the internal collection of robots. Returns the
 // added robot
-func (g *Master) AddRobot(r *Robot) *Robot {
+func (g *Manager) AddRobot(r *Robot) *Robot {
 	*g.robots = append(*g.robots, r)
 	return r
 }
 
 // Robot returns a robot given name. Returns nil if the Robot does not exist.
-func (g *Master) Robot(name string) *Robot {
+func (g *Manager) Robot(name string) *Robot {
 	for _, robot := range *g.Robots() {
 		if robot.Name == name {
 			return robot

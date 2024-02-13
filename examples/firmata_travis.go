@@ -88,16 +88,16 @@ func checkTravis(robot *gobot.Robot) {
 }
 
 func main() {
-	master := gobot.NewMaster()
+	manager := gobot.NewManager()
 	firmataAdaptor := firmata.NewAdaptor(os.Args[1])
 	red := gpio.NewLedDriver(firmataAdaptor, "7", gpio.WithName("red"))
 	green := gpio.NewLedDriver(firmataAdaptor, "6", gpio.WithName("green"))
 	blue := gpio.NewLedDriver(firmataAdaptor, "5", gpio.WithName("blue"))
 
 	work := func() {
-		checkTravis(master.Robot("travis"))
+		checkTravis(manager.Robot("travis"))
 		gobot.Every(10*time.Second, func() {
-			checkTravis(master.Robot("travis"))
+			checkTravis(manager.Robot("travis"))
 		})
 	}
 
@@ -107,8 +107,8 @@ func main() {
 		work,
 	)
 
-	master.AddRobot(robot)
-	if err := master.Start(); err != nil {
+	manager.AddRobot(robot)
+	if err := manager.Start(); err != nil {
 		panic(err)
 	}
 }

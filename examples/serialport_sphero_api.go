@@ -14,8 +14,8 @@ import (
 )
 
 func main() {
-	master := gobot.NewMaster()
-	api.NewAPI(master).Start()
+	manager := gobot.NewManager()
+	api.NewAPI(manager).Start()
 
 	spheros := map[string]string{
 		"Sphero-BPO": "/dev/rfcomm0",
@@ -39,10 +39,10 @@ func main() {
 			return nil
 		})
 
-		master.AddRobot(robot)
+		manager.AddRobot(robot)
 	}
 
-	if err := master.Start(); err != nil {
+	if err := manager.Start(); err != nil {
 		panic(err)
 	}
 }

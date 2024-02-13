@@ -53,15 +53,15 @@ func NewSwarmBot(port string) *gobot.Robot {
 }
 
 func main() {
-	master := gobot.NewMaster()
-	api.NewAPI(master).Start()
+	manager := gobot.NewManager()
+	api.NewAPI(manager).Start()
 
 	for _, port := range os.Args[1:] {
 		bot := NewSwarmBot(port)
-		master.AddRobot(bot)
+		manager.AddRobot(bot)
 	}
 
-	if err := master.Start(); err != nil {
+	if err := manager.Start(); err != nil {
 		panic(err)
 	}
 }
