@@ -39,7 +39,7 @@ func TestNewTSL2561Driver(t *testing.T) {
 	var di interface{} = NewTSL2561Driver(newI2cTestAdaptor())
 	d, ok := di.(*TSL2561Driver)
 	if !ok {
-		t.Errorf("NewTSL2561Driver() should have returned a *TSL2561Driver")
+		require.Fail(t, "NewTSL2561Driver() should have returned a *TSL2561Driver")
 	}
 	assert.NotNil(t, d.Driver)
 	assert.True(t, strings.HasPrefix(d.Name(), "TSL2561"))

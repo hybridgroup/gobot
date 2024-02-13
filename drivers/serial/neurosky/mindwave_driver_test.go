@@ -56,7 +56,7 @@ func TestNeuroskyDriverStart(t *testing.T) {
 	case <-sem:
 	case <-time.After(100 * time.Millisecond):
 		{
-			t.Errorf("error was not emitted")
+			require.Fail(t, "error was not emitted")
 		}
 
 	}
@@ -84,7 +84,7 @@ func TestNeuroskyDriverParse(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(100 * time.Millisecond):
-		t.Errorf("Event \"extended\" was not published")
+		require.Fail(t, "Event \"extended\" was not published")
 	}
 
 	// mindWaveCodeSignalQuality

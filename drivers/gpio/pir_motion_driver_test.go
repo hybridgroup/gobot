@@ -104,7 +104,7 @@ func TestPIRMotionStart(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(motionTestDelay * time.Millisecond):
-		t.Errorf("PIRMotionDriver Event \"MotionDetected\" was not published")
+		require.Fail(t, "PIRMotionDriver Event \"MotionDetected\" was not published")
 	}
 
 	_ = d.Once(MotionStopped, func(data interface{}) {
@@ -116,7 +116,7 @@ func TestPIRMotionStart(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(motionTestDelay * time.Millisecond):
-		t.Errorf("PIRMotionDriver Event \"MotionStopped\" was not published")
+		require.Fail(t, "PIRMotionDriver Event \"MotionStopped\" was not published")
 	}
 
 	_ = d.Once(Error, func(data interface{}) {
@@ -126,7 +126,7 @@ func TestPIRMotionStart(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(motionTestDelay * time.Millisecond):
-		t.Errorf("PIRMotionDriver Event \"Error\" was not published")
+		require.Fail(t, "PIRMotionDriver Event \"Error\" was not published")
 	}
 
 	_ = d.Once(MotionDetected, func(data interface{}) {
@@ -138,7 +138,7 @@ func TestPIRMotionStart(t *testing.T) {
 
 	select {
 	case <-sem:
-		t.Errorf("PIRMotion Event \"MotionDetected\" should not published")
+		require.Fail(t, "PIRMotion Event \"MotionDetected\" should not published")
 	case <-time.After(motionTestDelay * time.Millisecond):
 	}
 }

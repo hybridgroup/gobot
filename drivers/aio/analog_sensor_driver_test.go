@@ -193,7 +193,7 @@ func TestAnalogSensor_WithSensorCyclicRead(t *testing.T) {
 	select {
 	case <-semDone:
 	case <-time.After(readTimeout):
-		t.Errorf("AnalogSensor Event \"Data\" was not published")
+		require.Fail(t, "AnalogSensor Event \"Data\" was not published")
 	}
 
 	// arrange: for error to be received
@@ -206,7 +206,7 @@ func TestAnalogSensor_WithSensorCyclicRead(t *testing.T) {
 	select {
 	case <-semDone:
 	case <-time.After(readTimeout):
-		t.Errorf("AnalogSensor Event \"Error\" was not published")
+		require.Fail(t, "AnalogSensor Event \"Error\" was not published")
 	}
 
 	// arrange: for halt message
@@ -224,9 +224,9 @@ func TestAnalogSensor_WithSensorCyclicRead(t *testing.T) {
 	// assert: no event
 	select {
 	case <-semData:
-		t.Errorf("AnalogSensor Event for data should not published")
+		require.Fail(t, "AnalogSensor Event for data should not published")
 	case <-semDone:
-		t.Errorf("AnalogSensor Event for value should not published")
+		require.Fail(t, "AnalogSensor Event for value should not published")
 	case <-time.After(readTimeout):
 	}
 }

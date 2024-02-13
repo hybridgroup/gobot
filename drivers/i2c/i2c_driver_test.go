@@ -30,7 +30,7 @@ func TestNewDriver(t *testing.T) {
 	// assert
 	d, ok := di.(*Driver)
 	if !ok {
-		t.Errorf("NewDriver() should have returned a *Driver")
+		require.Fail(t, "NewDriver() should have returned a *Driver")
 	}
 	assert.Contains(t, d.name, "I2C_BASIC")
 	assert.Equal(t, 0x15, d.defaultAddress)

@@ -25,7 +25,7 @@ func TestNewBMP280Driver(t *testing.T) {
 	var di interface{} = NewBMP280Driver(newI2cTestAdaptor())
 	d, ok := di.(*BMP280Driver)
 	if !ok {
-		t.Errorf("NewBMP280Driver() should have returned a *BMP280Driver")
+		require.Fail(t, "NewBMP280Driver() should have returned a *BMP280Driver")
 	}
 	assert.NotNil(t, d.Driver)
 	assert.True(t, strings.HasPrefix(d.Name(), "BMP280"))

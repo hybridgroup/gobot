@@ -64,6 +64,6 @@ func TestMagnetometerReadData(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(100 * time.Millisecond):
-		t.Errorf("Microbit Event \"Magnetometer\" was not published")
+		require.Fail(t, "Microbit Event \"Magnetometer\" was not published")
 	}
 }

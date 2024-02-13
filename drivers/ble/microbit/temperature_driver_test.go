@@ -61,6 +61,6 @@ func TestTemperatureReadData(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(100 * time.Millisecond):
-		t.Errorf("Microbit Event \"Temperature\" was not published")
+		require.Fail(t, "Microbit Event \"Temperature\" was not published")
 	}
 }

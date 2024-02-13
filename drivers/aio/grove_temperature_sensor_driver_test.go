@@ -116,7 +116,7 @@ func TestGroveTemperatureSensor_publishesTemperatureInCelsius(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(1 * time.Second):
-		t.Errorf("Grove Temperature Sensor Event \"Value\" was not published")
+		require.Fail(t, "Grove Temperature Sensor Event \"Value\" was not published")
 	}
 
 	assert.InDelta(t, 31.61532462352477, d.Temperature(), 0.0)

@@ -31,7 +31,7 @@ func TestNewJHD1313M1Driver(t *testing.T) {
 	var mpl interface{} = NewJHD1313M1Driver(newI2cTestAdaptor())
 	_, ok := mpl.(*JHD1313M1Driver)
 	if !ok {
-		t.Errorf("NewJHD1313M1Driver() should have returned a *JHD1313M1Driver")
+		require.Fail(t, "NewJHD1313M1Driver() should have returned a *JHD1313M1Driver")
 	}
 }
 

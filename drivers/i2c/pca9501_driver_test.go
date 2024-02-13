@@ -48,7 +48,7 @@ func TestNewPCA9501Driver(t *testing.T) {
 	// assert
 	d, ok := di.(*PCA9501Driver)
 	if !ok {
-		t.Errorf("NewPCA9501Driver() should have returned a *PCA9501Driver")
+		require.Fail(t, "NewPCA9501Driver() should have returned a *PCA9501Driver")
 	}
 	assert.NotNil(t, d.Driver)
 	assert.True(t, strings.HasPrefix(d.Name(), "PCA9501"))

@@ -56,7 +56,7 @@ func TestDriverHandleEventDS3(t *testing.T) {
 	tj.buttonCount = 17
 
 	if err := d.initConfig(); err != nil {
-		t.Errorf("initConfig() error: %v", err)
+		require.Fail(t, "initConfig() error: %v", err)
 	}
 
 	d.initEvents()
@@ -73,7 +73,7 @@ func TestDriverHandleEventDS3(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(1 * time.Second):
-		t.Errorf("Button Event \"left_x\" was not published")
+		require.Fail(t, "Button Event \"left_x\" was not published")
 	}
 
 	// square button press
@@ -87,7 +87,7 @@ func TestDriverHandleEventDS3(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(1 * time.Second):
-		t.Errorf("Button Event \"square_press\" was not published")
+		require.Fail(t, "Button Event \"square_press\" was not published")
 	}
 
 	// square button release
@@ -101,7 +101,7 @@ func TestDriverHandleEventDS3(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(1 * time.Second):
-		t.Errorf("Button Event \"square_release\" was not published")
+		require.Fail(t, "Button Event \"square_release\" was not published")
 	}
 }
 
@@ -112,7 +112,7 @@ func TestDriverHandleEventJSONDS3(t *testing.T) {
 	tj.buttonCount = 17
 
 	if err := d.initConfig(); err != nil {
-		t.Errorf("initConfig() error: %v", err)
+		require.Fail(t, "initConfig() error: %v", err)
 	}
 
 	d.initEvents()
@@ -129,7 +129,7 @@ func TestDriverHandleEventJSONDS3(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(1 * time.Second):
-		t.Errorf("Button Event \"left_x\" was not published")
+		require.Fail(t, "Button Event \"left_x\" was not published")
 	}
 
 	// square button press
@@ -143,7 +143,7 @@ func TestDriverHandleEventJSONDS3(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(1 * time.Second):
-		t.Errorf("Button Event \"square_press\" was not published")
+		require.Fail(t, "Button Event \"square_press\" was not published")
 	}
 
 	// square button release
@@ -157,7 +157,7 @@ func TestDriverHandleEventJSONDS3(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(1 * time.Second):
-		t.Errorf("Button Event \"square_release\" was not published")
+		require.Fail(t, "Button Event \"square_release\" was not published")
 	}
 }
 
@@ -168,7 +168,7 @@ func TestDriverHandleEventDS4(t *testing.T) {
 	tj.buttonCount = 17
 
 	if err := d.initConfig(); err != nil {
-		t.Errorf("initConfig() error: %v", err)
+		require.Fail(t, "initConfig() error: %v", err)
 	}
 
 	d.initEvents()
@@ -185,7 +185,7 @@ func TestDriverHandleEventDS4(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(1 * time.Second):
-		t.Errorf("Button Event \"left_x\" was not published")
+		require.Fail(t, "Button Event \"left_x\" was not published")
 	}
 
 	// square button press
@@ -199,7 +199,7 @@ func TestDriverHandleEventDS4(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(1 * time.Second):
-		t.Errorf("Button Event \"square_press\" was not published")
+		require.Fail(t, "Button Event \"square_press\" was not published")
 	}
 
 	// square button release
@@ -213,7 +213,7 @@ func TestDriverHandleEventDS4(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(1 * time.Second):
-		t.Errorf("Button Event \"square_release\" was not published")
+		require.Fail(t, "Button Event \"square_release\" was not published")
 	}
 }
 

@@ -28,7 +28,7 @@ func TestNewMPU6050Driver(t *testing.T) {
 	var di interface{} = NewMPU6050Driver(newI2cTestAdaptor())
 	d, ok := di.(*MPU6050Driver)
 	if !ok {
-		t.Errorf("NewMPU6050Driver() should have returned a *MPU6050Driver")
+		require.Fail(t, "NewMPU6050Driver() should have returned a *MPU6050Driver")
 	}
 	assert.NotNil(t, d.Driver)
 	assert.True(t, strings.HasPrefix(d.name, "MPU6050"))

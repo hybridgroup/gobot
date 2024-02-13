@@ -149,7 +149,7 @@ func TestTemperatureSensorWithSensorCyclicRead_PublishesTemperatureInCelsius(t *
 	select {
 	case <-sem:
 	case <-time.After(1 * time.Second):
-		t.Errorf(" Temperature Sensor Event \"Data\" was not published")
+		require.Fail(t, " Temperature Sensor Event \"Data\" was not published")
 	}
 
 	assert.InDelta(t, 31.61532462352477, d.Value(), 0.0)
@@ -177,7 +177,7 @@ func TestTemperatureSensorWithSensorCyclicRead_PublishesError(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(1 * time.Second):
-		t.Errorf(" Temperature Sensor Event \"Error\" was not published")
+		require.Fail(t, " Temperature Sensor Event \"Error\" was not published")
 	}
 }
 
@@ -195,7 +195,7 @@ func TestTemperatureSensorHalt_WithSensorCyclicRead(t *testing.T) {
 	select {
 	case <-done:
 	case <-time.After(100 * time.Millisecond):
-		t.Errorf("Temperature Sensor was not halted")
+		require.Fail(t, "Temperature Sensor was not halted")
 	}
 }
 

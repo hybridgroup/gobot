@@ -34,7 +34,7 @@ func TestNewLIDARLiteDriver(t *testing.T) {
 	var di interface{} = NewLIDARLiteDriver(newI2cTestAdaptor())
 	d, ok := di.(*LIDARLiteDriver)
 	if !ok {
-		t.Errorf("NewLIDARLiteDriver() should have returned a *LIDARLiteDriver")
+		require.Fail(t, "NewLIDARLiteDriver() should have returned a *LIDARLiteDriver")
 	}
 	assert.NotNil(t, d.Driver)
 	assert.True(t, strings.HasPrefix(d.Name(), "LIDARLite"))

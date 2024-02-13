@@ -84,7 +84,7 @@ func TestThermalZoneWithSensorCyclicRead_PublishesTemperatureInFahrenheit(t *tes
 	select {
 	case <-sem:
 	case <-time.After(1 * time.Second):
-		t.Errorf(" Temperature Sensor Event \"Data\" was not published")
+		require.Fail(t, " Temperature Sensor Event \"Data\" was not published")
 	}
 
 	assert.InDelta(t, -148.0, d.Value(), 0.0)

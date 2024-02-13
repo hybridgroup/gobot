@@ -29,7 +29,7 @@ func TestNewBH1750Driver(t *testing.T) {
 	var di interface{} = NewBH1750Driver(newI2cTestAdaptor())
 	d, ok := di.(*BH1750Driver)
 	if !ok {
-		t.Errorf("NewBH1750Driver() should have returned a *BH1750Driver")
+		require.Fail(t, "NewBH1750Driver() should have returned a *BH1750Driver")
 	}
 	assert.NotNil(t, d.Driver)
 	assert.True(t, strings.HasPrefix(d.Name(), "BH1750"))

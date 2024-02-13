@@ -28,7 +28,7 @@ func TestNewHMC6352Driver(t *testing.T) {
 	var di interface{} = NewHMC6352Driver(newI2cTestAdaptor())
 	d, ok := di.(*HMC6352Driver)
 	if !ok {
-		t.Errorf("NewHMC6352Driver() should have returned a *HMC6352Driver")
+		require.Fail(t, "NewHMC6352Driver() should have returned a *HMC6352Driver")
 	}
 	assert.NotNil(t, d.Driver)
 	assert.True(t, strings.HasPrefix(d.Name(), "HMC6352"))
