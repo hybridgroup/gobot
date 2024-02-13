@@ -78,8 +78,8 @@ func main() {
   work := func() {
     gobot.Every(1*time.Second, func() {
       if err := led.Toggle(); err != nil {
-				fmt.Println(err)
-			}
+        fmt.Println(err)
+      }
     })
   }
 
@@ -90,8 +90,8 @@ func main() {
   )
 
   if err := robot.Start(); err != nil {
-		panic(err)
-	}
+    panic(err)
+  }
 }
 ```
 
@@ -148,26 +148,26 @@ import (
 func main() {
   e := edison.NewAdaptor()
   if err := e.Connect(); err != nil {
-		fmt.Println(err)
-	}
+    fmt.Println(err)
+  }
 
   led := gpio.NewLedDriver(e, "13")
   if err := led.Start(); err != nil {
-		fmt.Println(err)
-	}
+    fmt.Println(err)
+  }
 
   for {
     if err := led.Toggle(); err != nil {
-				fmt.Println(err)
-			}
+      fmt.Println(err)
+    }
     time.Sleep(1000 * time.Millisecond)
   }
 }
 ```
 
-### "Master" Gobot
+### "Manager" Gobot
 
-You can also use the full capabilities of the framework aka "Master Gobot" to control swarms of robots or other features
+You can also use the full capabilities of the framework aka "Manager Gobot" to control swarms of robots or other features
 such as the built-in API server. For example:
 
 ```go
@@ -216,8 +216,8 @@ func NewSwarmBot(port string) *gobot.Robot {
 }
 
 func main() {
-  master := gobot.NewMaster()
-  api.NewAPI(master).Start()
+  manager := gobot.NewManager()
+  api.NewAPI(manager).Start()
 
   spheros := []string{
     "/dev/rfcomm0",
@@ -227,12 +227,12 @@ func main() {
   }
 
   for _, port := range spheros {
-    master.AddRobot(NewSwarmBot(port))
+    manager.AddRobot(NewSwarmBot(port))
   }
 
-  if err := master.Start(); err != nil {
-		panic(err)
-	}
+  if err := manager.Start(); err != nil {
+    panic(err)
+  }
 }
 ```
 
@@ -416,15 +416,15 @@ device status, and execute device commands.
 To activate the API, import the `gobot.io/x/gobot/v2/api` package and instantiate the `API` like this:
 
 ```go
-  master := gobot.NewMaster()
-  api.NewAPI(master).Start()
+  manager := gobot.NewManager()
+  api.NewAPI(manager).Start()
 ```
 
 You can also specify the api host and port, and turn on authentication:
 
 ```go
-  master := gobot.NewMaster()
-  server := api.NewAPI(master)
+  manager := gobot.NewManager()
+  server := api.NewAPI(manager)
   server.Port = "4000"
   server.AddHandler(api.BasicAuth("gort", "klatuu"))
   server.Start()

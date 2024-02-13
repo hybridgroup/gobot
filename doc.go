@@ -76,9 +76,9 @@ pure idiomatic Golang code. For example:
 	    }
 	}
 
-# Master Gobot
+# Manager Gobot
 
-Finally, you can use Master Gobot to add the complete Gobot API or control swarms of Robots:
+Finally, you can use Manager Gobot to add the complete Gobot API or control swarms of Robots:
 
 		package main
 
@@ -125,8 +125,8 @@ Finally, you can use Master Gobot to add the complete Gobot API or control swarm
 		}
 
 		func main() {
-		    master := gobot.NewMaster()
-		    api.NewAPI(master).Start()
+		    manager := gobot.NewManager()
+		    api.NewAPI(manager).Start()
 
 		    spheros := []string{
 		        "/dev/rfcomm0",
@@ -136,10 +136,10 @@ Finally, you can use Master Gobot to add the complete Gobot API or control swarm
 		    }
 
 		    for _, port := range spheros {
-		        master.AddRobot(NewSwarmBot(port))
+		        manager.AddRobot(NewSwarmBot(port))
 		    }
 
-		    if err := master.Start(); err != nil {
+		    if err := manager.Start(); err != nil {
 		panic(err)
 	}
 		}

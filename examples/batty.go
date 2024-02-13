@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
+	gbot := gobot.NewManager()
 
 	api.NewAPI(gbot).Start()
 

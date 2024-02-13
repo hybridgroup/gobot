@@ -25,8 +25,8 @@ import (
 )
 
 func main() {
-	master := gobot.NewMaster()
-	api.NewAPI(master).Start()
+	manager := gobot.NewManager()
+	api.NewAPI(manager).Start()
 
 	core := particle.NewAdaptor(os.Args[1], os.Args[2])
 	led := gpio.NewLedDriver(core, "D7")
@@ -45,9 +45,9 @@ func main() {
 		work,
 	)
 
-	master.AddRobot(robot)
+	manager.AddRobot(robot)
 
-	if err := master.Start(); err != nil {
+	if err := manager.Start(); err != nil {
 		panic(err)
 	}
 }
