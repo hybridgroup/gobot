@@ -39,7 +39,7 @@ func (sys *nativeSyscall) syscall(
 	address uint16,
 ) (r1, r2 uintptr, err SyscallErrno) {
 	var errNo unix.Errno
-	if signal == I2C_SLAVE {
+	if signal == I2C_TARGET {
 		// this is the setup for the address, it just needs to be converted to an uintptr,
 		// the given payload is not used in this case, see the comment on the function
 		r1, r2, errNo = unix.Syscall(trap, f.Fd(), signal, uintptr(address))

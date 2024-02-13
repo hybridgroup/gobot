@@ -41,7 +41,7 @@ type Adaptor struct {
 // Optional parameters:
 //
 //	adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs
-//	adaptors.WithSpiGpioAccess(sclk, nss, mosi, miso):	use GPIO's instead of /dev/spidev#.#
+//	adaptors.WithSpiGpioAccess(sclk, ncs, sdo, sdi):	use GPIO's instead of /dev/spidev#.#
 //
 //	Optional parameters for PWM, see [adaptors.NewPWMPinsAdaptor]
 func NewAdaptor(opts ...interface{}) *Adaptor {

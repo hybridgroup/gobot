@@ -37,7 +37,7 @@ func getSyscallFuncImpl(
 				system.I2C_FUNC_SMBUS_WRITE_WORD_DATA
 		}
 		// set address
-		if (trap == system.Syscall_SYS_IOCTL) && (a2 == system.I2C_SLAVE) {
+		if (trap == system.Syscall_SYS_IOCTL) && (a2 == system.I2C_TARGET) {
 			if errorMask&0x02 == 0x02 {
 				return 0, 0, 1
 			}

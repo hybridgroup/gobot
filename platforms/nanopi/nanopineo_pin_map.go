@@ -8,8 +8,8 @@ var neoGpioPins = map[string]gpioPinDefinition{
 	"13": {sysfs: 2, cdev: cdevPin{chip: 0, line: 2}},     // UART2_RTS/GPIOA2
 	"15": {sysfs: 3, cdev: cdevPin{chip: 0, line: 3}},     // UART2_CTS/GPIOA3
 	"12": {sysfs: 6, cdev: cdevPin{chip: 0, line: 6}},     // GPIOA6
-	"19": {sysfs: 64, cdev: cdevPin{chip: 0, line: 64}},   // SPI0_MOSI/GPIOC0
-	"21": {sysfs: 65, cdev: cdevPin{chip: 0, line: 65}},   // SPI0_MISO/GPIOC1
+	"19": {sysfs: 64, cdev: cdevPin{chip: 0, line: 64}},   // SPI0_SDO/GPIOC0
+	"21": {sysfs: 65, cdev: cdevPin{chip: 0, line: 65}},   // SPI0_SDI/GPIOC1
 	"23": {sysfs: 66, cdev: cdevPin{chip: 0, line: 66}},   // SPI0_CLK/GPIOC2
 	"24": {sysfs: 67, cdev: cdevPin{chip: 0, line: 67}},   // SPI0_CS/GPIOC3
 	"8":  {sysfs: 198, cdev: cdevPin{chip: 0, line: 198}}, // UART1_TX/GPIOG6

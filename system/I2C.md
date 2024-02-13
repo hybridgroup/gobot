@@ -23,7 +23,7 @@ In general there are different ioctl features for I2C
 > Some calls are branched by kernels [i2c-dev.c:i2cdev_ioctl()](https://elixir.bootlin.com/linux/latest/source/drivers/i2c/i2c-dev.c#L392)
 > to the next listed calls.
 
-Set the device address `ioctl(file, I2C_SLAVE, long addr)`. The call set the address directly to the character device.  
+Set the device address `ioctl(file, I2C_TARGET, long addr)`. The call set the address directly to the character device.
 
 Query the supported functions `ioctl(file, I2C_FUNCS, unsigned long *funcs)`. The call is converted to in-kernel function
 [i2c.h:i2c_get_functionality()](https://elixir.bootlin.com/linux/latest/source/include/linux/i2c.h#L902)

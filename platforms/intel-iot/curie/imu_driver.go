@@ -86,13 +86,13 @@ func (imu *IMUDriver) Start() error {
 // Halt stops the IMUDriver
 func (imu *IMUDriver) Halt() error { return nil }
 
-// Name returns the IMUDriver's name
+// Name returns the IMUDrivers name
 func (imu *IMUDriver) Name() string { return imu.name }
 
-// SetName sets the IMUDriver'ss name
+// SetName sets the IMUDrivers name
 func (imu *IMUDriver) SetName(n string) { imu.name = n }
 
-// Connection returns the IMUDriver's Connection
+// Connection returns the IMUDrivers Connection
 func (imu *IMUDriver) Connection() gobot.Connection { return imu.connection }
 
 // ReadAccelerometer calls the Curie's built-in accelerometer. The result will

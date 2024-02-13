@@ -66,8 +66,8 @@ gpiochip0 - 54 lines:
   ...
   line   7:  "SPI_CE1_N"       unused   input  active-high 
   line   8:  "SPI_CE0_N"       unused   input  active-high 
-  line   9:   "SPI_MISO"       unused   input  active-high 
-  line  10:   "SPI_MOSI"       unused   input  active-high 
+  line   9:    "SPI_SDI"       unused   input  active-high
+  line  10:    "SPI_SDO"       unused   input  active-high
   line  11:   "SPI_SCLK"       unused   input  active-high 
   ...
   line  14:       "TXD0"       unused   input  active-high 
