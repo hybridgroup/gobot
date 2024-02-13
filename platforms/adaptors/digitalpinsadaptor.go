@@ -63,9 +63,9 @@ func WithGpiodAccess() func(DigitalPinsOptioner) {
 }
 
 // WithSpiGpioAccess can be used to switch the default SPI implementation to GPIO usage.
-func WithSpiGpioAccess(sclkPin, nssPin, mosiPin, misoPin string) func(DigitalPinsOptioner) {
+func WithSpiGpioAccess(sclkPin, ncsPin, sdoPin, sdiPin string) func(DigitalPinsOptioner) {
 	return func(o DigitalPinsOptioner) {
-		o.setDigitalPinsForSystemSpi(sclkPin, nssPin, mosiPin, misoPin)
+		o.setDigitalPinsForSystemSpi(sclkPin, ncsPin, sdoPin, sdiPin)
 	}
 }
 

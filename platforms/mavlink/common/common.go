@@ -451,7 +451,7 @@ const (
 	MAV_CMD_DO_PARACHUTE                 = 208 // Mission command to trigger a parachute | action (0=disable, 1=enable, 2=release, for some systems see PARACHUTE_ACTION enum, not in general message set.) | Empty | Empty | Empty | Empty | Empty | Empty |
 	MAV_CMD_DO_INVERTED_FLIGHT           = 210 // Change to/from inverted flight | inverted (0=normal, 1=inverted) | Empty | Empty | Empty | Empty | Empty | Empty |
 	MAV_CMD_DO_MOUNT_CONTROL_QUAT        = 220 // Mission command to control a camera or antenna mount, using a quaternion as reference. | q1 - quaternion param #1, w (1 in null-rotation) | q2 - quaternion param #2, x (0 in null-rotation) | q3 - quaternion param #3, y (0 in null-rotation) | q4 - quaternion param #4, z (0 in null-rotation) | Empty | Empty | Empty |
-	MAV_CMD_DO_GUIDED_MASTER             = 221 // set id of master controller | System ID | Component ID | Empty | Empty | Empty | Empty | Empty |
+	MAV_CMD_DO_GUIDED_CONTROLLER         = 221 // set id of the controller | System ID | Component ID | Empty | Empty | Empty | Empty | Empty |
 	MAV_CMD_DO_GUIDED_LIMITS             = 222 // set limits for external control | timeout - maximum time (in seconds) that external controller will be allowed to control vehicle. 0 means no timeout | absolute altitude min (in meters, WGS84) - if vehicle moves below this alt, the command will be aborted and the mission will continue.  0 means no lower altitude limit | absolute altitude max (in meters)- if vehicle moves above this alt, the command will be aborted and the mission will continue.  0 means no upper altitude limit | horizontal move limit (in meters, WGS84) - if vehicle moves more than this distance from it's location at the moment the command was executed, the command will be aborted and the mission will continue. 0 means no horizontal altitude limit | Empty | Empty | Empty |
 	MAV_CMD_DO_LAST                      = 240 // NOP - This command is only used to mark the upper limit of the DO commands in the enumeration | Empty | Empty | Empty | Empty | Empty | Empty | Empty |
 	MAV_CMD_PREFLIGHT_CALIBRATION        = 241 // Trigger calibration. This command will be only accepted if in pre-flight mode. | Gyro calibration: 0: no, 1: yes | Magnetometer calibration: 0: no, 1: yes | Ground pressure: 0: no, 1: yes | Radio calibration: 0: no, 1: yes | Accelerometer calibration: 0: no, 1: yes | Compass/Motor interference calibration: 0: no, 1: yes | Empty |
@@ -879,7 +879,7 @@ func (m *SysStatus) Decode(buf []byte) {
 //
 // MAVLINK_MSG_ID_SYSTEM_TIME_CRC 137
 type SystemTime struct {
-	TIME_UNIX_USEC uint64 // Timestamp of the master clock in microseconds since UNIX epoch.
+	TIME_UNIX_USEC uint64 // Timestamp of the primary reference clock in microseconds since UNIX epoch.
 	TIME_BOOT_MS   uint32 // Timestamp of the component clock since boot time in milliseconds.
 }
 

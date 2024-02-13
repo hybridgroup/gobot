@@ -13,7 +13,7 @@ import (
 type DigitalPinsOptioner interface {
 	setDigitalPinInitializer(initializer digitalPinInitializer)
 	setDigitalPinsForSystemGpiod()
-	setDigitalPinsForSystemSpi(sclkPin, nssPin, mosiPin, misoPin string)
+	setDigitalPinsForSystemSpi(sclkPin, ncsPin, sdoPin, sdiPin string)
 	prepareDigitalPinsActiveLow(pin string, otherPins ...string)
 	prepareDigitalPinsPullDown(pin string, otherPins ...string)
 	prepareDigitalPinsPullUp(pin string, otherPins ...string)
@@ -37,8 +37,8 @@ func (a *DigitalPinsAdaptor) setDigitalPinsForSystemGpiod() {
 	system.WithDigitalPinGpiodAccess()(a.sys)
 }
 
-func (a *DigitalPinsAdaptor) setDigitalPinsForSystemSpi(sclkPin, nssPin, mosiPin, misoPin string) {
-	system.WithSpiGpioAccess(a, sclkPin, nssPin, mosiPin, misoPin)(a.sys)
+func (a *DigitalPinsAdaptor) setDigitalPinsForSystemSpi(sclkPin, ncsPin, sdoPin, sdiPin string) {
+	system.WithSpiGpioAccess(a, sclkPin, ncsPin, sdoPin, sdiPin)(a.sys)
 }
 
 func (a *DigitalPinsAdaptor) prepareDigitalPinsActiveLow(id string, otherIDs ...string) {
