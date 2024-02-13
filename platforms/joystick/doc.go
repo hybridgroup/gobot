@@ -59,6 +59,6 @@ Example:
 	}
 
 For further information refer to joystick README:
-https://github.com/hybridgroup/gobot/blob/master/platforms/joystick/README.md
+https://github.com/hybridgroup/gobot/blob/release/platforms/joystick/README.md
 */
 package joystick // import "gobot.io/x/gobot/v2/platforms/joystick"

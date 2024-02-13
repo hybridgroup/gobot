@@ -41,6 +41,6 @@ Example:
 	}
 
 For more information refer to the ardrone README:
-https://github.com/hybridgroup/gobot/tree/master/platforms/parrot/ardrone/README.md
+https://github.com/hybridgroup/gobot/blob/release/platforms/parrot/ardrone/README.md
 */
 package ardrone // import "gobot.io/x/gobot/v2/platforms/parrot/ardrone"

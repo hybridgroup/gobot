@@ -44,6 +44,6 @@ Example:
 	}
 
 For further information refer to digispark README:
-https://github.com/hybridgroup/gobot/blob/master/platforms/digispark/README.md
+https://github.com/hybridgroup/gobot/blob/release/platforms/digispark/README.md
 */
 package digispark // import "gobot.io/x/gobot/v2/platforms/digispark"

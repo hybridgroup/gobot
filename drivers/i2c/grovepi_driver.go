@@ -14,7 +14,7 @@ const grovePiDefaultAddress = 0x04
 
 // commands, see:
 // * https://www.dexterindustries.com/GrovePi/programming/grovepi-protocol-adding-custom-sensors/
-// * https://github.com/DexterInd/GrovePi/blob/master/Script/multi_grovepi_installer/grovepi4.py
+// * https://github.com/DexterInd/GrovePi/tree/1.3.0/Script/multi_grovepi_installer/grovepi4.py
 const (
 	commandReadDigital         = 1
 	commandWriteDigital        = 2
@@ -30,7 +30,7 @@ const (
 // https://www.dexterindustries.com/grovepi/
 //
 // To use this driver with the GrovePi, it must be running the firmware >= 1.4.0 and the system version >=3.
-// https://github.com/DexterInd/GrovePi/blob/master/README.md
+// https://github.com/DexterInd/GrovePi/tree/1.3.0/README.md
 type GrovePiDriver struct {
 	*Driver
 	pins map[int]string

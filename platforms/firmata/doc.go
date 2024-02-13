@@ -41,6 +41,6 @@ Example:
 	}
 
 For further information refer to firmata readme:
-https://github.com/hybridgroup/gobot/blob/master/platforms/firmata/README.md
+https://github.com/hybridgroup/gobot/blob/release/platforms/firmata/README.md
 */
 package firmata // import "gobot.io/x/gobot/v2/platforms/firmata"

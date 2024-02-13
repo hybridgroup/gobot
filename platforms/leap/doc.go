@@ -40,6 +40,6 @@ Example:
 	}
 
 For more information refer to the leap README:
-https://github.com/hybridgroup/gobot/blob/master/platforms/leap/README.md
+https://github.com/hybridgroup/gobot/blob/release/platforms/leap/README.md
 */
 package leap // import "gobot.io/x/gobot/v2/platforms/leap"
