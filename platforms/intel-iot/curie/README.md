@@ -69,8 +69,8 @@ func main() {
   )
 
   if err := robot.Start(); err != nil {
-		panic(err)
-	}
+    panic(err)
+  }
 }
 ```
 
@@ -78,7 +78,9 @@ func main() {
 
 ### Installing Firmware
 
-You need to flash your Intel Curie with firmware that uses ConfigurableFirmata along with the FirmataCurieIMU plugin. There are 2 versions of this firmware, once that allows connecting using the serial interface, the other using a Bluetooth LE connection.
+You need to flash your Intel Curie with firmware that uses ConfigurableFirmata along with the FirmataCurieIMU plugin.
+There are 2 versions of this firmware, once that allows connecting using the serial interface, the other using a
+Bluetooth LE connection.
 
 To setup your Arduino environment:
 
@@ -86,12 +88,8 @@ To setup your Arduino environment:
 - Install the "Intel Curie Boards" board files using the "Board Manager". You can find it in the Arduino IDE under the
   "Tools" menu. Choose "Boards > Boards Manager".
 - Search for the "Intel Curie Boards" package in the "Boards Manager" dialog, and then install the latest version.
-- Download the ZIP file for the ConfigurableFirmata library. You can download the latest version of the ConfigurableFirmata
-  from here:
-  [https://github.com/firmata/ConfigurableFirmata/archive/master.zip](https://github.com/firmata/ConfigurableFirmata/archive/master.zip)
-  Once you have downloaded ConfigurableFirmata, install it by using the "Library Manager". You can find it in the Arduino
-  IDE under the "Sketch" menu. Choose "Include Library > Add .ZIP Library". Select the ZIP file for the ConfigurableFirmata
-  library that you just downloaded.
+- Follow the [installation instructions](https://github.com/firmata/ConfigurableFirmata#installation) for the
+  ConfigurableFirmata library
 - Download the ZIP file for the FirmataCurieIMU library. You can download the latest version of FirmataCurieIMU from here:
   [https://github.com/intel-iot-devkit/firmata-curie-imu/archive/master.zip](https://github.com/intel-iot-devkit/firmata-curie-imu/archive/master.zip)
 - Once you have downloaded the FirmataCurieIMU library, install it by using the "Library Manager". You can find it in the

@@ -51,7 +51,7 @@ func TestMPL115A2ReadData(t *testing.T) {
 	//   * shift the temperature value right for 6 bits (resolution is 10 bit)
 	//   * shift the pressure value right for 6 bits (resolution is 10 bit)
 	// * calculate temperature in °C according to this implementation:
-	//   https://github.com/adafruit/Adafruit_MPL115A2/blob/master/Adafruit_MPL115A2.cpp
+	//   https://github.com/adafruit/Adafruit_MPL115A2/tree/2.0.2/Adafruit_MPL115A2.cpp
 	//
 	// arrange
 	d, a := initTestMPL115A2DriverWithStubbedAdaptor()
