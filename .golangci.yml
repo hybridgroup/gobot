@@ -168,6 +168,14 @@ linters-settings:
     # Default: false
     require-specific: true
 
+  perfsprint:
+    # Optimizes `fmt.Errorf`.
+    # Default: true
+    errorf: false
+    # Optimizes `fmt.Sprintf` with only one argument
+    # Default: true
+    sprintf1: false
+
   revive:
     rules:
       # https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md#unexported-return

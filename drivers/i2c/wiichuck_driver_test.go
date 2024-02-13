@@ -109,7 +109,7 @@ func TestWiichuckDriverCButton(t *testing.T) {
 	done := make(chan bool)
 
 	_ = d.On(d.Event(C), func(data interface{}) {
-		assert.Equal(t, true, data) //nolint:testifylint // data is an interface
+		assert.Equal(t, true, data)
 		done <- true
 	})
 
@@ -132,7 +132,7 @@ func TestWiichuckDriverZButton(t *testing.T) {
 	done := make(chan bool)
 
 	_ = d.On(d.Event(Z), func(data interface{}) {
-		assert.Equal(t, true, data) //nolint:testifylint // data is an interface
+		assert.Equal(t, true, data)
 		done <- true
 	})
 

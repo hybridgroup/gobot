@@ -194,7 +194,6 @@ func (b *Bebop) Discover() error {
 	data := make([]byte, 10240)
 
 	_, err = b.discoveryClient.Read(data)
-
 	if err != nil {
 		return err
 	}
@@ -214,7 +213,6 @@ func (b *Bebop) Connect() error {
 	}
 
 	b.c2dClient, err = net.DialUDP("udp", nil, c2daddr)
-
 	if err != nil {
 		return err
 	}
