@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestEvery(t *testing.T) {
@@ -35,7 +36,7 @@ func TestEveryWhenStopped(t *testing.T) {
 		done.Stop()
 	case <-time.After(190 * time.Millisecond):
 		done.Stop()
-		t.Errorf("Every was not called")
+		require.Fail(t, "Every was not called")
 	}
 
 	select {
@@ -57,7 +58,7 @@ func TestAfter(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(190 * time.Millisecond):
-		t.Errorf("After was not called")
+		require.Fail(t, "After was not called")
 	}
 
 	assert.Equal(t, 1, i)
@@ -82,7 +83,7 @@ func TestRand(t *testing.T) {
 	a := Rand(10000)
 	b := Rand(10000)
 	if a == b {
-		t.Errorf("%v should not equal %v", a, b)
+		require.Fail(t, "%v should not equal %v", a, b)
 	}
 }
 

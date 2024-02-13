@@ -27,7 +27,7 @@ func TestNewWiichuckDriver(t *testing.T) {
 	var di interface{} = NewWiichuckDriver(newI2cTestAdaptor())
 	d, ok := di.(*WiichuckDriver)
 	if !ok {
-		t.Errorf("NewWiichuckDriver() should have returned a *WiichuckDriver")
+		require.Fail(t, "NewWiichuckDriver() should have returned a *WiichuckDriver")
 	}
 	assert.NotNil(t, d.Driver)
 	assert.True(t, strings.HasPrefix(d.Name(), "Wiichuck"))
@@ -63,7 +63,7 @@ func TestWiichuckDriverStart(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(100 * time.Millisecond):
-		t.Errorf("origin not read correctly")
+		require.Fail(t, "origin not read correctly")
 	}
 }
 
@@ -118,7 +118,7 @@ func TestWiichuckDriverCButton(t *testing.T) {
 	select {
 	case <-done:
 	case <-time.After(10 * time.Second):
-		t.Errorf("Did not receive 'C' event")
+		require.Fail(t, "Did not receive 'C' event")
 	}
 }
 
@@ -141,7 +141,7 @@ func TestWiichuckDriverZButton(t *testing.T) {
 	select {
 	case <-done:
 	case <-time.After(10 * time.Second):
-		t.Errorf("Did not receive 'Z' event")
+		require.Fail(t, "Did not receive 'Z' event")
 	}
 }
 
@@ -169,7 +169,7 @@ func TestWiichuckDriverUpdateJoystick(t *testing.T) {
 	select {
 	case <-done:
 	case <-time.After(10 * time.Second):
-		t.Errorf("Did not receive 'Joystick' event")
+		require.Fail(t, "Did not receive 'Joystick' event")
 	}
 }
 

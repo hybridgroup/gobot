@@ -1,6 +1,10 @@
 package spherocommon
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/require"
+)
 
 func TestCalculateChecksum(t *testing.T) {
 	tests := []struct {
@@ -14,7 +18,7 @@ func TestCalculateChecksum(t *testing.T) {
 	for _, tt := range tests {
 		actual := CalculateChecksum(tt.data)
 		if actual != tt.checksum {
-			t.Errorf("Expected %x, got %x for data %x.", tt.checksum, actual, tt.data)
+			require.Fail(t, "Expected %x, got %x for data %x.", tt.checksum, actual, tt.data)
 		}
 	}
 }

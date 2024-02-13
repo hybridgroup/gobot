@@ -27,7 +27,7 @@ func TestNewPCF8583Driver(t *testing.T) {
 	var di interface{} = NewPCF8583Driver(newI2cTestAdaptor())
 	d, ok := di.(*PCF8583Driver)
 	if !ok {
-		t.Errorf("NewPCF8583Driver() should have returned a *PCF8583Driver")
+		require.Fail(t, "NewPCF8583Driver() should have returned a *PCF8583Driver")
 	}
 	assert.NotNil(t, d.Driver)
 	assert.True(t, strings.HasPrefix(d.name, "PCF8583"))

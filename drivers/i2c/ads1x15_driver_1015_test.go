@@ -22,7 +22,7 @@ func TestNewADS1015Driver(t *testing.T) {
 	var di interface{} = NewADS1015Driver(newI2cTestAdaptor())
 	d, ok := di.(*ADS1x15Driver)
 	if !ok {
-		t.Errorf("NewADS1015Driver() should have returned a *ADS1x15Driver")
+		require.Fail(t, "NewADS1015Driver() should have returned a *ADS1x15Driver")
 	}
 	assert.NotNil(t, d.Driver)
 	assert.True(t, strings.HasPrefix(d.Name(), "ADS1015"))

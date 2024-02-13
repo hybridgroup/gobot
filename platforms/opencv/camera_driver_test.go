@@ -45,7 +45,7 @@ func TestCameraDriverStart(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(100 * time.Millisecond):
-		t.Errorf("Event \"frame\" was not published")
+		require.Fail(t, "Event \"frame\" was not published")
 	}
 
 	d = NewCameraDriver("")

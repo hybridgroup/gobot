@@ -90,7 +90,7 @@ func TestLeapMotionDriverParser(t *testing.T) {
 	parsedFrame, _ := d.ParseFrame(file)
 
 	if parsedFrame.Hands == nil || parsedFrame.Pointables == nil || parsedFrame.Gestures == nil {
-		t.Errorf("ParseFrame incorrectly parsed frame")
+		require.Fail(t, "ParseFrame incorrectly parsed frame")
 	}
 
 	assert.Equal(t, uint64(134211791358), parsedFrame.Timestamp)

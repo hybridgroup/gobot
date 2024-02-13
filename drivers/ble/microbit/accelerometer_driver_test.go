@@ -61,6 +61,6 @@ func TestAccelerometerReadData(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(100 * time.Millisecond):
-		t.Errorf("Microbit Event \"Accelerometer\" was not published")
+		require.Fail(t, "Microbit Event \"Accelerometer\" was not published")
 	}
 }
