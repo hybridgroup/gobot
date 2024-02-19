@@ -80,8 +80,8 @@ github.com/warthog618/go-gpiosim v0.1.0 h1:2rTMTcKUVZxpUuvRKsagnKAbKpd3Bwffp87xy
 github.com/warthog618/gpiod v0.8.2 h1:2HgQ9pNowPp7W77sXhX5ut5Tqq1WoS3t7bXYDxtYvxc=
 github.com/warthog618/gpiod v0.8.2/go.mod h1:O7BNpHjCn/4YS5yFVmoFZAlY1LuYuQ8vhPf0iy/qdi4=
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
-go.bug.st/serial v1.6.1 h1:VSSWmUxlj1T/YlRo2J104Zv3wJFrjHIl/T3NeruWAHY=
-go.bug.st/serial v1.6.1/go.mod h1:UABfsluHAiaNI+La2iESysd9Vetq7VRdpxvjx7CmmOE=
+go.bug.st/serial v1.6.2 h1:kn9LRX3sdm+WxWKufMlIRndwGfPWsH1/9lCWXQCasq8=
+go.bug.st/serial v1.6.2/go.mod h1:UABfsluHAiaNI+La2iESysd9Vetq7VRdpxvjx7CmmOE=
 gocv.io/x/gocv v0.35.0 h1:Qaxb5KdVyy8Spl4S4K0SMZ6CVmKtbfoSGQAxRD3FZlw=
 gocv.io/x/gocv v0.35.0/go.mod h1:oc6FvfYqfBp99p+yOEzs9tbYF9gOrAQSeL/dyIPefJU=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
