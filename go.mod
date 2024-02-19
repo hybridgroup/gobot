@@ -11,7 +11,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/hybridgroup/go-ardrone v0.0.0-20140402002621-b9750d8d7b78
 	github.com/hybridgroup/mjpeg v0.0.0-20140228234708-4680f319790e
-	github.com/nats-io/nats.go v1.32.0
+	github.com/nats-io/nats.go v1.33.1
 	github.com/nsf/termbox-go v1.1.1
 	github.com/sigurn/crc8 v0.0.0-20220107193325-2243fe600f9f
 	github.com/stretchr/testify v1.8.4
