@@ -149,6 +149,7 @@ func (fs *MockFilesystem) stat(name string) (os.FileInfo, error) {
 			log.Println("A")
 			return nil, err
 		}
+		defer tmpFile.Close()
 		defer os.Remove(tmpFile.Name())
 
 		return os.Stat(tmpFile.Name())
