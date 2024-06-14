@@ -38,7 +38,7 @@ func TestConnect(t *testing.T) {
 	tests := map[string]struct {
 		identifier  string
 		extAdapter  *btTestAdapter
-		extDevice   *btTestDevice
+		extDevice   btTestDevice
 		wantAddress string
 		wantName    string
 		wantErr     string
@@ -50,7 +50,7 @@ func TestConnect(t *testing.T) {
 				rssi:          rssi,
 				payload:       &btTestPayload{name: deviceName},
 			},
-			extDevice:   &btTestDevice{},
+			extDevice:   btTestDevice{},
 			wantAddress: deviceAddress,
 			wantName:    deviceName,
 		},
@@ -61,7 +61,7 @@ func TestConnect(t *testing.T) {
 				rssi:          rssi,
 				payload:       &btTestPayload{name: deviceName},
 			},
-			extDevice:   &btTestDevice{},
+			extDevice:   btTestDevice{},
 			wantAddress: deviceAddress,
 			wantName:    deviceName,
 		},
@@ -122,7 +122,7 @@ func TestConnect(t *testing.T) {
 				deviceAddress: deviceAddress,
 				payload:       &btTestPayload{name: "disco_err"},
 			},
-			extDevice: &btTestDevice{
+			extDevice: btTestDevice{
 				simulateDiscoverServicesErr: true,
 			},
 			wantAddress: deviceAddress,
