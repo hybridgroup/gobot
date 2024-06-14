@@ -18,7 +18,7 @@ type bluetoothExtAdapterer interface {
 	Enable() error
 	Scan(callback func(*bluetooth.Adapter, bluetooth.ScanResult)) error
 	StopScan() error
-	Connect(address bluetooth.Address, params bluetooth.ConnectionParams) (*bluetooth.Device, error)
+	Connect(address bluetooth.Address, params bluetooth.ConnectionParams) (bluetooth.Device, error)
 }
 
 type bluetoothExtCharacteristicer interface {
