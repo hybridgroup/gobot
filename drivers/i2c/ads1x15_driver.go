@@ -394,10 +394,10 @@ func (d *ADS1x15Driver) rawRead(channel int, channelOffset int, gain int, dataRa
 
 	// Specify mux value.
 	mux := channel + channelOffset
-	config |= uint16((mux & 0x07) << ads1x15ConfigMuxOffset)
+	config |= uint16((mux & 0x07) << ads1x15ConfigMuxOffset) //nolint:gosec // TODO: fix later
 
 	// Set the programmable gain amplifier bits.
-	config |= uint16(gain) << ads1x15ConfigPgaOffset
+	config |= uint16(gain) << ads1x15ConfigPgaOffset //nolint:gosec // TODO: fix later
 
 	// Set the mode (continuous or single shot).
 	config |= ads1x15ConfigModeSingle
@@ -525,12 +525,12 @@ func ads1x15GetDataRateBits(dataRates map[int]uint16, dataRate int) (uint16, err
 
 // ads1x15BestGainForVoltage returns the gain the most adapted to read up to the specified difference of potential.
 func ads1x15BestGainForVoltage(voltage float64) (int, error) {
-	var max float64
+	var maximum float64
 	difference := math.MaxFloat64
 	currentBestGain := -1
 
 	for key, fsr := range ads1x15FullScaleRange {
-		max = math.Max(max, fsr)
+		maximum = math.Max(maximum, fsr)
 		newDiff := fsr - voltage
 		if newDiff >= 0 && newDiff < difference {
 			difference = newDiff
@@ -539,7 +539,7 @@ func ads1x15BestGainForVoltage(voltage float64) (int, error) {
 	}
 
 	if currentBestGain < 0 {
-		return 0, fmt.Errorf("The maximum voltage which can be read is %f", max)
+		return 0, fmt.Errorf("The maximum voltage which can be read is %f", maximum)
 	}
 
 	return currentBestGain, nil

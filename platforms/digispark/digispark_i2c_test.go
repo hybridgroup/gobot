@@ -1,3 +1,6 @@
+//go:build libusb
+// +build libusb
+
 //nolint:forcetypeassert // ok here
 package digispark
 

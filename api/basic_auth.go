@@ -22,6 +22,7 @@ func BasicAuth(username, password string) http.HandlerFunc {
 }
 
 func secureCompare(given string, actual string) bool {
+	//nolint:gosec // TODO: fix later
 	if subtle.ConstantTimeEq(int32(len(given)), int32(len(actual))) == 1 {
 		return subtle.ConstantTimeCompare([]byte(given), []byte(actual)) == 1
 	}

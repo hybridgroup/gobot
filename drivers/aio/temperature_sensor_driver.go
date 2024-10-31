@@ -86,7 +86,7 @@ func TemperatureSensorNtcScaler(
 		if input < 0 {
 			input = 0
 		}
-		rTherm := temperaturSensorGetResistance(uint(input), vRef, rOhm, reverse)
+		rTherm := temperaturSensorGetResistance(uint(input), vRef, rOhm, reverse) //nolint:gosec // checked before
 		temp := ntc.getTemp(rTherm)
 		return temp
 	})

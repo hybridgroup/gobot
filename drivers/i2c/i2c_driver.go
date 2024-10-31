@@ -131,13 +131,13 @@ func (d *Driver) Write(pin string, val int) error {
 
 	if val > 0xFFFF {
 		buf := make([]byte, 4)
-		binary.LittleEndian.PutUint32(buf, uint32(val))
+		binary.LittleEndian.PutUint32(buf, uint32(val)) //nolint:gosec // ok here
 		return d.connection.WriteBlockData(register, buf)
 	}
 	if val > 0xFF {
 		return d.connection.WriteWordData(register, uint16(val))
 	}
-	return d.connection.WriteByteData(register, uint8(val))
+	return d.connection.WriteByteData(register, uint8(val)) //nolint:gosec // ok here
 }
 
 // Read implements a simple read mechanism from the given register of an i2c device.

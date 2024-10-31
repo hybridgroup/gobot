@@ -29,8 +29,8 @@ var (
 type bitState uint8
 
 const (
-	clear bitState = 0x00
-	set   bitState = 0x01
+	clearBit bitState = 0x00
+	setBit   bitState = 0x01
 )
 
 // Connection is a connection to an I2C device with a specified address
@@ -115,7 +115,7 @@ func twosComplement16Bit(uValue uint16) int16 {
 	if result&0x8000 != 0 {
 		result -= 1 << 16
 	}
-	return int16(result)
+	return int16(result) //nolint:gosec // ok here
 }
 
 func swapBytes(value uint16) uint16 {

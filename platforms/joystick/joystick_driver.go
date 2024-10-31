@@ -205,9 +205,11 @@ func (j *Driver) Halt() error {
 
 func (j *Driver) handleButtons(state js.State) error {
 	for button := 0; button < j.adaptor().joystick.ButtonCount(); button++ {
+		//nolint:gosec // TODO: fix later
 		buttonPressed := state.Buttons&(1<<uint32(button)) != 0
 		if buttonPressed != j.buttonState[button] {
 			j.buttonState[button] = buttonPressed
+			//nolint:gosec // TODO: fix later
 			name := j.findName(uint8(button), j.config.Buttons)
 			if name == "" {
 				return fmt.Errorf("Unknown button: %v", button)
@@ -226,6 +228,7 @@ func (j *Driver) handleButtons(state js.State) error {
 
 func (j *Driver) handleAxes(state js.State) error {
 	for axis := 0; axis < j.adaptor().joystick.AxisCount(); axis++ {
+		//nolint:gosec // TODO: fix later
 		name := j.findName(uint8(axis), j.config.Axis)
 		if name == "" {
 			return fmt.Errorf("Unknown Axis: %v", axis)

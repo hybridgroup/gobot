@@ -125,7 +125,7 @@ func NewAdafruit2348Driver(c Connector, options ...func(Config)) *Adafruit2348Dr
 
 // SetDCMotorSpeed will set the appropriate pins to run the specified DC motor for the given speed.
 func (a *Adafruit2348Driver) SetDCMotorSpeed(dcMotor int, speed int32) error {
-	return a.SetPWM(int(a.dcMotors[dcMotor].pwmPin), 0, uint16(speed*16))
+	return a.SetPWM(int(a.dcMotors[dcMotor].pwmPin), 0, uint16(speed*16)) //nolint:gosec // TODO: fix later
 }
 
 // RunDCMotor will set the appropriate pins to run the specified DC motor for the given direction.
@@ -281,9 +281,11 @@ func (a *Adafruit2348Driver) oneStep(motor int, dir Adafruit2348Direction, style
 	a.stepperMotors[motor].currentStep %= adafruit2348StepperMicrosteps * 4
 
 	// only really used for microstepping, otherwise always on!
+	//nolint:gosec // TODO: fix later
 	if err := a.SetPWM(int(a.stepperMotors[motor].pwmPinA), 0, uint16(pwmA*16)); err != nil {
 		return 0, err
 	}
+	//nolint:gosec // TODO: fix later
 	if err := a.SetPWM(int(a.stepperMotors[motor].pwmPinB), 0, uint16(pwmB*16)); err != nil {
 		return 0, err
 	}

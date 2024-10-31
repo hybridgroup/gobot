@@ -1,3 +1,6 @@
+//go:build gocv
+// +build gocv
+
 package opencv
 
 import (
@@ -41,7 +44,7 @@ func NewCameraDriver(source interface{}) *CameraDriver {
 			default:
 				return errors.New("Unknown camera source")
 			}
-			return
+			return nil
 		},
 	}
 
@@ -72,7 +75,7 @@ func (c *CameraDriver) Start() error {
 			}
 		}
 	}()
-	return
+	return nil
 }
 
 // Halt stops camera driver

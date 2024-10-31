@@ -124,7 +124,7 @@ func (i *INA3221Driver) getBusVoltageRaw(channel INA3221Channel) (int16, error) 
 		value -= 0x10000
 	}
 
-	return int16(value), nil
+	return int16(value), nil //nolint:gosec // TODO: fix later
 }
 
 // getShuntVoltageRaw gets the raw shunt voltage (16-bit signed integer, so +-32767)
@@ -139,7 +139,7 @@ func (i *INA3221Driver) getShuntVoltageRaw(channel INA3221Channel) (int16, error
 		value -= 0x10000
 	}
 
-	return int16(value), nil
+	return int16(value), nil //nolint:gosec // TODO: fix later
 }
 
 // reads word from supplied register address

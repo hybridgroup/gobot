@@ -11,6 +11,7 @@
 	go run examples/firmata_servo.go /dev/ttyACM0
 */
 
+//nolint:gosec // ok here
 package main
 
 import (

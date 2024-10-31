@@ -1,3 +1,6 @@
+//go:build gocv
+// +build gocv
+
 package opencv
 
 import (
@@ -39,11 +42,11 @@ func (w *WindowDriver) Connection() gobot.Connection { return nil }
 // Start starts window thread and driver
 func (w *WindowDriver) Start() error {
 	w.start(w)
-	return
+	return nil
 }
 
 // Halt returns true if camera is halted successfully
-func (w *WindowDriver) Halt() error { return }
+func (w *WindowDriver) Halt() error { return nil }
 
 // ShowImage displays image in window
 func (w *WindowDriver) ShowImage(img gocv.Mat) {

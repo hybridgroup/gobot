@@ -29,6 +29,7 @@ func getDummyResponseForPath(t *testing.T, path string, dummyResponse string) *h
 	return createTestServer(func(w http.ResponseWriter, r *http.Request) {
 		actualPath := "/v1/devices" + path
 		if r.URL.Path != actualPath {
+			//nolint:testifylint // TODO: fix later
 			require.Fail(t, "Path doesn't match, expected %#v, got %#v", actualPath, r.URL.Path)
 		}
 		_, _ = w.Write(dummyData)
@@ -48,6 +49,7 @@ func getDummyResponseForPathWithParams(
 	return createTestServer(func(w http.ResponseWriter, r *http.Request) {
 		actualPath := "/v1/devices" + path
 		if r.URL.Path != actualPath {
+			//nolint:testifylint // TODO: fix later
 			require.Fail(t, "Path doesn't match, expected %#v, got %#v", actualPath, r.URL.Path)
 		}
 

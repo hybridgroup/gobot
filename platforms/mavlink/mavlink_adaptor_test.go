@@ -52,7 +52,7 @@ func (nullReadWriteCloser) Close() error {
 func initTestMavlinkAdaptor() *Adaptor {
 	m := NewAdaptor("/dev/null")
 	m.sp = nullReadWriteCloser{}
-	m.connect = func(port string) (io.ReadWriteCloser, error) { return nil, nil }
+	m.connect = func(port string) (io.ReadWriteCloser, error) { return nil, nil } //nolint:nilnil // ok for tests
 	return m
 }
 

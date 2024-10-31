@@ -1,3 +1,6 @@
+//go:build libusb
+// +build libusb
+
 package digispark
 
 //#cgo pkg-config: libusb

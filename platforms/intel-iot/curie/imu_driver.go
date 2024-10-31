@@ -203,9 +203,9 @@ func parseAccelerometerData(data []byte) (*AccelerometerData, error) {
 	if len(data) < 9 {
 		return nil, errors.New("Invalid data")
 	}
-	x := int16(uint16(data[3]) | uint16(data[4])<<7)
-	y := int16(uint16(data[5]) | uint16(data[6])<<7)
-	z := int16(uint16(data[7]) | uint16(data[8])<<7)
+	x := int16(uint16(data[3]) | uint16(data[4])<<7) //nolint:gosec // ok here
+	y := int16(uint16(data[5]) | uint16(data[6])<<7) //nolint:gosec // ok here
+	z := int16(uint16(data[7]) | uint16(data[8])<<7) //nolint:gosec // ok here
 
 	res := &AccelerometerData{X: x, Y: y, Z: z}
 	return res, nil
@@ -215,9 +215,9 @@ func parseGyroscopeData(data []byte) (*GyroscopeData, error) {
 	if len(data) < 9 {
 		return nil, errors.New("Invalid data")
 	}
-	x := int16(uint16(data[3]) | uint16(data[4])<<7)
-	y := int16(uint16(data[5]) | uint16(data[6])<<7)
-	z := int16(uint16(data[7]) | uint16(data[8])<<7)
+	x := int16(uint16(data[3]) | uint16(data[4])<<7) //nolint:gosec // ok here
+	y := int16(uint16(data[5]) | uint16(data[6])<<7) //nolint:gosec // ok here
+	z := int16(uint16(data[7]) | uint16(data[8])<<7) //nolint:gosec // ok here
 
 	res := &GyroscopeData{X: x, Y: y, Z: z}
 	return res, nil
@@ -227,8 +227,8 @@ func parseTemperatureData(data []byte) (float32, error) {
 	if len(data) < 8 {
 		return 0, errors.New("Invalid data")
 	}
-	t1 := int16(uint16(data[3]) | uint16(data[4])<<7)
-	t2 := int16(uint16(data[5]) | uint16(data[6])<<7)
+	t1 := int16(uint16(data[3]) | uint16(data[4])<<7) //nolint:gosec // ok here
+	t2 := int16(uint16(data[5]) | uint16(data[6])<<7) //nolint:gosec // ok here
 
 	res := (float32(t1+(t2*8)) / 512.0) + 23.0
 	return res, nil
@@ -248,7 +248,7 @@ func parseStepData(data []byte) (int16, error) {
 		return 0, errors.New("Invalid data")
 	}
 
-	res := int16(uint16(data[3]) | uint16(data[4])<<7)
+	res := int16(uint16(data[3]) | uint16(data[4])<<7) //nolint:gosec // ok here
 	return res, nil
 }
 
@@ -265,13 +265,13 @@ func parseMotionData(data []byte) (*MotionData, error) {
 	if len(data) < 16 {
 		return nil, errors.New("Invalid data")
 	}
-	ax := int16(uint16(data[3]) | uint16(data[4])<<7)
-	ay := int16(uint16(data[5]) | uint16(data[6])<<7)
-	az := int16(uint16(data[7]) | uint16(data[8])<<7)
+	ax := int16(uint16(data[3]) | uint16(data[4])<<7) //nolint:gosec // ok here
+	ay := int16(uint16(data[5]) | uint16(data[6])<<7) //nolint:gosec // ok here
+	az := int16(uint16(data[7]) | uint16(data[8])<<7) //nolint:gosec // ok here
 
-	gx := int16(uint16(data[9]) | uint16(data[10])<<7)
-	gy := int16(uint16(data[11]) | uint16(data[12])<<7)
-	gz := int16(uint16(data[13]) | uint16(data[14])<<7)
+	gx := int16(uint16(data[9]) | uint16(data[10])<<7)  //nolint:gosec // ok here
+	gy := int16(uint16(data[11]) | uint16(data[12])<<7) //nolint:gosec // ok here
+	gz := int16(uint16(data[13]) | uint16(data[14])<<7) //nolint:gosec // ok here
 
 	res := &MotionData{AX: ax, AY: ay, AZ: az, GX: gx, GY: gy, GZ: gz}
 	return res, nil

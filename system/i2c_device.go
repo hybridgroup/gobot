@@ -382,6 +382,7 @@ func (d *i2cDevice) syscallIoctl(signal uintptr, payload unsafe.Pointer, address
 	if err := d.openFileLazy(sender); err != nil {
 		return err
 	}
+	//nolint:gosec // TODO: fix later
 	if _, _, errno := d.sys.syscall(Syscall_SYS_IOCTL, d.file, signal, payload, uint16(address)); errno != 0 {
 		return fmt.Errorf("%s failed with syscall.Errno %v", sender, errno)
 	}

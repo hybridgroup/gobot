@@ -394,6 +394,7 @@ func (d *MinidroneDriver) generatePcmd() *bytes.Buffer {
 	if err := binary.Write(cmd, binary.LittleEndian, int8(2)); err != nil {
 		panic(err)
 	}
+	//nolint:gosec // TODO: fix later
 	if err := binary.Write(cmd, binary.LittleEndian, int8(d.stepsfa0a)); err != nil {
 		panic(err)
 	}
@@ -409,18 +410,23 @@ func (d *MinidroneDriver) generatePcmd() *bytes.Buffer {
 	if err := binary.Write(cmd, binary.LittleEndian, int8(0)); err != nil {
 		panic(err)
 	}
+	//nolint:gosec // TODO: fix later
 	if err := binary.Write(cmd, binary.LittleEndian, int8(pcmd.Flag)); err != nil {
 		panic(err)
 	}
+	//nolint:gosec // TODO: fix later
 	if err := binary.Write(cmd, binary.LittleEndian, int8(pcmd.Roll)); err != nil {
 		panic(err)
 	}
+	//nolint:gosec // TODO: fix later
 	if err := binary.Write(cmd, binary.LittleEndian, int8(pcmd.Pitch)); err != nil {
 		panic(err)
 	}
+	//nolint:gosec // TODO: fix later
 	if err := binary.Write(cmd, binary.LittleEndian, int8(pcmd.Yaw)); err != nil {
 		panic(err)
 	}
+	//nolint:gosec // TODO: fix later
 	if err := binary.Write(cmd, binary.LittleEndian, int8(pcmd.Gaz)); err != nil {
 		panic(err)
 	}

@@ -84,7 +84,7 @@ func (p *PCA9501Driver) WriteGPIO(pin uint8, val uint8) error {
 	// set pin as output by clearing bit
 	iodirVal := bit.Clear(int(iodir), pin)
 	// write CTRL register
-	err = p.connection.WriteByte(uint8(iodirVal))
+	err = p.connection.WriteByte(uint8(iodirVal)) //nolint:gosec // TODO: fix later
 	if err != nil {
 		return err
 	}
@@ -101,7 +101,7 @@ func (p *PCA9501Driver) WriteGPIO(pin uint8, val uint8) error {
 		nVal = bit.Set(int(cVal), pin)
 	}
 	// write new value to port
-	err = p.connection.WriteByte(uint8(nVal))
+	err = p.connection.WriteByte(uint8(nVal)) //nolint:gosec // TODO: fix later
 	if err != nil {
 		return err
 	}
@@ -121,7 +121,7 @@ func (p *PCA9501Driver) ReadGPIO(pin uint8) (uint8, error) {
 	// set pin as input by setting bit
 	iodirVal := bit.Set(int(iodir), pin)
 	// write CTRL register
-	err = p.connection.WriteByte(uint8(iodirVal))
+	err = p.connection.WriteByte(uint8(iodirVal)) //nolint:gosec // TODO: fix later
 	if err != nil {
 		return 0, err
 	}

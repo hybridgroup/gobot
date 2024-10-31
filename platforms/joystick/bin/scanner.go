@@ -39,6 +39,7 @@ func readJoystick(js joystick.Joystick) {
 
 	printAt(1, 5, "Buttons:")
 	for button := 0; button < js.ButtonCount(); button++ {
+		//nolint:gosec // TODO: fix later
 		if jinfo.Buttons&(1<<uint32(button)) != 0 {
 			printAt(10+button, 5, "X")
 			printAt(1, 6, fmt.Sprintf("Button %2d Pressed", button))

@@ -13,6 +13,7 @@
  NOTE: sudo is required to use BLE in Linux
 */
 
+//nolint:gosec // ok here
 package main
 
 import (

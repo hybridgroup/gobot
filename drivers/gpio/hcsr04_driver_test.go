@@ -1,6 +1,7 @@
 package gpio
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -132,7 +133,7 @@ func TestHCSR04MeasureDistance(t *testing.T) {
 				oldVal = val
 				var err error
 				if tc.simulateWriteErr != "" {
-					err = fmt.Errorf(tc.simulateWriteErr)
+					err = errors.New(tc.simulateWriteErr)
 				}
 				return err
 			}

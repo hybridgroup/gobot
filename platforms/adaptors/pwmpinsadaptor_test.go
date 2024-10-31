@@ -2,6 +2,7 @@
 package adaptors
 
 import (
+	"errors"
 	"fmt"
 	"runtime"
 	"strconv"
@@ -416,7 +417,7 @@ func Test_PWMPin(t *testing.T) {
 				"/sys/devices/platform/ff680020.pwm/pwm/pwmchip3/pwm44/polarity: no such file",
 		},
 		"translate_error": {
-			translate: func(string) (string, int, error) { return "", -1, fmt.Errorf(translateErr) },
+			translate: func(string) (string, int, error) { return "", -1, errors.New(translateErr) },
 			wantErr:   translateErr,
 		},
 	}

@@ -1,4 +1,4 @@
-//nolint:forcetypeassert // ok here
+//nolint:forcetypeassert,nilnil // ok here
 package mavlink
 
 import (

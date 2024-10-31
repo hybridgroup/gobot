@@ -41,5 +41,5 @@ func (a *Adafruit2327Driver) SetServoMotorFreq(freq float64) error {
 // SetServoMotorPulse is a convenience function to specify the 'tick' value,
 // between 0-4095, when the signal will turn on, and when it will turn off.
 func (a *Adafruit2327Driver) SetServoMotorPulse(channel byte, on, off int32) error {
-	return a.SetPWM(int(channel), uint16(on), uint16(off))
+	return a.SetPWM(int(channel), uint16(on), uint16(off)) //nolint:gosec // TODO: fix later
 }

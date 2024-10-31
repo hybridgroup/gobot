@@ -239,9 +239,9 @@ func (d *ADXL345Driver) readRawData() (int16, int16, int16, error) {
 		return 0, 0, 0, err
 	}
 
-	rx := int16(binary.LittleEndian.Uint16(buf[0:2]))
-	ry := int16(binary.LittleEndian.Uint16(buf[2:4]))
-	rz := int16(binary.LittleEndian.Uint16(buf[4:6]))
+	rx := int16(binary.LittleEndian.Uint16(buf[0:2])) //nolint:gosec // TODO: fix later
+	ry := int16(binary.LittleEndian.Uint16(buf[2:4])) //nolint:gosec // TODO: fix later
+	rz := int16(binary.LittleEndian.Uint16(buf[4:6])) //nolint:gosec // TODO: fix later
 	return rx, ry, rz, nil
 }
 

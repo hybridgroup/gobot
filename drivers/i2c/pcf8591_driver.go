@@ -143,8 +143,8 @@ func WithPCF8591With400kbitStabilization(additionalReadWrite, additionalRead int
 			if additionalRead < 0 {
 				additionalRead = 2 // works in most cases
 			}
-			p.additionalReadWrite = uint8(additionalReadWrite)
-			p.additionalRead = uint8(additionalRead)
+			p.additionalReadWrite = uint8(additionalReadWrite) //nolint:gosec // checked before
+			p.additionalRead = uint8(additionalRead)           //nolint:gosec // checked before
 			if pcf8591Debug {
 				log.Printf("400 kbit stabilization for PCF8591Driver set rw: %d, r: %d", p.additionalReadWrite, p.additionalRead)
 			}

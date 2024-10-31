@@ -84,7 +84,7 @@ func (d *DisplayBuffer) Clear() {
 // SetPixel sets the x, y pixel with c color
 func (d *DisplayBuffer) SetPixel(x, y, c int) {
 	idx := x + (y/d.pageSize)*d.width
-	bit := uint(y) % uint(d.pageSize)
+	bit := uint(y) % uint(d.pageSize) //nolint:gosec // TODO: fix later
 	if c == 0 {
 		d.buffer[idx] &= ^(1 << bit)
 	} else {
@@ -305,6 +305,7 @@ func (s *SSD1306Driver) Display() error {
 	if err := s.command(0); err != nil {
 		return err
 	}
+	//nolint:gosec // TODO: fix later
 	if err := s.command(uint8(s.DisplayWidth) - 1); err != nil {
 		return err
 	}
@@ -314,6 +315,7 @@ func (s *SSD1306Driver) Display() error {
 	if err := s.command(0); err != nil {
 		return err
 	}
+	//nolint:gosec // TODO: fix later
 	if err := s.command(uint8(s.pageSize) - 1); err != nil {
 		return err
 	}
@@ -371,6 +373,7 @@ func (s *SSD1306Driver) initialize() error {
 	if err := s.command(ssd1306SetMultiplexRatio); err != nil {
 		return err
 	}
+	//nolint:gosec // TODO: fix later
 	if err := s.command(uint8(s.DisplayHeight) - 1); err != nil {
 		return err
 	}

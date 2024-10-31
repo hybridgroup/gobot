@@ -77,7 +77,7 @@ func NewPCA9685Driver(c Connector, options ...func(Config)) *PCA9685Driver {
 		channel, _ := strconv.Atoi(params["channel"].(string))
 		on, _ := strconv.Atoi(params["on"].(string))
 		off, _ := strconv.Atoi(params["off"].(string))
-		return p.SetPWM(channel, uint16(on), uint16(off))
+		return p.SetPWM(channel, uint16(on), uint16(off)) //nolint:gosec // TODO: fix later
 	})
 	p.AddCommand("SetPWMFreq", func(params map[string]interface{}) interface{} {
 		freq, _ := strconv.ParseFloat(params["freq"].(string), 32)

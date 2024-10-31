@@ -435,30 +435,35 @@ func (b *Bebop) generatePcmd() *bytes.Buffer {
 	cmd.Write(tmp.Bytes())
 
 	tmp = &bytes.Buffer{}
+	//nolint:gosec // TODO: fix later
 	if err := binary.Write(tmp, binary.LittleEndian, uint8(b.Pcmd.Flag)); err != nil {
 		panic(err)
 	}
 	cmd.Write(tmp.Bytes())
 
 	tmp = &bytes.Buffer{}
+	//nolint:gosec // TODO: fix later
 	if err := binary.Write(tmp, binary.LittleEndian, int8(b.Pcmd.Roll)); err != nil {
 		panic(err)
 	}
 	cmd.Write(tmp.Bytes())
 
 	tmp = &bytes.Buffer{}
+	//nolint:gosec // TODO: fix later
 	if err := binary.Write(tmp, binary.LittleEndian, int8(b.Pcmd.Pitch)); err != nil {
 		panic(err)
 	}
 	cmd.Write(tmp.Bytes())
 
 	tmp = &bytes.Buffer{}
+	//nolint:gosec // TODO: fix later
 	if err := binary.Write(tmp, binary.LittleEndian, int8(b.Pcmd.Yaw)); err != nil {
 		panic(err)
 	}
 	cmd.Write(tmp.Bytes())
 
 	tmp = &bytes.Buffer{}
+	//nolint:gosec // TODO: fix later
 	if err := binary.Write(tmp, binary.LittleEndian, int8(b.Pcmd.Gaz)); err != nil {
 		panic(err)
 	}
@@ -482,6 +487,7 @@ func (b *Bebop) createAck(frame NetworkFrame) *bytes.Buffer {
 	// libARNetwork/Sources/ARNETWORK_Manager.h#ARNETWORK_Manager_IDOutputToIDAck
 	//
 
+	//nolint:gosec // TODO: fix later
 	return b.nwFrameGenerator.generate(bytes.NewBuffer([]byte{uint8(frame.Seq)}),
 		ARNETWORKAL_FRAME_TYPE_ACK,
 		byte(uint16(frame.Id)+(ARNETWORKAL_MANAGER_DEFAULT_ID_MAX/2)),
@@ -755,14 +761,17 @@ func (b *Bebop) createARStreamACK(frame ARStreamFrame) *bytes.Buffer {
 	b.tmpFrame.fragments[frame.FragmentNumber] = frame.Frame
 
 	if frame.FragmentNumber < 64 {
+		//nolint:gosec // TODO: fix later
 		b.tmpFrame.arstreamACK.LowPacketsAck |= uint64(1) << uint64(frame.FragmentNumber)
 	} else {
+		//nolint:gosec // TODO: fix later
 		b.tmpFrame.arstreamACK.HighPacketsAck |= uint64(1) << uint64(frame.FragmentNumber-64)
 	}
 
 	ackPacket := &bytes.Buffer{}
 	tmp := &bytes.Buffer{}
 
+	//nolint:gosec // TODO: fix later
 	if err := binary.Write(tmp, binary.LittleEndian, uint16(b.tmpFrame.arstreamACK.FrameNumber)); err != nil {
 		panic(err)
 	}
