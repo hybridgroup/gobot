@@ -17,7 +17,7 @@ var _ gobot.Adaptor = (*Adaptor)(nil)
 
 func connStub(options ...nats.Option) func() (*nats.Conn, error) {
 	return func() (*nats.Conn, error) {
-		opts := nats.DefaultOptions
+		opts := nats.GetDefaultOptions()
 		for _, opt := range options {
 			if err := opt(&opts); err != nil {
 				return nil, err
