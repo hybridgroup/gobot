@@ -70,10 +70,10 @@ examples_fmt_fix:
 
 $(EXAMPLES):
 ifeq ($(CHECK),ON)
-	go vet ./$@
+	go vet -tags libusb ./$@
 else ifeq ($(CHECK),FMT)
 	gofumpt -l -w ./$@
 	golangci-lint run ./$@ --fix --build-tags example,libusb --disable forcetypeassert --disable noctx
 else
-	go build -o /tmp/gobot_examples/$@ ./$@
+	go build -tags libusb -o /tmp/gobot_examples/$@ ./$@
 endif

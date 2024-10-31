@@ -1,6 +1,7 @@
 package system
 
 import (
+	"fmt"
 	"os"
 	"unsafe"
 
@@ -149,6 +150,15 @@ func (a *Accesser) NewAnalogPin(path string, r, w bool, readBufLen uint16) gobot
 // NewSpiDevice returns a new connection to SPI with the given parameters.
 func (a *Accesser) NewSpiDevice(busNum, chipNum, mode, bits int, maxSpeed int64) (gobot.SpiSystemDevicer, error) {
 	return a.spiAccess.createDevice(busNum, chipNum, mode, bits, maxSpeed)
+}
+
+// NewOneWireDevice returns a new 1-wire device with the given parameters.
+// note: this is a basic implementation without using the possibilities of bus controller
+// it depends on automatic device search, see https://www.kernel.org/doc/Documentation/w1/w1.generic
+func (a *Accesser) NewOneWireDevice(familyCode byte, serialNumber uint64) (gobot.OneWireSystemDevicer, error) {
+	sfa := &sysfsFileAccess{fs: a.fs, readBufLen: 200}
+	deviceID := fmt.Sprintf("%02x-%012x", familyCode, serialNumber)
+	return newOneWireDeviceSysfs(sfa, deviceID), nil
 }
 
 // OpenFile opens file of given name from native or the mocked file system

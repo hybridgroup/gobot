@@ -408,6 +408,12 @@ a shared set of drivers provided using the `gobot/drivers/spi` package:
   - MFRC522 RFID Card Reader
   - SSD1306 OLED Display Controller
 
+Support for devices that use 1-wire bus with Linux Kernel support (w1-gpio) have
+a shared set of drivers provided using the `gobot/drivers/onewire` package:
+
+- [1-wire](https://en.wikipedia.org/wiki/1-Wire) <=> [Drivers](https://github.com/hybridgroup/gobot/blob/release/drivers/onewire)
+  - DS18B20 Temperature Sensor
+
 ## API
 
 Gobot includes a RESTful API to query the status of any robot running within a group, including the connection and

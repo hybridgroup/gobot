@@ -54,6 +54,7 @@ type Adaptor struct {
 	*adaptors.PWMPinsAdaptor
 	*adaptors.I2cBusAdaptor
 	*adaptors.SpiBusAdaptor
+	*adaptors.OneWireBusAdaptor
 }
 
 // NewAdaptor creates a Tinkerboard Adaptor
@@ -96,6 +97,7 @@ func NewAdaptor(opts ...interface{}) *Adaptor {
 	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, a.validateI2cBusNumber, defaultI2cBusNumber)
 	a.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, a.validateSpiBusNumber, defaultSpiBusNumber, defaultSpiChipNumber,
 		defaultSpiMode, defaultSpiBitsNumber, defaultSpiMaxSpeed)
+	a.OneWireBusAdaptor = adaptors.NewOneWireBusAdaptor(sys)
 	return a
 }
 
@@ -109,6 +111,10 @@ func (a *Adaptor) SetName(n string) { a.name = n }
 func (a *Adaptor) Connect() error {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
+
+	if err := a.OneWireBusAdaptor.Connect(); err != nil {
+		return err
+	}
 
 	if err := a.SpiBusAdaptor.Connect(); err != nil {
 		return err
@@ -148,6 +154,10 @@ func (a *Adaptor) Finalize() error {
 	}
 
 	if e := a.SpiBusAdaptor.Finalize(); e != nil {
+		err = multierror.Append(err, e)
+	}
+
+	if e := a.OneWireBusAdaptor.Finalize(); e != nil {
 		err = multierror.Append(err, e)
 	}
 	return err

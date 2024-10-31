@@ -14,8 +14,11 @@ Tested OS:
 * [Debian TinkerOS](https://github.com/TinkerBoard/debian_kernel/releases)
 * [armbian](https://www.armbian.com/tinkerboard/) with Debian or Ubuntu
 
-> The latest "Tinker Board Debian 10 V3.0.11" is official discontinued. Nevertheless it is well tested with gobot. There
-> is a known i2c issue with the Kernel 4.4.194 if using block reads. armbian is known to work in this area.
+> The latest "Tinker Board Debian 10 V3.0.11" is official discontinued. Nevertheless it is tested with gobot. There
+> is a known i2c issue with the Kernel 4.4.194 if using block reads. armbian is known to work in this area. We recommend
+> to use "armbian bookworm minimal", because it is used for the latest development steps of gobot.
+
+## Configuration steps for the OS
 
 ### System access and configuration basics
 
@@ -26,7 +29,7 @@ Note that these configuration steps must be performed on the Tinker Board itself
 Board via SSH (option "-4" is used to force IPv4, which is needed for some versions of TinkerOS):
 
 ```sh
-ssh -4 linaro@192.168.1.xxx
+ssh -4 <user>@192.168.1.xxx # linaro@192.168.1.xxx
 ```
 
 ### Enabling hardware drivers
@@ -35,19 +38,20 @@ Not all drivers are enabled by default. You can have a look at the configuration
 your system:
 
 ```sh
-cat /boot/config.txt
+cat /boot/armbianEnv.txt #/boot/config.txt
 ```
 
 This file can be modified by "vi" or "nano", it is self explanatory:
 
 ```sh
-sudo vi /boot/config.txt
+sudo vi /boot/armbianEnv.txt
 ```
 
-Newer versions of Tinker Board provide an user interface for configuration with:
+Newer versions of OS provide an user interface for configuration with:
 
 ```sh
-sudo tinker-config
+sudo apt install armbian-config
+sudo armbian-config # tinker-config
 ```
 
 After configuration was changed, an reboot is necessary.
@@ -68,17 +72,17 @@ sudo groupadd -f --system gpio
 
 If you already have a "gpio" group, you can skip to the next step.
 
-#### Add the "linaro" user to the new "gpio" group
+#### Add the user to the new "gpio" group (TinkerOS only)
 
-Add the user "linaro" to be a member of the Linux group named "gpio" by running the following command:
+Add the user to be a member of the Linux group named "gpio" by running the following command:
 
 ```sh
-sudo usermod -a -G gpio linaro
+sudo usermod -a -G gpio <user>
 ```
 
 If you already have added the "gpio" group, you can skip to the next step.
 
-#### Add a "udev" rules file for gpio
+#### Add a "udev" rules file for gpio (TinkerOS only)
 
 Create a new "udev" rules file for the GPIO on the Tinker Board by running the following command:
 
@@ -108,17 +112,17 @@ Create a Linux group named "i2c" by running the following command:
 sudo groupadd -f --system i2c
 ```
 
-#### Add the "linaro" user to the new "i2c" group
+#### Add the user to the new "i2c" group
 
 If you already have added the "i2c" group, you can skip to the next step.  
 
-Add the user "linaro" to be a member of the Linux group named "i2c" by running the following command:
+Add the user to be a member of the Linux group named "i2c" by running the following command:
 
 ```sh
-sudo usermod -a -G gpio linaro
+sudo usermod -a -G gpio <user>
 ```
 
-#### Add a "udev" rules file for I2C
+#### Add a "udev" rules file for I2C (TinkerOS only)
 
 Create a new "udev" rules file for the I2C on the Tinker Board by running the following command:
 
@@ -159,8 +163,8 @@ Once you have compiled your code, you can upload your program and execute it on 
 using the `scp` and `ssh` commands like this:
 
 ```sh
-scp tinkerboard_blink linaro@192.168.1.xxx:/home/linaro/
-ssh -t linaro@192.168.1.xxx "./tinkerboard_blink"
+scp tinkerboard_blink <user>@192.168.1.xxx:/home/<user>/
+ssh -t <user>@192.168.1.xxx "./tinkerboard_blink"
 ```
 
 ## Troubleshooting

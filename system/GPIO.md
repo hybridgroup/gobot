@@ -1,6 +1,6 @@
 # GPIOs
 
-This document describes some basics for developers. This is useful to understand programming in gobot's [digital pin driver](digital_pin.go).
+This document describes some basics for developers. This is useful to understand programming in gobot's [digital pin driver](./digitalpin_access.go).
 
 ## GPIOs with sysfs
 

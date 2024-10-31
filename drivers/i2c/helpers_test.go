@@ -66,6 +66,7 @@ func (t *i2cTestAdaptor) ReadByte() (byte, error) {
 		return 0, err
 	}
 	val := bytes[0]
+
 	return val, nil
 }
 
@@ -80,6 +81,7 @@ func (t *i2cTestAdaptor) ReadByteData(reg uint8) (uint8, error) {
 		return 0, err
 	}
 	val := bytes[0]
+
 	return val, nil
 }
 
@@ -98,6 +100,7 @@ func (t *i2cTestAdaptor) ReadWordData(reg uint8) (uint16, error) {
 		return 0, fmt.Errorf("Buffer underrun")
 	}
 	low, high := bytes[0], bytes[1]
+
 	return (uint16(high) << 8) | uint16(low), nil
 }
 
@@ -107,6 +110,7 @@ func (t *i2cTestAdaptor) ReadBlockData(reg uint8, b []byte) error {
 	if err := t.writeBytes([]byte{reg}); err != nil {
 		return err
 	}
+
 	return t.readBytes(b)
 }
 
@@ -153,6 +157,7 @@ func (t *i2cTestAdaptor) WriteBytes(b []byte) error {
 	if len(b) > 32 {
 		b = b[:32]
 	}
+
 	return t.writeBytes(b)
 }
 
@@ -162,6 +167,7 @@ func (t *i2cTestAdaptor) GetI2cConnection(address int, bus int) (Connection, err
 	}
 	t.bus = bus
 	t.address = address
+
 	return t, nil
 }
 
@@ -194,6 +200,7 @@ func (t *i2cTestAdaptor) readBytes(b []byte) error {
 	if n != len(b) {
 		return fmt.Errorf("Read %v bytes from device by i2c helpers, expected %v", n, len(b))
 	}
+
 	return nil
 }
 
@@ -204,5 +211,6 @@ func (t *i2cTestAdaptor) writeBytes(b []byte) error {
 	if err != nil {
 		return err
 	}
+
 	return nil
 }

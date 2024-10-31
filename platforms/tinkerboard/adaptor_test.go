@@ -95,6 +95,7 @@ func TestNewAdaptor(t *testing.T) {
 	assert.NotNil(t, a.PWMPinsAdaptor)
 	assert.NotNil(t, a.I2cBusAdaptor)
 	assert.NotNil(t, a.SpiBusAdaptor)
+	assert.NotNil(t, a.OneWireBusAdaptor)
 	// act & assert
 	a.SetName("NewName")
 	assert.Equal(t, "NewName", a.Name())

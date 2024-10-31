@@ -176,6 +176,22 @@ type SpiSystemDevicer interface {
 	Close() error
 }
 
+// OneWireSystemDevicer is the interface to a 1-wire device at system level.
+type OneWireSystemDevicer interface {
+	// ID returns the device id in the form "family code"-"serial number".
+	ID() string
+	// ReadData reads byte data from the device
+	ReadData(command string, data []byte) error
+	// WriteData writes byte data to the device
+	WriteData(command string, data []byte) error
+	// ReadInteger reads an integer value from the device
+	ReadInteger(command string) (int, error)
+	// WriteInteger writes an integer value to the device
+	WriteInteger(command string, val int) error
+	// Close the 1-wire connection.
+	Close() error
+}
+
 // BusOperations are functions provided by a bus device, e.g. SPI, i2c.
 type BusOperations interface {
 	// ReadByteData reads a byte from the given register of bus device.
@@ -209,6 +225,22 @@ type SpiOperations interface {
 	BusOperations
 	// ReadCommandData uses the SPI device TX to send/receive data.
 	ReadCommandData(command []byte, data []byte) error
+	// Close the connection.
+	Close() error
+}
+
+// OneWireOperations are the wrappers around the actual functions used by the 1-wire device interface
+type OneWireOperations interface {
+	// ID returns the device id in the form "family code"-"serial number".
+	ID() string
+	// ReadData reads from the device
+	ReadData(command string, data []byte) error
+	// WriteData writes to the device
+	WriteData(command string, data []byte) error
+	// ReadInteger reads an integer value from the device
+	ReadInteger(command string) (int, error)
+	// WriteInteger writes an integer value to the device
+	WriteInteger(command string, val int) error
 	// Close the connection.
 	Close() error
 }
