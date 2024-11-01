@@ -16,7 +16,7 @@ var _ gobot.Adaptor = (*Adaptor)(nil)
 
 func initTestLeapMotionAdaptor() *Adaptor {
 	a := NewAdaptor("")
-	a.connect = func(port string) (io.ReadWriteCloser, error) { return nil, nil }
+	a.connect = func(port string) (io.ReadWriteCloser, error) { return nil, nil } //nolint:nilnil // ok for test
 	return a
 }
 

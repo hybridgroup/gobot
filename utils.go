@@ -30,27 +30,27 @@ func After(t time.Duration, f func()) {
 	time.AfterFunc(t, f)
 }
 
-// Rand returns a positive random int up to max
-func Rand(max int) int {
-	i, _ := rand.Int(rand.Reader, big.NewInt(int64(max)))
+// Rand returns a positive random int up to maximum
+func Rand(maximum int) int {
+	i, _ := rand.Int(rand.Reader, big.NewInt(int64(maximum)))
 	return int(i.Int64())
 }
 
-// FromScale returns a converted input from min, max to 0.0...1.0.
-func FromScale(input, min, max float64) float64 {
-	return (input - math.Min(min, max)) / (math.Max(min, max) - math.Min(min, max))
+// FromScale returns a converted input from minimum, maximum to 0.0...1.0.
+func FromScale(input, minimum, maximum float64) float64 {
+	return (input - math.Min(minimum, maximum)) / (math.Max(minimum, maximum) - math.Min(minimum, maximum))
 }
 
-// ToScale returns a converted input from 0...1 to min...max scale.
-// If input is less than min then ToScale returns min.
-// If input is greater than max then ToScale returns max
-func ToScale(input, min, max float64) float64 {
-	i := input*(math.Max(min, max)-math.Min(min, max)) + math.Min(min, max)
+// ToScale returns a converted input from 0...1 to minimum...maximum scale.
+// If input is less than minimum then ToScale returns minimum.
+// If input is greater than maximum then ToScale returns maximum
+func ToScale(input, minimum, maximum float64) float64 {
+	i := input*(math.Max(minimum, maximum)-math.Min(minimum, maximum)) + math.Min(minimum, maximum)
 	switch {
-	case i < math.Min(min, max):
-		return math.Min(min, max)
-	case i > math.Max(min, max):
-		return math.Max(min, max)
+	case i < math.Min(minimum, maximum):
+		return math.Min(minimum, maximum)
+	case i > math.Max(minimum, maximum):
+		return math.Max(minimum, maximum)
 	default:
 		return i
 	}

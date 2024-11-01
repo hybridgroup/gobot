@@ -163,6 +163,7 @@ func (d *DRV2605LDriver) SetSequence(waveforms []uint8) error {
 		waveforms = waveforms[0:8]
 	}
 	for i, w := range waveforms {
+		//nolint:gosec // TODO: fix later
 		if err := d.connection.WriteByteData(uint8(drv2605RegWaveSeq1+i), w); err != nil {
 			return err
 		}

@@ -20,7 +20,7 @@ func (c *busConnMock) ReadByteData(reg uint8) (uint8, error) {
 
 	switch reg {
 	case regFIFOLevel:
-		return uint8(len(c.simFifo)), nil
+		return uint8(len(c.simFifo)), nil //nolint:gosec // ok for test
 	case regFIFOData:
 		c.fifoIdx++
 		return c.simFifo[c.fifoIdx-1], nil

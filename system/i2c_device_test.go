@@ -1,3 +1,4 @@
+//nolint:gosec // ok for test
 package system
 
 import (

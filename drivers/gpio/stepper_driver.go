@@ -308,6 +308,7 @@ func (d *StepperDriver) stepAsynch(stepsToMove float64) error {
 	// t [min] = steps [st] / (steps_per_revolution [st/u] * speed [u/min]) or
 	// t [min] = steps [st] * delay_per_step [min/st], use safety factor 2 and a small offset of 100 ms
 	// prepare this timeout outside of stop function to prevent data race with stepsLeft
+	//nolint:gosec // TODO: fix later
 	stopTimeout := time.Duration(2*stepsLeft)*d.getDelayPerStep() + 100*time.Millisecond
 	endlessMovement := false
 

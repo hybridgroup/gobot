@@ -1,3 +1,6 @@
+//go:build gocv
+// +build gocv
+
 package opencv
 
 import (

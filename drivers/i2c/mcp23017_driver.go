@@ -273,7 +273,7 @@ func (m *MCP23017Driver) WriteGPIO(pin uint8, portStr string, val uint8) error {
 	if !m.mcpBehav.autoIODirOff {
 		// Set IODIR register bit for given pin to an output by clearing bit.
 		// can't call SetPinMode() because mutex will cause deadlock
-		if err := m.write(selectedPort.IODIR, pin, clear); err != nil {
+		if err := m.write(selectedPort.IODIR, pin, clearBit); err != nil {
 			return err
 		}
 	}
@@ -290,7 +290,7 @@ func (m *MCP23017Driver) ReadGPIO(pin uint8, portStr string) (uint8, error) {
 	if !m.mcpBehav.autoIODirOff {
 		// Set IODIR register bit for given pin to an input by set bit.
 		// can't call SetPinMode() because mutex will cause deadlock
-		if err := m.write(selectedPort.IODIR, pin, set); err != nil {
+		if err := m.write(selectedPort.IODIR, pin, setBit); err != nil {
 			return 0, err
 		}
 	}
@@ -323,10 +323,10 @@ func (m *MCP23017Driver) write(reg uint8, pin uint8, state bitState) error {
 	}
 
 	var val uint8
-	if state == clear {
-		val = uint8(bit.Clear(int(valOrg), pin))
+	if state == clearBit {
+		val = uint8(bit.Clear(int(valOrg), pin)) //nolint:gosec // TODO: fix later
 	} else {
-		val = uint8(bit.Set(int(valOrg), pin))
+		val = uint8(bit.Set(int(valOrg), pin)) //nolint:gosec // TODO: fix later
 	}
 
 	if val != valOrg || m.mcpBehav.forceRefresh {

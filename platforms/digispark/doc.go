@@ -1,3 +1,6 @@
+//go:build libusb
+// +build libusb
+
 /*
 Package digispark provides the Gobot adaptor for the Digispark ATTiny-based USB development board.
 

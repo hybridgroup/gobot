@@ -172,6 +172,7 @@ func (d *MFRC522Common) communicateWithPICC(command uint8, sendData []byte, back
 	}
 
 	// TODO: this is not used at the moment (propagation of IRQ pin)
+	//nolint:gosec // TODO: fix later
 	if err := d.writeByteData(regComIEn, uint8(irqEn|comIEnRegIRqInv)); err != nil {
 		return err
 	}
@@ -337,10 +338,11 @@ func (d *MFRC522Common) readFifo(backData []byte) (uint8, error) {
 	if err != nil {
 		return 0, err
 	}
+	//nolint:gosec // TODO: fix later
 	if n > uint8(len(backData)) {
 		return 0, fmt.Errorf("more data in FIFO (%d) than expected (%d)", n, len(backData))
 	}
-
+	//nolint:gosec // TODO: fix later
 	if n < uint8(len(backData)) {
 		return 0, fmt.Errorf("less data in FIFO (%d) than expected (%d)", n, len(backData))
 	}

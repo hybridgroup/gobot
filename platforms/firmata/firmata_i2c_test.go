@@ -1,7 +1,7 @@
 //go:build !windows
 // +build !windows
 
-//nolint:forcetypeassert // ok here
+//nolint:forcetypeassert,gosec // ok here
 package firmata
 
 import (

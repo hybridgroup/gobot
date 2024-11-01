@@ -69,3 +69,5 @@ func main() {
 	}
 }
 ```
+
+Build your application with build tag "gocv".

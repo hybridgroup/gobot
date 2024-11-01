@@ -20,11 +20,11 @@ func main() {
 	ollieBot := sphero.NewOllieDriver(bleAdaptor)
 
 	work := func() {
-		head := 90
+		head := uint16(90)
 		ollieBot.SetRGB(255, 0, 0)
 		ollieBot.Boost(true)
 		gobot.Every(1*time.Second, func() {
-			ollieBot.Roll(0, uint16(head))
+			ollieBot.Roll(0, head)
 			time.Sleep(1 * time.Second)
 			head += 90
 			head = head % 360

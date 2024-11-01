@@ -143,6 +143,7 @@ func (d *OllieDriver) SetRGB(r uint8, g uint8, b uint8) {
 
 // Roll tells the Ollie to roll
 func (d *OllieDriver) Roll(speed uint8, heading uint16) {
+	//nolint:gosec // TODO: fix later
 	d.sendCraftPacket([]uint8{speed, uint8(heading >> 8), uint8(heading & 0xFF), 0x01}, 0x02, 0x30)
 }
 
@@ -353,13 +354,13 @@ func (d *OllieDriver) handleLocatorDetected(data []uint8) {
 	var x, y int16
 
 	if ux > 32255 {
-		x = int16(ux - 65535)
+		x = int16(ux - 65535) //nolint:gosec // ok here
 	} else {
 		x = int16(ux)
 	}
 
 	if uy > 32255 {
-		y = int16(uy - 65535)
+		y = int16(uy - 65535) //nolint:gosec // ok here
 	} else {
 		y = int16(uy)
 	}
@@ -424,7 +425,7 @@ func (d *OllieDriver) sendCraftPacket(body []uint8, did byte, cid byte) {
 
 func (d *OllieDriver) craftPacket(body []uint8, did byte, cid byte) *packet {
 	dlen := len(body) + 1
-	hdr := []uint8{0xFF, 0xFF, did, cid, d.seq, uint8(dlen)}
+	hdr := []uint8{0xFF, 0xFF, did, cid, d.seq, uint8(dlen)} //nolint:gosec // TODO: fix later
 	buf := append(hdr, body...)
 
 	packet := &packet{

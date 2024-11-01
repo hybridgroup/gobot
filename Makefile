@@ -12,7 +12,7 @@ including_except := $(shell go list ./... | grep -v platforms/opencv)
 
 # Run tests on nearly all directories without test cache, with race detection
 test_race:
-	go test -failfast -count=1 -race $(including_except)
+	go test -failfast -count=1 -race $(including_except) -tags libusb
 
 # Run tests on nearly all directories without test cache
 test:
@@ -73,7 +73,7 @@ ifeq ($(CHECK),ON)
 	go vet ./$@
 else ifeq ($(CHECK),FMT)
 	gofumpt -l -w ./$@
-	golangci-lint run ./$@ --fix --build-tags example --disable forcetypeassert --disable noctx
+	golangci-lint run ./$@ --fix --build-tags example,libusb --disable forcetypeassert --disable noctx
 else
 	go build -o /tmp/gobot_examples/$@ ./$@
 endif

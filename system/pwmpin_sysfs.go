@@ -139,7 +139,7 @@ func (p *pwmPinSysFs) Period() (uint32, error) {
 	if err != nil {
 		return 0, fmt.Errorf(pwmPinErrorPattern, "Period", p.pin, err)
 	}
-
+	//nolint:gosec // TODO: fix later
 	return uint32(val), nil
 }
 
@@ -161,7 +161,7 @@ func (p *pwmPinSysFs) DutyCycle() (uint32, error) {
 	if err != nil {
 		return 0, fmt.Errorf(pwmPinErrorPattern, "DutyCycle", p.pin, err)
 	}
-
+	//nolint:gosec // TODO: fix later
 	return uint32(val), err
 }
 

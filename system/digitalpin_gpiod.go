@@ -1,13 +1,14 @@
 package system
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/warthog618/gpiod"
+	gpiod "github.com/warthog618/go-gpiocdev"
 
 	"gobot.io/x/gobot/v2"
 )
@@ -117,7 +118,8 @@ func (d *digitalPinGpiod) Unexport() error {
 	if len(errs) == 0 {
 		return nil
 	}
-	return fmt.Errorf(strings.Join(errs, ","))
+
+	return errors.New(strings.Join(errs, ","))
 }
 
 // Write writes the given value to the character device. Implements the interface gobot.DigitalPinner.

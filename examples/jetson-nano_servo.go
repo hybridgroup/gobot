@@ -4,6 +4,7 @@
 //
 // Do not build by default.
 
+//nolint:gosec // ok here
 package main
 
 //

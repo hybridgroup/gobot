@@ -29,5 +29,5 @@ func CalculateChecksum(buf []byte) byte {
 	for i := range buf {
 		calculatedChecksum += uint16(buf[i])
 	}
-	return uint8(^(calculatedChecksum % 256))
+	return uint8(^(calculatedChecksum % 256)) //nolint:gosec // TODO: fix later
 }

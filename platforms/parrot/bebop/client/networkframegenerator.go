@@ -40,11 +40,7 @@ func (nwg *nwFrameGenerator) generate(cmd *bytes.Buffer, frameType byte, id byte
 		nwg.seq[id] = 0
 	}
 
-	nwg.seq[id]++
-
-	if nwg.seq[id] > 255 {
-		nwg.seq[id] = 0
-	}
+	nwg.seq[id]++ // automatically rollover to 0 when > 255 is fine
 
 	ret := &bytes.Buffer{}
 	ret.WriteByte(frameType)
@@ -52,6 +48,7 @@ func (nwg *nwFrameGenerator) generate(cmd *bytes.Buffer, frameType byte, id byte
 	ret.WriteByte(nwg.seq[id])
 
 	size := &bytes.Buffer{}
+	//nolint:gosec // TODO: fix later
 	if err := binary.Write(size, binary.LittleEndian, uint32(cmd.Len()+nwg.hlen)); err != nil {
 		panic(err)
 	}

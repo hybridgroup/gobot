@@ -15,24 +15,24 @@ jobs:
     name: lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-go@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
         with:
-          go-version: '1.20'
+          go-version: '1.22'
           cache: false
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@v6
         with:
           # Optional: version of golangci-lint to use in form of v1.2 or v1.2.3 or `latest` to use the latest version
-          version: v1.56.1
+          version: v1.61.0
 
           # Optional: working directory, useful for monorepos
           # working-directory: v2
 
           # Optional: golangci-lint command line arguments.
-          # mostly there is no problem locally, but on server: "could not import C (cgo preprocessing failed) (typecheck)"
-          # and the digispark adaptor can not be build since switch to linter version 1.54.2
-          args: --skip-files="platforms/digispark/littleWire.go,platforms/digispark/digispark_adaptor.go"
+          # Note: exclude arguments, e.g. --exclude-files="my_file", will not affect the "typecheck" linter,
+          # at least since v1.61.0 - use build tags instead.
+          #args: --exclude-files="platforms/digispark/digispark_adaptor.go"
 
           # Optional: show only new issues if it's a pull request. The default value is `false`.
           # only-new-issues: true
@@ -40,9 +40,3 @@ jobs:
           # Optional: if set to true then the all caching functionality will be complete disabled,
           #           takes precedence over all other caching options.
           # skip-cache: true
-
-          # Optional: if set to true then the action don't cache or restore ~/go/pkg.
-          # skip-pkg-cache: true
-
-          # Optional: if set to true then the action don't cache or restore ~/.cache/go-build.
-          # skip-build-cache: true

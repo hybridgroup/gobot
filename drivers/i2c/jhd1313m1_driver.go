@@ -303,7 +303,7 @@ func (d *JHD1313M1Driver) SetCustomChar(pos int, charMap [8]byte) error {
 	if pos > 7 {
 		return fmt.Errorf("can't set a custom character at a position greater than 7")
 	}
-	location := uint8(pos)
+	location := uint8(pos) //nolint:gosec // checked before
 	if err := d.command([]byte{LCD_SETCGRAMADDR | (location << 3)}); err != nil {
 		return err
 	}

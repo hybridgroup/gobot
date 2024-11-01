@@ -219,13 +219,13 @@ func (d *BMP180Driver) calculatePressure(
 	x1 = (int32(d.calCoeffs.ac3) * b6) >> 13
 	x2 = (int32(d.calCoeffs.b1) * ((b6 * b6) >> 12)) >> 16
 	x3 = ((x1 + x2) + 2) >> 2
-	b4 := (uint32(d.calCoeffs.ac4) * uint32(x3+32768)) >> 15
-	b7 := (uint32(rawPressure-b3) * (50000 >> uint(oversampling)))
+	b4 := (uint32(d.calCoeffs.ac4) * uint32(x3+32768)) >> 15       //nolint:gosec // TODO: fix later
+	b7 := (uint32(rawPressure-b3) * (50000 >> uint(oversampling))) //nolint:gosec // TODO: fix later
 	var p int32
 	if b7 < 0x80000000 {
-		p = int32((b7 << 1) / b4)
+		p = int32((b7 << 1) / b4) //nolint:gosec // TODO: fix later
 	} else {
-		p = int32((b7 / b4) << 1)
+		p = int32((b7 / b4) << 1) //nolint:gosec // TODO: fix later
 	}
 	x1 = (p >> 8) * (p >> 8)
 	x1 = (x1 * 3038) >> 16

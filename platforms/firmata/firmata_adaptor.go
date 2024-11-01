@@ -28,7 +28,7 @@ type firmataBoard interface {
 	I2cRead(address int, numBytes int) error
 	I2cWrite(address int, data []byte) error
 	I2cConfig(delay int) error
-	ServoConfig(pin int, max int, min int) error
+	ServoConfig(pin int, maximum int, minimum int) error
 	WriteSysex(data []byte) error
 	gobot.Eventer
 }
@@ -126,13 +126,13 @@ func (f *Adaptor) Name() string { return f.name }
 func (f *Adaptor) SetName(n string) { f.name = n }
 
 // ServoConfig sets the pulse width in microseconds for a pin attached to a servo
-func (f *Adaptor) ServoConfig(pin string, min, max int) error {
+func (f *Adaptor) ServoConfig(pin string, minimum, maximum int) error {
 	p, err := strconv.Atoi(pin)
 	if err != nil {
 		return err
 	}
 
-	return f.Board.ServoConfig(p, max, min)
+	return f.Board.ServoConfig(p, maximum, minimum)
 }
 
 // ServoWrite writes the 0-180 degree angle to the specified pin.

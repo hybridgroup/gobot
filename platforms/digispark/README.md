@@ -66,6 +66,8 @@ func main() {
 }
 ```
 
+Build your application with build tag "libusb".
+
 ## How to Connect
 
 If your Digispark already has the Little Wire protocol firmware installed, you can connect right away with Gobot.

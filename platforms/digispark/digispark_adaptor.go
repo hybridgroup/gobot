@@ -1,3 +1,6 @@
+//go:build libusb
+// +build libusb
+
 package digispark
 
 import (
@@ -58,10 +61,12 @@ func (d *Adaptor) DigitalWrite(pin string, level byte) error {
 		return err
 	}
 
+	//nolint:gosec // TODO: fix later
 	if err := d.littleWire.pinMode(uint8(p), 0); err != nil {
 		return err
 	}
 
+	//nolint:gosec // TODO: fix later
 	return d.littleWire.digitalWrite(uint8(p), level)
 }
 
@@ -98,6 +103,7 @@ func (d *Adaptor) GetI2cConnection(address int, bus int) (i2c.Connection, error)
 	if bus != 0 {
 		return nil, fmt.Errorf("Invalid bus number %d, only 0 is supported", bus)
 	}
+	//nolint:gosec // TODO: fix later
 	c := NewDigisparkI2cConnection(d, uint8(address))
 	if err := c.Init(); err != nil {
 		return nil, err

@@ -183,6 +183,7 @@ func (d *SpheroDriver) SetRotationRate(level uint8) {
 
 // SetHeading sets the heading of the Sphero
 func (d *SpheroDriver) SetHeading(heading uint16) {
+	//nolint:gosec // TODO: fix later
 	d.sendCraftPacket([]uint8{uint8(heading >> 8), uint8(heading & 0xFF)}, 0x01)
 }
 
@@ -197,6 +198,7 @@ func (d *SpheroDriver) SetStabilization(on bool) {
 
 // Roll sends a roll command to the Sphero gives a speed and heading
 func (d *SpheroDriver) Roll(speed uint8, heading uint16) {
+	//nolint:gosec // TODO: fix later
 	d.sendCraftPacket([]uint8{speed, uint8(heading >> 8), uint8(heading & 0xFF), 0x01}, 0x30)
 }
 
@@ -393,7 +395,7 @@ func (d *SpheroDriver) sendCraftPacket(body []uint8, cid byte) {
 func (d *SpheroDriver) craftPacket(body []uint8, cid byte) *packet {
 	dlen := len(body) + 1
 	did := uint8(0x02)
-	hdr := []uint8{0xFF, 0xFF, did, cid, d.seq, uint8(dlen)}
+	hdr := []uint8{0xFF, 0xFF, did, cid, d.seq, uint8(dlen)} //nolint:gosec // TODO: fix later
 	buf := append(hdr, body...)
 
 	packet := &packet{

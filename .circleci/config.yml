@@ -14,7 +14,7 @@ version: 2
 jobs:
   "test_core_and_drivers_with_coverage":
     docker:
-      - image: cimg/go:1.20
+      - image: cimg/go:1.22
     steps:
       - checkout
       - run:
@@ -31,7 +31,7 @@ jobs:
 
   "test_platforms":
     docker:
-      - image: cimg/go:1.20
+      - image: cimg/go:1.22
     steps:
       - checkout
       - run:
@@ -45,7 +45,7 @@ jobs:
   
   "check_examples":
     docker:
-      - image: cimg/go:1.20
+      - image: cimg/go:1.22
     steps:
       - checkout
       - run:
@@ -61,7 +61,7 @@ jobs:
 
   "fmt_check_examples":
     docker:
-      - image: golangci/golangci-lint:v1.56.1
+      - image: golangci/golangci-lint:v1.61.0
     steps:
       - checkout
       - run:
