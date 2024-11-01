@@ -46,12 +46,10 @@ linters:
   # https://golangci-lint.run/usage/linters/#enabled-by-default
   # note: typecheck can not be disabled, it is used to check code compilation
   disable:
-    # deprecated: none
-    - gomnd # The linter has been renamed. Replaced by mnd.
-    # not used for this go version
-    - copyloopvar # the Go version (1.21) of your project is lower than Go 1.22
-    - intrange # the Go version (1.21) of your project is lower than Go 1.22
+    # deprecated:
     - exportloopref # Since Go1.22 (loopvar) this linter is no longer relevant. Replaced by copyloopvar
+    - gomnd # The linter has been renamed. Replaced by mnd.
+    # not used for this go version: none
     # not used for any reason
     - err113 # not used (we allow error creation at return statement)
     - execinquery # not needed (no sql)
@@ -83,6 +81,7 @@ linters:
     - gocyclo # useful with some tweeks (better understandable code)
     - goheader # useful, if we introduce a common header (e.g. for copyright)
     - interfacebloat # useful with some exclusions at usage of external packages
+    - intrange # introduced with go 1.22, will simplify the range syntax
     - maintidx # useful with some tweeks (better understandable code), maybe use instead "gocyclo", "gocognit" , "cyclop"
     - mnd # useful with some exclusions for existing code (e.g. mavlink.go)
     - nestif # useful (reduce bugs, simplify code, better understandable code)
