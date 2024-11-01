@@ -1,6 +1,51 @@
 # CHANGELOG
 
-## [Unreleased](https://github.com/hybridgroup/gobot/compare/v2.3.0...HEAD)
+## [Unreleased](https://github.com/hybridgroup/gobot/compare/v2.4.0...HEAD)
+
+## [v2.4.0](https://github.com/hybridgroup/gobot/compare/v2.3.0...v2.4.0) (2024-11-05)
+
+### Bebop
+
+* fix concurrent map writes ([#1063](https://github.com/hybridgroup/gobot/issues/1063))
+
+### Ble
+
+* add support for functional options, add tests ([#1059](https://github.com/hybridgroup/gobot/issues/1059))
+* introduce in drivers folder ([#1057](https://github.com/hybridgroup/gobot/issues/1057))
+* **client:** add scan timout ([#1051](https://github.com/hybridgroup/gobot/issues/1051))
+* **module:** update tinygo.org/x/bluetooth to v0.10 and adapt code ([#1084](https://github.com/hybridgroup/gobot/issues/1084))
+
+### Build
+
+* **go, deps:** switch to Go 1.22 and update modules, linter v1.61.0 and adapt code ([#1093](https://github.com/hybridgroup/gobot/issues/1093),[#1092](https://github.com/hybridgroup/gobot/issues/1092))
+* **go, deps:** switch to Go 1.20 and update modules ([#1067](https://github.com/hybridgroup/gobot/issues/1067))
+* **linter:** update linter to v1.56.1 and fix issues ([#1068](https://github.com/hybridgroup/gobot/issues/1068))
+
+### Doc
+
+* update links to release or tagged branch ([#1069](https://github.com/hybridgroup/gobot/issues/1069))
+* **core:** prepare for release v2.4.0
+
+### Examples
+
+* fix missing checks of return values ([#1060](https://github.com/hybridgroup/gobot/issues/1060))
+
+### Gobot
+
+* rename Master to Manager ([#1070](https://github.com/hybridgroup/gobot/issues/1070))
+
+### Megapi
+
+* use serialport adaptor and move driver to drivers/serial ([#1062](https://github.com/hybridgroup/gobot/issues/1062))
+
+### Neurosky
+
+* use serialport adaptor and move driver to drivers/serial ([#1061](https://github.com/hybridgroup/gobot/issues/1061))
+
+### Test
+
+* try to stabilize eventer tests ([#1066](https://github.com/hybridgroup/gobot/issues/1066))
+* try to stabilize firmata tests ([#1097](https://github.com/hybridgroup/gobot/issues/1097))
 
 ## [v2.3.0](https://github.com/hybridgroup/gobot/compare/v2.2.0...v2.3.0) (2024-01-06)
 
