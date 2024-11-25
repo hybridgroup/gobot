@@ -16,7 +16,7 @@ require (
 	github.com/nats-io/nats.go v1.37.0
 	github.com/nsf/termbox-go v1.1.1
 	github.com/sigurn/crc8 v0.0.0-20220107193325-2243fe600f9f
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	github.com/warthog618/go-gpiocdev v0.9.1
 	go.bug.st/serial v1.6.2
 	gocv.io/x/gocv v0.39.0
