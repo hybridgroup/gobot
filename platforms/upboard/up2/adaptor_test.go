@@ -170,38 +170,6 @@ func TestSpiDefaultValues(t *testing.T) {
 	assert.Equal(t, int64(500000), a.SpiDefaultMaxSpeed())
 }
 
-func Test_validateSpiBusNumber(t *testing.T) {
-	tests := map[string]struct {
-		busNr   int
-		wantErr error
-	}{
-		"number_negative_error": {
-			busNr:   -1,
-			wantErr: fmt.Errorf("Bus number -1 out of range"),
-		},
-		"number_0_ok": {
-			busNr: 0,
-		},
-		"number_1_ok": {
-			busNr: 1,
-		},
-		"number_2_error": {
-			busNr:   2,
-			wantErr: fmt.Errorf("Bus number 2 out of range"),
-		},
-	}
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			// arrange
-			a := NewAdaptor()
-			// act
-			err := a.validateSpiBusNumber(tc.busNr)
-			// assert
-			assert.Equal(t, tc.wantErr, err)
-		})
-	}
-}
-
 func TestI2cDefaultBus(t *testing.T) {
 	a := NewAdaptor()
 	assert.Equal(t, 5, a.DefaultI2cBus())
@@ -222,42 +190,6 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	err = a.Finalize()
 	// assert
 	require.ErrorContains(t, err, "close error")
-}
-
-func Test_validateI2cBusNumber(t *testing.T) {
-	tests := map[string]struct {
-		busNr   int
-		wantErr error
-	}{
-		"number_negative_error": {
-			busNr:   -1,
-			wantErr: fmt.Errorf("Bus number -1 out of range"),
-		},
-		"number_4_error": {
-			busNr:   4,
-			wantErr: fmt.Errorf("Bus number 4 out of range"),
-		},
-		"number_5_ok": {
-			busNr: 5,
-		},
-		"number_6_ok": {
-			busNr: 6,
-		},
-		"number_7_error": {
-			busNr:   7,
-			wantErr: fmt.Errorf("Bus number 7 out of range"),
-		},
-	}
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			// arrange
-			a := NewAdaptor()
-			// act
-			err := a.validateI2cBusNumber(tc.busNr)
-			// assert
-			assert.Equal(t, tc.wantErr, err)
-		})
-	}
 }
 
 func Test_translatePWMPin(t *testing.T) {

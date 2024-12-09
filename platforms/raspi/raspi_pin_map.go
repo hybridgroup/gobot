@@ -1,5 +1,7 @@
 package raspi
 
+import "gobot.io/x/gobot/v2/platforms/adaptors"
+
 var pins = map[string]map[string]int{
 	"3": {
 		"1": 0,
@@ -93,7 +95,7 @@ var pins = map[string]map[string]int{
 	},
 }
 
-var analogPinDefinitions = map[string]analogPinDefinition{
+var analogPinDefinitions = adaptors.AnalogPinDefinitions{
 	// +/-273.200 °C need >=7 characters to read: +/-273200 millidegree Celsius
-	"thermal_zone0": {path: "/sys/class/thermal/thermal_zone0/temp", r: true, w: false, bufLen: 7},
+	"thermal_zone0": {Path: "/sys/class/thermal/thermal_zone0/temp", R: true, W: false, BufLen: 7},
 }

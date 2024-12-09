@@ -155,7 +155,7 @@ func TestAnalog(t *testing.T) {
 	assert.Equal(t, 567, got)
 
 	_, err = a.AnalogRead("thermal_zone10")
-	require.ErrorContains(t, err, "'thermal_zone10' is not a valid id for a analog pin")
+	require.ErrorContains(t, err, "'thermal_zone10' is not a valid id for an analog pin")
 
 	fs.WithReadError = true
 	_, err = a.AnalogRead("thermal_zone0")
@@ -343,113 +343,6 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	err = a.Finalize()
 	// assert
 	require.ErrorContains(t, err, "close error")
-}
-
-func Test_validateSpiBusNumber(t *testing.T) {
-	tests := map[string]struct {
-		busNr   int
-		wantErr error
-	}{
-		"number_negative_error": {
-			busNr:   -1,
-			wantErr: fmt.Errorf("Bus number -1 out of range"),
-		},
-		"number_0_ok": {
-			busNr: 0,
-		},
-		"number_1_ok": {
-			busNr: 1,
-		},
-		"number_2_error": {
-			busNr:   2,
-			wantErr: fmt.Errorf("Bus number 2 out of range"),
-		},
-	}
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			// arrange
-			a := NewAdaptor()
-			// act
-			err := a.validateSpiBusNumber(tc.busNr)
-			// assert
-			assert.Equal(t, tc.wantErr, err)
-		})
-	}
-}
-
-func Test_validateI2cBusNumber(t *testing.T) {
-	tests := map[string]struct {
-		busNr   int
-		wantErr error
-	}{
-		"number_negative_error": {
-			busNr:   -1,
-			wantErr: fmt.Errorf("Bus number -1 out of range"),
-		},
-		"number_0_ok": {
-			busNr: 0,
-		},
-		"number_1_ok": {
-			busNr: 1,
-		},
-		"number_2_not_ok": {
-			busNr:   2,
-			wantErr: fmt.Errorf("Bus number 2 out of range"),
-		},
-	}
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			// arrange
-			a := NewAdaptor()
-			// act
-			err := a.validateI2cBusNumber(tc.busNr)
-			// assert
-			assert.Equal(t, tc.wantErr, err)
-		})
-	}
-}
-
-func Test_translateAnalogPin(t *testing.T) {
-	mockedPaths := []string{
-		"/sys/class/thermal/thermal_zone0/temp",
-		"/sys/class/thermal/thermal_zone1/temp",
-	}
-	tests := map[string]struct {
-		id           string
-		wantPath     string
-		wantReadable bool
-		wantBufLen   uint16
-		wantErr      string
-	}{
-		"translate_thermal_zone0": {
-			id:           "thermal_zone0",
-			wantPath:     "/sys/class/thermal/thermal_zone0/temp",
-			wantReadable: true,
-			wantBufLen:   7,
-		},
-		"unknown_id": {
-			id:      "thermal_zone1",
-			wantErr: "'thermal_zone1' is not a valid id for a analog pin",
-		},
-	}
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			// arrange
-			a, _ := initTestAdaptorWithMockedFilesystem(mockedPaths)
-			// act
-			path, r, w, buf, err := a.translateAnalogPin(tc.id)
-			// assert
-			if tc.wantErr != "" {
-				require.EqualError(t, err, tc.wantErr)
-			} else {
-				require.NoError(t, err)
-			}
-			assert.Equal(t, tc.wantPath, path)
-			assert.Equal(t, tc.wantReadable, r)
-			assert.False(t, w)
-			assert.Equal(t, tc.wantBufLen, buf)
-		})
-	}
 }
 
 func Test_getPinTranslatorFunction(t *testing.T) {

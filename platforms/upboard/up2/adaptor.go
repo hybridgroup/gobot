@@ -80,11 +80,17 @@ func NewAdaptor(opts ...interface{}) *Adaptor {
 		}
 	}
 
+	// Valid bus numbers are [5,6] which corresponds to /dev/i2c-5 through /dev/i2c-6.
+	i2cBusNumberValidator := adaptors.NewBusNumberValidator([]int{5, 6})
+	// Valid bus numbers are [0,1] which corresponds to /dev/spidev0.x through /dev/spidev1.x.
+	// x is the chip number <255
+	spiBusNumberValidator := adaptors.NewBusNumberValidator([]int{0, 1})
+
 	a.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, a.translateDigitalPin, digitalPinsOpts...)
 	a.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, a.translatePWMPin, pwmPinsOpts...)
-	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, a.validateI2cBusNumber, defaultI2cBusNumber)
-	a.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, a.validateSpiBusNumber, defaultSpiBusNumber, defaultSpiChipNumber,
-		defaultSpiMode, defaultSpiBitsNumber, defaultSpiMaxSpeed)
+	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, i2cBusNumberValidator.Validate, defaultI2cBusNumber)
+	a.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, spiBusNumberValidator.Validate, defaultSpiBusNumber,
+		defaultSpiChipNumber, defaultSpiMode, defaultSpiBitsNumber, defaultSpiMaxSpeed)
 	return a
 }
 
@@ -152,23 +158,6 @@ func (a *Adaptor) DigitalWrite(id string, val byte) error {
 	}
 
 	return a.DigitalPinsAdaptor.DigitalWrite(id, val)
-}
-
-func (a *Adaptor) validateSpiBusNumber(busNr int) error {
-	// Valid bus numbers are [0,1] which corresponds to /dev/spidev0.x through /dev/spidev1.x.
-	// x is the chip number <255
-	if (busNr < 0) || (busNr > 1) {
-		return fmt.Errorf("Bus number %d out of range", busNr)
-	}
-	return nil
-}
-
-func (a *Adaptor) validateI2cBusNumber(busNr int) error {
-	// Valid bus number is [5..6] which corresponds to /dev/i2c-5 through /dev/i2c-6.
-	if (busNr < 5) || (busNr > 6) {
-		return fmt.Errorf("Bus number %d out of range", busNr)
-	}
-	return nil
 }
 
 func (a *Adaptor) translateDigitalPin(id string) (string, int, error) {

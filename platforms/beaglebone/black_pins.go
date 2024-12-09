@@ -1,5 +1,7 @@
 package beaglebone
 
+import "gobot.io/x/gobot/v2/platforms/adaptors"
+
 var bbbPinMap = map[string]int{
 	// P8_01 - P8_2 GND
 	// P8_03 - P8_6 EMCC
@@ -49,36 +51,36 @@ var bbbPinMap = map[string]int{
 	"P9_31": 110,
 }
 
-var bbbPwmPinMap = map[string]pwmPinDefinition{
+var bbbPwmPinMap = adaptors.PWMPinDefinitions{
 	"P8_13": {
-		dir: "/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/", dirRegexp: "pwmchip[0-9]+$", channel: 1,
+		Dir: "/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/", DirRegexp: "pwmchip[0-9]+$", Channel: 1,
 	},
 	"P8_19": {
-		dir: "/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/", dirRegexp: "pwmchip[0-9]+$", channel: 0,
+		Dir: "/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/", DirRegexp: "pwmchip[0-9]+$", Channel: 0,
 	},
 	"P9_14": {
-		dir: "/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/", dirRegexp: "pwmchip[0-9]+$", channel: 0,
+		Dir: "/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/", DirRegexp: "pwmchip[0-9]+$", Channel: 0,
 	},
 	"P9_16": {
-		dir: "/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/", dirRegexp: "pwmchip[0-9]+$", channel: 1,
+		Dir: "/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/", DirRegexp: "pwmchip[0-9]+$", Channel: 1,
 	},
 	"P9_21": {
-		dir: "/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/", dirRegexp: "pwmchip[0-9]+$", channel: 1,
+		Dir: "/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/", DirRegexp: "pwmchip[0-9]+$", Channel: 1,
 	},
 	"P9_22": {
-		dir: "/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/", dirRegexp: "pwmchip[0-9]+$", channel: 0,
+		Dir: "/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/", DirRegexp: "pwmchip[0-9]+$", Channel: 0,
 	},
 	"P9_42": {
-		dir: "/sys/devices/platform/ocp/48300000.epwmss/48300100.ecap/pwm/", dirRegexp: "pwmchip[0-9]+$", channel: 0,
+		Dir: "/sys/devices/platform/ocp/48300000.epwmss/48300100.ecap/pwm/", DirRegexp: "pwmchip[0-9]+$", Channel: 0,
 	},
 }
 
-var bbbAnalogPinMap = map[string]analogPinDefinition{
-	"P9_39": {path: "/sys/bus/iio/devices/iio:device0/in_voltage0_raw", r: true, w: false, bufLen: 1024},
-	"P9_40": {path: "/sys/bus/iio/devices/iio:device0/in_voltage1_raw", r: true, w: false, bufLen: 1024},
-	"P9_37": {path: "/sys/bus/iio/devices/iio:device0/in_voltage2_raw", r: true, w: false, bufLen: 1024},
-	"P9_38": {path: "/sys/bus/iio/devices/iio:device0/in_voltage3_raw", r: true, w: false, bufLen: 1024},
-	"P9_33": {path: "/sys/bus/iio/devices/iio:device0/in_voltage4_raw", r: true, w: false, bufLen: 1024},
-	"P9_36": {path: "/sys/bus/iio/devices/iio:device0/in_voltage5_raw", r: true, w: false, bufLen: 1024},
-	"P9_35": {path: "/sys/bus/iio/devices/iio:device0/in_voltage6_raw", r: true, w: false, bufLen: 1024},
+var bbbAnalogPinMap = adaptors.AnalogPinDefinitions{
+	"P9_39": {Path: "/sys/bus/iio/devices/iio:device0/in_voltage0_raw", R: true, W: false, BufLen: 1024},
+	"P9_40": {Path: "/sys/bus/iio/devices/iio:device0/in_voltage1_raw", R: true, W: false, BufLen: 1024},
+	"P9_37": {Path: "/sys/bus/iio/devices/iio:device0/in_voltage2_raw", R: true, W: false, BufLen: 1024},
+	"P9_38": {Path: "/sys/bus/iio/devices/iio:device0/in_voltage3_raw", R: true, W: false, BufLen: 1024},
+	"P9_33": {Path: "/sys/bus/iio/devices/iio:device0/in_voltage4_raw", R: true, W: false, BufLen: 1024},
+	"P9_36": {Path: "/sys/bus/iio/devices/iio:device0/in_voltage5_raw", R: true, W: false, BufLen: 1024},
+	"P9_35": {Path: "/sys/bus/iio/devices/iio:device0/in_voltage6_raw", R: true, W: false, BufLen: 1024},
 }

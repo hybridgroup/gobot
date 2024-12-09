@@ -281,6 +281,7 @@ platforms are currently supported:
 - [Sphero Ollie](http://www.sphero.com/ollie) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/sphero/ollie)
 - [Sphero SPRK+](http://www.sphero.com/sprk-plus) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/sphero/sprkplus)
 - [Tinker Board](https://www.asus.com/us/Single-Board-Computer/Tinker-Board/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/tinkerboard)
+- [Tinker Board 2](https://tinker-board.asus.com/series/tinker-board-2.html/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/tinkerboard/tinkerboard2)
 - [UP2](http://www.up-board.org/upsquared/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/upboard/up2)
 
 Support for many devices that use Analog Input/Output (AIO) have a shared set of drivers provided using

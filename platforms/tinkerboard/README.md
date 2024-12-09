@@ -233,7 +233,7 @@ lrwxrwxrwx 1 root root    0 Apr 24 14:17 subsystem -> ../../../../../class/pwm
 
 #### Creating pwm0
 
-`echo 0 > /sys/class/pwm/pwmchip2/enable`
+`echo 0 > /sys/class/pwm/pwmchip2/export`
 
 investigate result:
 

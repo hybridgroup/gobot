@@ -2,7 +2,6 @@ package rockpi
 
 import (
 	"errors"
-	"fmt"
 	"sync"
 
 	multierror "github.com/hashicorp/go-multierror"
@@ -46,88 +45,79 @@ type Adaptor struct {
 //	adaptors.WithGpiosActiveLow(pin's): invert the pin behavior
 func NewAdaptor(opts ...func(adaptors.DigitalPinsOptioner)) *Adaptor {
 	sys := system.NewAccesser()
-	c := &Adaptor{
+	a := &Adaptor{
 		name: gobot.DefaultName("RockPi"),
 		sys:  sys,
 	}
-	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.getPinTranslatorFunction(), opts...)
-	c.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, c.validateI2cBusNumber, defaultI2cBusNumber)
-	c.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, c.validateSpiBusNumber, defaultSpiBusNumber, defaultSpiChipNumber,
-		defaultSpiMode, defaultSpiBitsNumber, defaultSpiMaxSpeed)
-	return c
+
+	// The RockPi4 has 3 I2C buses: 2, 6, 7. See https://wiki.radxa.com/Rock4/hardware/gpio
+	// This could change in the future with other revisions!
+	i2cBusNumberValidator := adaptors.NewBusNumberValidator([]int{2, 6, 7})
+	// The RockPi4 has 2 SPI buses: 1, 2. See https://wiki.radxa.com/Rock4/hardware/gpio
+	// This could change in the future with other revisions!
+	spiBusNumberValidator := adaptors.NewBusNumberValidator([]int{1, 2})
+
+	a.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, a.getPinTranslatorFunction(), opts...)
+	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, i2cBusNumberValidator.Validate, defaultI2cBusNumber)
+	a.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, spiBusNumberValidator.Validate, defaultSpiBusNumber,
+		defaultSpiChipNumber, defaultSpiMode, defaultSpiBitsNumber, defaultSpiMaxSpeed)
+
+	return a
 }
 
 // Name returns the adaptors name
-func (c *Adaptor) Name() string {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
+func (a *Adaptor) Name() string {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
 
-	return c.name
+	return a.name
 }
 
 // SetName sets the adaptors name
-func (c *Adaptor) SetName(n string) {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
+func (a *Adaptor) SetName(n string) {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
 
-	c.name = n
+	a.name = n
 }
 
 // Connect create new connection to board and pins.
-func (c *Adaptor) Connect() error {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
+func (a *Adaptor) Connect() error {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
 
-	if err := c.SpiBusAdaptor.Connect(); err != nil {
+	if err := a.SpiBusAdaptor.Connect(); err != nil {
 		return err
 	}
 
-	if err := c.I2cBusAdaptor.Connect(); err != nil {
+	if err := a.I2cBusAdaptor.Connect(); err != nil {
 		return err
 	}
 
-	return c.DigitalPinsAdaptor.Connect()
+	return a.DigitalPinsAdaptor.Connect()
 }
 
 // Finalize closes connection to board and pins
-func (c *Adaptor) Finalize() error {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
+func (a *Adaptor) Finalize() error {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
 
-	err := c.DigitalPinsAdaptor.Finalize()
+	err := a.DigitalPinsAdaptor.Finalize()
 
-	if e := c.I2cBusAdaptor.Finalize(); e != nil {
+	if e := a.I2cBusAdaptor.Finalize(); e != nil {
 		err = multierror.Append(err, e)
 	}
 
-	if e := c.SpiBusAdaptor.Finalize(); e != nil {
+	if e := a.SpiBusAdaptor.Finalize(); e != nil {
 		err = multierror.Append(err, e)
 	}
 	return err
 }
 
-// The RockPi4 has 2 SPI buses: 1, 2. See https://wiki.radxa.com/Rock4/hardware/gpio
-// This could change in the future with other revisions!
-func (c *Adaptor) validateSpiBusNumber(busNr int) error {
-	if busNr != 1 && busNr != 2 {
-		return fmt.Errorf("SPI Bus number %d invalid: only 1, 2 supported by current Rockchip.", busNr)
-	}
-	return nil
-}
-
-// The RockPi4 has 3 I2C buses: 2, 6, 7. See https://wiki.radxa.com/Rock4/hardware/gpio
-// This could change in the future with other revisions!
-func (c *Adaptor) validateI2cBusNumber(busNr int) error {
-	if busNr != 2 && busNr != 6 && busNr != 7 {
-		return fmt.Errorf("I2C Bus number %d invalid: only 2, 6, 7 supported by current Rockchip.", busNr)
-	}
-	return nil
-}
-
-func (c *Adaptor) getPinTranslatorFunction() func(string) (string, int, error) {
+func (a *Adaptor) getPinTranslatorFunction() func(string) (string, int, error) {
 	return func(pin string) (string, int, error) {
 		var line int
-		if val, ok := pins[pin][c.readRevision()]; ok {
+		if val, ok := pins[pin][a.readRevision()]; ok {
 			line = val
 		} else if val, ok := pins[pin]["*"]; ok {
 			line = val
@@ -138,22 +128,22 @@ func (c *Adaptor) getPinTranslatorFunction() func(string) (string, int, error) {
 	}
 }
 
-func (c *Adaptor) readRevision() string {
-	if c.revision == "" {
-		content, err := c.sys.ReadFile(procDeviceTreeModel)
+func (a *Adaptor) readRevision() string {
+	if a.revision == "" {
+		content, err := a.sys.ReadFile(procDeviceTreeModel)
 		if err != nil {
-			return c.revision
+			return a.revision
 		}
 		model := string(content)
 		switch model {
 		case "Radxa ROCK 4":
-			c.revision = "4"
+			a.revision = "4"
 		case "Radxa ROCK 4C+":
-			c.revision = "4C+"
+			a.revision = "4C+"
 		default:
-			c.revision = "4"
+			a.revision = "4"
 		}
 	}
 
-	return c.revision
+	return a.revision
 }

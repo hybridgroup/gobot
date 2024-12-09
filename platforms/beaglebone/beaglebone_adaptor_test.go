@@ -90,32 +90,11 @@ func TestNewAdaptor(t *testing.T) {
 	assert.NotNil(t, a.I2cBusAdaptor)
 	assert.NotNil(t, a.SpiBusAdaptor)
 	assert.Equal(t, bbbPinMap, a.pinMap)
-	assert.Equal(t, bbbPwmPinMap, a.pwmPinMap)
-	assert.Equal(t, bbbAnalogPinMap, a.analogPinMap)
+	assert.NotNil(t, a.pwmPinTranslate)
 	assert.Equal(t, "/sys/class/leds/beaglebone:green:", a.usrLed)
 	// act & assert
 	a.SetName("NewName")
 	assert.Equal(t, "NewName", a.Name())
-}
-
-func TestNewPocketBeagleAdaptor(t *testing.T) {
-	// arrange & act
-	a := NewPocketBeagleAdaptor()
-	// assert
-	assert.IsType(t, &PocketBeagleAdaptor{}, a)
-	assert.True(t, strings.HasPrefix(a.Name(), "PocketBeagle"))
-	assert.NotNil(t, a.sys)
-	assert.Equal(t, pocketBeaglePinMap, a.pinMap)
-	assert.Equal(t, pocketBeaglePwmPinMap, a.pwmPinMap)
-	assert.Equal(t, pocketBeagleAnalogPinMap, a.analogPinMap)
-	assert.Equal(t, "/sys/class/leds/beaglebone:green:", a.usrLed)
-}
-
-func TestNewPocketBeagleAdaptorWithOption(t *testing.T) {
-	// arrange & act
-	a := NewPocketBeagleAdaptor(adaptors.WithGpiodAccess())
-	// assert
-	require.NoError(t, a.Connect())
 }
 
 func TestPWMWrite(t *testing.T) {
@@ -173,7 +152,7 @@ func TestAnalog(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = a.AnalogRead("P9_99")
-	require.ErrorContains(t, err, "Not a valid analog pin")
+	require.ErrorContains(t, err, "not a valid id for an analog pin")
 
 	fs.WithReadError = true
 	_, err = a.AnalogRead("P9_40")
@@ -305,74 +284,6 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	err = a.Finalize()
 	// assert
 	require.ErrorContains(t, err, "close error")
-}
-
-func Test_validateSpiBusNumber(t *testing.T) {
-	tests := map[string]struct {
-		busNr   int
-		wantErr error
-	}{
-		"number_negative_error": {
-			busNr:   -1,
-			wantErr: fmt.Errorf("Bus number -1 out of range"),
-		},
-		"number_0_ok": {
-			busNr: 0,
-		},
-		"number_1_ok": {
-			busNr: 1,
-		},
-		"number_2_error": {
-			busNr:   2,
-			wantErr: fmt.Errorf("Bus number 2 out of range"),
-		},
-	}
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			// arrange
-			a := NewAdaptor()
-			// act
-			err := a.validateSpiBusNumber(tc.busNr)
-			// assert
-			assert.Equal(t, tc.wantErr, err)
-		})
-	}
-}
-
-func Test_validateI2cBusNumber(t *testing.T) {
-	tests := map[string]struct {
-		busNr   int
-		wantErr error
-	}{
-		"number_negative_error": {
-			busNr:   -1,
-			wantErr: fmt.Errorf("Bus number -1 out of range"),
-		},
-		"number_0_ok": {
-			busNr: 0,
-		},
-		"number_1_error": {
-			busNr:   1,
-			wantErr: fmt.Errorf("Bus number 1 out of range"),
-		},
-		"number_2_ok": {
-			busNr: 2,
-		},
-		"number_3_error": {
-			busNr:   3,
-			wantErr: fmt.Errorf("Bus number 3 out of range"),
-		},
-	}
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			// arrange
-			a := NewAdaptor()
-			// act
-			err := a.validateI2cBusNumber(tc.busNr)
-			// assert
-			assert.Equal(t, tc.wantErr, err)
-		})
-	}
 }
 
 func Test_translateAndMuxPWMPin(t *testing.T) {

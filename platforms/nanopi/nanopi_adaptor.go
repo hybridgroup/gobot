@@ -21,36 +21,11 @@ const (
 	defaultSpiMaxSpeed   = 500000
 )
 
-type cdevPin struct {
-	chip uint8
-	line uint8
-}
-
-type gpioPinDefinition struct {
-	sysfs int
-	cdev  cdevPin
-}
-
-type analogPinDefinition struct {
-	path   string
-	r      bool // readable
-	w      bool // writable
-	bufLen uint16
-}
-
-type pwmPinDefinition struct {
-	channel   int
-	dir       string
-	dirRegexp string
-}
-
 // Adaptor represents a Gobot Adaptor for the FriendlyARM NanoPi Boards
 type Adaptor struct {
-	name       string
-	sys        *system.Accesser
-	gpioPinMap map[string]gpioPinDefinition
-	pwmPinMap  map[string]pwmPinDefinition
-	mutex      sync.Mutex
+	name  string
+	sys   *system.Accesser
+	mutex sync.Mutex
 	*adaptors.AnalogPinsAdaptor
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.PWMPinsAdaptor
@@ -74,10 +49,8 @@ type Adaptor struct {
 func NewNeoAdaptor(opts ...interface{}) *Adaptor {
 	sys := system.NewAccesser(system.WithDigitalPinGpiodAccess())
 	a := &Adaptor{
-		name:       gobot.DefaultName("NanoPi NEO Board"),
-		sys:        sys,
-		gpioPinMap: neoGpioPins,
-		pwmPinMap:  neoPwmPins,
+		name: gobot.DefaultName("NanoPi NEO Board"),
+		sys:  sys,
 	}
 
 	var digitalPinsOpts []func(adaptors.DigitalPinsOptioner)
@@ -93,12 +66,21 @@ func NewNeoAdaptor(opts ...interface{}) *Adaptor {
 		}
 	}
 
-	a.AnalogPinsAdaptor = adaptors.NewAnalogPinsAdaptor(sys, a.translateAnalogPin)
-	a.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, a.translateDigitalPin, digitalPinsOpts...)
-	a.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, a.translatePWMPin, pwmPinsOpts...)
-	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, a.validateI2cBusNumber, defaultI2cBusNumber)
-	a.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, a.validateSpiBusNumber, defaultSpiBusNumber, defaultSpiChipNumber,
-		defaultSpiMode, defaultSpiBitsNumber, defaultSpiMaxSpeed)
+	analogPinTranslator := adaptors.NewAnalogPinTranslator(sys, analogPinDefinitions)
+	digitalPinTranslator := adaptors.NewDigitalPinTranslator(sys, neoDigitalPinDefinitions)
+	pwmPinTranslator := adaptors.NewPWMPinTranslator(sys, neoPWMPinDefinitions)
+	// Valid bus numbers are [0..2] which corresponds to /dev/i2c-0 through /dev/i2c-2.
+	i2cBusNumberValidator := adaptors.NewBusNumberValidator([]int{0, 1, 2})
+	// Valid bus numbers are [0] which corresponds to /dev/spidev0.x
+	// x is the chip number <255
+	spiBusNumberValidator := adaptors.NewBusNumberValidator([]int{0})
+
+	a.AnalogPinsAdaptor = adaptors.NewAnalogPinsAdaptor(sys, analogPinTranslator.Translate)
+	a.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, digitalPinTranslator.Translate, digitalPinsOpts...)
+	a.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, pwmPinTranslator.Translate, pwmPinsOpts...)
+	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, i2cBusNumberValidator.Validate, defaultI2cBusNumber)
+	a.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, spiBusNumberValidator.Validate, defaultSpiBusNumber,
+		defaultSpiChipNumber, defaultSpiMode, defaultSpiBitsNumber, defaultSpiMaxSpeed)
 	return a
 }
 
@@ -154,83 +136,4 @@ func (a *Adaptor) Finalize() error {
 		err = multierror.Append(err, e)
 	}
 	return err
-}
-
-func (a *Adaptor) validateSpiBusNumber(busNr int) error {
-	// Valid bus numbers are [0] which corresponds to /dev/spidev0.x
-	// x is the chip number <255
-	if busNr != 0 {
-		return fmt.Errorf("Bus number %d out of range", busNr)
-	}
-	return nil
-}
-
-func (a *Adaptor) validateI2cBusNumber(busNr int) error {
-	// Valid bus number is [0..2] which corresponds to /dev/i2c-0 through /dev/i2c-2.
-	if (busNr < 0) || (busNr > 2) {
-		return fmt.Errorf("Bus number %d out of range", busNr)
-	}
-	return nil
-}
-
-func (a *Adaptor) translateAnalogPin(id string) (string, bool, bool, uint16, error) {
-	pinInfo, ok := analogPinDefinitions[id]
-	if !ok {
-		return "", false, false, 0, fmt.Errorf("'%s' is not a valid id for a analog pin", id)
-	}
-
-	path := pinInfo.path
-	info, err := a.sys.Stat(path)
-	if err != nil {
-		return "", false, false, 0, fmt.Errorf("Error (%v) on access '%s'", err, path)
-	}
-	if info.IsDir() {
-		return "", false, false, 0, fmt.Errorf("The item '%s' is a directory, which is not expected", path)
-	}
-
-	return path, pinInfo.r, pinInfo.w, pinInfo.bufLen, nil
-}
-
-func (a *Adaptor) translateDigitalPin(id string) (string, int, error) {
-	pindef, ok := a.gpioPinMap[id]
-	if !ok {
-		return "", -1, fmt.Errorf("'%s' is not a valid id for a digital pin", id)
-	}
-	if a.sys.IsSysfsDigitalPinAccess() {
-		return "", pindef.sysfs, nil
-	}
-	chip := fmt.Sprintf("gpiochip%d", pindef.cdev.chip)
-	line := int(pindef.cdev.line)
-	return chip, line, nil
-}
-
-func (a *Adaptor) translatePWMPin(id string) (string, int, error) {
-	pinInfo, ok := a.pwmPinMap[id]
-	if !ok {
-		return "", -1, fmt.Errorf("'%s' is not a valid id for a PWM pin", id)
-	}
-	path, err := pinInfo.findPWMDir(a.sys)
-	if err != nil {
-		return "", -1, err
-	}
-	return path, pinInfo.channel, nil
-}
-
-func (p pwmPinDefinition) findPWMDir(sys *system.Accesser) (string, error) {
-	items, _ := sys.Find(p.dir, p.dirRegexp)
-	if len(items) == 0 {
-		return "", fmt.Errorf("No path found for PWM directory pattern, '%s' in path '%s'. See README.md for activation",
-			p.dirRegexp, p.dir)
-	}
-
-	dir := items[0]
-	info, err := sys.Stat(dir)
-	if err != nil {
-		return "", fmt.Errorf("Error (%v) on access '%s'", err, dir)
-	}
-	if !info.IsDir() {
-		return "", fmt.Errorf("The item '%s' is not a directory, which is not expected", dir)
-	}
-
-	return dir, nil
 }

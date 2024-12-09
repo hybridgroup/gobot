@@ -2,6 +2,7 @@ package beaglebone
 
 import (
 	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/platforms/adaptors"
 )
 
 // PocketBeagleAdaptor is the Gobot Adaptor for the PocketBeagle
@@ -22,9 +23,13 @@ type PocketBeagleAdaptor struct {
 func NewPocketBeagleAdaptor(opts ...interface{}) *PocketBeagleAdaptor {
 	a := NewAdaptor(opts...)
 	a.SetName(gobot.DefaultName("PocketBeagle"))
+
+	analogPinTranslator := adaptors.NewAnalogPinTranslator(a.sys, pocketBeagleAnalogPinMap)
+	pwmPinTranslator := adaptors.NewPWMPinTranslator(a.sys, pocketBeaglePwmPinMap)
+
+	a.AnalogPinsAdaptor = adaptors.NewAnalogPinsAdaptor(a.sys, analogPinTranslator.Translate)
 	a.pinMap = pocketBeaglePinMap
-	a.pwmPinMap = pocketBeaglePwmPinMap
-	a.analogPinMap = pocketBeagleAnalogPinMap
+	a.pwmPinTranslate = pwmPinTranslator.Translate
 
 	return &PocketBeagleAdaptor{
 		Adaptor: a,

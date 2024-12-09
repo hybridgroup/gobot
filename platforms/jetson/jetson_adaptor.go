@@ -69,11 +69,17 @@ func NewAdaptor(opts ...interface{}) *Adaptor {
 		}
 	}
 
+	// Valid bus numbers are [0,1] which corresponds to /dev/i2c-0 through /dev/i2c-1.
+	i2cBusNumberValidator := adaptors.NewBusNumberValidator([]int{0, 1})
+	// Valid bus numbers are [0,1] which corresponds to /dev/spidev0.x through /dev/spidev1.x.
+	// x is the chip number <255
+	spiBusNumberValidator := adaptors.NewBusNumberValidator([]int{0, 1})
+
 	a.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, a.translateDigitalPin, digitalPinsOpts...)
 	a.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, a.translatePWMPin, pwmPinsOpts...)
-	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, a.validateI2cBusNumber, defaultI2cBusNumber)
-	a.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, a.validateSpiBusNumber, defaultSpiBusNumber, defaultSpiChipNumber,
-		defaultSpiMode, defaultSpiBitsNumber, defaultSpiMaxSpeed)
+	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, i2cBusNumberValidator.Validate, defaultI2cBusNumber)
+	a.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, spiBusNumberValidator.Validate, defaultSpiBusNumber,
+		defaultSpiChipNumber, defaultSpiMode, defaultSpiBitsNumber, defaultSpiMaxSpeed)
 	return a
 }
 
@@ -132,23 +138,6 @@ func (a *Adaptor) Finalize() error {
 		err = multierror.Append(err, e)
 	}
 	return err
-}
-
-func (a *Adaptor) validateSpiBusNumber(busNr int) error {
-	// Valid bus numbers are [0,1] which corresponds to /dev/spidev0.x through /dev/spidev1.x.
-	// x is the chip number <255
-	if (busNr < 0) || (busNr > 1) {
-		return fmt.Errorf("Bus number %d out of range", busNr)
-	}
-	return nil
-}
-
-func (a *Adaptor) validateI2cBusNumber(busNr int) error {
-	// Valid bus number is [0..1] which corresponds to /dev/i2c-0 through /dev/i2c-1.
-	if (busNr < 0) || (busNr > 1) {
-		return fmt.Errorf("Bus number %d out of range", busNr)
-	}
-	return nil
 }
 
 func (a *Adaptor) translateDigitalPin(id string) (string, int, error) {

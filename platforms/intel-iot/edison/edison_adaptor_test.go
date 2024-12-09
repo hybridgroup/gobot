@@ -574,7 +574,7 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	require.ErrorContains(t, err, "close error")
 }
 
-func Test_validateI2cBusNumber(t *testing.T) {
+func Test_validateAndSetupI2cBusNumber(t *testing.T) {
 	tests := map[string]struct {
 		board   string
 		busNr   int

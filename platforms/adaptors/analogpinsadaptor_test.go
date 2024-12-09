@@ -52,7 +52,7 @@ func testAnalogPinTranslator(id string) (string, bool, bool, uint16, error) {
 		return analogReadWriteStringPath, true, true, 13, nil
 	}
 
-	return "", false, false, 0, fmt.Errorf("'%s' is not a valid id of a analog pin", id)
+	return "", false, false, 0, fmt.Errorf("'%s' is not a valid id of an analog pin", id)
 }
 
 func TestAnalogPinsConnect(t *testing.T) {
@@ -158,7 +158,7 @@ func TestAnalogWrite(t *testing.T) {
 			wantValW:   "0",
 			wantValRW:  "30000",
 			wantValRWS: "inverted",
-			wantErr:    "'notexist' is not a valid id of a analog pin",
+			wantErr:    "'notexist' is not a valid id of an analog pin",
 		},
 		"error_write_not_allowed": {
 			pin:        "read",
@@ -218,7 +218,7 @@ func TestAnalogRead(t *testing.T) {
 		},
 		"error_notexist": {
 			pin:     "notexist",
-			wantErr: "'notexist' is not a valid id of a analog pin",
+			wantErr: "'notexist' is not a valid id of an analog pin",
 		},
 		"error_invalid_syntax": {
 			pin:     "read/write_string",

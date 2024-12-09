@@ -23,13 +23,6 @@ const (
 	defaultSpiMaxSpeed   = 500000
 )
 
-type analogPinDefinition struct {
-	path   string
-	r      bool // readable
-	w      bool // writable
-	bufLen uint16
-}
-
 // Adaptor is the Gobot Adaptor for the Raspberry Pi
 type Adaptor struct {
 	name     string
@@ -74,12 +67,19 @@ func NewAdaptor(opts ...interface{}) *Adaptor {
 		}
 	}
 
-	a.AnalogPinsAdaptor = adaptors.NewAnalogPinsAdaptor(sys, a.translateAnalogPin)
+	analogPinTranslator := adaptors.NewAnalogPinTranslator(sys, analogPinDefinitions)
+	// Valid bus numbers are [0,1] which corresponds to /dev/i2c-0 through /dev/i2c-1.
+	i2cBusNumberValidator := adaptors.NewBusNumberValidator([]int{0, 1})
+	// Valid bus numbers are [0,1] which corresponds to /dev/spidev0.x through /dev/spidev1.x.
+	// x is the chip number <255
+	spiBusNumberValidator := adaptors.NewBusNumberValidator([]int{0, 1})
+
+	a.AnalogPinsAdaptor = adaptors.NewAnalogPinsAdaptor(sys, analogPinTranslator.Translate)
 	a.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, a.getPinTranslatorFunction(), digitalPinsOpts...)
 	a.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, a.getPinTranslatorFunction(), pwmPinsOpts...)
-	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, a.validateI2cBusNumber, 1)
-	a.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, a.validateSpiBusNumber, defaultSpiBusNumber, defaultSpiChipNumber,
-		defaultSpiMode, defaultSpiBitsNumber, defaultSpiMaxSpeed)
+	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, i2cBusNumberValidator.Validate, 1)
+	a.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, spiBusNumberValidator.Validate, defaultSpiBusNumber,
+		defaultSpiChipNumber, defaultSpiMode, defaultSpiBitsNumber, defaultSpiMaxSpeed)
 	return a
 }
 
@@ -156,41 +156,6 @@ func (a *Adaptor) DefaultI2cBus() int {
 		return 1
 	}
 	return 0
-}
-
-func (a *Adaptor) validateSpiBusNumber(busNr int) error {
-	// Valid bus numbers are [0,1] which corresponds to /dev/spidev0.x through /dev/spidev1.x.
-	// x is the chip number <255
-	if (busNr < 0) || (busNr > 1) {
-		return fmt.Errorf("Bus number %d out of range", busNr)
-	}
-	return nil
-}
-
-func (a *Adaptor) validateI2cBusNumber(busNr int) error {
-	// Valid bus number is [0..1] which corresponds to /dev/i2c-0 through /dev/i2c-1.
-	if (busNr < 0) || (busNr > 1) {
-		return fmt.Errorf("Bus number %d out of range", busNr)
-	}
-	return nil
-}
-
-func (a *Adaptor) translateAnalogPin(id string) (string, bool, bool, uint16, error) {
-	pinInfo, ok := analogPinDefinitions[id]
-	if !ok {
-		return "", false, false, 0, fmt.Errorf("'%s' is not a valid id for a analog pin", id)
-	}
-
-	path := pinInfo.path
-	info, err := a.sys.Stat(path)
-	if err != nil {
-		return "", false, false, 0, fmt.Errorf("Error (%v) on access '%s'", err, path)
-	}
-	if info.IsDir() {
-		return "", false, false, 0, fmt.Errorf("The item '%s' is a directory, which is not expected", path)
-	}
-
-	return path, pinInfo.r, pinInfo.w, pinInfo.bufLen, nil
 }
 
 // getPinTranslatorFunction returns a function to be able to translate GPIO and PWM pins.

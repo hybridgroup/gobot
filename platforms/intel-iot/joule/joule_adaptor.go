@@ -56,9 +56,12 @@ func NewAdaptor(opts ...interface{}) *Adaptor {
 		}
 	}
 
+	// Valid bus numbers are [0..2] which corresponds to /dev/i2c-0 through /dev/i2c-2.
+	i2cBusNumberValidator := adaptors.NewBusNumberValidator([]int{0, 1, 2})
+
 	a.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, a.translateDigitalPin, digitalPinsOpts...)
 	a.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, a.translatePWMPin, pwmPinsOpts...)
-	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, a.validateI2cBusNumber, defaultI2cBusNumber)
+	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, i2cBusNumberValidator.Validate, defaultI2cBusNumber)
 	return a
 }
 
@@ -99,14 +102,6 @@ func (a *Adaptor) Finalize() error {
 	}
 
 	return err
-}
-
-func (a *Adaptor) validateI2cBusNumber(busNr int) error {
-	// Valid bus number is [0..2] which corresponds to /dev/i2c-0 through /dev/i2c-2.
-	if (busNr < 0) || (busNr > 2) {
-		return fmt.Errorf("Bus number %d out of range", busNr)
-	}
-	return nil
 }
 
 func (a *Adaptor) translateDigitalPin(id string) (string, int, error) {

@@ -1,7 +1,6 @@
 package jetson
 
 import (
-	"fmt"
 	"runtime"
 	"strconv"
 	"strings"
@@ -170,70 +169,6 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	err = a.Finalize()
 	// assert
 	require.ErrorContains(t, err, "close error")
-}
-
-func Test_validateSpiBusNumber(t *testing.T) {
-	tests := map[string]struct {
-		busNr   int
-		wantErr error
-	}{
-		"number_negative_error": {
-			busNr:   -1,
-			wantErr: fmt.Errorf("Bus number -1 out of range"),
-		},
-		"number_0_ok": {
-			busNr: 0,
-		},
-		"number_1_ok": {
-			busNr: 1,
-		},
-		"number_2_error": {
-			busNr:   2,
-			wantErr: fmt.Errorf("Bus number 2 out of range"),
-		},
-	}
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			// arrange
-			a := NewAdaptor()
-			// act
-			err := a.validateSpiBusNumber(tc.busNr)
-			// assert
-			assert.Equal(t, tc.wantErr, err)
-		})
-	}
-}
-
-func Test_validateI2cBusNumber(t *testing.T) {
-	tests := map[string]struct {
-		busNr   int
-		wantErr error
-	}{
-		"number_negative_error": {
-			busNr:   -1,
-			wantErr: fmt.Errorf("Bus number -1 out of range"),
-		},
-		"number_0_ok": {
-			busNr: 0,
-		},
-		"number_1_ok": {
-			busNr: 1,
-		},
-		"number_2_not_ok": {
-			busNr:   2,
-			wantErr: fmt.Errorf("Bus number 2 out of range"),
-		},
-	}
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			// arrange
-			a := NewAdaptor()
-			// act
-			err := a.validateI2cBusNumber(tc.busNr)
-			// assert
-			assert.Equal(t, tc.wantErr, err)
-		})
-	}
 }
 
 func Test_translatePWMPin(t *testing.T) {

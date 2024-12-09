@@ -1,7 +1,6 @@
 package joule
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 
@@ -188,39 +187,4 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	err = a.Finalize()
 	// assert
 	require.ErrorContains(t, err, "close error")
-}
-
-func Test_validateI2cBusNumber(t *testing.T) {
-	tests := map[string]struct {
-		busNr   int
-		wantErr error
-	}{
-		"number_negative_error": {
-			busNr:   -1,
-			wantErr: fmt.Errorf("Bus number -1 out of range"),
-		},
-		"number_0_ok": {
-			busNr: 0,
-		},
-		"number_1_ok": {
-			busNr: 1,
-		},
-		"number_2_ok": {
-			busNr: 2,
-		},
-		"number_3_error": {
-			busNr:   3,
-			wantErr: fmt.Errorf("Bus number 3 out of range"),
-		},
-	}
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			// arrange
-			a := NewAdaptor()
-			// act
-			err := a.validateI2cBusNumber(tc.busNr)
-			// assert
-			assert.Equal(t, tc.wantErr, err)
-		})
-	}
 }

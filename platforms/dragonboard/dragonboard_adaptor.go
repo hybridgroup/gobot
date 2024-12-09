@@ -56,8 +56,12 @@ func NewAdaptor(opts ...func(adaptors.DigitalPinsOptioner)) *Adaptor {
 		name: gobot.DefaultName("DragonBoard"),
 		sys:  sys,
 	}
+
+	// Valid bus numbers are [0,1] which corresponds to /dev/i2c-0 through /dev/i2c-1.
+	i2cBusNumberValidator := adaptors.NewBusNumberValidator([]int{0, 1})
+
 	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.translateDigitalPin, opts...)
-	c.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, c.validateI2cBusNumber, defaultI2cBusNumber)
+	c.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, i2cBusNumberValidator.Validate, defaultI2cBusNumber)
 	c.pinMap = fixedPins
 	for i := 0; i < 122; i++ {
 		pin := fmt.Sprintf("GPIO_%d", i)
@@ -96,14 +100,6 @@ func (c *Adaptor) Finalize() error {
 	}
 
 	return err
-}
-
-func (c *Adaptor) validateI2cBusNumber(busNr int) error {
-	// Valid bus number is [0..1] which corresponds to /dev/i2c-0 through /dev/i2c-1.
-	if (busNr < 0) || (busNr > 1) {
-		return fmt.Errorf("Bus number %d out of range", busNr)
-	}
-	return nil
 }
 
 func (c *Adaptor) translateDigitalPin(id string) (string, int, error) {
