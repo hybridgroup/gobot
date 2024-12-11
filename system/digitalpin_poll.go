@@ -45,6 +45,9 @@ func startEdgePolling(
 		for {
 			select {
 			case <-quitChan:
+				if !firstLoopDone {
+					wg.Done()
+				}
 				return
 			default:
 				// note: pure reading takes between 30us and 1ms on rasperry Pi1, typically 50us, with sysfs also 500us
