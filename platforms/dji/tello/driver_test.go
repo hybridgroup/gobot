@@ -130,7 +130,7 @@ func Test_handleResponse(t *testing.T) {
 					if got != want {
 						require.Fail(t, "\ngot: %s\nwant: %s\n", got, want)
 					}
-				case <-time.After(time.Millisecond):
+				case <-time.After(5 * time.Millisecond):
 					t.Error("subscription channel seems empty")
 				}
 			}

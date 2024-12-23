@@ -24,7 +24,7 @@ const (
 // Adaptor represents a Gobot Adaptor for the ASUS Tinker Board
 type Adaptor struct {
 	name  string
-	sys   *system.Accesser
+	sys   *system.Accesser // used for unit tests only
 	mutex *sync.Mutex
 	*adaptors.AnalogPinsAdaptor
 	*adaptors.DigitalPinsAdaptor
@@ -38,7 +38,7 @@ type Adaptor struct {
 //
 // Optional parameters:
 //
-//	adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs (still used by default)
+//	adaptors.WithSysfsAccess():	use legacy sysfs driver instead of default character device gpiod
 //	adaptors.WithSpiGpioAccess(sclk, ncs, sdo, sdi):	use GPIO's instead of /dev/spidev#.#
 //	adaptors.WithGpiosActiveLow(pin's): invert the pin behavior
 //	adaptors.WithGpiosPullUp/Down(pin's): sets the internal pull resistor
@@ -48,18 +48,18 @@ type Adaptor struct {
 // note from RK3288 datasheet: "The pull direction (pullup or pulldown) for all of GPIOs are software-programmable", but
 // the latter is not working for any pin (armbian 22.08.7)
 func NewAdaptor(opts ...interface{}) *Adaptor {
-	sys := system.NewAccesser(system.WithDigitalPinGpiodAccess())
+	sys := system.NewAccesser()
 	a := &Adaptor{
 		name:  gobot.DefaultName("Tinker Board"),
 		sys:   sys,
 		mutex: &sync.Mutex{},
 	}
 
-	var digitalPinsOpts []func(adaptors.DigitalPinsOptioner)
+	var digitalPinsOpts []adaptors.DigitalPinsOptionApplier
 	var pwmPinsOpts []adaptors.PwmPinsOptionApplier
 	for _, opt := range opts {
 		switch o := opt.(type) {
-		case func(adaptors.DigitalPinsOptioner):
+		case adaptors.DigitalPinsOptionApplier:
 			digitalPinsOpts = append(digitalPinsOpts, o)
 		case adaptors.PwmPinsOptionApplier:
 			pwmPinsOpts = append(pwmPinsOpts, o)

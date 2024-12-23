@@ -28,9 +28,9 @@ type sysfsPin struct {
 // Adaptor represents a Gobot Adaptor for a C.H.I.P.
 type Adaptor struct {
 	name   string
-	sys    *system.Accesser
+	sys    *system.Accesser // used for unit tests only
 	mutex  sync.Mutex
-	pinmap map[string]sysfsPin
+	pinMap map[string]sysfsPin
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.PWMPinsAdaptor
 	*adaptors.I2cBusAdaptor
@@ -45,24 +45,24 @@ type Adaptor struct {
 //
 //	Optional parameters for PWM, see [adaptors.NewPWMPinsAdaptor]
 func NewAdaptor(opts ...interface{}) *Adaptor {
-	sys := system.NewAccesser()
+	sys := system.NewAccesser(system.WithDigitalPinSysfsAccess())
 	a := &Adaptor{
 		name: gobot.DefaultName("CHIP"),
 		sys:  sys,
 	}
 
-	a.pinmap = chipPins
+	a.pinMap = chipPins
 	baseAddr, _ := getXIOBase()
 	for i := 0; i < 8; i++ {
 		pin := fmt.Sprintf("XIO-P%d", i)
-		a.pinmap[pin] = sysfsPin{pin: baseAddr + i, pwmPin: -1}
+		a.pinMap[pin] = sysfsPin{pin: baseAddr + i, pwmPin: -1}
 	}
 
-	var digitalPinsOpts []func(adaptors.DigitalPinsOptioner)
+	var digitalPinsOpts []adaptors.DigitalPinsOptionApplier
 	var pwmPinsOpts []adaptors.PwmPinsOptionApplier
 	for _, opt := range opts {
 		switch o := opt.(type) {
-		case func(adaptors.DigitalPinsOptioner):
+		case adaptors.DigitalPinsOptionApplier:
 			digitalPinsOpts = append(digitalPinsOpts, o)
 		case adaptors.PwmPinsOptionApplier:
 			pwmPinsOpts = append(pwmPinsOpts, o)
@@ -77,14 +77,6 @@ func NewAdaptor(opts ...interface{}) *Adaptor {
 	a.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, a.translateDigitalPin, digitalPinsOpts...)
 	a.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, a.translatePWMPin, pwmPinsOpts...)
 	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, i2cBusNumberValidator.Validate, defaultI2cBusNumber)
-	return a
-}
-
-// NewProAdaptor creates a C.H.I.P. Pro Adaptor
-func NewProAdaptor() *Adaptor {
-	a := NewAdaptor()
-	a.name = gobot.DefaultName("CHIP Pro")
-	a.pinmap = chipProPins
 	return a
 }
 
@@ -158,14 +150,14 @@ func getXIOBase() (int, error) {
 }
 
 func (a *Adaptor) translateDigitalPin(id string) (string, int, error) {
-	if val, ok := a.pinmap[id]; ok {
+	if val, ok := a.pinMap[id]; ok {
 		return "", val.pin, nil
 	}
 	return "", -1, fmt.Errorf("'%s' is not a valid id for a digital pin", id)
 }
 
 func (a *Adaptor) translatePWMPin(id string) (string, int, error) {
-	sysPin, ok := a.pinmap[id]
+	sysPin, ok := a.pinMap[id]
 	if !ok {
 		return "", -1, fmt.Errorf("'%s' is not a valid id for a pin", id)
 	}

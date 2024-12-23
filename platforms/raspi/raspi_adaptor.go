@@ -40,7 +40,7 @@ type Adaptor struct {
 //
 // Optional parameters:
 //
-//	adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs (still used by default)
+//	adaptors.WithSysfsAccess():	use legacy sysfs driver instead of default character device gpiod
 //	adaptors.WithSpiGpioAccess(sclk, ncs, sdo, sdi):	use GPIO's instead of /dev/spidev#.#
 //	adaptors.WithGpiosActiveLow(pin's): invert the pin behavior
 //	adaptors.WithGpiosPullUp/Down(pin's): sets the internal pull resistor
@@ -48,17 +48,17 @@ type Adaptor struct {
 //	adaptors.WithGpioDebounce(pin, period): sets the input debouncer
 //	adaptors.WithGpioEventOnFallingEdge/RaisingEdge/BothEdges(pin, handler): activate edge detection
 func NewAdaptor(opts ...interface{}) *Adaptor {
-	sys := system.NewAccesser(system.WithDigitalPinGpiodAccess())
+	sys := system.NewAccesser()
 	a := &Adaptor{
 		name: gobot.DefaultName("RaspberryPi"),
 		sys:  sys,
 	}
 
-	var digitalPinsOpts []func(adaptors.DigitalPinsOptioner)
+	var digitalPinsOpts []adaptors.DigitalPinsOptionApplier
 	var pwmPinsOpts []adaptors.PwmPinsOptionApplier
 	for _, opt := range opts {
 		switch o := opt.(type) {
-		case func(adaptors.DigitalPinsOptioner):
+		case adaptors.DigitalPinsOptionApplier:
 			digitalPinsOpts = append(digitalPinsOpts, o)
 		case adaptors.PwmPinsOptionApplier:
 			pwmPinsOpts = append(pwmPinsOpts, o)

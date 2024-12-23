@@ -63,7 +63,7 @@ func preparePwmFs(fs *system.MockFilesystem) {
 	fs.Files[pwmPolarityPath].Contents = pwmInvertedIdentifier
 }
 
-func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.MockFilesystem) {
+func initConnectedTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.MockFilesystem) {
 	a := NewAdaptor()
 	fs := a.sys.UseMockFilesystem(mockPaths)
 	if err := a.Connect(); err != nil {
@@ -72,12 +72,30 @@ func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.
 	return a, fs
 }
 
-func TestName(t *testing.T) {
+func TestNewAdaptor(t *testing.T) {
+	// arrange & act
 	a := NewAdaptor()
-
+	// assert
+	assert.IsType(t, &Adaptor{}, a)
 	assert.True(t, strings.HasPrefix(a.Name(), "RaspberryPi"))
+	assert.NotNil(t, a.sys)
+	assert.NotNil(t, a.AnalogPinsAdaptor)
+	assert.NotNil(t, a.DigitalPinsAdaptor)
+	assert.NotNil(t, a.PWMPinsAdaptor)
+	assert.NotNil(t, a.I2cBusAdaptor)
+	assert.NotNil(t, a.SpiBusAdaptor)
+	assert.True(t, a.sys.IsGpiodDigitalPinAccess())
+	// act & assert
 	a.SetName("NewName")
 	assert.Equal(t, "NewName", a.Name())
+}
+
+func TestNewAdaptorWithOption(t *testing.T) {
+	// arrange & act
+	a := NewAdaptor(adaptors.WithGpiosActiveLow("1"), adaptors.WithSysfsAccess())
+	// assert
+	require.NoError(t, a.Connect())
+	assert.True(t, a.sys.IsSysfsDigitalPinAccess())
 }
 
 func TestGetDefaultBus(t *testing.T) {
@@ -133,7 +151,7 @@ func TestFinalize(t *testing.T) {
 		"/dev/spidev0.0",
 		"/dev/spidev0.1",
 	}
-	a, _ := initTestAdaptorWithMockedFilesystem(mockedPaths)
+	a, _ := initConnectedTestAdaptorWithMockedFilesystem(mockedPaths)
 
 	_ = a.DigitalWrite("3", 1)
 	_ = a.PwmWrite("7", 255)
@@ -147,7 +165,7 @@ func TestAnalog(t *testing.T) {
 		"/sys/class/thermal/thermal_zone0/temp",
 	}
 
-	a, fs := initTestAdaptorWithMockedFilesystem(mockPaths)
+	a, fs := initConnectedTestAdaptorWithMockedFilesystem(mockPaths)
 
 	fs.Files["/sys/class/thermal/thermal_zone0/temp"].Contents = "567\n"
 	got, err := a.AnalogRead("thermal_zone0")
@@ -167,7 +185,7 @@ func TestAnalog(t *testing.T) {
 
 func TestPwmWrite(t *testing.T) {
 	// arrange
-	a, fs := initTestAdaptorWithMockedFilesystem(pwmMockPaths)
+	a, fs := initConnectedTestAdaptorWithMockedFilesystem(pwmMockPaths)
 	preparePwmFs(fs)
 	// act
 	err := a.PwmWrite("pwm0", 100)
@@ -258,30 +276,29 @@ func TestPWM_piPlaster(t *testing.T) {
 }
 
 func TestDigitalIO(t *testing.T) {
-	mockedPaths := []string{
-		"/sys/class/gpio/export",
-		"/sys/class/gpio/unexport",
-		"/sys/class/gpio/gpio4/value",
-		"/sys/class/gpio/gpio4/direction",
-		"/sys/class/gpio/gpio27/value",
-		"/sys/class/gpio/gpio27/direction",
+	// some basic tests, further tests are done in "digitalpinsadaptor.go"
+	// arrange
+	a := NewAdaptor()
+	if err := a.Connect(); err != nil {
+		panic(err)
 	}
-	a, fs := initTestAdaptorWithMockedFilesystem(mockedPaths)
-
-	err := a.DigitalWrite("7", 1)
-	require.NoError(t, err)
-	assert.Equal(t, "1", fs.Files["/sys/class/gpio/gpio4/value"].Contents)
-
+	dpa := a.sys.UseMockDigitalPinAccess()
+	require.True(t, a.sys.IsGpiodDigitalPinAccess())
+	// act & assert write
+	_ = a.DigitalWrite("7", 1)
+	assert.Equal(t, []int{1}, dpa.Written("gpiochip0", "4"))
+	// arrange, act & assert read
 	a.revision = "2"
-	err = a.DigitalWrite("13", 1)
-	require.NoError(t, err)
-
+	dpa.UseValue("gpiochip0", "27", 2)
 	i, err := a.DigitalRead("13")
 	require.NoError(t, err)
-	assert.Equal(t, 1, i)
-
+	assert.Equal(t, 2, i)
+	// act and assert unknown pin
 	require.ErrorContains(t, a.DigitalWrite("notexist", 1), "'notexist' is not a valid pin id for raspi revision 2")
+	// act and assert finalize
 	require.NoError(t, a.Finalize())
+	assert.Equal(t, 0, dpa.Exported("gpiochip0", "4"))
+	assert.Equal(t, 0, dpa.Exported("gpiochip0", "27"))
 }
 
 func TestDigitalPinConcurrency(t *testing.T) {
@@ -318,7 +335,7 @@ func TestSpiDefaultValues(t *testing.T) {
 
 func TestI2cDefaultBus(t *testing.T) {
 	mockedPaths := []string{"/dev/i2c-1"}
-	a, _ := initTestAdaptorWithMockedFilesystem(mockedPaths)
+	a, _ := initConnectedTestAdaptorWithMockedFilesystem(mockedPaths)
 	a.sys.UseMockSyscall()
 
 	a.revision = "0"

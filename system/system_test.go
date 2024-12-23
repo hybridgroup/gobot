@@ -15,10 +15,12 @@ func TestNewAccesser(t *testing.T) {
 	nativeSys := a.sys.(*nativeSyscall)
 	nativeFsSys := a.fs.(*nativeFilesystem)
 	perphioSpi := a.spiAccess.(*periphioSpiAccess)
+	gpiodDigitalPin := a.digitalPinAccess.(*gpiodDigitalPinAccess)
 	assert.NotNil(t, a)
 	assert.NotNil(t, nativeSys)
 	assert.NotNil(t, nativeFsSys)
 	assert.NotNil(t, perphioSpi)
+	assert.NotNil(t, gpiodDigitalPin)
 }
 
 func TestNewAccesser_NewSpiDevice(t *testing.T) {
@@ -47,47 +49,41 @@ func TestNewAccesser_NewSpiDevice(t *testing.T) {
 
 func TestNewAccesser_IsSysfsDigitalPinAccess(t *testing.T) {
 	tests := map[string]struct {
-		gpiodAccesser bool
-		wantSys       bool
+		sysfsAccesser bool
+		wantGpiod     bool
 	}{
-		"default_accesser_sysfs": {
-			wantSys: true,
+		"default_accesser_gpiod": {
+			wantGpiod: true,
 		},
 		"accesser_sysfs": {
-			wantSys: true,
-		},
-		"accesser_gpiod": {
-			gpiodAccesser: true,
-			wantSys:       false,
+			sysfsAccesser: true,
+			wantGpiod:     false,
 		},
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
 			a := NewAccesser()
-			if tc.gpiodAccesser {
-				// there is no mock at this level, so if the system do not support
-				// character device gpio, we skip the test
-				dpa := &gpiodDigitalPinAccess{fs: &nativeFilesystem{}}
-				if !dpa.isSupported() {
-					t.Skip()
-				}
-				WithDigitalPinGpiodAccess()(a)
+			if tc.sysfsAccesser {
+				WithDigitalPinSysfsAccess()(a)
 			}
 			// act
-			got := a.IsSysfsDigitalPinAccess()
+			gotGpiod := a.IsGpiodDigitalPinAccess()
+			gotSysfs := a.IsSysfsDigitalPinAccess()
 			// assert
 			assert.NotNil(t, a)
-			if tc.wantSys {
-				assert.True(t, got)
-				dpaSys := a.digitalPinAccess.(*sysfsDigitalPinAccess)
-				assert.NotNil(t, dpaSys)
-				assert.Equal(t, a.fs.(*nativeFilesystem), dpaSys.sfa.fs)
-			} else {
-				assert.False(t, got)
+			if tc.wantGpiod {
+				assert.True(t, gotGpiod)
+				assert.False(t, gotSysfs)
 				dpaGpiod := a.digitalPinAccess.(*gpiodDigitalPinAccess)
 				assert.NotNil(t, dpaGpiod)
 				assert.Equal(t, a.fs.(*nativeFilesystem), dpaGpiod.fs)
+			} else {
+				assert.False(t, gotGpiod)
+				assert.True(t, gotSysfs)
+				dpaSys := a.digitalPinAccess.(*sysfsDigitalPinAccess)
+				assert.NotNil(t, dpaSys)
+				assert.Equal(t, a.fs.(*nativeFilesystem), dpaSys.sfa.fs)
 			}
 		})
 	}

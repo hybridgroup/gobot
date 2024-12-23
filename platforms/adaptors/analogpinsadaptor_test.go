@@ -40,23 +40,23 @@ func initTestAnalogPinsAdaptorWithMockedFilesystem(mockPaths []string) (*AnalogP
 	return a, fs
 }
 
-func testAnalogPinTranslator(id string) (string, bool, bool, uint16, error) {
+func testAnalogPinTranslator(id string) (string, bool, uint16, error) {
 	switch id {
 	case "read":
-		return analogReadPath, true, false, 10, nil
+		return analogReadPath, false, 10, nil
 	case "write":
-		return analogWritePath, false, true, 11, nil
+		return analogWritePath, true, 0, nil
 	case "read/write":
-		return analogReadWritePath, true, true, 12, nil
+		return analogReadWritePath, true, 12, nil
 	case "read/write_string":
-		return analogReadWriteStringPath, true, true, 13, nil
+		return analogReadWriteStringPath, true, 13, nil
 	}
 
-	return "", false, false, 0, fmt.Errorf("'%s' is not a valid id of an analog pin", id)
+	return "", false, 0, fmt.Errorf("'%s' is not a valid id of an analog pin", id)
 }
 
 func TestAnalogPinsConnect(t *testing.T) {
-	translate := func(id string) (path string, r, w bool, bufLen uint16, err error) { return }
+	translate := func(id string) (path string, w bool, bufLen uint16, err error) { return }
 	a := NewAnalogPinsAdaptor(system.NewAccesser(), translate)
 	assert.Equal(t, (map[string]gobot.AnalogPinner)(nil), a.pins)
 

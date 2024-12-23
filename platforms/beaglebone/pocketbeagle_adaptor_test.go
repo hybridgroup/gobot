@@ -21,11 +21,15 @@ func TestNewPocketBeagleAdaptor(t *testing.T) {
 	assert.NotNil(t, a.pwmPinTranslate)
 	assert.Equal(t, pocketBeaglePinMap, a.pinMap)
 	assert.Equal(t, "/sys/class/leds/beaglebone:green:", a.usrLed)
+	assert.True(t, a.sys.IsSysfsDigitalPinAccess())
 }
 
 func TestNewPocketBeagleAdaptorWithOption(t *testing.T) {
 	// arrange & act
 	a := NewPocketBeagleAdaptor(adaptors.WithGpiodAccess())
+	// we have to mock the fs at this point to ensure the option can be applied on each test environment
+	a.sys.UseMockFilesystem([]string{"/dev/gpiochip0"})
 	// assert
 	require.NoError(t, a.Connect())
+	assert.True(t, a.sys.IsGpiodDigitalPinAccess())
 }

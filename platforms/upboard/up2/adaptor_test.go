@@ -59,7 +59,7 @@ var gpioMockPaths = []string{
 	"/sys/class/leds/upboard:green:/brightness",
 }
 
-func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.MockFilesystem) {
+func initConnectedTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.MockFilesystem) {
 	a := NewAdaptor()
 	fs := a.sys.UseMockFilesystem(mockPaths)
 	if err := a.Connect(); err != nil {
@@ -68,15 +68,26 @@ func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.
 	return a, fs
 }
 
-func TestName(t *testing.T) {
+func TestNewAdaptor(t *testing.T) {
+	// arrange & act
 	a := NewAdaptor()
+	// assert
+	assert.IsType(t, &Adaptor{}, a)
 	assert.True(t, strings.HasPrefix(a.Name(), "UP2"))
+	assert.NotNil(t, a.sys)
+	assert.Equal(t, "/sys/class/leds/upboard:%s:/brightness", a.ledPath)
+	assert.NotNil(t, a.DigitalPinsAdaptor)
+	assert.NotNil(t, a.PWMPinsAdaptor)
+	assert.NotNil(t, a.I2cBusAdaptor)
+	assert.NotNil(t, a.SpiBusAdaptor)
+	assert.True(t, a.sys.IsSysfsDigitalPinAccess())
+	// act & assert
 	a.SetName("NewName")
 	assert.Equal(t, "NewName", a.Name())
 }
 
 func TestDigitalIO(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem(gpioMockPaths)
+	a, fs := initConnectedTestAdaptorWithMockedFilesystem(gpioMockPaths)
 
 	_ = a.DigitalWrite("7", 1)
 	assert.Equal(t, "1", fs.Files["/sys/class/gpio/gpio462/value"].Contents)
@@ -97,7 +108,7 @@ func TestDigitalIO(t *testing.T) {
 
 func TestPWMWrite(t *testing.T) {
 	// arrange
-	a, fs := initTestAdaptorWithMockedFilesystem(pwmMockPaths)
+	a, fs := initConnectedTestAdaptorWithMockedFilesystem(pwmMockPaths)
 	fs.Files[pwmDutyCyclePath].Contents = "0"
 	fs.Files[pwmPeriodPath].Contents = "0"
 	// act
@@ -139,7 +150,7 @@ func TestServoWrite(t *testing.T) {
 }
 
 func TestFinalizeErrorAfterGPIO(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem(gpioMockPaths)
+	a, fs := initConnectedTestAdaptorWithMockedFilesystem(gpioMockPaths)
 
 	require.NoError(t, a.DigitalWrite("7", 1))
 
@@ -150,7 +161,7 @@ func TestFinalizeErrorAfterGPIO(t *testing.T) {
 }
 
 func TestFinalizeErrorAfterPWM(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem(pwmMockPaths)
+	a, fs := initConnectedTestAdaptorWithMockedFilesystem(pwmMockPaths)
 	fs.Files[pwmDutyCyclePath].Contents = "0"
 	fs.Files[pwmPeriodPath].Contents = "0"
 

@@ -17,36 +17,44 @@ type gpiodDigitalPinAccess struct {
 	chips []string
 }
 
-func (h *sysfsDigitalPinAccess) isSupported() bool {
+func (dpa *sysfsDigitalPinAccess) isType(accesserType digitalPinAccesserType) bool {
+	return accesserType == digitalPinAccesserTypeSysfs
+}
+
+func (dpa *sysfsDigitalPinAccess) isSupported() bool {
 	// currently this is supported by all Kernels
 	return true
 }
 
-func (h *sysfsDigitalPinAccess) createPin(chip string, pin int,
+func (dpa *sysfsDigitalPinAccess) createPin(chip string, pin int,
 	o ...func(gobot.DigitalPinOptioner) bool,
 ) gobot.DigitalPinner {
-	return newDigitalPinSysfs(h.sfa, strconv.Itoa(pin), o...)
+	return newDigitalPinSysfs(dpa.sfa, strconv.Itoa(pin), o...)
 }
 
-func (h *sysfsDigitalPinAccess) setFs(fs filesystem) {
-	h.sfa = &sysfsFileAccess{fs: fs, readBufLen: 2}
+func (dpa *sysfsDigitalPinAccess) setFs(fs filesystem) {
+	dpa.sfa = &sysfsFileAccess{fs: fs, readBufLen: 2}
 }
 
-func (h *gpiodDigitalPinAccess) isSupported() bool {
-	chips, err := h.fs.find("/dev", "gpiochip")
+func (dpa *gpiodDigitalPinAccess) isType(accesserType digitalPinAccesserType) bool {
+	return accesserType == digitalPinAccesserTypeGpiod
+}
+
+func (dpa *gpiodDigitalPinAccess) isSupported() bool {
+	chips, err := dpa.fs.find("/dev", "gpiochip")
 	if err != nil || len(chips) == 0 {
 		return false
 	}
-	h.chips = chips
+	dpa.chips = chips
 	return true
 }
 
-func (h *gpiodDigitalPinAccess) createPin(chip string, pin int,
+func (dpa *gpiodDigitalPinAccess) createPin(chip string, pin int,
 	o ...func(gobot.DigitalPinOptioner) bool,
 ) gobot.DigitalPinner {
 	return newDigitalPinGpiod(chip, pin, o...)
 }
 
-func (h *gpiodDigitalPinAccess) setFs(fs filesystem) {
-	h.fs = fs
+func (dpa *gpiodDigitalPinAccess) setFs(fs filesystem) {
+	dpa.fs = fs
 }

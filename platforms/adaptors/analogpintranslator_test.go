@@ -23,31 +23,28 @@ func TestNewAnalogPinTranslator(t *testing.T) {
 
 func TestAnalogPinTranslatorTranslate(t *testing.T) {
 	pinDefinitions := AnalogPinDefinitions{
-		"thermal_zone0": {Path: "/sys/class/thermal/thermal_zone0/temp", R: true, W: false, BufLen: 7},
-		"thermal_zone1": {Path: "/sys/class/thermal/thermal_zone1/temp", R: true, W: false, BufLen: 7},
+		"thermal_zone0": {Path: "/sys/class/thermal/thermal_zone0/temp", W: false, ReadBufLen: 7},
+		"thermal_zone1": {Path: "/sys/class/thermal/thermal_zone1/temp", W: false, ReadBufLen: 7},
 	}
 	mockedPaths := []string{
 		"/sys/class/thermal/thermal_zone0/temp",
 		"/sys/class/thermal/thermal_zone1/temp",
 	}
 	tests := map[string]struct {
-		id           string
-		wantPath     string
-		wantReadable bool
-		wantBufLen   uint16
-		wantErr      string
+		id         string
+		wantPath   string
+		wantBufLen uint16
+		wantErr    string
 	}{
 		"translate_thermal_zone0": {
-			id:           "thermal_zone0",
-			wantPath:     "/sys/class/thermal/thermal_zone0/temp",
-			wantReadable: true,
-			wantBufLen:   7,
+			id:         "thermal_zone0",
+			wantPath:   "/sys/class/thermal/thermal_zone0/temp",
+			wantBufLen: 7,
 		},
 		"translate_thermal_zone1": {
-			id:           "thermal_zone1",
-			wantPath:     "/sys/class/thermal/thermal_zone1/temp",
-			wantReadable: true,
-			wantBufLen:   7,
+			id:         "thermal_zone1",
+			wantPath:   "/sys/class/thermal/thermal_zone1/temp",
+			wantBufLen: 7,
 		},
 		"unknown_id": {
 			id:      "99",
@@ -61,7 +58,7 @@ func TestAnalogPinTranslatorTranslate(t *testing.T) {
 			_ = sys.UseMockFilesystem(mockedPaths)
 			pt := NewAnalogPinTranslator(sys, pinDefinitions)
 			// act
-			path, r, w, buf, err := pt.Translate(tc.id)
+			path, w, buf, err := pt.Translate(tc.id)
 			// assert
 			if tc.wantErr != "" {
 				require.EqualError(t, err, tc.wantErr)
@@ -69,7 +66,6 @@ func TestAnalogPinTranslatorTranslate(t *testing.T) {
 				require.NoError(t, err)
 			}
 			assert.Equal(t, tc.wantPath, path)
-			assert.Equal(t, tc.wantReadable, r)
 			assert.False(t, w)
 			assert.Equal(t, tc.wantBufLen, buf)
 		})

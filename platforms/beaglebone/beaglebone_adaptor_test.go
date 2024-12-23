@@ -32,7 +32,7 @@ var (
 	_ spi.Connector               = (*Adaptor)(nil)
 )
 
-func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.MockFilesystem) {
+func initConnectedTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.MockFilesystem) {
 	a := NewAdaptor()
 	fs := a.sys.UseMockFilesystem(mockPaths)
 	if err := a.Connect(); err != nil {
@@ -92,6 +92,7 @@ func TestNewAdaptor(t *testing.T) {
 	assert.Equal(t, bbbPinMap, a.pinMap)
 	assert.NotNil(t, a.pwmPinTranslate)
 	assert.Equal(t, "/sys/class/leds/beaglebone:green:", a.usrLed)
+	assert.True(t, a.sys.IsSysfsDigitalPinAccess())
 	// act & assert
 	a.SetName("NewName")
 	assert.Equal(t, "NewName", a.Name())
@@ -99,7 +100,7 @@ func TestNewAdaptor(t *testing.T) {
 
 func TestPWMWrite(t *testing.T) {
 	// arrange
-	a, fs := initTestAdaptorWithMockedFilesystem(pwmMockPaths)
+	a, fs := initConnectedTestAdaptorWithMockedFilesystem(pwmMockPaths)
 	fs.Files[pwm1DutyCyclePath].Contents = "0"
 	fs.Files[pwm1PeriodPath].Contents = "0"
 	// act & assert wrong pin
@@ -139,12 +140,12 @@ func TestServoWrite(t *testing.T) {
 	require.NoError(t, a.Finalize())
 }
 
-func TestAnalog(t *testing.T) {
+func TestAnalogRead(t *testing.T) {
 	mockPaths := []string{
 		"/sys/bus/iio/devices/iio:device0/in_voltage1_raw",
 	}
 
-	a, fs := initTestAdaptorWithMockedFilesystem(mockPaths)
+	a, fs := initConnectedTestAdaptorWithMockedFilesystem(mockPaths)
 
 	fs.Files["/sys/bus/iio/devices/iio:device0/in_voltage1_raw"].Contents = "567\n"
 	i, err := a.AnalogRead("P9_40")
@@ -180,10 +181,10 @@ func TestDigitalIO(t *testing.T) {
 		"/sys/class/gpio/gpio30/direction",
 	}
 
-	a, fs := initTestAdaptorWithMockedFilesystem(mockPaths)
+	a, fs := initConnectedTestAdaptorWithMockedFilesystem(mockPaths)
 
 	// DigitalIO
-	_ = a.DigitalWrite("usr1", 1)
+	require.NoError(t, a.DigitalWrite("usr1", 1))
 	assert.Equal(t,
 		"1",
 		fs.Files["/sys/class/leds/beaglebone:green:usr1/brightness"].Contents,
@@ -193,7 +194,7 @@ func TestDigitalIO(t *testing.T) {
 	err := a.DigitalWrite("usr10101", 1)
 	require.ErrorContains(t, err, " : /sys/class/leds/beaglebone:green:usr10101/brightness: no such file")
 
-	_ = a.DigitalWrite("P9_12", 1)
+	require.NoError(t, a.DigitalWrite("P9_12", 1))
 	assert.Equal(t, "1", fs.Files["/sys/class/gpio/gpio60/value"].Contents)
 
 	require.ErrorContains(t, a.DigitalWrite("P9_99", 1), "'P9_99' is not a valid id for a digital pin")
@@ -214,7 +215,7 @@ func TestAnalogReadFileError(t *testing.T) {
 		"/sys/devices/platform/whatever",
 	}
 
-	a, _ := initTestAdaptorWithMockedFilesystem(mockPaths)
+	a, _ := initConnectedTestAdaptorWithMockedFilesystem(mockPaths)
 
 	_, err := a.AnalogRead("P9_40")
 	require.ErrorContains(t, err, "/sys/bus/iio/devices/iio:device0/in_voltage1_raw: no such file")
@@ -227,7 +228,7 @@ func TestDigitalPinDirectionFileError(t *testing.T) {
 		"/sys/devices/platform/ocp/ocp:P9_12_pinmux/state",
 	}
 
-	a, _ := initTestAdaptorWithMockedFilesystem(mockPaths)
+	a, _ := initConnectedTestAdaptorWithMockedFilesystem(mockPaths)
 
 	err := a.DigitalWrite("P9_12", 1)
 	require.ErrorContains(t, err, "/sys/class/gpio/gpio60/direction: no such file")
@@ -245,7 +246,7 @@ func TestDigitalPinFinalizeFileError(t *testing.T) {
 		"/sys/devices/platform/ocp/ocp:P9_12_pinmux/state",
 	}
 
-	a, _ := initTestAdaptorWithMockedFilesystem(mockPaths)
+	a, _ := initConnectedTestAdaptorWithMockedFilesystem(mockPaths)
 
 	err := a.DigitalWrite("P9_12", 1)
 	require.NoError(t, err)
@@ -294,7 +295,7 @@ func Test_translateAndMuxPWMPin(t *testing.T) {
 		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/",
 		"/sys/devices/platform/ocp/48300000.epwmss/48300100.ecap/pwm/pwmchip0/",
 	}
-	a, fs := initTestAdaptorWithMockedFilesystem(mockPaths)
+	a, fs := initConnectedTestAdaptorWithMockedFilesystem(mockPaths)
 
 	tests := map[string]struct {
 		wantDir     string

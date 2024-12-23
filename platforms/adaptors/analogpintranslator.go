@@ -7,10 +7,9 @@ import (
 )
 
 type AnalogPinDefinition struct {
-	Path   string
-	R      bool // readable
-	W      bool // writable
-	BufLen uint16
+	Path       string
+	W          bool   // writable
+	ReadBufLen uint16 // readable if buffer > 0
 }
 
 type AnalogPinDefinitions map[string]AnalogPinDefinition
@@ -26,20 +25,20 @@ func NewAnalogPinTranslator(sys *system.Accesser, pinDefinitions AnalogPinDefini
 }
 
 // Translate returns the sysfs path for the given id.
-func (pt *AnalogPinTranslator) Translate(id string) (string, bool, bool, uint16, error) {
+func (pt *AnalogPinTranslator) Translate(id string) (string, bool, uint16, error) {
 	pinInfo, ok := pt.pinDefinitions[id]
 	if !ok {
-		return "", false, false, 0, fmt.Errorf("'%s' is not a valid id for an analog pin", id)
+		return "", false, 0, fmt.Errorf("'%s' is not a valid id for an analog pin", id)
 	}
 
 	path := pinInfo.Path
 	info, err := pt.sys.Stat(path)
 	if err != nil {
-		return "", false, false, 0, fmt.Errorf("Error (%v) on access '%s'", err, path)
+		return "", false, 0, fmt.Errorf("Error (%v) on access '%s'", err, path)
 	}
 	if info.IsDir() {
-		return "", false, false, 0, fmt.Errorf("The item '%s' is a directory, which is not expected", path)
+		return "", false, 0, fmt.Errorf("The item '%s' is a directory, which is not expected", path)
 	}
 
-	return path, pinInfo.R, pinInfo.W, pinInfo.BufLen, nil
+	return path, pinInfo.W, pinInfo.ReadBufLen, nil
 }

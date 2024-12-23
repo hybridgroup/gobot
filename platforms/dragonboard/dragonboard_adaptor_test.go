@@ -21,7 +21,7 @@ var (
 	_ i2c.Connector               = (*Adaptor)(nil)
 )
 
-func initTestAdaptor() *Adaptor {
+func initConnectedTestAdaptor() *Adaptor {
 	a := NewAdaptor()
 	if err := a.Connect(); err != nil {
 		panic(err)
@@ -29,15 +29,24 @@ func initTestAdaptor() *Adaptor {
 	return a
 }
 
-func TestName(t *testing.T) {
-	a := initTestAdaptor()
+func TestNewAdaptor(t *testing.T) {
+	// arrange & act
+	a := NewAdaptor()
+	// assert
+	assert.IsType(t, &Adaptor{}, a)
 	assert.True(t, strings.HasPrefix(a.Name(), "DragonBoard"))
+	assert.NotNil(t, a.sys)
+	assert.NotNil(t, a.pinMap)
+	assert.NotNil(t, a.DigitalPinsAdaptor)
+	assert.NotNil(t, a.I2cBusAdaptor)
+	assert.True(t, a.sys.IsSysfsDigitalPinAccess())
+	// act & assert
 	a.SetName("NewName")
 	assert.Equal(t, "NewName", a.Name())
 }
 
 func TestDigitalIO(t *testing.T) {
-	a := initTestAdaptor()
+	a := initConnectedTestAdaptor()
 	mockPaths := []string{
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/unexport",
@@ -60,7 +69,7 @@ func TestDigitalIO(t *testing.T) {
 }
 
 func TestFinalizeErrorAfterGPIO(t *testing.T) {
-	a := initTestAdaptor()
+	a := initConnectedTestAdaptor()
 	mockPaths := []string{
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/unexport",
@@ -71,7 +80,6 @@ func TestFinalizeErrorAfterGPIO(t *testing.T) {
 	}
 	fs := a.sys.UseMockFilesystem(mockPaths)
 
-	require.NoError(t, a.Connect())
 	require.NoError(t, a.DigitalWrite("GPIO_B", 1))
 
 	fs.WithWriteError = true
@@ -81,16 +89,15 @@ func TestFinalizeErrorAfterGPIO(t *testing.T) {
 }
 
 func TestI2cDefaultBus(t *testing.T) {
-	a := initTestAdaptor()
+	a := initConnectedTestAdaptor()
 	assert.Equal(t, 0, a.DefaultI2cBus())
 }
 
 func TestI2cFinalizeWithErrors(t *testing.T) {
 	// arrange
-	a := NewAdaptor()
+	a := initConnectedTestAdaptor()
 	a.sys.UseMockSyscall()
 	fs := a.sys.UseMockFilesystem([]string{"/dev/i2c-1"})
-	require.NoError(t, a.Connect())
 	con, err := a.GetI2cConnection(0xff, 1)
 	require.NoError(t, err)
 	_, err = con.Write([]byte{0xbf})

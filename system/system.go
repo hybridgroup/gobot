@@ -10,6 +10,13 @@ import (
 
 const systemDebug = false
 
+type digitalPinAccesserType int
+
+const (
+	digitalPinAccesserTypeGpiod digitalPinAccesserType = iota
+	digitalPinAccesserTypeSysfs
+)
+
 // A File represents basic IO interactions with the underlying file system
 type File interface {
 	Write(b []byte) (n int, err error)
@@ -49,6 +56,7 @@ type digitalPinAccesser interface {
 	isSupported() bool
 	createPin(chip string, pin int, o ...func(gobot.DigitalPinOptioner) bool) gobot.DigitalPinner
 	setFs(fs filesystem)
+	isType(accesserType digitalPinAccesserType) bool
 }
 
 // spiAccesser represents unexposed interface to allow the switch between different implementations and a mocked one
@@ -68,33 +76,26 @@ type Accesser struct {
 // NewAccesser returns a accesser to native system call, native file system and the chosen digital pin access.
 // Digital pin accesser can be empty or "sysfs", otherwise it will be automatically chosen.
 func NewAccesser(options ...func(Optioner)) *Accesser {
-	s := &Accesser{
+	a := &Accesser{
 		sys: &nativeSyscall{},
 		fs:  &nativeFilesystem{},
 	}
-	s.spiAccess = &periphioSpiAccess{fs: s.fs}
-	s.digitalPinAccess = &sysfsDigitalPinAccess{sfa: &sysfsFileAccess{fs: s.fs, readBufLen: 2}}
+	a.spiAccess = &periphioSpiAccess{fs: a.fs}
+	a.digitalPinAccess = &gpiodDigitalPinAccess{fs: a.fs}
 	for _, option := range options {
-		option(s)
+		if option == nil {
+			continue
+		}
+		option(a)
 	}
-	return s
+	return a
 }
 
-// UseDigitalPinAccessWithMockFs sets the digital pin handler accesser to the chosen one. Used only for tests.
-func (a *Accesser) UseDigitalPinAccessWithMockFs(digitalPinAccess string, files []string) digitalPinAccesser {
-	fs := newMockFilesystem(files)
-	var dph digitalPinAccesser
-	switch digitalPinAccess {
-	case "sysfs":
-		dph = &sysfsDigitalPinAccess{sfa: &sysfsFileAccess{fs: fs, readBufLen: 2}}
-	case "cdev":
-		dph = &gpiodDigitalPinAccess{fs: fs}
-	default:
-		dph = &mockDigitalPinAccess{fs: fs}
-	}
-	a.fs = fs
-	a.digitalPinAccess = dph
-	return dph
+// UseMockDigitalPinAccess sets the digital pin handler accesser to the chosen one. Used only for tests.
+func (a *Accesser) UseMockDigitalPinAccess() *mockDigitalPinAccess {
+	dpa := newMockDigitalPinAccess(a.digitalPinAccess)
+	a.digitalPinAccess = dpa
+	return dpa
 }
 
 // UseMockSyscall sets the Syscall implementation of the accesser to the mocked one. Used only for tests.
@@ -128,10 +129,12 @@ func (a *Accesser) NewDigitalPin(chip string, pin int,
 
 // IsSysfsDigitalPinAccess returns whether the used digital pin accesser is a sysfs one.
 func (a *Accesser) IsSysfsDigitalPinAccess() bool {
-	if _, ok := a.digitalPinAccess.(*sysfsDigitalPinAccess); ok {
-		return true
-	}
-	return false
+	return a.digitalPinAccess.isType(digitalPinAccesserTypeSysfs)
+}
+
+// IsGpiodDigitalPinAccess returns whether the used digital pin accesser is a sysfs one.
+func (a *Accesser) IsGpiodDigitalPinAccess() bool {
+	return a.digitalPinAccess.isType(digitalPinAccesserTypeGpiod)
 }
 
 // NewPWMPin returns a new system PWM pin, according to the given pin number.
@@ -140,7 +143,8 @@ func (a *Accesser) NewPWMPin(path string, pin int, polNormIdent string, polInvId
 	return newPWMPinSysfs(sfa, path, pin, polNormIdent, polInvIdent)
 }
 
-func (a *Accesser) NewAnalogPin(path string, r, w bool, readBufLen uint16) gobot.AnalogPinner {
+func (a *Accesser) NewAnalogPin(path string, w bool, readBufLen uint16) gobot.AnalogPinner {
+	r := readBufLen > 0
 	if readBufLen == 0 {
 		readBufLen = 32 // max. count of characters for int value is 20
 	}

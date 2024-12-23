@@ -28,7 +28,7 @@ var (
 	_ spi.Connector               = (*Adaptor)(nil)
 )
 
-func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.MockFilesystem) {
+func initConnectedTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.MockFilesystem) {
 	a := NewAdaptor()
 	fs := a.sys.UseMockFilesystem(mockPaths)
 	if err := a.Connect(); err != nil {
@@ -38,10 +38,19 @@ func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.
 }
 
 func TestNewAdaptor(t *testing.T) {
+	// arrange & act
 	a := NewAdaptor()
-
+	// assert
+	assert.IsType(t, &Adaptor{}, a)
 	assert.True(t, strings.HasPrefix(a.Name(), "JetsonNano"))
-
+	assert.NotNil(t, a.sys)
+	assert.NotNil(t, a.mutex)
+	assert.NotNil(t, a.DigitalPinsAdaptor)
+	assert.NotNil(t, a.PWMPinsAdaptor)
+	assert.NotNil(t, a.I2cBusAdaptor)
+	assert.NotNil(t, a.SpiBusAdaptor)
+	assert.True(t, a.sys.IsSysfsDigitalPinAccess())
+	// act & assert
 	a.SetName("NewName")
 	assert.Equal(t, "NewName", a.Name())
 }
@@ -55,7 +64,7 @@ func TestFinalize(t *testing.T) {
 		"/dev/spidev0.0",
 		"/dev/spidev0.1",
 	}
-	a, _ := initTestAdaptorWithMockedFilesystem(mockPaths)
+	a, _ := initConnectedTestAdaptorWithMockedFilesystem(mockPaths)
 
 	_ = a.DigitalWrite("3", 1)
 
@@ -83,7 +92,7 @@ func TestPWMPinsReConnect(t *testing.T) {
 		"/sys/class/pwm/pwmchip0/pwm2/polarity",
 		"/sys/class/pwm/pwmchip0/pwm2/enable",
 	}
-	a, _ := initTestAdaptorWithMockedFilesystem(mockPaths)
+	a, _ := initConnectedTestAdaptorWithMockedFilesystem(mockPaths)
 	require.NoError(t, a.PwmWrite("33", 1))
 	require.NoError(t, a.Finalize())
 	// act
@@ -101,7 +110,7 @@ func TestDigitalIO(t *testing.T) {
 		"/sys/class/gpio/gpio14/value",
 		"/sys/class/gpio/gpio14/direction",
 	}
-	a, fs := initTestAdaptorWithMockedFilesystem(mockPaths)
+	a, fs := initConnectedTestAdaptorWithMockedFilesystem(mockPaths)
 
 	err := a.DigitalWrite("7", 1)
 	require.NoError(t, err)

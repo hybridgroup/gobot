@@ -50,7 +50,7 @@ type Adaptor struct {
 //
 //	Optional parameters for PWM, see [adaptors.NewPWMPinsAdaptor]
 func NewAdaptor(opts ...interface{}) *Adaptor {
-	sys := system.NewAccesser()
+	sys := system.NewAccesser(system.WithDigitalPinSysfsAccess())
 	pwmPinTranslator := adaptors.NewPWMPinTranslator(sys, bbbPwmPinMap)
 	a := &Adaptor{
 		name:            gobot.DefaultName("BeagleboneBlack"),
@@ -61,11 +61,11 @@ func NewAdaptor(opts ...interface{}) *Adaptor {
 		usrLed:          "/sys/class/leds/beaglebone:green:",
 	}
 
-	var digitalPinsOpts []func(adaptors.DigitalPinsOptioner)
+	var digitalPinsOpts []adaptors.DigitalPinsOptionApplier
 	pwmPinsOpts := []adaptors.PwmPinsOptionApplier{adaptors.WithPWMDefaultPeriod(pwmPeriodDefault)}
 	for _, opt := range opts {
 		switch o := opt.(type) {
-		case func(adaptors.DigitalPinsOptioner):
+		case adaptors.DigitalPinsOptionApplier:
 			digitalPinsOpts = append(digitalPinsOpts, o)
 		case adaptors.PwmPinsOptionApplier:
 			pwmPinsOpts = append(pwmPinsOpts, o)

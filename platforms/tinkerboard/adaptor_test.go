@@ -18,11 +18,6 @@ import (
 )
 
 const (
-	gpio17Path  = "/sys/class/gpio/gpio17/"
-	gpio160Path = "/sys/class/gpio/gpio160/"
-)
-
-const (
 	pwmDir           = "/sys/devices/platform/ff680020.pwm/pwm/pwmchip2/" //nolint:gosec // false positive
 	pwmPwmDir        = pwmDir + "pwm0/"
 	pwmExportPath    = pwmDir + "export"
@@ -42,15 +37,6 @@ var pwmMockPaths = []string{
 	pwmPeriodPath,
 	pwmDutyCyclePath,
 	pwmPolarityPath,
-}
-
-var gpioMockPaths = []string{
-	"/sys/class/gpio/export",
-	"/sys/class/gpio/unexport",
-	gpio17Path + "value",
-	gpio17Path + "direction",
-	gpio160Path + "value",
-	gpio160Path + "direction",
 }
 
 // make sure that this Adaptor fulfills all the required interfaces
@@ -73,13 +59,18 @@ func preparePwmFs(fs *system.MockFilesystem) {
 	fs.Files[pwmPolarityPath].Contents = pwmInvertedIdentifier
 }
 
-func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.MockFilesystem) {
-	a := NewAdaptor()
+func initConnectedTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.MockFilesystem) {
+	a := initConnectedTestAdaptor()
 	fs := a.sys.UseMockFilesystem(mockPaths)
+	return a, fs
+}
+
+func initConnectedTestAdaptor() *Adaptor {
+	a := NewAdaptor()
 	if err := a.Connect(); err != nil {
 		panic(err)
 	}
-	return a, fs
+	return a
 }
 
 func TestNewAdaptor(t *testing.T) {
@@ -96,6 +87,7 @@ func TestNewAdaptor(t *testing.T) {
 	assert.NotNil(t, a.I2cBusAdaptor)
 	assert.NotNil(t, a.SpiBusAdaptor)
 	assert.NotNil(t, a.OneWireBusAdaptor)
+	assert.True(t, a.sys.IsGpiodDigitalPinAccess())
 	// act & assert
 	a.SetName("NewName")
 	assert.Equal(t, "NewName", a.Name())
@@ -103,24 +95,57 @@ func TestNewAdaptor(t *testing.T) {
 
 func TestNewAdaptorWithOption(t *testing.T) {
 	// arrange & act
-	a := NewAdaptor(adaptors.WithGpiosActiveLow("1"))
+	a := NewAdaptor(adaptors.WithGpiosActiveLow("1"), adaptors.WithSysfsAccess())
 	// assert
 	require.NoError(t, a.Connect())
+	assert.True(t, a.sys.IsSysfsDigitalPinAccess())
 }
 
 func TestDigitalIO(t *testing.T) {
-	// only basic tests needed, further tests are done in "digitalpinsadaptor.go"
-	a, fs := initTestAdaptorWithMockedFilesystem(gpioMockPaths)
-
-	_ = a.DigitalWrite("7", 1)
-	assert.Equal(t, "1", fs.Files[gpio17Path+"value"].Contents)
-
-	fs.Files[gpio160Path+"value"].Contents = "1"
-	i, _ := a.DigitalRead("10")
-	assert.Equal(t, 1, i)
-
+	// some basic tests, further tests are done in "digitalpinsadaptor.go"
+	// arrange
+	a := initConnectedTestAdaptor()
+	dpa := a.sys.UseMockDigitalPinAccess()
+	require.True(t, a.sys.IsGpiodDigitalPinAccess())
+	// act & assert write
+	err := a.DigitalWrite("7", 1)
+	require.NoError(t, err)
+	assert.Equal(t, []int{1}, dpa.Written("gpiochip0", "17"))
+	// arrange, act & assert read
+	dpa.UseValue("gpiochip5", "8", 2)
+	i, err := a.DigitalRead("10")
+	require.NoError(t, err)
+	assert.Equal(t, 2, i)
+	// act and assert unknown pin
 	require.ErrorContains(t, a.DigitalWrite("99", 1), "'99' is not a valid id for a digital pin")
+	// act and assert finalize
 	require.NoError(t, a.Finalize())
+	assert.Equal(t, 0, dpa.Exported("gpiochip0", "17"))
+	assert.Equal(t, 0, dpa.Exported("gpiochip5", "8"))
+}
+
+func TestDigitalIOSysfs(t *testing.T) {
+	// some basic tests, further tests are done in "digitalpinsadaptor.go"
+	// arrange
+	a := NewAdaptor(adaptors.WithSysfsAccess())
+	require.NoError(t, a.Connect())
+	dpa := a.sys.UseMockDigitalPinAccess()
+	require.True(t, a.sys.IsSysfsDigitalPinAccess())
+	// act & assert write
+	err := a.DigitalWrite("7", 1)
+	require.NoError(t, err)
+	assert.Equal(t, []int{1}, dpa.Written("", "17"))
+	// arrange, act & assert read
+	dpa.UseValue("", "160", 2)
+	i, err := a.DigitalRead("10")
+	require.NoError(t, err)
+	assert.Equal(t, 2, i)
+	// act and assert unknown pin
+	require.ErrorContains(t, a.DigitalWrite("99", 1), "'99' is not a valid id for a digital pin")
+	// act and assert finalize
+	require.NoError(t, a.Finalize())
+	assert.Equal(t, 0, dpa.Exported("", "17"))
+	assert.Equal(t, 0, dpa.Exported("", "160"))
 }
 
 func TestAnalogRead(t *testing.T) {
@@ -128,7 +153,7 @@ func TestAnalogRead(t *testing.T) {
 		"/sys/class/thermal/thermal_zone0/temp",
 	}
 
-	a, fs := initTestAdaptorWithMockedFilesystem(mockPaths)
+	a, fs := initConnectedTestAdaptorWithMockedFilesystem(mockPaths)
 
 	fs.Files["/sys/class/thermal/thermal_zone0/temp"].Contents = "567\n"
 	got, err := a.AnalogRead("thermal_zone0")
@@ -148,7 +173,7 @@ func TestAnalogRead(t *testing.T) {
 
 func TestPwmWrite(t *testing.T) {
 	// arrange
-	a, fs := initTestAdaptorWithMockedFilesystem(pwmMockPaths)
+	a, fs := initConnectedTestAdaptorWithMockedFilesystem(pwmMockPaths)
 	preparePwmFs(fs)
 	// act
 	err := a.PwmWrite("33", 100)
@@ -195,7 +220,7 @@ func TestServoWrite(t *testing.T) {
 
 func TestSetPeriod(t *testing.T) {
 	// arrange
-	a, fs := initTestAdaptorWithMockedFilesystem(pwmMockPaths)
+	a, fs := initConnectedTestAdaptorWithMockedFilesystem(pwmMockPaths)
 	preparePwmFs(fs)
 
 	newPeriod := uint32(2550000)
@@ -234,18 +259,20 @@ func TestSetPeriod(t *testing.T) {
 }
 
 func TestFinalizeErrorAfterGPIO(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem(gpioMockPaths)
-
+	// arrange
+	a := initConnectedTestAdaptor()
+	dpa := a.sys.UseMockDigitalPinAccess()
+	require.True(t, a.sys.IsGpiodDigitalPinAccess())
 	require.NoError(t, a.DigitalWrite("7", 1))
-
-	fs.WithWriteError = true
-
+	dpa.UseUnexportError("gpiochip0", "17")
+	// act
 	err := a.Finalize()
-	require.ErrorContains(t, err, "write error")
+	// assert
+	require.ErrorContains(t, err, "unexport error")
 }
 
 func TestFinalizeErrorAfterPWM(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem(pwmMockPaths)
+	a, fs := initConnectedTestAdaptorWithMockedFilesystem(pwmMockPaths)
 	preparePwmFs(fs)
 
 	require.NoError(t, a.PwmWrite("33", 1))
@@ -273,10 +300,9 @@ func TestI2cDefaultBus(t *testing.T) {
 
 func TestI2cFinalizeWithErrors(t *testing.T) {
 	// arrange
-	a := NewAdaptor()
+	a := initConnectedTestAdaptor()
 	a.sys.UseMockSyscall()
 	fs := a.sys.UseMockFilesystem([]string{"/dev/i2c-4"})
-	require.NoError(t, a.Connect())
 	con, err := a.GetI2cConnection(0xff, 4)
 	require.NoError(t, err)
 	_, err = con.Write([]byte{0xbf})

@@ -42,7 +42,7 @@ type Adaptor struct {
 	name    string
 	sys     *system.Accesser
 	mutex   sync.Mutex
-	pinmap  map[string]sysfsPin
+	pinMap  map[string]sysfsPin
 	ledPath string
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.PWMPinsAdaptor
@@ -59,19 +59,19 @@ type Adaptor struct {
 //
 //	Optional parameters for PWM, see [adaptors.NewPWMPinsAdaptor]
 func NewAdaptor(opts ...interface{}) *Adaptor {
-	sys := system.NewAccesser()
+	sys := system.NewAccesser(system.WithDigitalPinSysfsAccess())
 	a := &Adaptor{
 		name:    gobot.DefaultName("UP2"),
 		sys:     sys,
 		ledPath: "/sys/class/leds/upboard:%s:/brightness",
-		pinmap:  fixedPins,
+		pinMap:  fixedPins,
 	}
 
-	var digitalPinsOpts []func(adaptors.DigitalPinsOptioner)
+	var digitalPinsOpts []adaptors.DigitalPinsOptionApplier
 	var pwmPinsOpts []adaptors.PwmPinsOptionApplier
 	for _, opt := range opts {
 		switch o := opt.(type) {
-		case func(adaptors.DigitalPinsOptioner):
+		case adaptors.DigitalPinsOptionApplier:
 			digitalPinsOpts = append(digitalPinsOpts, o)
 		case adaptors.PwmPinsOptionApplier:
 			pwmPinsOpts = append(pwmPinsOpts, o)
@@ -161,14 +161,14 @@ func (a *Adaptor) DigitalWrite(id string, val byte) error {
 }
 
 func (a *Adaptor) translateDigitalPin(id string) (string, int, error) {
-	if val, ok := a.pinmap[id]; ok {
+	if val, ok := a.pinMap[id]; ok {
 		return "", val.pin, nil
 	}
 	return "", -1, fmt.Errorf("'%s' is not a valid id for a digital pin", id)
 }
 
 func (a *Adaptor) translatePWMPin(id string) (string, int, error) {
-	sysPin, ok := a.pinmap[id]
+	sysPin, ok := a.pinMap[id]
 	if !ok {
 		return "", -1, fmt.Errorf("'%s' is not a valid id for a pin", id)
 	}

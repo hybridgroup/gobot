@@ -25,8 +25,7 @@ transfer the final executable to your BeagleBone, and run the program on the Bea
 
 The pin numbering used by your Gobot program should match the way your board is labeled right on the board itself.
 
-Gobot also has support for the four built-in LEDs on the BeagleBone Black, by referring to them as `usr0`, `usr1`, `usr2`,
-and `usr3`.
+Gobot also has support for the four built-in LEDs, by referring to them as `usr0`, `usr1`, `usr2` and `usr3`.
 
 ```go
 package main
@@ -107,14 +106,14 @@ func main() {
 Compile your Gobot program on your workstation like this:
 
 ```sh
-GOARM=7 GOARCH=arm GOOS=linux go build examples/beaglebone_blink.go
+GOARM=7 GOARCH=arm GOOS=linux go build -o output/ examples/beaglebone_blink.go
 ```
 
 Once you have compiled your code, you can you can upload your program and execute it on the BeagleBone from your workstation
 using the `scp` and `ssh` commands like this:
 
 ```sh
-scp beaglebone_blink debian@192.168.7.2:/home/debian/
+scp output/beaglebone_blink debian@192.168.7.2:/home/debian/
 ssh -t debian@192.168.7.2 "./beaglebone_blink"
 ```
 

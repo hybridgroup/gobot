@@ -28,7 +28,7 @@ const (
 // Adaptor is the Gobot adaptor for the Jetson Nano
 type Adaptor struct {
 	name  string
-	sys   *system.Accesser
+	sys   *system.Accesser // used for unit tests only
 	mutex *sync.Mutex
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.PWMPinsAdaptor
@@ -45,14 +45,14 @@ type Adaptor struct {
 //
 //	Optional parameters for PWM, see [adaptors.NewPWMPinsAdaptor]
 func NewAdaptor(opts ...interface{}) *Adaptor {
-	sys := system.NewAccesser()
+	sys := system.NewAccesser(system.WithDigitalPinSysfsAccess())
 	a := &Adaptor{
 		name:  gobot.DefaultName("JetsonNano"),
 		sys:   sys,
 		mutex: &sync.Mutex{},
 	}
 
-	var digitalPinsOpts []func(adaptors.DigitalPinsOptioner)
+	var digitalPinsOpts []adaptors.DigitalPinsOptionApplier
 	pwmPinsOpts := []adaptors.PwmPinsOptionApplier{
 		adaptors.WithPWMDefaultPeriod(pwmPeriodDefault),
 		adaptors.WithPWMMinimumPeriod(pwmPeriodMinimum),
@@ -60,7 +60,7 @@ func NewAdaptor(opts ...interface{}) *Adaptor {
 	}
 	for _, opt := range opts {
 		switch o := opt.(type) {
-		case func(adaptors.DigitalPinsOptioner):
+		case adaptors.DigitalPinsOptionApplier:
 			digitalPinsOpts = append(digitalPinsOpts, o)
 		case adaptors.PwmPinsOptionApplier:
 			pwmPinsOpts = append(pwmPinsOpts, o)

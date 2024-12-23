@@ -16,7 +16,7 @@ const defaultI2cBusNumber = 0
 // Adaptor represents a Gobot Adaptor for a DragonBoard 410c
 type Adaptor struct {
 	name   string
-	sys    *system.Accesser
+	sys    *system.Accesser // used for unit tests only
 	mutex  sync.Mutex
 	pinMap map[string]int
 	*adaptors.DigitalPinsAdaptor
@@ -50,8 +50,8 @@ var fixedPins = map[string]int{
 //
 //	adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs
 //	adaptors.WithSpiGpioAccess(sclk, ncs, sdo, sdi):	use GPIO's instead of /dev/spidev#.#
-func NewAdaptor(opts ...func(adaptors.DigitalPinsOptioner)) *Adaptor {
-	sys := system.NewAccesser()
+func NewAdaptor(opts ...adaptors.DigitalPinsOptionApplier) *Adaptor {
+	sys := system.NewAccesser(system.WithDigitalPinSysfsAccess())
 	c := &Adaptor{
 		name: gobot.DefaultName("DragonBoard"),
 		sys:  sys,

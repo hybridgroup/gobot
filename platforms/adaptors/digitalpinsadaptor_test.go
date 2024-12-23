@@ -23,13 +23,21 @@ var (
 	_ gpio.DigitalWriter          = (*DigitalPinsAdaptor)(nil)
 )
 
-func initTestDigitalPinsAdaptorWithMockedFilesystem(mockPaths []string) (*DigitalPinsAdaptor, *system.MockFilesystem) {
-	sys := system.NewAccesser()
-	fs := sys.UseMockFilesystem(mockPaths)
-	a := NewDigitalPinsAdaptor(sys, testDigitalPinTranslator)
+func initTestConnectedDigitalPinsAdaptorWithMockedFilesystem(
+	mockPaths []string,
+) (*DigitalPinsAdaptor, *system.MockFilesystem) {
+	a, fs := initTestDigitalPinsAdaptorWithMockedFilesystem(mockPaths)
 	if err := a.Connect(); err != nil {
 		panic(err)
 	}
+	return a, fs
+}
+
+func initTestDigitalPinsAdaptorWithMockedFilesystem(mockPaths []string) (*DigitalPinsAdaptor, *system.MockFilesystem) {
+	sys := system.NewAccesser(system.WithDigitalPinSysfsAccess())
+	fs := sys.UseMockFilesystem(mockPaths)
+	a := NewDigitalPinsAdaptor(sys, testDigitalPinTranslator)
+
 	return a, fs
 }
 
@@ -42,9 +50,25 @@ func testDigitalPinTranslator(pin string) (string, int, error) {
 	return "", line, err
 }
 
+func TestNewDigitalPinsAdaptor(t *testing.T) {
+	// arrange
+	translate := func(string) (string, int, error) { return "", 0, nil }
+	sys := system.NewAccesser()
+	// act
+	a := NewDigitalPinsAdaptor(sys, translate)
+	// assert
+	assert.IsType(t, &DigitalPinsAdaptor{}, a)
+	assert.NotNil(t, a.sys)
+	assert.NotNil(t, a.digitalPinsCfg)
+	assert.NotNil(t, a.translate)
+	assert.Nil(t, a.pins)       // will be created on connect
+	assert.Nil(t, a.pinOptions) // will be created on connect
+	assert.True(t, a.sys.IsGpiodDigitalPinAccess())
+}
+
 func TestDigitalPinsConnect(t *testing.T) {
 	translate := func(pin string) (chip string, line int, err error) { return }
-	sys := system.NewAccesser()
+	sys := system.NewAccesser(system.WithDigitalPinSysfsAccess())
 
 	a := NewDigitalPinsAdaptor(sys, translate)
 	assert.Equal(t, (map[string]gobot.DigitalPinner)(nil), a.pins)
@@ -69,7 +93,7 @@ func TestDigitalPinsFinalize(t *testing.T) {
 		"/sys/class/gpio/gpio14/direction",
 		"/sys/class/gpio/gpio14/value",
 	}
-	sys := system.NewAccesser()
+	sys := system.NewAccesser(system.WithDigitalPinSysfsAccess())
 	fs := sys.UseMockFilesystem(mockedPaths)
 	a := NewDigitalPinsAdaptor(sys, testDigitalPinTranslator)
 	// assert that finalize before connect is working
@@ -101,7 +125,7 @@ func TestDigitalPinsReConnect(t *testing.T) {
 		"/sys/class/gpio/gpio15/direction",
 		"/sys/class/gpio/gpio15/value",
 	}
-	a, _ := initTestDigitalPinsAdaptorWithMockedFilesystem(mockedPaths)
+	a, _ := initTestConnectedDigitalPinsAdaptorWithMockedFilesystem(mockedPaths)
 	require.NoError(t, a.DigitalWrite("4", 1))
 	assert.Len(t, a.pins, 1)
 	require.NoError(t, a.Finalize())
@@ -120,7 +144,7 @@ func TestDigitalIO(t *testing.T) {
 		"/sys/class/gpio/gpio25/value",
 		"/sys/class/gpio/gpio25/direction",
 	}
-	a, _ := initTestDigitalPinsAdaptorWithMockedFilesystem(mockedPaths)
+	a, _ := initTestConnectedDigitalPinsAdaptorWithMockedFilesystem(mockedPaths)
 
 	err := a.DigitalWrite("14", 1)
 	require.NoError(t, err)
@@ -138,7 +162,7 @@ func TestDigitalRead(t *testing.T) {
 		"/sys/class/gpio/gpio24/value",
 		"/sys/class/gpio/gpio24/direction",
 	}
-	a, fs := initTestDigitalPinsAdaptorWithMockedFilesystem(mockedPaths)
+	a, fs := initTestConnectedDigitalPinsAdaptorWithMockedFilesystem(mockedPaths)
 	fs.Files["/sys/class/gpio/gpio24/value"].Contents = "1"
 
 	// assert read correct value without error
@@ -163,7 +187,7 @@ func TestDigitalPinConcurrency(t *testing.T) {
 	defer runtime.GOMAXPROCS(oldProcs)
 
 	translate := func(pin string) (string, int, error) { line, err := strconv.Atoi(pin); return "", line, err }
-	sys := system.NewAccesser()
+	sys := system.NewAccesser(system.WithDigitalPinSysfsAccess())
 
 	for retry := 0; retry < 20; retry++ {
 

@@ -87,10 +87,10 @@ var pocketBeaglePwmPinMap = adaptors.PWMPinDefinitions{
 }
 
 var pocketBeagleAnalogPinMap = adaptors.AnalogPinDefinitions{
-	"P1_19": {Path: "/sys/bus/iio/devices/iio:device0/in_voltage0_raw", R: true, W: false, BufLen: 1024},
-	"P1_21": {Path: "/sys/bus/iio/devices/iio:device0/in_voltage1_raw", R: true, W: false, BufLen: 1024},
-	"P1_23": {Path: "/sys/bus/iio/devices/iio:device0/in_voltage2_raw", R: true, W: false, BufLen: 1024},
-	"P1_25": {Path: "/sys/bus/iio/devices/iio:device0/in_voltage3_raw", R: true, W: false, BufLen: 1024},
-	"P1_27": {Path: "/sys/bus/iio/devices/iio:device0/in_voltage4_raw", R: true, W: false, BufLen: 1024},
-	"P2_36": {Path: "/sys/bus/iio/devices/iio:device0/in_voltage7_raw", R: true, W: false, BufLen: 1024},
+	"P1_19": {Path: "/sys/bus/iio/devices/iio:device0/in_voltage0_raw", W: false, ReadBufLen: 1024},
+	"P1_21": {Path: "/sys/bus/iio/devices/iio:device0/in_voltage1_raw", W: false, ReadBufLen: 1024},
+	"P1_23": {Path: "/sys/bus/iio/devices/iio:device0/in_voltage2_raw", W: false, ReadBufLen: 1024},
+	"P1_25": {Path: "/sys/bus/iio/devices/iio:device0/in_voltage3_raw", W: false, ReadBufLen: 1024},
+	"P1_27": {Path: "/sys/bus/iio/devices/iio:device0/in_voltage4_raw", W: false, ReadBufLen: 1024},
+	"P2_36": {Path: "/sys/bus/iio/devices/iio:device0/in_voltage7_raw", W: false, ReadBufLen: 1024},
 }

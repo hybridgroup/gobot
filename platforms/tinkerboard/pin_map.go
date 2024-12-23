@@ -45,6 +45,6 @@ var pwmPinDefinitions = adaptors.PWMPinDefinitions{
 
 var analogPinDefinitions = adaptors.AnalogPinDefinitions{
 	// +/-273.200 °C need >=7 characters to read: +/-273200 millidegree Celsius
-	"thermal_zone0": {Path: "/sys/class/thermal/thermal_zone0/temp", R: true, W: false, BufLen: 7},
-	"thermal_zone1": {Path: "/sys/class/thermal/thermal_zone1/temp", R: true, W: false, BufLen: 7},
+	"thermal_zone0": {Path: "/sys/class/thermal/thermal_zone0/temp", W: false, ReadBufLen: 7},
+	"thermal_zone1": {Path: "/sys/class/thermal/thermal_zone1/temp", W: false, ReadBufLen: 7},
 }

@@ -43,7 +43,7 @@ var mockPaths = []string{
 	"/sys/class/pwm/pwmchip0/pwm0/period",
 }
 
-func initTestAdaptorWithMockedFilesystem() (*Adaptor, *system.MockFilesystem) {
+func initConnectedTestAdaptorWithMockedFilesystem() (*Adaptor, *system.MockFilesystem) {
 	a := NewAdaptor()
 	fs := a.sys.UseMockFilesystem(mockPaths)
 	if err := a.Connect(); err != nil {
@@ -52,29 +52,25 @@ func initTestAdaptorWithMockedFilesystem() (*Adaptor, *system.MockFilesystem) {
 	return a, fs
 }
 
-func initTestProAdaptorWithMockedFilesystem() (*Adaptor, *system.MockFilesystem) {
-	a := NewProAdaptor()
-	fs := a.sys.UseMockFilesystem(mockPaths)
-	if err := a.Connect(); err != nil {
-		panic(err)
-	}
-	return a, fs
-}
-
-func TestName(t *testing.T) {
+func TestNewAdaptor(t *testing.T) {
+	// arrange & act
 	a := NewAdaptor()
+	// assert
+	assert.IsType(t, &Adaptor{}, a)
 	assert.True(t, strings.HasPrefix(a.Name(), "CHIP"))
+	assert.NotNil(t, a.sys)
+	assert.NotNil(t, a.pinMap)
+	assert.NotNil(t, a.DigitalPinsAdaptor)
+	assert.NotNil(t, a.PWMPinsAdaptor)
+	assert.NotNil(t, a.I2cBusAdaptor)
+	assert.True(t, a.sys.IsSysfsDigitalPinAccess())
+	// act & assert
 	a.SetName("NewName")
 	assert.Equal(t, "NewName", a.Name())
 }
 
-func TestNewProAdaptor(t *testing.T) {
-	a := NewProAdaptor()
-	assert.True(t, strings.HasPrefix(a.Name(), "CHIP Pro"))
-}
-
 func TestFinalizeErrorAfterGPIO(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
+	a, fs := initConnectedTestAdaptorWithMockedFilesystem()
 	require.NoError(t, a.DigitalWrite("CSID7", 1))
 
 	fs.WithWriteError = true
@@ -84,7 +80,7 @@ func TestFinalizeErrorAfterGPIO(t *testing.T) {
 }
 
 func TestFinalizeErrorAfterPWM(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
+	a, fs := initConnectedTestAdaptorWithMockedFilesystem()
 	fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents = "0"
 	fs.Files["/sys/class/pwm/pwmchip0/pwm0/period"].Contents = "0"
 
@@ -97,7 +93,7 @@ func TestFinalizeErrorAfterPWM(t *testing.T) {
 }
 
 func TestDigitalIO(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
+	a, fs := initConnectedTestAdaptorWithMockedFilesystem()
 
 	require.NoError(t, a.DigitalWrite("CSID7", 1))
 	assert.Equal(t, "1", fs.Files["/sys/class/gpio/gpio139/value"].Contents)
@@ -110,24 +106,9 @@ func TestDigitalIO(t *testing.T) {
 	require.NoError(t, a.Finalize())
 }
 
-func TestProDigitalIO(t *testing.T) {
-	a, fs := initTestProAdaptorWithMockedFilesystem()
-	_ = a.Connect()
-
-	_ = a.DigitalWrite("CSID7", 1)
-	assert.Equal(t, "1", fs.Files["/sys/class/gpio/gpio139/value"].Contents)
-
-	fs.Files["/sys/class/gpio/gpio50/value"].Contents = "1"
-	i, _ := a.DigitalRead("TWI2-SDA")
-	assert.Equal(t, 1, i)
-
-	require.ErrorContains(t, a.DigitalWrite("XIO-P0", 1), "'XIO-P0' is not a valid id for a digital pin")
-	require.NoError(t, a.Finalize())
-}
-
 func TestPWMWrite(t *testing.T) {
 	// arrange
-	a, fs := initTestAdaptorWithMockedFilesystem()
+	a, fs := initConnectedTestAdaptorWithMockedFilesystem()
 	fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents = "0"
 	fs.Files["/sys/class/pwm/pwmchip0/pwm0/period"].Contents = "0"
 	// act

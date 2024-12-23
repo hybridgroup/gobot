@@ -37,7 +37,7 @@ type Adaptor struct {
 	board       string
 	sys         *system.Accesser
 	mutex       sync.Mutex
-	pinmap      map[string]sysfsPin
+	pinMap      map[string]sysfsPin
 	tristate    gobot.DigitalPinner
 	digitalPins map[int]gobot.DigitalPinner
 	*adaptors.AnalogPinsAdaptor
@@ -51,12 +51,12 @@ type Adaptor struct {
 //
 //	Optional parameters for PWM, see [adaptors.NewPWMPinsAdaptor]
 func NewAdaptor(opts ...interface{}) *Adaptor {
-	sys := system.NewAccesser()
+	sys := system.NewAccesser(system.WithDigitalPinSysfsAccess())
 	a := &Adaptor{
 		name:   gobot.DefaultName("Edison"),
 		board:  "arduino",
 		sys:    sys,
-		pinmap: arduinoPinMap,
+		pinMap: arduinoPinMap,
 	}
 
 	pwmPinsOpts := []adaptors.PwmPinsOptionApplier{adaptors.WithPWMPinInitializer(pwmPinInitializer)}
@@ -107,15 +107,15 @@ func (a *Adaptor) Connect() error {
 
 	switch a.board {
 	case "sparkfun":
-		a.pinmap = sparkfunPinMap
+		a.pinMap = sparkfunPinMap
 	case "arduino":
 		a.board = "arduino"
-		a.pinmap = arduinoPinMap
+		a.pinMap = arduinoPinMap
 		if err := a.arduinoSetup(); err != nil {
 			return err
 		}
 	case "miniboard":
-		a.pinmap = miniboardPinMap
+		a.pinMap = miniboardPinMap
 	default:
 		return fmt.Errorf("Unknown board type: %s", a.board)
 	}
@@ -285,7 +285,7 @@ func (a *Adaptor) arduinoI2CSetup() error {
 }
 
 func (a *Adaptor) digitalPin(id string, o ...func(gobot.DigitalPinOptioner) bool) (gobot.DigitalPinner, error) {
-	i := a.pinmap[id]
+	i := a.pinMap[id]
 
 	err := a.ensureDigitalPin(i.pin, o...)
 	if err != nil {
@@ -352,18 +352,17 @@ func pwmPinInitializer(_ string, pin gobot.PWMPinner) error {
 	return pin.SetEnabled(true)
 }
 
-func (a *Adaptor) translateAnalogPin(pin string) (string, bool, bool, uint16, error) {
+func (a *Adaptor) translateAnalogPin(pin string) (string, bool, uint16, error) {
 	path := fmt.Sprintf("/sys/bus/iio/devices/iio:device1/in_voltage%s_raw", pin)
 	const (
-		read       = true
 		write      = false
 		readBufLen = 200
 	)
-	return path, read, write, readBufLen, nil
+	return path, write, readBufLen, nil
 }
 
 func (a *Adaptor) translateAndMuxPWMPin(id string) (string, int, error) {
-	sysPin, ok := a.pinmap[id]
+	sysPin, ok := a.pinMap[id]
 	if !ok {
 		return "", -1, fmt.Errorf("'%s' is not a valid id for a pin", id)
 	}

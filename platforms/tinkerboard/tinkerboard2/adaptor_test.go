@@ -5,6 +5,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"gobot.io/x/gobot/v2/platforms/adaptors"
 )
 
 func TestNewAdaptor(t *testing.T) {
@@ -18,7 +21,16 @@ func TestNewAdaptor(t *testing.T) {
 	assert.NotNil(t, a.PWMPinsAdaptor)
 	assert.NotNil(t, a.I2cBusAdaptor)
 	assert.NotNil(t, a.SpiBusAdaptor)
+	assert.True(t, a.sys.IsGpiodDigitalPinAccess())
 	// act & assert
 	a.SetName("NewName")
 	assert.Equal(t, "NewName", a.Name())
+}
+
+func TestNewAdaptorWithOption(t *testing.T) {
+	// arrange & act
+	a := NewAdaptor(adaptors.WithGpiosActiveLow("1"), adaptors.WithSysfsAccess())
+	// assert
+	require.NoError(t, a.Connect())
+	assert.True(t, a.sys.IsSysfsDigitalPinAccess())
 }

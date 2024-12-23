@@ -21,28 +21,29 @@ const (
 
 type Tinkerboard2Adaptor struct {
 	*tinkerboard.Adaptor
+	sys *system.Accesser // used for unit tests only
 }
 
 // NewAdaptor creates a Tinkerboard-2 Adaptor
 //
 // Optional parameters:
 //
-//	adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs (still used by default)
+//	adaptors.WithSysfsAccess():	use legacy sysfs driver instead of default character device gpiod
 //	adaptors.WithSpiGpioAccess(sclk, ncs, sdo, sdi):	use GPIO's instead of /dev/spidev#.#
 //	adaptors.WithGpiosActiveLow(pin's): invert the pin behavior
 //	adaptors.WithGpiosPullUp/Down(pin's): sets the internal pull resistor
 //
 //	Optional parameters for PWM, see [adaptors.NewPWMPinsAdaptor]
 func NewAdaptor(opts ...interface{}) *Tinkerboard2Adaptor {
-	sys := system.NewAccesser(system.WithDigitalPinGpiodAccess())
-	a := tinkerboard.NewAdaptor()
+	sys := system.NewAccesser()
+	a := tinkerboard.NewAdaptor(opts...)
 	a.SetName(gobot.DefaultName("Tinker Board 2"))
 
-	var digitalPinsOpts []func(adaptors.DigitalPinsOptioner)
+	var digitalPinsOpts []adaptors.DigitalPinsOptionApplier
 	var pwmPinsOpts []adaptors.PwmPinsOptionApplier
 	for _, opt := range opts {
 		switch o := opt.(type) {
-		case func(adaptors.DigitalPinsOptioner):
+		case adaptors.DigitalPinsOptionApplier:
 			digitalPinsOpts = append(digitalPinsOpts, o)
 		case adaptors.PwmPinsOptionApplier:
 			pwmPinsOpts = append(pwmPinsOpts, o)
@@ -65,5 +66,5 @@ func NewAdaptor(opts ...interface{}) *Tinkerboard2Adaptor {
 	a.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, spiBusNumberValidator.Validate, defaultSpiBusNumber,
 		defaultSpiChipNumber, defaultSpiMode, defaultSpiBitsNumber, defaultSpiMaxSpeed)
 
-	return &Tinkerboard2Adaptor{Adaptor: a}
+	return &Tinkerboard2Adaptor{Adaptor: a, sys: sys}
 }

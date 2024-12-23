@@ -28,44 +28,41 @@ func TestDigitalPinTranslatorTranslate(t *testing.T) {
 		"5":  {Sysfs: 253, Cdev: CdevPin{Chip: 8, Line: 5}},
 	}
 	tests := map[string]struct {
-		access   string
+		access   func(system.Optioner)
 		pin      string
 		wantChip string
 		wantLine int
 		wantErr  error
 	}{
 		"cdev_ok_7": {
-			access:   "cdev",
 			pin:      "7",
 			wantChip: "gpiochip0",
 			wantLine: 17,
 		},
 		"cdev_ok_22": {
-			access:   "cdev",
 			pin:      "22",
 			wantChip: "gpiochip5",
 			wantLine: 19,
 		},
 		"cdev_ok_5": {
-			access:   "cdev",
 			pin:      "5",
 			wantChip: "gpiochip8",
 			wantLine: 5,
 		},
 		"sysfs_ok_7": {
-			access:   "sysfs",
+			access:   system.WithDigitalPinSysfsAccess(),
 			pin:      "7",
 			wantChip: "",
 			wantLine: 17,
 		},
 		"sysfs_ok_22": {
-			access:   "sysfs",
+			access:   system.WithDigitalPinSysfsAccess(),
 			pin:      "22",
 			wantChip: "",
 			wantLine: 171,
 		},
 		"sysfs_ok_5": {
-			access:   "sysfs",
+			access:   system.WithDigitalPinSysfsAccess(),
 			pin:      "5",
 			wantChip: "",
 			wantLine: 253,
@@ -80,8 +77,7 @@ func TestDigitalPinTranslatorTranslate(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			sys := system.NewAccesser(system.WithDigitalPinGpiodAccess())
-			sys.UseDigitalPinAccessWithMockFs(tc.access, []string{})
+			sys := system.NewAccesser(tc.access)
 			pt := NewDigitalPinTranslator(sys, pinDefinitions)
 			// act
 			chip, line, err := pt.Translate(tc.pin)

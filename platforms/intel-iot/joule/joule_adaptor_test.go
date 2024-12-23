@@ -24,7 +24,7 @@ var (
 	_ i2c.Connector               = (*Adaptor)(nil)
 )
 
-func initTestAdaptorWithMockedFilesystem() (*Adaptor, *system.MockFilesystem) {
+func initConnectedTestAdaptorWithMockedFilesystem() (*Adaptor, *system.MockFilesystem) {
 	a := NewAdaptor()
 	mockPaths := []string{
 		"/sys/class/pwm/pwmchip0/export",
@@ -98,16 +98,24 @@ func initTestAdaptorWithMockedFilesystem() (*Adaptor, *system.MockFilesystem) {
 	return a, fs
 }
 
-func TestName(t *testing.T) {
-	a, _ := initTestAdaptorWithMockedFilesystem()
-
+func TestNewAdaptor(t *testing.T) {
+	// arrange & act
+	a := NewAdaptor()
+	// assert
+	assert.IsType(t, &Adaptor{}, a)
 	assert.True(t, strings.HasPrefix(a.Name(), "Joule"))
+	assert.NotNil(t, a.sys)
+	assert.NotNil(t, a.DigitalPinsAdaptor)
+	assert.NotNil(t, a.PWMPinsAdaptor)
+	assert.NotNil(t, a.I2cBusAdaptor)
+	assert.True(t, a.sys.IsSysfsDigitalPinAccess())
+	// act & assert
 	a.SetName("NewName")
 	assert.Equal(t, "NewName", a.Name())
 }
 
 func TestFinalize(t *testing.T) {
-	a, _ := initTestAdaptorWithMockedFilesystem()
+	a, _ := initConnectedTestAdaptorWithMockedFilesystem()
 
 	_ = a.DigitalWrite("J12_1", 1)
 	_ = a.PwmWrite("J12_26", 100)
@@ -122,7 +130,7 @@ func TestFinalize(t *testing.T) {
 }
 
 func TestDigitalIO(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
+	a, fs := initConnectedTestAdaptorWithMockedFilesystem()
 
 	_ = a.DigitalWrite("J12_1", 1)
 	assert.Equal(t, "1", fs.Files["/sys/class/gpio/gpio451/value"].Contents)
@@ -138,7 +146,7 @@ func TestDigitalIO(t *testing.T) {
 }
 
 func TestPwm(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
+	a, fs := initConnectedTestAdaptorWithMockedFilesystem()
 
 	err := a.PwmWrite("J12_26", 100)
 	require.NoError(t, err)
@@ -152,7 +160,7 @@ func TestPwm(t *testing.T) {
 }
 
 func TestPwmPinExportError(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
+	a, fs := initConnectedTestAdaptorWithMockedFilesystem()
 	delete(fs.Files, "/sys/class/pwm/pwmchip0/export")
 
 	err := a.PwmWrite("J12_26", 100)
@@ -160,7 +168,7 @@ func TestPwmPinExportError(t *testing.T) {
 }
 
 func TestPwmPinEnableError(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
+	a, fs := initConnectedTestAdaptorWithMockedFilesystem()
 	delete(fs.Files, "/sys/class/pwm/pwmchip0/pwm0/enable")
 
 	err := a.PwmWrite("J12_26", 100)

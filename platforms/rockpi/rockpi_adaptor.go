@@ -43,8 +43,8 @@ type Adaptor struct {
 //	adaptors.WithGpiodAccess():	use character device gpiod driver instead of the default sysfs (NOT work on RockPi4C+!)
 //	adaptors.WithSpiGpioAccess(sclk, ncs, sdo, sdi):	use GPIO's instead of /dev/spidev#.#
 //	adaptors.WithGpiosActiveLow(pin's): invert the pin behavior
-func NewAdaptor(opts ...func(adaptors.DigitalPinsOptioner)) *Adaptor {
-	sys := system.NewAccesser()
+func NewAdaptor(opts ...adaptors.DigitalPinsOptionApplier) *Adaptor {
+	sys := system.NewAccesser(system.WithDigitalPinSysfsAccess())
 	a := &Adaptor{
 		name: gobot.DefaultName("RockPi"),
 		sys:  sys,

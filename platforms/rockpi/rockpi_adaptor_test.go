@@ -2,6 +2,7 @@ package rockpi
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -9,15 +10,31 @@ import (
 	"gobot.io/x/gobot/v2/system"
 )
 
-func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.MockFilesystem) {
+func initConnectedTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.MockFilesystem) {
 	a := NewAdaptor()
 	fs := a.sys.UseMockFilesystem(mockPaths)
 	_ = a.Connect()
 	return a, fs
 }
 
+func TestNewAdaptor(t *testing.T) {
+	// arrange & act
+	a := NewAdaptor()
+	// assert
+	assert.IsType(t, &Adaptor{}, a)
+	assert.True(t, strings.HasPrefix(a.Name(), "RockPi"))
+	assert.NotNil(t, a.sys)
+	assert.NotNil(t, a.DigitalPinsAdaptor)
+	assert.NotNil(t, a.I2cBusAdaptor)
+	assert.NotNil(t, a.SpiBusAdaptor)
+	assert.True(t, a.sys.IsSysfsDigitalPinAccess())
+	// act & assert
+	a.SetName("NewName")
+	assert.Equal(t, "NewName", a.Name())
+}
+
 func TestDefaultI2cBus(t *testing.T) {
-	a, _ := initTestAdaptorWithMockedFilesystem([]string{})
+	a, _ := initConnectedTestAdaptorWithMockedFilesystem([]string{})
 	assert.Equal(t, 7, a.DefaultI2cBus())
 }
 

@@ -31,7 +31,7 @@ type pwmPinServoScale struct {
 	minDuty, maxDuty     time.Duration
 }
 
-// pwmPinConfiguration contains all changeable attributes of the adaptor.
+// pwmPinsConfiguration contains all changeable attributes of the adaptor.
 type pwmPinsConfiguration struct {
 	initialize                 pwmPinInitializer
 	usePiBlasterPin            bool

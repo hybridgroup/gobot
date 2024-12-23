@@ -8,7 +8,7 @@ import (
 	"gobot.io/x/gobot/v2/system"
 )
 
-type analogPinTranslator func(pin string) (path string, r, w bool, bufLen uint16, err error)
+type analogPinTranslator func(pin string) (path string, w bool, readBufLen uint16, err error)
 
 // AnalogPinsAdaptor is a adaptor for analog pins, normally used for composition in platforms.
 // It is also usable for general sysfs access.
@@ -83,11 +83,11 @@ func (a *AnalogPinsAdaptor) analogPin(id string) (gobot.AnalogPinner, error) {
 	pin := a.pins[id]
 
 	if pin == nil {
-		path, r, w, bufLen, err := a.translate(id)
+		path, w, readBufLen, err := a.translate(id)
 		if err != nil {
 			return nil, err
 		}
-		pin = a.sys.NewAnalogPin(path, r, w, bufLen)
+		pin = a.sys.NewAnalogPin(path, w, readBufLen)
 		a.pins[id] = pin
 	}
 
