@@ -239,7 +239,7 @@ func (d *digitalPinConfig) SetEventHandlerForEdge(
 
 // SetPollForEdgeDetection use a discrete input polling method to detect edges. A poll interval of zero or smaller
 // will deactivate this function. Please note: Using this feature is CPU consuming and less accurate than using cdev
-// event handler (gpiod implementation) and should be done only if the former is not implemented or not working for
+// event handler (go-gpiocdev package) and should be done only if the former is not implemented or not working for
 // the adaptor. E.g. sysfs driver in gobot has not implemented edge detection yet. The function is only useful
 // together with SetEventHandlerForEdge() and its corresponding With*() functions.
 // The function is intended to use by WithPinPollForEdgeDetection().

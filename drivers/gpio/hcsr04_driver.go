@@ -36,7 +36,7 @@ type hcsr04Configuration struct {
 }
 
 // hcsr04UseEdgePollingOption is the type for applying to use discrete edge polling instead pin edge detection
-// by "cdev" from gpiod.
+// by "cdev" from the go-gpiocdev package.
 type hcsr04UseEdgePollingOption bool
 
 // HCSR04Driver is a driver for ultrasonic range measurement.
@@ -132,7 +132,7 @@ func NewHCSR04Driver(a gobot.Adaptor, triggerPinID, echoPinID string, opts ...in
 	return &d
 }
 
-// WithHCSR04UseEdgePolling use discrete edge polling instead pin edge detection by "cdev" from gpiod.
+// WithHCSR04UseEdgePolling use discrete edge polling instead pin edge detection by "cdev" from the go-gpiocdev package.
 func WithHCSR04UseEdgePolling() hcsr04OptionApplier {
 	return hcsr04UseEdgePollingOption(true)
 }

@@ -37,7 +37,7 @@ type Adaptor struct {
 //
 // Optional parameters:
 //
-//	adaptors.WithSysfsAccess():	use legacy sysfs driver instead of default character device gpiod
+//	adaptors.WithGpioSysfsAccess():	use legacy sysfs driver instead of default character device driver
 //	adaptors.WithSpiGpioAccess(sclk, ncs, sdo, sdi):	use GPIO's instead of /dev/spidev#.#
 //	adaptors.WithGpiosActiveLow(pin's): invert the pin behavior
 //	adaptors.WithGpiosPullUp/Down(pin's): sets the internal pull resistor

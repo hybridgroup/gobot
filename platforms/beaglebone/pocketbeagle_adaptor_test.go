@@ -26,10 +26,10 @@ func TestNewPocketBeagleAdaptor(t *testing.T) {
 
 func TestNewPocketBeagleAdaptorWithOption(t *testing.T) {
 	// arrange & act
-	a := NewPocketBeagleAdaptor(adaptors.WithGpiodAccess())
+	a := NewPocketBeagleAdaptor(adaptors.WithGpioCdevAccess())
 	// we have to mock the fs at this point to ensure the option can be applied on each test environment
 	a.sys.UseMockFilesystem([]string{"/dev/gpiochip0"})
 	// assert
 	require.NoError(t, a.Connect())
-	assert.True(t, a.sys.IsGpiodDigitalPinAccess())
+	assert.True(t, a.sys.IsCdevDigitalPinAccess())
 }

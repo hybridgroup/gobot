@@ -48,7 +48,7 @@ var fixedPins = map[string]int{
 //
 // Optional parameters:
 //
-//	adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs
+//	adaptors.WithGpioCdevAccess():	use character device driver instead of sysfs
 //	adaptors.WithSpiGpioAccess(sclk, ncs, sdo, sdi):	use GPIO's instead of /dev/spidev#.#
 func NewAdaptor(opts ...adaptors.DigitalPinsOptionApplier) *Adaptor {
 	sys := system.NewAccesser(system.WithDigitalPinSysfsAccess())

@@ -66,7 +66,7 @@ type DigitalPinsAdaptor struct {
 	mutex          sync.Mutex
 }
 
-// NewDigitalPinsAdaptor provides the access to digital pins of the board. It supports sysfs and gpiod system drivers.
+// NewDigitalPinsAdaptor provides the access to digital pins of the board. It supports sysfs and cdev system drivers.
 // This is decided by the given accesser. The translator is used to adapt the pin header naming, which is given by user,
 // to the internal file name or chip/line nomenclature. This varies by each platform. If for some reasons the default
 // initializer is not suitable, it can be given by the option "WithDigitalPinInitializer()". This is especially needed,
@@ -92,15 +92,15 @@ func WithDigitalPinInitializer(pc digitalPinInitializer) digitalPinsInitializeOp
 	return digitalPinsInitializeOption(pc)
 }
 
-// WithGpiodAccess can be used to change the default legacy sysfs implementation to the character device Kernel ABI,
-// provided by the gpiod package.
-func WithGpiodAccess() digitalPinsSystemSysfsOption {
+// WithGpioCdevAccess can be used to change the default legacy sysfs implementation to the character device Kernel ABI,
+// provided by the go-gpiocdev package.
+func WithGpioCdevAccess() digitalPinsSystemSysfsOption {
 	return digitalPinsSystemSysfsOption(false)
 }
 
-// WithSysfsAccess can be used to change the default character device implementation, provided by the gpiod package, to
-// the legacy sysfs Kernel ABI.
-func WithSysfsAccess() digitalPinsSystemSysfsOption {
+// WithGpioSysfsAccess can be used to change the default character device implementation, provided by the go-gpiocdev
+// package, to the legacy sysfs Kernel ABI.
+func WithGpioSysfsAccess() digitalPinsSystemSysfsOption {
 	return digitalPinsSystemSysfsOption(true)
 }
 
@@ -206,7 +206,7 @@ func (a *DigitalPinsAdaptor) Connect() error {
 		if *cfg.useSysfs {
 			system.WithDigitalPinSysfsAccess()(a.sys)
 		} else {
-			system.WithDigitalPinGpiodAccess()(a.sys)
+			system.WithDigitalPinCdevAccess()(a.sys)
 		}
 	}
 

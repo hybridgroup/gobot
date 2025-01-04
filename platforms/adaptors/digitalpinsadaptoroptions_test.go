@@ -53,16 +53,16 @@ func TestDigitalPinsWithSysfsAccess(t *testing.T) {
 	// arrange
 	a := NewDigitalPinsAdaptor(system.NewAccesser(), nil)
 	require.NoError(t, a.Connect())
-	require.True(t, a.sys.IsGpiodDigitalPinAccess())
+	require.True(t, a.sys.IsCdevDigitalPinAccess())
 	require.NoError(t, a.Finalize())
 	// act, connect is mandatory to set options to the system
-	WithSysfsAccess().apply(a.digitalPinsCfg)
+	WithGpioSysfsAccess().apply(a.digitalPinsCfg)
 	require.NoError(t, a.Connect())
 	// assert
 	assert.True(t, a.sys.IsSysfsDigitalPinAccess())
 }
 
-func TestDigitalPinsWithGpiodAccess(t *testing.T) {
+func TestDigitalPinsWithCdevAccess(t *testing.T) {
 	// arrange
 	a := NewDigitalPinsAdaptor(system.NewAccesser(system.WithDigitalPinSysfsAccess()), nil)
 	require.NoError(t, a.Connect())
@@ -71,10 +71,10 @@ func TestDigitalPinsWithGpiodAccess(t *testing.T) {
 	// we have to mock the fs at this point to ensure the option can be applied on each test environment
 	a.sys.UseMockFilesystem([]string{"/dev/gpiochip0"})
 	// act, connect is mandatory to set options to the system
-	WithGpiodAccess().apply(a.digitalPinsCfg)
+	WithGpioCdevAccess().apply(a.digitalPinsCfg)
 	require.NoError(t, a.Connect())
 	// assert
-	assert.True(t, a.sys.IsGpiodDigitalPinAccess())
+	assert.True(t, a.sys.IsCdevDigitalPinAccess())
 }
 
 func TestDigitalReadWithGpiosActiveLow(t *testing.T) {

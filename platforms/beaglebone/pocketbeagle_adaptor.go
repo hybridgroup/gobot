@@ -16,7 +16,7 @@ type PocketBeagleAdaptor struct {
 // NewPocketBeagleAdaptor creates a new Adaptor for the PocketBeagle
 // Optional parameters:
 //
-//	adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs
+//	adaptors.WithGpioCdevAccess():	use character device driver instead of sysfs
 //	adaptors.WithSpiGpioAccess(sclk, ncs, sdo, sdi):	use GPIO's instead of /dev/spidev#.#
 //
 //	Optional parameters for PWM, see [adaptors.NewPWMPinsAdaptor]

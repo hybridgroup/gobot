@@ -21,7 +21,7 @@ func TestNewAdaptor(t *testing.T) {
 	assert.NotNil(t, a.PWMPinsAdaptor)
 	assert.NotNil(t, a.I2cBusAdaptor)
 	assert.NotNil(t, a.SpiBusAdaptor)
-	assert.True(t, a.sys.IsGpiodDigitalPinAccess())
+	assert.True(t, a.sys.IsCdevDigitalPinAccess())
 	// act & assert
 	a.SetName("NewName")
 	assert.Equal(t, "NewName", a.Name())
@@ -29,7 +29,7 @@ func TestNewAdaptor(t *testing.T) {
 
 func TestNewAdaptorWithOption(t *testing.T) {
 	// arrange & act
-	a := NewAdaptor(adaptors.WithGpiosActiveLow("1"), adaptors.WithSysfsAccess())
+	a := NewAdaptor(adaptors.WithGpiosActiveLow("1"), adaptors.WithGpioSysfsAccess())
 	// assert
 	require.NoError(t, a.Connect())
 	assert.True(t, a.sys.IsSysfsDigitalPinAccess())

@@ -13,7 +13,7 @@ const systemDebug = false
 type digitalPinAccesserType int
 
 const (
-	digitalPinAccesserTypeGpiod digitalPinAccesserType = iota
+	digitalPinAccesserTypeCdev digitalPinAccesserType = iota
 	digitalPinAccesserTypeSysfs
 )
 
@@ -81,7 +81,7 @@ func NewAccesser(options ...func(Optioner)) *Accesser {
 		fs:  &nativeFilesystem{},
 	}
 	a.spiAccess = &periphioSpiAccess{fs: a.fs}
-	a.digitalPinAccess = &gpiodDigitalPinAccess{fs: a.fs}
+	a.digitalPinAccess = &cdevDigitalPinAccess{fs: a.fs}
 	for _, option := range options {
 		if option == nil {
 			continue
@@ -132,9 +132,9 @@ func (a *Accesser) IsSysfsDigitalPinAccess() bool {
 	return a.digitalPinAccess.isType(digitalPinAccesserTypeSysfs)
 }
 
-// IsGpiodDigitalPinAccess returns whether the used digital pin accesser is a sysfs one.
-func (a *Accesser) IsGpiodDigitalPinAccess() bool {
-	return a.digitalPinAccess.isType(digitalPinAccesserTypeGpiod)
+// IsCdevDigitalPinAccess returns whether the used digital pin accesser is a sysfs one.
+func (a *Accesser) IsCdevDigitalPinAccess() bool {
+	return a.digitalPinAccess.isType(digitalPinAccesserTypeCdev)
 }
 
 // NewPWMPin returns a new system PWM pin, according to the given pin number.

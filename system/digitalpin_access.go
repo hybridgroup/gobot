@@ -11,8 +11,8 @@ type sysfsDigitalPinAccess struct {
 	sfa *sysfsFileAccess
 }
 
-// gpiodDigitalPinAccess represents the character device implementation
-type gpiodDigitalPinAccess struct {
+// cdevDigitalPinAccess represents the character device implementation
+type cdevDigitalPinAccess struct {
 	fs    filesystem
 	chips []string
 }
@@ -36,11 +36,11 @@ func (dpa *sysfsDigitalPinAccess) setFs(fs filesystem) {
 	dpa.sfa = &sysfsFileAccess{fs: fs, readBufLen: 2}
 }
 
-func (dpa *gpiodDigitalPinAccess) isType(accesserType digitalPinAccesserType) bool {
-	return accesserType == digitalPinAccesserTypeGpiod
+func (dpa *cdevDigitalPinAccess) isType(accesserType digitalPinAccesserType) bool {
+	return accesserType == digitalPinAccesserTypeCdev
 }
 
-func (dpa *gpiodDigitalPinAccess) isSupported() bool {
+func (dpa *cdevDigitalPinAccess) isSupported() bool {
 	chips, err := dpa.fs.find("/dev", "gpiochip")
 	if err != nil || len(chips) == 0 {
 		return false
@@ -49,12 +49,12 @@ func (dpa *gpiodDigitalPinAccess) isSupported() bool {
 	return true
 }
 
-func (dpa *gpiodDigitalPinAccess) createPin(chip string, pin int,
+func (dpa *cdevDigitalPinAccess) createPin(chip string, pin int,
 	o ...func(gobot.DigitalPinOptioner) bool,
 ) gobot.DigitalPinner {
-	return newDigitalPinGpiod(chip, pin, o...)
+	return newDigitalPinCdev(chip, pin, o...)
 }
 
-func (dpa *gpiodDigitalPinAccess) setFs(fs filesystem) {
+func (dpa *cdevDigitalPinAccess) setFs(fs filesystem) {
 	dpa.fs = fs
 }

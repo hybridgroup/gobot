@@ -11,13 +11,13 @@ import (
 )
 
 var (
-	_ gobot.DigitalPinner           = (*digitalPinGpiod)(nil)
-	_ gobot.DigitalPinValuer        = (*digitalPinGpiod)(nil)
-	_ gobot.DigitalPinOptioner      = (*digitalPinGpiod)(nil)
-	_ gobot.DigitalPinOptionApplier = (*digitalPinGpiod)(nil)
+	_ gobot.DigitalPinner           = (*digitalPinCdev)(nil)
+	_ gobot.DigitalPinValuer        = (*digitalPinCdev)(nil)
+	_ gobot.DigitalPinOptioner      = (*digitalPinCdev)(nil)
+	_ gobot.DigitalPinOptionApplier = (*digitalPinCdev)(nil)
 )
 
-func Test_newDigitalPinGpiod(t *testing.T) {
+func Test_newDigitalPinCdev(t *testing.T) {
 	// arrange
 	const (
 		chip  = "gpiochip0"
@@ -25,7 +25,7 @@ func Test_newDigitalPinGpiod(t *testing.T) {
 		label = "gobotio17"
 	)
 	// act
-	d := newDigitalPinGpiod(chip, pin)
+	d := newDigitalPinCdev(chip, pin)
 	// assert
 	assert.NotNil(t, d)
 	assert.Equal(t, chip, d.chipName)
@@ -35,14 +35,14 @@ func Test_newDigitalPinGpiod(t *testing.T) {
 	assert.Equal(t, 0, d.outInitialState)
 }
 
-func Test_newDigitalPinGpiodWithOptions(t *testing.T) {
-	// This is a general test, that options are applied by using "newDigitalPinGpiod" with the WithPinLabel() option.
+func Test_newDigitalPinCdevWithOptions(t *testing.T) {
+	// This is a general test, that options are applied by using "newDigitalPinCdev" with the WithPinLabel() option.
 	// All other configuration options will be tested in tests for "digitalPinConfig".
 	//
 	// arrange
 	const label = "my own label"
 	// act
-	dp := newDigitalPinGpiod("", 9, WithPinLabel(label))
+	dp := newDigitalPinCdev("", 9, WithPinLabel(label))
 	// assert
 	assert.Equal(t, label, dp.label)
 }
@@ -80,20 +80,20 @@ func TestApplyOptions(t *testing.T) {
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			// currently the gpiod.Chip has no interface for RequestLine(),
+			// currently the gpiocdev.Chip has no interface for RequestLine(),
 			// so we can only test without trigger of real reconfigure
 			// arrange
-			orgReconf := digitalPinGpiodReconfigure
-			defer func() { digitalPinGpiodReconfigure = orgReconf }()
+			orgReconf := digitalPinCdevReconfigure
+			defer func() { digitalPinCdevReconfigure = orgReconf }()
 
 			inputForced := true
 			reconfigured := 0
-			digitalPinGpiodReconfigure = func(d *digitalPinGpiod, forceInput bool) error {
+			digitalPinCdevReconfigure = func(d *digitalPinCdev, forceInput bool) error {
 				inputForced = forceInput
 				reconfigured++
 				return tc.simErr
 			}
-			d := &digitalPinGpiod{digitalPinConfig: &digitalPinConfig{direction: "in"}}
+			d := &digitalPinCdev{digitalPinConfig: &digitalPinConfig{direction: "in"}}
 			optionFunction1 := func(gobot.DigitalPinOptioner) bool {
 				d.digitalPinConfig.direction = "test"
 				return tc.changed[0]
@@ -116,7 +116,7 @@ func TestApplyOptions(t *testing.T) {
 	}
 }
 
-func TestExportGpiod(t *testing.T) {
+func TestExport_cdev(t *testing.T) {
 	tests := map[string]struct {
 		simErr           error
 		wantReconfigured int
@@ -128,25 +128,25 @@ func TestExportGpiod(t *testing.T) {
 		"error": {
 			wantReconfigured: 1,
 			simErr:           fmt.Errorf("reconfigure error"),
-			wantErr:          fmt.Errorf("gpiod.Export(): reconfigure error"),
+			wantErr:          fmt.Errorf("cdev.Export(): reconfigure error"),
 		},
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			// currently the gpiod.Chip has no interface for RequestLine(),
+			// currently the gpiocdev.Chip has no interface for RequestLine(),
 			// so we can only test without trigger of real reconfigure
 			// arrange
-			orgReconf := digitalPinGpiodReconfigure
-			defer func() { digitalPinGpiodReconfigure = orgReconf }()
+			orgReconf := digitalPinCdevReconfigure
+			defer func() { digitalPinCdevReconfigure = orgReconf }()
 
 			inputForced := true
 			reconfigured := 0
-			digitalPinGpiodReconfigure = func(d *digitalPinGpiod, forceInput bool) error {
+			digitalPinCdevReconfigure = func(d *digitalPinCdev, forceInput bool) error {
 				inputForced = forceInput
 				reconfigured++
 				return tc.simErr
 			}
-			d := &digitalPinGpiod{}
+			d := &digitalPinCdev{}
 			// act
 			err := d.Export()
 			// assert
@@ -157,7 +157,7 @@ func TestExportGpiod(t *testing.T) {
 	}
 }
 
-func TestUnexportGpiod(t *testing.T) {
+func TestUnexport_cdev(t *testing.T) {
 	tests := map[string]struct {
 		simNoLine        bool
 		simReconfErr     error
@@ -185,25 +185,25 @@ func TestUnexportGpiod(t *testing.T) {
 		"error_close": {
 			wantReconfigured: 1,
 			simCloseErr:      fmt.Errorf("close error"),
-			wantErr:          fmt.Errorf("gpiod.Unexport()-line.Close(): close error"),
+			wantErr:          fmt.Errorf("cdev.Unexport()-line.Close(): close error"),
 		},
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			// currently the gpiod.Chip has no interface for RequestLine(),
+			// currently the gpiocdev.Chip has no interface for RequestLine(),
 			// so we can only test without trigger of real reconfigure
 			// arrange
-			orgReconf := digitalPinGpiodReconfigure
-			defer func() { digitalPinGpiodReconfigure = orgReconf }()
+			orgReconf := digitalPinCdevReconfigure
+			defer func() { digitalPinCdevReconfigure = orgReconf }()
 
 			inputForced := false
 			reconfigured := 0
-			digitalPinGpiodReconfigure = func(d *digitalPinGpiod, forceInput bool) error {
+			digitalPinCdevReconfigure = func(d *digitalPinCdev, forceInput bool) error {
 				inputForced = forceInput
 				reconfigured++
 				return tc.simReconfErr
 			}
-			dp := newDigitalPinGpiod("", 4)
+			dp := newDigitalPinCdev("", 4)
 			if !tc.simNoLine {
 				dp.line = &lineMock{simCloseErr: tc.simCloseErr}
 			}
@@ -219,7 +219,7 @@ func TestUnexportGpiod(t *testing.T) {
 	}
 }
 
-func TestWriteGpiod(t *testing.T) {
+func TestWrite_cdev(t *testing.T) {
 	tests := map[string]struct {
 		val     int
 		simErr  error
@@ -244,13 +244,13 @@ func TestWriteGpiod(t *testing.T) {
 		},
 		"write_with_err": {
 			simErr:  fmt.Errorf("a write err"),
-			wantErr: []string{"a write err", "gpiod.Write"},
+			wantErr: []string{"a write err", "cdev.Write"},
 		},
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			dp := newDigitalPinGpiod("", 4)
+			dp := newDigitalPinCdev("", 4)
 			lm := &lineMock{lastVal: 10, simSetErr: tc.simErr}
 			dp.line = lm
 			// act
@@ -268,7 +268,7 @@ func TestWriteGpiod(t *testing.T) {
 	}
 }
 
-func TestReadGpiod(t *testing.T) {
+func TestRead_cdev(t *testing.T) {
 	tests := map[string]struct {
 		simVal  int
 		simErr  error
@@ -279,13 +279,13 @@ func TestReadGpiod(t *testing.T) {
 		},
 		"write_with_err": {
 			simErr:  fmt.Errorf("a read err"),
-			wantErr: []string{"a read err", "gpiod.Read"},
+			wantErr: []string{"a read err", "cdev.Read"},
 		},
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			dp := newDigitalPinGpiod("", 4)
+			dp := newDigitalPinCdev("", 4)
 			lm := &lineMock{lastVal: tc.simVal, simValueErr: tc.simErr}
 			dp.line = lm
 			// act

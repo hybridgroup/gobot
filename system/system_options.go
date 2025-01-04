@@ -10,16 +10,16 @@ import (
 // caller/user when creating the system access, e.g. by "NewAccesser()".
 // TODO: change to applier-architecture, see options of pwmpinsadaptor.go
 type Optioner interface {
-	setDigitalPinToGpiodAccess()
+	setDigitalPinToCdevAccess()
 	setDigitalPinToSysfsAccess()
 	setSpiToGpioAccess(p gobot.DigitalPinnerProvider, sclkPin, ncsPin, sdoPin, sdiPin string)
 }
 
-// WithDigitalPinGpiodAccess can be used to change the default sysfs implementation for digital pins to the character
-// device Kernel ABI. The access is provided by the gpiod package.
-func WithDigitalPinGpiodAccess() func(Optioner) {
+// WithDigitalPinCdevAccess can be used to change the default sysfs implementation for digital pins to the character
+// device Kernel ABI. The access is provided by the go-gpiocdev package.
+func WithDigitalPinCdevAccess() func(Optioner) {
 	return func(s Optioner) {
-		s.setDigitalPinToGpiodAccess()
+		s.setDigitalPinToCdevAccess()
 	}
 }
 
@@ -38,18 +38,18 @@ func WithSpiGpioAccess(p gobot.DigitalPinnerProvider, sclkPin, ncsPin, sdoPin, s
 	}
 }
 
-func (a *Accesser) setDigitalPinToGpiodAccess() {
-	dpa := &gpiodDigitalPinAccess{fs: a.fs}
+func (a *Accesser) setDigitalPinToCdevAccess() {
+	dpa := &cdevDigitalPinAccess{fs: a.fs}
 	if dpa.isSupported() {
 		a.digitalPinAccess = dpa
 		if systemDebug {
-			fmt.Printf("use gpiod driver for digital pins with this chips: %v\n", dpa.chips)
+			fmt.Printf("use cdev driver for digital pins with this chips: %v\n", dpa.chips)
 		}
 
 		return
 	}
 	if systemDebug {
-		fmt.Println("gpiod driver not supported, fallback to sysfs")
+		fmt.Println("cdev driver not supported, fallback to sysfs driver")
 	}
 }
 
@@ -64,7 +64,7 @@ func (a *Accesser) setDigitalPinToSysfsAccess() {
 		return
 	}
 	if systemDebug {
-		fmt.Println("sysfs driver not supported, fallback to gpiod")
+		fmt.Println("sysfs driver not supported, fallback to cdev driver")
 	}
 }
 

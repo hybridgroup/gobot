@@ -80,7 +80,7 @@ func (o digitalPinsInitializeOption) String() string {
 }
 
 func (o digitalPinsSystemSysfsOption) String() string {
-	return "use gpiod system access option for digital pins"
+	return "use sysfs vs. cdev system access option for digital pins"
 }
 
 func (o digitalPinsForSystemSpiOption) String() string {

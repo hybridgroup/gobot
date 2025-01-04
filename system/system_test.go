@@ -15,7 +15,7 @@ func TestNewAccesser(t *testing.T) {
 	nativeSys := a.sys.(*nativeSyscall)
 	nativeFsSys := a.fs.(*nativeFilesystem)
 	perphioSpi := a.spiAccess.(*periphioSpiAccess)
-	gpiodDigitalPin := a.digitalPinAccess.(*gpiodDigitalPinAccess)
+	gpiodDigitalPin := a.digitalPinAccess.(*cdevDigitalPinAccess)
 	assert.NotNil(t, a)
 	assert.NotNil(t, nativeSys)
 	assert.NotNil(t, nativeFsSys)
@@ -50,14 +50,14 @@ func TestNewAccesser_NewSpiDevice(t *testing.T) {
 func TestNewAccesser_IsSysfsDigitalPinAccess(t *testing.T) {
 	tests := map[string]struct {
 		sysfsAccesser bool
-		wantGpiod     bool
+		wantCdev      bool
 	}{
 		"default_accesser_gpiod": {
-			wantGpiod: true,
+			wantCdev: true,
 		},
 		"accesser_sysfs": {
 			sysfsAccesser: true,
-			wantGpiod:     false,
+			wantCdev:      false,
 		},
 	}
 	for name, tc := range tests {
@@ -68,18 +68,18 @@ func TestNewAccesser_IsSysfsDigitalPinAccess(t *testing.T) {
 				WithDigitalPinSysfsAccess()(a)
 			}
 			// act
-			gotGpiod := a.IsGpiodDigitalPinAccess()
+			gotCdev := a.IsCdevDigitalPinAccess()
 			gotSysfs := a.IsSysfsDigitalPinAccess()
 			// assert
 			assert.NotNil(t, a)
-			if tc.wantGpiod {
-				assert.True(t, gotGpiod)
+			if tc.wantCdev {
+				assert.True(t, gotCdev)
 				assert.False(t, gotSysfs)
-				dpaGpiod := a.digitalPinAccess.(*gpiodDigitalPinAccess)
-				assert.NotNil(t, dpaGpiod)
-				assert.Equal(t, a.fs.(*nativeFilesystem), dpaGpiod.fs)
+				dpaGpioCdev := a.digitalPinAccess.(*cdevDigitalPinAccess)
+				assert.NotNil(t, dpaGpioCdev)
+				assert.Equal(t, a.fs.(*nativeFilesystem), dpaGpioCdev.fs)
 			} else {
-				assert.False(t, gotGpiod)
+				assert.False(t, gotCdev)
 				assert.True(t, gotSysfs)
 				dpaSys := a.digitalPinAccess.(*sysfsDigitalPinAccess)
 				assert.NotNil(t, dpaSys)

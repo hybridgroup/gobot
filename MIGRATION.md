@@ -1,11 +1,52 @@
-# Migration of drivers
+# Migration guide
 
 From time to time a breaking change of API can happen. Following to [SemVer](https://semver.org/), the gobot main version
 should be increased. In such case all users needs to adjust there projects for the next update, although they not using
-a driver with changed API.
+a driver or platform with changed API.
 
-To prevent this scenario for most users, the main version will not always increased, but affected drivers are listed
-here and a migration strategy is provided.
+To prevent this scenario for most users, the main version will not always increased, but affected drivers and platforms
+are listed here and a migration strategy is provided.
+
+## Switch from version 2.4.0 (applications using the gpiod options affected)
+
+### The term gpiod was renamed to cdev
+
+Using the term "cdev" (short for character device Kernel ABI for GPIO access) is more suitable than using "gpiod" (the
+name of the user space driver in Linux). Also it relates better to the term "sysfs" (the legacy sysfs Kernel ABI for
+GPIO access). The former name was chosen so there would be no difference to the used go module "gpiod". Since also this
+module is now renamed to "go-gpiocdev", we choose the better name "cdev" from now on.
+
+This change affects all applications, which using the With... options of "gpiod" or "sysfs". A search and replace is
+suitable:
+
+```go
+// old
+...
+  a := NewAdaptor(adaptors.WithGpiodAccess())
+...
+
+// new
+...
+  a := NewAdaptor(adaptors.WithGpioCdevAccess())
+...
+```
+
+```go
+// old
+...
+  a := NewAdaptor(adaptors.WithSysfsAccess())
+...
+
+// new
+...
+  a := NewAdaptor(adaptors.WithGpioSysfsAccess())
+...
+```
+
+Also those findings needs to be replaced, which usually affects developers, but not users:
+
+* `system.WithDigitalPinGpiodAccess()` --> `system.WithDigitalPinCdevAccess()`
+* `IsGpiodDigitalPinAccess()` --> `IsCdevDigitalPinAccess()`
 
 ## Switch from version 2.3.0 (ble and sphero adaptors affected)
 

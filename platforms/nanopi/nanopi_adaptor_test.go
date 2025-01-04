@@ -85,7 +85,7 @@ func TestNewAdaptor(t *testing.T) {
 	assert.NotNil(t, a.PWMPinsAdaptor)
 	assert.NotNil(t, a.I2cBusAdaptor)
 	assert.NotNil(t, a.SpiBusAdaptor)
-	assert.True(t, a.sys.IsGpiodDigitalPinAccess())
+	assert.True(t, a.sys.IsCdevDigitalPinAccess())
 	// act & assert
 	a.SetName("NewName")
 	assert.Equal(t, "NewName", a.Name())
@@ -93,7 +93,7 @@ func TestNewAdaptor(t *testing.T) {
 
 func TestNewAdaptorWithOption(t *testing.T) {
 	// arrange & act
-	a := NewNeoAdaptor(adaptors.WithGpiosActiveLow("1"), adaptors.WithSysfsAccess())
+	a := NewNeoAdaptor(adaptors.WithGpiosActiveLow("1"), adaptors.WithGpioSysfsAccess())
 	// assert
 	require.NoError(t, a.Connect())
 	assert.True(t, a.sys.IsSysfsDigitalPinAccess())
@@ -104,7 +104,7 @@ func TestDigitalIO(t *testing.T) {
 	// arrange
 	a := initConnectedTestAdaptor()
 	dpa := a.sys.UseMockDigitalPinAccess()
-	require.True(t, a.sys.IsGpiodDigitalPinAccess())
+	require.True(t, a.sys.IsCdevDigitalPinAccess())
 	// act & assert write
 	err := a.DigitalWrite("7", 1)
 	require.NoError(t, err)
@@ -125,7 +125,7 @@ func TestDigitalIO(t *testing.T) {
 func TestDigitalIOSysfs(t *testing.T) {
 	// some basic tests, further tests are done in "digitalpinsadaptor.go"
 	// arrange
-	a := NewNeoAdaptor(adaptors.WithSysfsAccess())
+	a := NewNeoAdaptor(adaptors.WithGpioSysfsAccess())
 	require.NoError(t, a.Connect())
 	dpa := a.sys.UseMockDigitalPinAccess()
 	require.True(t, a.sys.IsSysfsDigitalPinAccess())
@@ -274,7 +274,7 @@ func TestFinalizeErrorAfterGPIO(t *testing.T) {
 	// arrange
 	a := initConnectedTestAdaptor()
 	dpa := a.sys.UseMockDigitalPinAccess()
-	require.True(t, a.sys.IsGpiodDigitalPinAccess())
+	require.True(t, a.sys.IsCdevDigitalPinAccess())
 	require.NoError(t, a.DigitalWrite("7", 1))
 	dpa.UseUnexportError("gpiochip0", "203")
 	// act

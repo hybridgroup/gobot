@@ -63,7 +63,7 @@ func TestNewDigitalPinsAdaptor(t *testing.T) {
 	assert.NotNil(t, a.translate)
 	assert.Nil(t, a.pins)       // will be created on connect
 	assert.Nil(t, a.pinOptions) // will be created on connect
-	assert.True(t, a.sys.IsGpiodDigitalPinAccess())
+	assert.True(t, a.sys.IsCdevDigitalPinAccess())
 }
 
 func TestDigitalPinsConnect(t *testing.T) {
