@@ -231,15 +231,6 @@ func (d *OllieDriver) initialize() error {
 		}
 	}()
 
-	go func() {
-		for {
-			if _, err := d.Adaptor().ReadCharacteristic(responseChara); err != nil {
-				panic(err)
-			}
-			time.Sleep(100 * time.Millisecond)
-		}
-	}()
-
 	d.ConfigureCollisionDetection(d.defaultCollisionConfig)
 	d.enableStopOnDisconnect()
 
