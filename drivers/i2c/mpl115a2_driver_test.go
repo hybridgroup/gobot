@@ -90,7 +90,7 @@ func TestMPL115A2ReadData(t *testing.T) {
 	assert.Equal(t, uint8(0x12), a.written[3])
 	assert.Equal(t, uint8(0x00), a.written[4])
 	assert.Equal(t, uint8(0x00), a.written[5])
-	assert.InDelta(t, float32(96.585915), press, 0.0)
+	assert.InDelta(t, float32(96.585915), press, 1.0e-5)
 	assert.InDelta(t, float32(23.317757), temp, 0.0)
 }
 

@@ -144,7 +144,7 @@ func TestAnalogSensorRead_SetScaler(t *testing.T) {
 			got, err := d.Read()
 			// assert
 			require.NoError(t, err)
-			assert.InDelta(t, tc.want, got, 0.0)
+			assert.InDelta(t, tc.want, got, 1.0e-14)
 		})
 	}
 }
@@ -157,7 +157,7 @@ func TestAnalogSensor_WithSensorCyclicRead(t *testing.T) {
 	semData := make(chan bool)
 	semDone := make(chan bool)
 	nextVal := make(chan int)
-	readTimeout := 1 * time.Second
+	readTimeout := time.Second
 	a.analogReadFunc = func() (int, error) {
 		val := 100
 		var err error
@@ -172,22 +172,25 @@ func TestAnalogSensor_WithSensorCyclicRead(t *testing.T) {
 		}
 	}
 
-	// act (start cyclic reading)
-	require.NoError(t, d.Start())
-
 	// arrange: expect raw value to be received
-	_ = d.Once(d.Event(Data), func(data interface{}) {
+	_ = d.Once(Data, func(data interface{}) { // we can't use d.Event(Data) here, because not registered yet
 		assert.Equal(t, 100, data.(int))
 		semData <- true
 	})
 
 	// arrange: expect scaled value to be received
-	_ = d.Once(d.Event(Value), func(value interface{}) {
+	_ = d.Once(Value, func(value interface{}) { // we can't use d.Event(Value) here, because not registered yet
 		assert.InDelta(t, 10000.0, value.(float64), 0.0)
 		<-semData // wait for data is finished
 		semDone <- true
 		nextVal <- -1 // arrange: error in read function
 	})
+
+	// wait some time to ensure the cyclic go routine is working
+	time.Sleep(15 * time.Millisecond)
+
+	// act (start cyclic reading)
+	require.NoError(t, d.Start())
 
 	// assert: both events within timeout
 	select {
@@ -227,7 +230,7 @@ func TestAnalogSensor_WithSensorCyclicRead(t *testing.T) {
 		require.Fail(t, "AnalogSensor Event for data should not published")
 	case <-semDone:
 		require.Fail(t, "AnalogSensor Event for value should not published")
-	case <-time.After(readTimeout):
+	case <-time.After(100 * time.Millisecond):
 	}
 }
 

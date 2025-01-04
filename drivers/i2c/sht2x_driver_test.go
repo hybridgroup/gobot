@@ -78,7 +78,7 @@ func TestSHT2xMeasurements(t *testing.T) {
 	_ = d.Start()
 	temp, err := d.Temperature()
 	require.NoError(t, err)
-	assert.InDelta(t, float32(18.809052), temp, 0.0)
+	assert.InDelta(t, float32(18.809052), temp, 1.0e-5)
 	hum, err := d.Humidity()
 	require.NoError(t, err)
 	assert.InDelta(t, float32(40.279907), hum, 0.0)

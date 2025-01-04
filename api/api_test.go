@@ -401,24 +401,18 @@ func TestRobotDeviceEvent(t *testing.T) {
 		Event("TestEvent")
 
 	go func() {
-		time.Sleep(time.Millisecond * 5)
+		time.Sleep(time.Millisecond * 10) // wait some time, so select below is ready
 		a.manager.Robot("Robot1").
 			Device("Device1").(gobot.Eventer).Publish(event, "event-data")
 	}()
 
-	done := false
-
-	for !done {
-		select {
-		case resp := <-respc:
-			reader := bufio.NewReader(resp.Body)
-			data, _ := reader.ReadString('\n')
-			assert.Equal(t, "data: \"event-data\"\n", data)
-			done = true
-		case <-time.After(200 * time.Millisecond):
-			t.Error("Not receiving data")
-			done = true
-		}
+	select {
+	case resp := <-respc:
+		reader := bufio.NewReader(resp.Body)
+		data, _ := reader.ReadString('\n')
+		assert.Equal(t, "data: \"event-data\"\n", data)
+	case <-time.After(50 * time.Millisecond):
+		t.Error("Not receiving data")
 	}
 
 	server.CloseClientConnections()

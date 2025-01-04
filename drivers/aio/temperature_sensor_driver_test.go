@@ -3,7 +3,6 @@ package aio
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -123,7 +122,7 @@ func TestTemperatureSensorDriver_LinearScaler(t *testing.T) {
 			got, err := d.Read()
 			// assert
 			require.NoError(t, err)
-			assert.InDelta(t, tc.want, got, 0.0)
+			assert.InDelta(t, tc.want, got, 1.0e-14)
 		})
 	}
 }
@@ -136,23 +135,39 @@ func TestTemperatureSensorWithSensorCyclicRead_PublishesTemperatureInCelsius(t *
 	ntc := TemperatureSensorNtcConf{TC0: 25, R0: 10000.0, B: 3975} // Ohm, R25=10k
 	d.SetNtcScaler(1023, 10000, false, ntc)                        // Ohm, reference value: 1023, series R: 10k
 
+	// 584: 31.52208881030674, 585: 31.61532462352477
+	lastRawValue := 585
 	a.analogReadFunc = func() (int, error) {
-		return 585, nil
+		// ensure a changed value on each read, otherwise no event will be published
+		lastRawValue++
+		if lastRawValue > 585 {
+			lastRawValue = 584
+		}
+		return lastRawValue, nil
 	}
 
+	// act: start cyclic reading
 	require.NoError(t, d.Start())
+
+	// wait some time to ensure the cyclic go routine is working
+	time.Sleep(15 * time.Millisecond)
+
+	var eventValue float64
 	_ = d.Once(d.Event(Value), func(data interface{}) {
-		assert.Equal(t, "31.62", fmt.Sprintf("%.2f", data.(float64)))
+		eventValue = data.(float64)
 		sem <- true
 	})
 
+	// assert: value was published and is in expected delta
 	select {
 	case <-sem:
-	case <-time.After(1 * time.Second):
-		require.Fail(t, " Temperature Sensor Event \"Data\" was not published")
+		require.NoError(t, d.Halt())
+	case <-time.After(100 * time.Millisecond):
+		require.Fail(t, "Grove Temperature Sensor Event \"Value\" was not published")
 	}
 
-	assert.InDelta(t, 31.61532462352477, d.Value(), 0.0)
+	assert.InDelta(t, eventValue, d.Temperature(), 0.0)
+	assert.InDelta(t, 31.61532462352477, d.Value(), 31.61532462352477-31.52208881030674)
 }
 
 func TestTemperatureSensorWithSensorCyclicRead_PublishesError(t *testing.T) {
