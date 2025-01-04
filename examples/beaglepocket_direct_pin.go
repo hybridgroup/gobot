@@ -13,7 +13,7 @@ import (
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/gpio"
 	"gobot.io/x/gobot/v2/platforms/adaptors"
-	"gobot.io/x/gobot/v2/platforms/beaglebone"
+	"gobot.io/x/gobot/v2/platforms/beagleboard/pocketbeagle"
 )
 
 // Wiring
@@ -23,6 +23,7 @@ import (
 // LED's: the output pins are wired to the cathode of the LED, the anode is wired with a resistor (70-130Ohm for 20mA)
 // to VCC
 // Expected behavior: always one LED is on, the other in opposite state, if button is pressed the state changes
+// note: you can also use user LEDs, e.g. "usr0", "usr3"
 func main() {
 	const (
 		inPinNum          = "P1_34"
@@ -30,21 +31,28 @@ func main() {
 		outPinInvertedNum = "P1_36"
 	)
 
-	board := beaglebone.NewPocketBeagleAdaptor(adaptors.WithGpiosActiveLow(outPinInvertedNum))
+	board := pocketbeagle.NewAdaptor(adaptors.WithGpiosActiveLow(outPinInvertedNum))
 
 	inPin := gpio.NewDirectPinDriver(board, inPinNum)
 	outPin := gpio.NewDirectPinDriver(board, outPinNum)
 	outPinInverted := gpio.NewDirectPinDriver(board, outPinInvertedNum)
 
 	work := func() {
+		level := byte(1)
+
 		gobot.Every(500*time.Millisecond, func() {
 			read, err := inPin.DigitalRead()
 			fmt.Printf("pin %s state is %d\n", inPinNum, read)
 			if err != nil {
 				fmt.Println(err)
+				if level == 1 {
+					level = 0
+				} else {
+					level = 1
+				}
+			} else {
+				level = byte(read)
 			}
-
-			level := byte(read)
 
 			err = outPin.DigitalWrite(level)
 			fmt.Printf("pin %s is now %d\n", outPinNum, level)

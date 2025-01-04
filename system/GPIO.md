@@ -257,4 +257,4 @@ A connected LED with pull-up resistor lights up for setting to "1" (inverse reve
 ## Links
 
 * <https://www.kernel.org/doc/html/latest/admin-guide/gpio/sysfs.html>
-* <https://embeddedbits.org/linux-kernel-gpio-user-space-interface>
+* <https://embeddedbits.org/linux-kernel-gpio-user-space-interface-embeddedbits-2/>

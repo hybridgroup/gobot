@@ -1,5 +1,5 @@
 /*
-Package beaglebone provides the Gobot adaptor for the Beaglebone Black/Green, as well as a
+Package beagleboard provides the Gobot adaptor for the Beaglebone Black/Green, as well as a
 separate Adaptor for the PocketBeagle.
 
 Installing:
@@ -15,7 +15,7 @@ Example:
 
 		"gobot.io/x/gobot/v2"
 		"gobot.io/x/gobot/v2/drivers/gpio"
-		"gobot.io/x/gobot/v2/platforms/beaglebone"
+		"gobot.io/x/gobot/v2/platforms/beagleboard/beaglebone"
 	)
 
 	func main() {
@@ -42,6 +42,6 @@ Example:
 	}
 
 For more information refer to the beaglebone README:
-https://github.com/hybridgroup/gobot/blob/release/platforms/beaglebone/README.md
+https://github.com/hybridgroup/gobot/blob/release/platforms/beagleboard/README.md
 */
-package beaglebone // import "gobot.io/x/gobot/v2/platforms/beaglebone"
+package beagleboard // import "gobot.io/x/gobot/v2/platforms/beagleboard"

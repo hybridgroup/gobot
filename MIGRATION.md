@@ -48,6 +48,32 @@ Also those findings needs to be replaced, which usually affects developers, but 
 * `system.WithDigitalPinGpiodAccess()` --> `system.WithDigitalPinCdevAccess()`
 * `IsGpiodDigitalPinAccess()` --> `IsCdevDigitalPinAccess()`
 
+### PocketBeagle adaptor goes cdev
+
+The beagle board "PocketBeagle" supports with latest images the Linux Kernel character device API, so the adaptor was
+changed to use this as the default.
+
+By "adaptors.WithSysfsAccess()" the old behavior can be forced. This is most likely needed if an old image with old
+Kernel is used which does not support this new API.
+
+A small renaming is also done, please search and replace:
+
+```go
+// old
+...
+"gobot.io/x/gobot/v2/platforms/beaglebone"
+...
+beaglebone.NewPocketBeagleAdaptor(...)
+...
+
+// new
+...
+"gobot.io/x/gobot/v2/platforms/beagleboard/pocketbeagle"
+...
+pocketbeagle.NewAdaptor(...)
+...
+```
+
 ## Switch from version 2.3.0 (ble and sphero adaptors affected)
 
 ### BLE drivers and client adaptor

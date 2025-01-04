@@ -15,6 +15,7 @@ type spiGpioConfig struct {
 	ncsPinID    string
 	sdoPinID    string
 	sdiPinID    string
+	debug       bool
 }
 
 // spiGpio is the implementation of the SPI interface using GPIO's.
@@ -39,13 +40,13 @@ func (s *spiGpio) initializeTime(maxSpeed int64) {
 	// maxSpeed is given in Hz, tclk is half the cycle time, tclk=1/(2*f), tclk[ns]=1 000 000 000/(2*maxSpeed)
 	// but with gpio's a speed of more than ~15kHz is most likely not possible, so we limit to 10kHz
 	if maxSpeed > 10000 {
-		if systemDebug {
+		if s.cfg.debug {
 			fmt.Printf("reduce SPI speed for GPIO usage to 10Khz")
 		}
 		maxSpeed = 10000
 	}
 	tclk := time.Duration(1000000000/2/maxSpeed) * time.Nanosecond
-	if systemDebug {
+	if s.cfg.debug {
 		fmt.Println("clk", tclk)
 	}
 }

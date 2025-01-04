@@ -8,8 +8,6 @@ import (
 	"gobot.io/x/gobot/v2"
 )
 
-const systemDebug = false
-
 type digitalPinAccesserType int
 
 const (
@@ -71,6 +69,7 @@ type Accesser struct {
 	fs               filesystem
 	digitalPinAccess digitalPinAccesser
 	spiAccess        spiAccesser
+	debug            bool
 }
 
 // NewAccesser returns a accesser to native system call, native file system and the chosen digital pin access.

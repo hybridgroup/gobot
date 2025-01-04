@@ -10,9 +10,17 @@ import (
 // caller/user when creating the system access, e.g. by "NewAccesser()".
 // TODO: change to applier-architecture, see options of pwmpinsadaptor.go
 type Optioner interface {
+	setSystemAccesserDebug(on bool)
 	setDigitalPinToCdevAccess()
 	setDigitalPinToSysfsAccess()
 	setSpiToGpioAccess(p gobot.DigitalPinnerProvider, sclkPin, ncsPin, sdoPin, sdiPin string)
+}
+
+// WithSystemAccesserDebug can be used to switch on debug messages.
+func WithSystemAccesserDebug() func(Optioner) {
+	return func(s Optioner) {
+		s.setSystemAccesserDebug(true)
+	}
 }
 
 // WithDigitalPinCdevAccess can be used to change the default sysfs implementation for digital pins to the character
@@ -38,17 +46,22 @@ func WithSpiGpioAccess(p gobot.DigitalPinnerProvider, sclkPin, ncsPin, sdoPin, s
 	}
 }
 
+func (a *Accesser) setSystemAccesserDebug(on bool) {
+	a.debug = on
+	fmt.Println("system accesser debug is now on")
+}
+
 func (a *Accesser) setDigitalPinToCdevAccess() {
 	dpa := &cdevDigitalPinAccess{fs: a.fs}
 	if dpa.isSupported() {
 		a.digitalPinAccess = dpa
-		if systemDebug {
+		if a.debug {
 			fmt.Printf("use cdev driver for digital pins with this chips: %v\n", dpa.chips)
 		}
 
 		return
 	}
-	if systemDebug {
+	if a.debug {
 		fmt.Println("cdev driver not supported, fallback to sysfs driver")
 	}
 }
@@ -57,13 +70,13 @@ func (a *Accesser) setDigitalPinToSysfsAccess() {
 	dpa := &sysfsDigitalPinAccess{sfa: &sysfsFileAccess{fs: a.fs, readBufLen: 2}}
 	if dpa.isSupported() {
 		a.digitalPinAccess = dpa
-		if systemDebug {
+		if a.debug {
 			fmt.Println("use sysfs driver for digital pins")
 		}
 
 		return
 	}
-	if systemDebug {
+	if a.debug {
 		fmt.Println("sysfs driver not supported, fallback to cdev driver")
 	}
 }
@@ -79,13 +92,13 @@ func (a *Accesser) setSpiToGpioAccess(p gobot.DigitalPinnerProvider, sclkPin, nc
 	gsa := &gpioSpiAccess{cfg: cfg}
 	if gsa.isSupported() {
 		a.spiAccess = gsa
-		if systemDebug {
+		if a.debug {
 			fmt.Printf("use gpio driver for SPI with this config: %s\n", gsa.cfg.String())
 		}
 
 		return
 	}
-	if systemDebug {
+	if a.debug {
 		fmt.Println("gpio driver not supported for SPI, fallback to periphio")
 	}
 }

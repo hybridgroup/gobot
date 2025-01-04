@@ -89,8 +89,6 @@ func TestNewAdaptor(t *testing.T) {
 	assert.NotNil(t, a.PWMPinsAdaptor)
 	assert.NotNil(t, a.I2cBusAdaptor)
 	assert.NotNil(t, a.SpiBusAdaptor)
-	assert.Equal(t, bbbPinMap, a.pinMap)
-	assert.NotNil(t, a.pwmPinTranslate)
 	assert.Equal(t, "/sys/class/leds/beaglebone:green:", a.usrLed)
 	assert.True(t, a.sys.IsSysfsDigitalPinAccess())
 	// act & assert
@@ -341,8 +339,10 @@ func Test_translateAndMuxPWMPin(t *testing.T) {
 			// arrange
 			muxPath := fmt.Sprintf("/sys/devices/platform/ocp/ocp:%s_pinmux/state", name)
 			fs.Add(muxPath)
+			pwmPinTranslator := adaptors.NewPWMPinTranslator(a.sys, bbbPwmPinMap)
+			translateAndMuxPWMPin := a.getTranslateAndMuxPWMPinFunc(pwmPinTranslator.Translate)
 			// act
-			path, channel, err := a.translateAndMuxPWMPin(name)
+			path, channel, err := translateAndMuxPWMPin(name)
 			// assert
 			assert.Equal(t, tc.wantErr, err)
 			assert.Equal(t, tc.wantDir, path)

@@ -36,7 +36,10 @@ type Tinkerboard2Adaptor struct {
 //	Optional parameters for PWM, see [adaptors.NewPWMPinsAdaptor]
 func NewAdaptor(opts ...interface{}) *Tinkerboard2Adaptor {
 	sys := system.NewAccesser()
-	a := tinkerboard.NewAdaptor(opts...)
+	a := Tinkerboard2Adaptor{
+		Adaptor: tinkerboard.NewAdaptor(opts...),
+		sys:     sys,
+	}
 	a.SetName(gobot.DefaultName("Tinker Board 2"))
 
 	var digitalPinsOpts []adaptors.DigitalPinsOptionApplier
@@ -66,5 +69,5 @@ func NewAdaptor(opts ...interface{}) *Tinkerboard2Adaptor {
 	a.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, spiBusNumberValidator.Validate, defaultSpiBusNumber,
 		defaultSpiChipNumber, defaultSpiMode, defaultSpiBitsNumber, defaultSpiMaxSpeed)
 
-	return &Tinkerboard2Adaptor{Adaptor: a, sys: sys}
+	return &a
 }

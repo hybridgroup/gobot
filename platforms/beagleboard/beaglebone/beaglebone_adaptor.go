@@ -36,9 +36,7 @@ type Adaptor struct {
 	*adaptors.PWMPinsAdaptor
 	*adaptors.I2cBusAdaptor
 	*adaptors.SpiBusAdaptor
-	usrLed          string
-	pinMap          map[string]int
-	pwmPinTranslate func(string) (string, int, error)
+	usrLed string
 }
 
 // NewAdaptor returns a new Beaglebone Black/Green Adaptor
@@ -53,12 +51,10 @@ func NewAdaptor(opts ...interface{}) *Adaptor {
 	sys := system.NewAccesser(system.WithDigitalPinSysfsAccess())
 	pwmPinTranslator := adaptors.NewPWMPinTranslator(sys, bbbPwmPinMap)
 	a := &Adaptor{
-		name:            gobot.DefaultName("BeagleboneBlack"),
-		sys:             sys,
-		mutex:           &sync.Mutex{},
-		pinMap:          bbbPinMap,
-		pwmPinTranslate: pwmPinTranslator.Translate,
-		usrLed:          "/sys/class/leds/beaglebone:green:",
+		name:   gobot.DefaultName("BeagleboneBlack"),
+		sys:    sys,
+		mutex:  &sync.Mutex{},
+		usrLed: "/sys/class/leds/beaglebone:green:",
 	}
 
 	var digitalPinsOpts []adaptors.DigitalPinsOptionApplier
@@ -69,6 +65,8 @@ func NewAdaptor(opts ...interface{}) *Adaptor {
 			digitalPinsOpts = append(digitalPinsOpts, o)
 		case adaptors.PwmPinsOptionApplier:
 			pwmPinsOpts = append(pwmPinsOpts, o)
+		case func(system.Optioner):
+			o(sys)
 		default:
 			panic(fmt.Sprintf("'%s' can not be applied on adaptor '%s'", opt, a.name))
 		}
@@ -83,7 +81,8 @@ func NewAdaptor(opts ...interface{}) *Adaptor {
 
 	a.AnalogPinsAdaptor = adaptors.NewAnalogPinsAdaptor(sys, analogPinTranslator.Translate)
 	a.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, a.translateAndMuxDigitalPin, digitalPinsOpts...)
-	a.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, a.translateAndMuxPWMPin, pwmPinsOpts...)
+	a.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, a.getTranslateAndMuxPWMPinFunc(pwmPinTranslator.Translate),
+		pwmPinsOpts...)
 	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, i2cBusNumberValidator.Validate, defaultI2cBusNumber)
 	a.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, spiBusNumberValidator.Validate, defaultSpiBusNumber,
 		defaultSpiChipNumber, defaultSpiMode, defaultSpiBitsNumber, defaultSpiMaxSpeed)
@@ -165,7 +164,7 @@ func (a *Adaptor) DigitalWrite(id string, val byte) error {
 
 // translatePin converts digital pin name to pin position
 func (a *Adaptor) translateAndMuxDigitalPin(id string) (string, int, error) {
-	line, ok := a.pinMap[id]
+	line, ok := bbbPinMap[id]
 	if !ok {
 		return "", -1, fmt.Errorf("'%s' is not a valid id for a digital pin", id)
 	}
@@ -176,17 +175,21 @@ func (a *Adaptor) translateAndMuxDigitalPin(id string) (string, int, error) {
 	return "", line, nil
 }
 
-func (a *Adaptor) translateAndMuxPWMPin(id string) (string, int, error) {
-	path, channel, err := a.pwmPinTranslate(id)
-	if err != nil {
-		return path, channel, err
-	}
+func (a *Adaptor) getTranslateAndMuxPWMPinFunc(
+	pwmPinTranslate func(id string) (string, int, error),
+) func(id string) (string, int, error) {
+	return func(id string) (string, int, error) {
+		path, channel, err := pwmPinTranslate(id)
+		if err != nil {
+			return path, channel, err
+		}
 
-	if err := a.muxPin(id, "pwm"); err != nil {
-		return "", -1, err
-	}
+		if err := a.muxPin(id, "pwm"); err != nil {
+			return "", -1, err
+		}
 
-	return path, channel, nil
+		return path, channel, nil
+	}
 }
 
 func (a *Adaptor) muxPin(pin, cmd string) error {

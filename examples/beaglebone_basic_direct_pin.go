@@ -10,7 +10,7 @@ import (
 	"fmt"
 
 	"gobot.io/x/gobot/v2/drivers/gpio"
-	"gobot.io/x/gobot/v2/platforms/beaglebone"
+	"gobot.io/x/gobot/v2/platforms/beagleboard/beaglebone"
 )
 
 func main() {

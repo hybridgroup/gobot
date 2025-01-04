@@ -1,4 +1,4 @@
-# Beaglebone
+# BeagleBoard devices
 
 The BeagleBone is an ARM based single board computer, with lots of GPIO, I2C, and analog interfaces built in.
 
@@ -35,12 +35,12 @@ import (
 
   "gobot.io/x/gobot/v2"
   "gobot.io/x/gobot/v2/drivers/gpio"
-  "gobot.io/x/gobot/v2/platforms/beaglebone"
+  "gobot.io/x/gobot/v2/platforms/beagleboard/beaglebone"
 )
 
 func main() {
-  beagleboneAdaptor := beaglebone.NewAdaptor()
-  led := gpio.NewLedDriver(beagleboneAdaptor, "P9_12")
+  beagleBoneAdaptor := beaglebone.NewAdaptor()
+  led := gpio.NewLedDriver(beagleBoneAdaptor, "P9_12")
 
   work := func() {
     gobot.Every(1*time.Second, func() {
@@ -51,7 +51,7 @@ func main() {
   }
 
   robot := gobot.NewRobot("blinkBot",
-    []gobot.Connection{beagleboneAdaptor},
+    []gobot.Connection{beagleBoneAdaptor},
     []gobot.Device{led},
     work,
   )
@@ -62,7 +62,7 @@ func main() {
 }
 ```
 
-To use the PocketBeagle, use `beaglebone.NewPocketBeagleAdaptor()` like this:
+To use the PocketBeagle, use `pocketbeagle.NewAdaptor()` like this:
 
 ```go
 package main
@@ -72,12 +72,12 @@ import (
 
   "gobot.io/x/gobot/v2"
   "gobot.io/x/gobot/v2/drivers/gpio"
-  "gobot.io/x/gobot/v2/platforms/beaglebone"
+  "gobot.io/x/gobot/v2/platforms/beagleboard/pocketbeagle"
 )
 
 func main() {
-  beagleboneAdaptor := beaglebone.NewPocketBeagleAdaptor()
-  led := gpio.NewLedDriver(beagleboneAdaptor, "P1_02")
+  pocketBeagleAdaptor := pocketbeagle.NewAdaptor()
+  led := gpio.NewLedDriver(pocketBeagleAdaptor, "P1_02")
 
   work := func() {
     gobot.Every(1*time.Second, func() {
@@ -88,7 +88,7 @@ func main() {
   }
 
   robot := gobot.NewRobot("pocketBeagleBot",
-    []gobot.Connection{beagleboneAdaptor},
+    []gobot.Connection{pocketBeagleAdaptor},
     []gobot.Device{led},
     work,
   )

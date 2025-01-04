@@ -49,6 +49,11 @@ func main() {
 			fmt.Printf("pin %s state is %d\n", inPinNum, read)
 			if err != nil {
 				fmt.Println(err)
+				if level == 1 {
+					level = 0
+				} else {
+					level = 1
+				}
 			} else {
 				level = byte(read)
 			}
@@ -63,12 +68,6 @@ func main() {
 			fmt.Printf("pin %s is now not %d\n", outPinInvertedNum, level)
 			if err != nil {
 				fmt.Println(err)
-			}
-
-			if level == 1 {
-				level = 0
-			} else {
-				level = 1
 			}
 		})
 	}
