@@ -2,6 +2,7 @@ package rockpi
 
 import (
 	"errors"
+	"fmt"
 	"sync"
 
 	multierror "github.com/hashicorp/go-multierror"
@@ -43,11 +44,24 @@ type Adaptor struct {
 //	adaptors.WithGpioCdevAccess():	use character device driver instead of the default sysfs (NOT work on RockPi4C+!)
 //	adaptors.WithSpiGpioAccess(sclk, ncs, sdo, sdi):	use GPIO's instead of /dev/spidev#.#
 //	adaptors.WithGpiosActiveLow(pin's): invert the pin behavior
-func NewAdaptor(opts ...adaptors.DigitalPinsOptionApplier) *Adaptor {
+func NewAdaptor(opts ...interface{}) *Adaptor {
 	sys := system.NewAccesser(system.WithDigitalPinSysfsAccess())
 	a := &Adaptor{
 		name: gobot.DefaultName("RockPi"),
 		sys:  sys,
+	}
+
+	var digitalPinsOpts []adaptors.DigitalPinsOptionApplier
+	var spiBusOpts []adaptors.SpiBusOptionApplier
+	for _, opt := range opts {
+		switch o := opt.(type) {
+		case adaptors.DigitalPinsOptionApplier:
+			digitalPinsOpts = append(digitalPinsOpts, o)
+		case adaptors.SpiBusOptionApplier:
+			spiBusOpts = append(spiBusOpts, o)
+		default:
+			panic(fmt.Sprintf("'%s' can not be applied on adaptor '%s'", opt, a.name))
+		}
 	}
 
 	// The RockPi4 has 3 I2C buses: 2, 6, 7. See https://wiki.radxa.com/Rock4/hardware/gpio
@@ -57,10 +71,10 @@ func NewAdaptor(opts ...adaptors.DigitalPinsOptionApplier) *Adaptor {
 	// This could change in the future with other revisions!
 	spiBusNumberValidator := adaptors.NewBusNumberValidator([]int{1, 2})
 
-	a.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, a.getPinTranslatorFunction(), opts...)
+	a.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, a.getPinTranslatorFunction(), digitalPinsOpts...)
 	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, i2cBusNumberValidator.Validate, defaultI2cBusNumber)
 	a.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, spiBusNumberValidator.Validate, defaultSpiBusNumber,
-		defaultSpiChipNumber, defaultSpiMode, defaultSpiBitsNumber, defaultSpiMaxSpeed)
+		defaultSpiChipNumber, defaultSpiMode, defaultSpiBitsNumber, defaultSpiMaxSpeed, a.DigitalPinsAdaptor, spiBusOpts...)
 
 	return a
 }

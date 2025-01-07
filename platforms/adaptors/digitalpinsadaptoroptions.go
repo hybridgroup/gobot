@@ -2,6 +2,8 @@ package adaptors
 
 import (
 	"time"
+
+	"gobot.io/x/gobot/v2/system"
 )
 
 // DigitalPinsOptionApplier is the interface for digital adaptors options. This provides the possibility for change the
@@ -11,15 +13,15 @@ type DigitalPinsOptionApplier interface {
 	apply(cfg *digitalPinsConfiguration)
 }
 
+// digitalPinsDebugOption is the type to switch on digital pin related debug messages.
+type digitalPinsDebugOption bool
+
 // digitalPinInitializeOption is the type for applying another than the default initializer
 type digitalPinsInitializeOption digitalPinInitializer
 
 // digitalPinsSystemSysfsOption is the type to change the default character device implementation to the legacy
 // sysfs Kernel ABI
 type digitalPinsSystemSysfsOption bool
-
-// digitalPinsForSystemSpiOption is the type to switch the default SPI implementation to GPIO usage
-type digitalPinsForSystemSpiOption digitalPinGpiosForSPI
 
 // digitalPinsActiveLowOption is the type to prepare the given pins for inverse reaction on next initialize
 type digitalPinsActiveLowOption []string
@@ -75,16 +77,16 @@ type digitalPinsPollForEdgeDetectionOption struct {
 	pollQuitChan chan struct{}
 }
 
+func (o digitalPinsDebugOption) String() string {
+	return "switch on debugging for digital pins option"
+}
+
 func (o digitalPinsInitializeOption) String() string {
 	return "pin initializer option for digital IO's"
 }
 
 func (o digitalPinsSystemSysfsOption) String() string {
 	return "use sysfs vs. cdev system access option for digital pins"
-}
-
-func (o digitalPinsForSystemSpiOption) String() string {
-	return "use digital pins for SPI option"
 }
 
 func (o digitalPinsActiveLowOption) String() string {
@@ -127,61 +129,72 @@ func (o digitalPinsPollForEdgeDetectionOption) String() string {
 	return "discrete polling function for edge detection on digital pin option"
 }
 
+func (o digitalPinsDebugOption) apply(cfg *digitalPinsConfiguration) {
+	cfg.debug = bool(o)
+	cfg.systemOptions = append(cfg.systemOptions, system.WithDigitalPinDebug())
+}
+
 func (o digitalPinsInitializeOption) apply(cfg *digitalPinsConfiguration) {
 	cfg.initialize = digitalPinInitializer(o)
 }
 
 func (o digitalPinsSystemSysfsOption) apply(cfg *digitalPinsConfiguration) {
-	c := bool(o)
-	cfg.useSysfs = &c
-}
+	useSysFs := bool(o)
 
-func (o digitalPinsForSystemSpiOption) apply(cfg *digitalPinsConfiguration) {
-	c := digitalPinGpiosForSPI(o)
-	cfg.gpiosForSPI = &c
+	if useSysFs {
+		cfg.systemOptions = append(cfg.systemOptions, system.WithDigitalPinSysfsAccess())
+	} else {
+		cfg.systemOptions = append(cfg.systemOptions, system.WithDigitalPinCdevAccess())
+	}
 }
 
 func (o digitalPinsActiveLowOption) apply(cfg *digitalPinsConfiguration) {
-	cfg.activeLowPins = append(cfg.activeLowPins, o...)
+	for _, pin := range o {
+		cfg.pinOptions[pin] = append(cfg.pinOptions[pin], system.WithPinActiveLow())
+	}
 }
 
 func (o digitalPinsPullDownOption) apply(cfg *digitalPinsConfiguration) {
-	cfg.pullDownPins = append(cfg.pullDownPins, o...)
+	for _, pin := range o {
+		cfg.pinOptions[pin] = append(cfg.pinOptions[pin], system.WithPinPullDown())
+	}
 }
 
 func (o digitalPinsPullUpOption) apply(cfg *digitalPinsConfiguration) {
-	cfg.pullUpPins = append(cfg.pullUpPins, o...)
+	for _, pin := range o {
+		cfg.pinOptions[pin] = append(cfg.pinOptions[pin], system.WithPinPullUp())
+	}
 }
 
 func (o digitalPinsOpenDrainOption) apply(cfg *digitalPinsConfiguration) {
-	cfg.openDrainPins = append(cfg.openDrainPins, o...)
+	for _, pin := range o {
+		cfg.pinOptions[pin] = append(cfg.pinOptions[pin], system.WithPinOpenDrain())
+	}
 }
 
 func (o digitalPinsOpenSourceOption) apply(cfg *digitalPinsConfiguration) {
-	cfg.openSourcePins = append(cfg.openSourcePins, o...)
+	for _, pin := range o {
+		cfg.pinOptions[pin] = append(cfg.pinOptions[pin], system.WithPinOpenSource())
+	}
 }
 
 func (o digitalPinsDebounceOption) apply(cfg *digitalPinsConfiguration) {
-	pinCfg := digitalPinsDebouncePin(o)
-	cfg.debouncePins = append(cfg.debouncePins, pinCfg)
+	cfg.pinOptions[o.id] = append(cfg.pinOptions[o.id], system.WithPinDebounce(o.period))
 }
 
 func (o digitalPinsEventOnFallingEdgeOption) apply(cfg *digitalPinsConfiguration) {
-	pinCfg := digitalPinsEventOnEdgePin(o)
-	cfg.eventOnFallingEdgePins = append(cfg.eventOnFallingEdgePins, pinCfg)
+	cfg.pinOptions[o.id] = append(cfg.pinOptions[o.id], system.WithPinEventOnFallingEdge(o.handler))
 }
 
 func (o digitalPinsEventOnRisingEdgeOption) apply(cfg *digitalPinsConfiguration) {
-	pinCfg := digitalPinsEventOnEdgePin(o)
-	cfg.eventOnRisingEdgePins = append(cfg.eventOnRisingEdgePins, pinCfg)
+	cfg.pinOptions[o.id] = append(cfg.pinOptions[o.id], system.WithPinEventOnRisingEdge(o.handler))
 }
 
 func (o digitalPinsEventOnBothEdgesOption) apply(cfg *digitalPinsConfiguration) {
-	pinCfg := digitalPinsEventOnEdgePin(o)
-	cfg.eventOnBothEdgesPins = append(cfg.eventOnBothEdgesPins, pinCfg)
+	cfg.pinOptions[o.id] = append(cfg.pinOptions[o.id], system.WithPinEventOnBothEdges(o.handler))
 }
 
 func (o digitalPinsPollForEdgeDetectionOption) apply(cfg *digitalPinsConfiguration) {
-	pinCfg := digitalPinsPollForEdgeDetectionPin(o)
-	cfg.pollForEdgeDetectionPins = append(cfg.pollForEdgeDetectionPins, pinCfg)
+	cfg.pinOptions[o.id] = append(cfg.pinOptions[o.id],
+		system.WithPinPollForEdgeDetection(o.pollInterval, o.pollQuitChan))
 }

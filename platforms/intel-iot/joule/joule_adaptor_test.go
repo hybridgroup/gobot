@@ -10,6 +10,7 @@ import (
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/gpio"
 	"gobot.io/x/gobot/v2/drivers/i2c"
+	"gobot.io/x/gobot/v2/platforms/adaptors"
 	"gobot.io/x/gobot/v2/system"
 )
 
@@ -108,10 +109,25 @@ func TestNewAdaptor(t *testing.T) {
 	assert.NotNil(t, a.DigitalPinsAdaptor)
 	assert.NotNil(t, a.PWMPinsAdaptor)
 	assert.NotNil(t, a.I2cBusAdaptor)
-	assert.True(t, a.sys.IsSysfsDigitalPinAccess())
+	assert.Nil(t, a.SpiBusAdaptor)
+	assert.True(t, a.sys.HasDigitalPinSysfsAccess())
 	// act & assert
 	a.SetName("NewName")
 	assert.Equal(t, "NewName", a.Name())
+}
+
+func TestNewAdaptorWithOption(t *testing.T) {
+	// arrange & act
+	a := NewAdaptor(adaptors.WithSpiGpioAccess("1", "2", "3", "4"))
+	// assert
+	assert.IsType(t, &Adaptor{}, a)
+	assert.True(t, strings.HasPrefix(a.Name(), "Joule"))
+	assert.NotNil(t, a.sys)
+	assert.NotNil(t, a.DigitalPinsAdaptor)
+	assert.NotNil(t, a.PWMPinsAdaptor)
+	assert.NotNil(t, a.I2cBusAdaptor)
+	assert.NotNil(t, a.SpiBusAdaptor)
+	assert.True(t, a.sys.HasDigitalPinSysfsAccess())
 }
 
 func TestFinalize(t *testing.T) {

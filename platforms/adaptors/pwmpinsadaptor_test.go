@@ -461,7 +461,7 @@ func TestPWMPinConcurrency(t *testing.T) {
 	for retry := 0; retry < 20; retry++ {
 
 		a := NewPWMPinsAdaptor(sys, translate)
-		_ = a.Connect()
+		require.NoError(t, a.Connect())
 		var wg sync.WaitGroup
 
 		for i := 0; i < 20; i++ {

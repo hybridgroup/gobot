@@ -27,6 +27,9 @@ func NewAnalogPinsAdaptor(sys *system.Accesser, t analogPinTranslator) *AnalogPi
 		sys:       sys,
 		translate: t,
 	}
+
+	sys.AddAnalogSupport()
+
 	return &a
 }
 

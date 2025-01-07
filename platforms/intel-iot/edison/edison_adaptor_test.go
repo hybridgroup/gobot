@@ -233,7 +233,7 @@ func TestNewAdaptor(t *testing.T) {
 	assert.NotNil(t, a.AnalogPinsAdaptor)
 	assert.NotNil(t, a.PWMPinsAdaptor)
 	assert.NotNil(t, a.I2cBusAdaptor)
-	assert.True(t, a.sys.IsSysfsDigitalPinAccess())
+	assert.True(t, a.sys.HasDigitalPinSysfsAccess())
 	// act & assert
 	a.SetName("NewName")
 	assert.Equal(t, "NewName", a.Name())

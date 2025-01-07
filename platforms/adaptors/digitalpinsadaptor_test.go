@@ -54,6 +54,8 @@ func TestNewDigitalPinsAdaptor(t *testing.T) {
 	// arrange
 	translate := func(string) (string, int, error) { return "", 0, nil }
 	sys := system.NewAccesser()
+	// arrange for cdev needed
+	sys.UseMockFilesystem([]string{"/dev/gpiochip"})
 	// act
 	a := NewDigitalPinsAdaptor(sys, translate)
 	// assert
@@ -61,9 +63,8 @@ func TestNewDigitalPinsAdaptor(t *testing.T) {
 	assert.NotNil(t, a.sys)
 	assert.NotNil(t, a.digitalPinsCfg)
 	assert.NotNil(t, a.translate)
-	assert.Nil(t, a.pins)       // will be created on connect
-	assert.Nil(t, a.pinOptions) // will be created on connect
-	assert.True(t, a.sys.IsCdevDigitalPinAccess())
+	assert.Nil(t, a.pins) // will be created on connect
+	assert.True(t, a.sys.HasDigitalPinCdevAccess())
 }
 
 func TestDigitalPinsConnect(t *testing.T) {

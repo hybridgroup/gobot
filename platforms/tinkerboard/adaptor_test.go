@@ -87,7 +87,7 @@ func TestNewAdaptor(t *testing.T) {
 	assert.NotNil(t, a.I2cBusAdaptor)
 	assert.NotNil(t, a.SpiBusAdaptor)
 	assert.NotNil(t, a.OneWireBusAdaptor)
-	assert.True(t, a.sys.IsCdevDigitalPinAccess())
+	assert.True(t, a.sys.HasDigitalPinCdevAccess())
 	// act & assert
 	a.SetName("NewName")
 	assert.Equal(t, "NewName", a.Name())
@@ -98,7 +98,7 @@ func TestNewAdaptorWithOption(t *testing.T) {
 	a := NewAdaptor(adaptors.WithGpiosActiveLow("1"), adaptors.WithGpioSysfsAccess())
 	// assert
 	require.NoError(t, a.Connect())
-	assert.True(t, a.sys.IsSysfsDigitalPinAccess())
+	assert.True(t, a.sys.HasDigitalPinSysfsAccess())
 }
 
 func TestDigitalIO(t *testing.T) {
@@ -106,16 +106,16 @@ func TestDigitalIO(t *testing.T) {
 	// arrange
 	a := initConnectedTestAdaptor()
 	dpa := a.sys.UseMockDigitalPinAccess()
-	require.True(t, a.sys.IsCdevDigitalPinAccess())
+	require.True(t, a.sys.HasDigitalPinCdevAccess())
 	// act & assert write
 	err := a.DigitalWrite("7", 1)
 	require.NoError(t, err)
 	assert.Equal(t, []int{1}, dpa.Written("gpiochip0", "17"))
 	// arrange, act & assert read
-	dpa.UseValue("gpiochip5", "8", 2)
+	dpa.UseValues("gpiochip5", "8", []int{3})
 	i, err := a.DigitalRead("10")
 	require.NoError(t, err)
-	assert.Equal(t, 2, i)
+	assert.Equal(t, 3, i)
 	// act and assert unknown pin
 	require.ErrorContains(t, a.DigitalWrite("99", 1), "'99' is not a valid id for a digital pin")
 	// act and assert finalize
@@ -130,16 +130,16 @@ func TestDigitalIOSysfs(t *testing.T) {
 	a := NewAdaptor(adaptors.WithGpioSysfsAccess())
 	require.NoError(t, a.Connect())
 	dpa := a.sys.UseMockDigitalPinAccess()
-	require.True(t, a.sys.IsSysfsDigitalPinAccess())
+	require.True(t, a.sys.HasDigitalPinSysfsAccess())
 	// act & assert write
 	err := a.DigitalWrite("7", 1)
 	require.NoError(t, err)
 	assert.Equal(t, []int{1}, dpa.Written("", "17"))
 	// arrange, act & assert read
-	dpa.UseValue("", "160", 2)
+	dpa.UseValues("", "160", []int{4})
 	i, err := a.DigitalRead("10")
 	require.NoError(t, err)
-	assert.Equal(t, 2, i)
+	assert.Equal(t, 4, i)
 	// act and assert unknown pin
 	require.ErrorContains(t, a.DigitalWrite("99", 1), "'99' is not a valid id for a digital pin")
 	// act and assert finalize
@@ -262,7 +262,7 @@ func TestFinalizeErrorAfterGPIO(t *testing.T) {
 	// arrange
 	a := initConnectedTestAdaptor()
 	dpa := a.sys.UseMockDigitalPinAccess()
-	require.True(t, a.sys.IsCdevDigitalPinAccess())
+	require.True(t, a.sys.HasDigitalPinCdevAccess())
 	require.NoError(t, a.DigitalWrite("7", 1))
 	dpa.UseUnexportError("gpiochip0", "17")
 	// act

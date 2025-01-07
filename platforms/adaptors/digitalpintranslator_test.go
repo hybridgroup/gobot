@@ -28,7 +28,7 @@ func TestDigitalPinTranslatorTranslate(t *testing.T) {
 		"5":  {Sysfs: 253, Cdev: CdevPin{Chip: 8, Line: 5}},
 	}
 	tests := map[string]struct {
-		access   func(system.Optioner)
+		access   system.AccesserOptionApplier
 		pin      string
 		wantChip string
 		wantLine int
@@ -77,7 +77,10 @@ func TestDigitalPinTranslatorTranslate(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			sys := system.NewAccesser(tc.access)
+			sys := system.NewAccesser()
+			// arrange for cdev needed
+			sys.UseMockFilesystem([]string{"/dev/gpiochip"})
+			sys.AddDigitalPinSupport(tc.access)
 			pt := NewDigitalPinTranslator(sys, pinDefinitions)
 			// act
 			chip, line, err := pt.Translate(tc.pin)

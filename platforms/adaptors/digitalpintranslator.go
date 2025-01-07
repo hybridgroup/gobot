@@ -34,7 +34,7 @@ func (pt *DigitalPinTranslator) Translate(id string) (string, int, error) {
 	if !ok {
 		return "", -1, fmt.Errorf("'%s' is not a valid id for a digital pin", id)
 	}
-	if pt.sys.IsSysfsDigitalPinAccess() {
+	if pt.sys.HasDigitalPinSysfsAccess() {
 		return "", pindef.Sysfs, nil
 	}
 	chip := fmt.Sprintf("gpiochip%d", pindef.Cdev.Chip)

@@ -45,15 +45,15 @@ led := gpio.NewLedDriver(r, "7")
 Compile your Gobot program on your workstation like this:
 
 ```sh
-GOARCH=arm64 GOOS=linux go build examples/tinkerboard_blink.go
+GOARCH=arm64 GOOS=linux go build -o output/ examples/tinkerboard2_yl40.go
 ```
 
 Once you have compiled your code, you can upload your program and execute it on the Tinker Board 2 from your workstation
 using the `scp` and `ssh` commands like this:
 
 ```sh
-scp tinkerboard_blink <user>@192.168.1.xxx:~
-ssh -t <user>@192.168.1.xxx "./tinkerboard_blink"
+scp output/tinkerboard2_yl40 <user>@192.168.1.xxx:~
+ssh -t <user>@192.168.1.xxx "./tinkerboard2_yl40"
 ```
 
 ## Troubleshooting

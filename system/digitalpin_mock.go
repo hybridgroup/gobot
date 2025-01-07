@@ -17,7 +17,7 @@ type simulateErrors struct {
 
 type mockDigitalPinAccess struct {
 	underlyingDigitalPinAccess digitalPinAccesser
-	values                     map[string]int
+	values                     map[string][]int
 	simulateErrors             map[string]simulateErrors // key is the pin-key
 	pins                       map[string]*digitalPinMock
 }
@@ -28,14 +28,15 @@ type digitalPinMock struct {
 	appliedOptions int
 	exported       int
 	written        []int
-	value          int
+	values         []int
+	readIdx        int
 	simulateErrors simulateErrors
 }
 
 func newMockDigitalPinAccess(underlyingDigitalPinAccess digitalPinAccesser) *mockDigitalPinAccess {
 	dpa := mockDigitalPinAccess{
 		underlyingDigitalPinAccess: underlyingDigitalPinAccess,
-		values:                     make(map[string]int),
+		values:                     make(map[string][]int),
 		simulateErrors:             make(map[string]simulateErrors),
 		pins:                       make(map[string]*digitalPinMock),
 	}
@@ -51,11 +52,11 @@ func (dpa *mockDigitalPinAccess) isSupported() bool { return true }
 func (dpa *mockDigitalPinAccess) createPin(chip string, pin int,
 	o ...func(gobot.DigitalPinOptioner) bool,
 ) gobot.DigitalPinner {
-	dpm := &digitalPinMock{chip: chip, pin: pin}
+	dpm := &digitalPinMock{chip: chip, pin: pin, readIdx: -1}
 
 	key := getDigitalPinMockKey(chip, strconv.Itoa(pin))
 	if v, ok := dpa.values[key]; ok {
-		dpm.value = v
+		dpm.values = v
 	}
 
 	if v, ok := dpa.simulateErrors[key]; ok {
@@ -70,6 +71,12 @@ func (dpa *mockDigitalPinAccess) setFs(fs filesystem) {
 	panic("setFs() for mockDigitalPinAccess not supported")
 }
 
+// DigitalPin implements the gobot.DigitalPinnerProvider.
+func (dpa *mockDigitalPinAccess) DigitalPin(id string) (gobot.DigitalPinner, error) {
+	pin, err := strconv.Atoi(id)
+	return dpa.createPin("", pin), err
+}
+
 func (dpa *mockDigitalPinAccess) AppliedOptions(chip, pin string) int {
 	return dpa.pins[getDigitalPinMockKey(chip, pin)].appliedOptions
 }
@@ -82,14 +89,14 @@ func (dpa *mockDigitalPinAccess) Exported(chip, pin string) int {
 	return dpa.pins[getDigitalPinMockKey(chip, pin)].exported
 }
 
-func (dpa *mockDigitalPinAccess) UseValue(chip, pin string, value int) {
+func (dpa *mockDigitalPinAccess) UseValues(chip, pin string, values []int) {
 	key := getDigitalPinMockKey(chip, pin)
 	if pin, ok := dpa.pins[key]; ok {
-		pin.value = value
+		pin.values = values
 	}
 
 	// for creation and re-creation
-	dpa.values[key] = value
+	dpa.values[key] = values
 }
 
 func (dpa *mockDigitalPinAccess) UseUnexportError(chip, pin string) {
@@ -135,11 +142,12 @@ func (dp *digitalPinMock) Write(b int) error {
 
 // Read reads the given value from character device
 func (dp *digitalPinMock) Read() (int, error) {
+	dp.readIdx++
 	if dp.simulateErrors.read {
 		return -1, errors.New("read error")
 	}
 
-	return dp.value, nil
+	return dp.values[dp.readIdx], nil
 }
 
 // Export sets the pin as exported with the configured direction

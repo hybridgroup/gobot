@@ -17,16 +17,15 @@ var _ i2c.Connector = (*I2cBusAdaptor)(nil)
 const i2cBus1 = "/dev/i2c-1"
 
 func initTestI2cAdaptorWithMockedFilesystem(mockPaths []string) (*I2cBusAdaptor, *system.MockFilesystem) {
-	sys := system.NewAccesser()
-	sys.UseMockSyscall()
-	fs := sys.UseMockFilesystem(mockPaths)
 	validator := func(busNr int) error {
 		if busNr > 1 {
 			return fmt.Errorf("%d not valid", busNr)
 		}
 		return nil
 	}
-	a := NewI2cBusAdaptor(sys, validator, 1)
+	a := NewI2cBusAdaptor(system.NewAccesser(), validator, 1)
+	a.sys.UseMockSyscall()
+	fs := a.sys.UseMockFilesystem(mockPaths)
 	if err := a.Connect(); err != nil {
 		panic(err)
 	}
@@ -110,6 +109,6 @@ func TestI2cReConnect(t *testing.T) {
 }
 
 func TestI2cGetDefaultBus(t *testing.T) {
-	a := NewI2cBusAdaptor(nil, nil, 2)
+	a := NewI2cBusAdaptor(system.NewAccesser(), nil, 2)
 	assert.Equal(t, 2, a.DefaultI2cBus())
 }

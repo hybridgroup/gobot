@@ -59,14 +59,15 @@ func NewAdaptor(opts ...interface{}) *Adaptor {
 
 	var digitalPinsOpts []adaptors.DigitalPinsOptionApplier
 	pwmPinsOpts := []adaptors.PwmPinsOptionApplier{adaptors.WithPWMDefaultPeriod(pwmPeriodDefault)}
+	var spiBusOpts []adaptors.SpiBusOptionApplier
 	for _, opt := range opts {
 		switch o := opt.(type) {
 		case adaptors.DigitalPinsOptionApplier:
 			digitalPinsOpts = append(digitalPinsOpts, o)
 		case adaptors.PwmPinsOptionApplier:
 			pwmPinsOpts = append(pwmPinsOpts, o)
-		case func(system.Optioner):
-			o(sys)
+		case adaptors.SpiBusOptionApplier:
+			spiBusOpts = append(spiBusOpts, o)
 		default:
 			panic(fmt.Sprintf("'%s' can not be applied on adaptor '%s'", opt, a.name))
 		}
@@ -85,7 +86,7 @@ func NewAdaptor(opts ...interface{}) *Adaptor {
 		pwmPinsOpts...)
 	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, i2cBusNumberValidator.Validate, defaultI2cBusNumber)
 	a.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, spiBusNumberValidator.Validate, defaultSpiBusNumber,
-		defaultSpiChipNumber, defaultSpiMode, defaultSpiBitsNumber, defaultSpiMaxSpeed)
+		defaultSpiChipNumber, defaultSpiMode, defaultSpiBitsNumber, defaultSpiMaxSpeed, a.DigitalPinsAdaptor, spiBusOpts...)
 	return a
 }
 

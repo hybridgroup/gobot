@@ -57,12 +57,15 @@ func NewAdaptor(opts ...interface{}) *Adaptor {
 
 	var digitalPinsOpts []adaptors.DigitalPinsOptionApplier
 	var pwmPinsOpts []adaptors.PwmPinsOptionApplier
+	var spiBusOpts []adaptors.SpiBusOptionApplier
 	for _, opt := range opts {
 		switch o := opt.(type) {
 		case adaptors.DigitalPinsOptionApplier:
 			digitalPinsOpts = append(digitalPinsOpts, o)
 		case adaptors.PwmPinsOptionApplier:
 			pwmPinsOpts = append(pwmPinsOpts, o)
+		case adaptors.SpiBusOptionApplier:
+			spiBusOpts = append(spiBusOpts, o)
 		default:
 			panic(fmt.Sprintf("'%s' can not be applied on adaptor '%s'", opt, a.name))
 		}
@@ -83,7 +86,7 @@ func NewAdaptor(opts ...interface{}) *Adaptor {
 	a.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, pwmPinTranslator.Translate, pwmPinsOpts...)
 	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, i2cBusNumberValidator.Validate, defaultI2cBusNumber)
 	a.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, spiBusNumberValidator.Validate, defaultSpiBusNumber,
-		defaultSpiChipNumber, defaultSpiMode, defaultSpiBitsNumber, defaultSpiMaxSpeed)
+		defaultSpiChipNumber, defaultSpiMode, defaultSpiBitsNumber, defaultSpiMaxSpeed, a.DigitalPinsAdaptor, spiBusOpts...)
 	a.OneWireBusAdaptor = adaptors.NewOneWireBusAdaptor(sys)
 
 	return a

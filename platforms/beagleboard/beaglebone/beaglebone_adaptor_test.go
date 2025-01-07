@@ -90,7 +90,7 @@ func TestNewAdaptor(t *testing.T) {
 	assert.NotNil(t, a.I2cBusAdaptor)
 	assert.NotNil(t, a.SpiBusAdaptor)
 	assert.Equal(t, "/sys/class/leds/beaglebone:green:", a.usrLed)
-	assert.True(t, a.sys.IsSysfsDigitalPinAccess())
+	assert.True(t, a.sys.HasDigitalPinSysfsAccess())
 	// act & assert
 	a.SetName("NewName")
 	assert.Equal(t, "NewName", a.Name())

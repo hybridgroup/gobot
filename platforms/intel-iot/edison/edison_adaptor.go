@@ -52,6 +52,7 @@ type Adaptor struct {
 //	Optional parameters for PWM, see [adaptors.NewPWMPinsAdaptor]
 func NewAdaptor(opts ...interface{}) *Adaptor {
 	sys := system.NewAccesser(system.WithDigitalPinSysfsAccess())
+	sys.AddDigitalPinSupport()
 	a := &Adaptor{
 		name:   gobot.DefaultName("Edison"),
 		board:  "arduino",

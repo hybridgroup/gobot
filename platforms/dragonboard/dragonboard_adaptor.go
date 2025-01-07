@@ -11,7 +11,11 @@ import (
 	"gobot.io/x/gobot/v2/system"
 )
 
-const defaultI2cBusNumber = 0
+const (
+	defaultI2cBusNumber = 0
+
+	defaultSpiMaxSpeed = 5000 // 5kHz (more than 15kHz not possible with SPI over GPIO)
+)
 
 // Adaptor represents a Gobot Adaptor for a DragonBoard 410c
 type Adaptor struct {
@@ -21,6 +25,7 @@ type Adaptor struct {
 	pinMap map[string]int
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.I2cBusAdaptor
+	*adaptors.SpiBusAdaptor // for usage of "adaptors.WithSpiGpioAccess()"
 }
 
 // Valid pins are the GPIO_A through GPIO_L pins from the
@@ -50,60 +55,80 @@ var fixedPins = map[string]int{
 //
 //	adaptors.WithGpioCdevAccess():	use character device driver instead of sysfs
 //	adaptors.WithSpiGpioAccess(sclk, ncs, sdo, sdi):	use GPIO's instead of /dev/spidev#.#
-func NewAdaptor(opts ...adaptors.DigitalPinsOptionApplier) *Adaptor {
+func NewAdaptor(opts ...interface{}) *Adaptor {
 	sys := system.NewAccesser(system.WithDigitalPinSysfsAccess())
-	c := &Adaptor{
+	a := &Adaptor{
 		name: gobot.DefaultName("DragonBoard"),
 		sys:  sys,
+	}
+
+	var digitalPinsOpts []adaptors.DigitalPinsOptionApplier
+	var spiBusOpts []adaptors.SpiBusOptionApplier
+	for _, opt := range opts {
+		switch o := opt.(type) {
+		case adaptors.DigitalPinsOptionApplier:
+			digitalPinsOpts = append(digitalPinsOpts, o)
+		case adaptors.SpiBusOptionApplier:
+			spiBusOpts = append(spiBusOpts, o)
+		default:
+			panic(fmt.Sprintf("'%s' can not be applied on adaptor '%s'", opt, a.name))
+		}
 	}
 
 	// Valid bus numbers are [0,1] which corresponds to /dev/i2c-0 through /dev/i2c-1.
 	i2cBusNumberValidator := adaptors.NewBusNumberValidator([]int{0, 1})
 
-	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.translateDigitalPin, opts...)
-	c.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, i2cBusNumberValidator.Validate, defaultI2cBusNumber)
-	c.pinMap = fixedPins
+	a.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, a.translateDigitalPin, digitalPinsOpts...)
+	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, i2cBusNumberValidator.Validate, defaultI2cBusNumber)
+
+	// SPI is only supported when "adaptors.WithSpiGpioAccess()" is given
+	if len(spiBusOpts) > 0 {
+		a.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, func(int) error { return nil }, 0, 0, 0, 0, defaultSpiMaxSpeed,
+			a.DigitalPinsAdaptor, spiBusOpts...)
+	}
+
+	a.pinMap = fixedPins
 	for i := 0; i < 122; i++ {
 		pin := fmt.Sprintf("GPIO_%d", i)
-		c.pinMap[pin] = i
+		a.pinMap[pin] = i
 	}
-	return c
+	return a
 }
 
 // Name returns the name of the Adaptor
-func (c *Adaptor) Name() string { return c.name }
+func (a *Adaptor) Name() string { return a.name }
 
 // SetName sets the name of the Adaptor
-func (c *Adaptor) SetName(n string) { c.name = n }
+func (a *Adaptor) SetName(n string) { a.name = n }
 
 // Connect create new connection to board and pins.
-func (c *Adaptor) Connect() error {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
+func (a *Adaptor) Connect() error {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
 
-	if err := c.I2cBusAdaptor.Connect(); err != nil {
+	if err := a.I2cBusAdaptor.Connect(); err != nil {
 		return err
 	}
 
-	return c.DigitalPinsAdaptor.Connect()
+	return a.DigitalPinsAdaptor.Connect()
 }
 
 // Finalize closes connection to board and pins
-func (c *Adaptor) Finalize() error {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
+func (a *Adaptor) Finalize() error {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
 
-	err := c.DigitalPinsAdaptor.Finalize()
+	err := a.DigitalPinsAdaptor.Finalize()
 
-	if e := c.I2cBusAdaptor.Finalize(); e != nil {
+	if e := a.I2cBusAdaptor.Finalize(); e != nil {
 		err = multierror.Append(err, e)
 	}
 
 	return err
 }
 
-func (c *Adaptor) translateDigitalPin(id string) (string, int, error) {
-	if line, ok := c.pinMap[id]; ok {
+func (a *Adaptor) translateDigitalPin(id string) (string, int, error) {
+	if line, ok := a.pinMap[id]; ok {
 		return "", line, nil
 	}
 	return "", -1, fmt.Errorf("'%s' is not a valid id for a digital pin", id)

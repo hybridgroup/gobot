@@ -68,7 +68,7 @@ type PWMPinsAdaptor struct {
 //	"WithPWMServoDutyCycleRangeForPin"
 //	"WithPWMServoAngleRangeForPin"
 func NewPWMPinsAdaptor(sys *system.Accesser, t pwmPinTranslator, opts ...PwmPinsOptionApplier) *PWMPinsAdaptor {
-	a := &PWMPinsAdaptor{
+	a := PWMPinsAdaptor{
 		sys:       sys,
 		translate: t,
 		pwmPinsCfg: &pwmPinsConfiguration{
@@ -86,7 +86,9 @@ func NewPWMPinsAdaptor(sys *system.Accesser, t pwmPinTranslator, opts ...PwmPins
 		o.apply(a.pwmPinsCfg)
 	}
 
-	return a
+	sys.AddPWMSupport()
+
+	return &a
 }
 
 // WithPWMPinInitializer substitute the default initializer.

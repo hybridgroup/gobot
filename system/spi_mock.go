@@ -6,15 +6,19 @@ import (
 	"gobot.io/x/gobot/v2"
 )
 
-// MockSpiAccess contains parameters of mocked SPI access
 type MockSpiAccess struct {
-	CreateError bool
-	busNum      int
-	chipNum     int
-	mode        int
-	bits        int
-	maxSpeed    int64
-	sysdev      *spiMock
+	underlyingSpiAccess spiAccesser
+	CreateError         bool
+	busNum              int
+	chipNum             int
+	mode                int
+	bits                int
+	maxSpeed            int64
+	sysdev              *spiMock
+}
+
+func newMockSpiAccess(underlyingSpiAccess spiAccesser) *MockSpiAccess {
+	return &MockSpiAccess{underlyingSpiAccess: underlyingSpiAccess}
 }
 
 func (spi *MockSpiAccess) createDevice(
@@ -32,6 +36,10 @@ func (spi *MockSpiAccess) createDevice(
 		err = fmt.Errorf("error while create SPI connection in mock")
 	}
 	return spi.sysdev, err
+}
+
+func (spi *MockSpiAccess) isType(accesserType spiBusAccesserType) bool {
+	return spi.underlyingSpiAccess.isType(accesserType)
 }
 
 func (*MockSpiAccess) isSupported() bool {

@@ -22,7 +22,7 @@ func TestNewAdaptor(t *testing.T) {
 	assert.NotNil(t, a.PWMPinsAdaptor)
 	assert.NotNil(t, a.I2cBusAdaptor)
 	assert.NotNil(t, a.SpiBusAdaptor)
-	assert.True(t, a.sys.IsCdevDigitalPinAccess())
+	assert.True(t, a.sys.HasDigitalPinCdevAccess())
 }
 
 func TestNewAdaptorWithOption(t *testing.T) {
@@ -30,7 +30,7 @@ func TestNewAdaptorWithOption(t *testing.T) {
 	a := NewAdaptor(adaptors.WithGpioSysfsAccess())
 	// assert
 	require.NoError(t, a.Connect())
-	assert.True(t, a.sys.IsSysfsDigitalPinAccess())
+	assert.True(t, a.sys.HasDigitalPinSysfsAccess())
 }
 
 func TestDigitalIO(t *testing.T) {
@@ -39,13 +39,13 @@ func TestDigitalIO(t *testing.T) {
 	a := NewAdaptor()
 	require.NoError(t, a.Connect())
 	dpa := a.sys.UseMockDigitalPinAccess()
-	require.True(t, a.sys.IsCdevDigitalPinAccess())
+	require.True(t, a.sys.HasDigitalPinCdevAccess())
 	// act & assert write
 	err := a.DigitalWrite("P1_02", 1)
 	require.NoError(t, err)
 	assert.Equal(t, []int{1}, dpa.Written("gpiochip2", "23"))
 	// arrange, act & assert read
-	dpa.UseValue("gpiochip3", "19", 2)
+	dpa.UseValues("gpiochip3", "19", []int{2})
 	i, err := a.DigitalRead("P2_34")
 	require.NoError(t, err)
 	assert.Equal(t, 2, i)

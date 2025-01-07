@@ -16,44 +16,12 @@ type (
 	digitalPinInitializer func(gobot.DigitalPinner) error
 )
 
-type digitalPinGpiosForSPI struct {
-	sclkPin string
-	ncsPin  string
-	sdoPin  string
-	sdiPin  string
-}
-
-type digitalPinsDebouncePin struct {
-	id     string
-	period time.Duration
-}
-
-type digitalPinsEventOnEdgePin struct {
-	id      string
-	handler func(lineOffset int, timestamp time.Duration, detectedEdge string, seqno uint32, lseqno uint32)
-}
-
-type digitalPinsPollForEdgeDetectionPin struct {
-	id           string
-	pollInterval time.Duration
-	pollQuitChan chan struct{}
-}
-
 // digitalPinsConfiguration contains all changeable attributes of the adaptor.
 type digitalPinsConfiguration struct {
-	initialize               digitalPinInitializer
-	useSysfs                 *bool
-	gpiosForSPI              *digitalPinGpiosForSPI
-	activeLowPins            []string
-	pullDownPins             []string
-	pullUpPins               []string
-	openDrainPins            []string
-	openSourcePins           []string
-	debouncePins             []digitalPinsDebouncePin
-	eventOnFallingEdgePins   []digitalPinsEventOnEdgePin
-	eventOnRisingEdgePins    []digitalPinsEventOnEdgePin
-	eventOnBothEdgesPins     []digitalPinsEventOnEdgePin
-	pollForEdgeDetectionPins []digitalPinsPollForEdgeDetectionPin
+	debug         bool
+	initialize    digitalPinInitializer
+	systemOptions []system.AccesserOptionApplier
+	pinOptions    map[string][]func(gobot.DigitalPinOptioner) bool
 }
 
 // DigitalPinsAdaptor is a adaptor for digital pins, normally used for composition in platforms.
@@ -62,7 +30,6 @@ type DigitalPinsAdaptor struct {
 	digitalPinsCfg *digitalPinsConfiguration
 	translate      digitalPinTranslator
 	pins           map[string]gobot.DigitalPinner
-	pinOptions     map[string][]func(gobot.DigitalPinOptioner) bool
 	mutex          sync.Mutex
 }
 
@@ -76,15 +43,27 @@ func NewDigitalPinsAdaptor(
 	t digitalPinTranslator,
 	opts ...DigitalPinsOptionApplier,
 ) *DigitalPinsAdaptor {
-	a := &DigitalPinsAdaptor{
-		sys:            sys,
-		digitalPinsCfg: &digitalPinsConfiguration{initialize: func(pin gobot.DigitalPinner) error { return pin.Export() }},
-		translate:      t,
+	a := DigitalPinsAdaptor{
+		sys: sys,
+		digitalPinsCfg: &digitalPinsConfiguration{
+			initialize: func(pin gobot.DigitalPinner) error { return pin.Export() },
+			pinOptions: make(map[string][]func(gobot.DigitalPinOptioner) bool),
+		},
+		translate: t,
 	}
+
 	for _, o := range opts {
 		o.apply(a.digitalPinsCfg)
 	}
-	return a
+
+	a.sys.AddDigitalPinSupport(a.digitalPinsCfg.systemOptions...)
+
+	return &a
+}
+
+// WithDigitalPinDebug can be used to switch on debugging for SPI implementation.
+func WithDigitalPinDebug() digitalPinsDebugOption {
+	return digitalPinsDebugOption(true)
 }
 
 // WithDigitalPinInitializer can be used to substitute the default initializer.
@@ -102,18 +81,6 @@ func WithGpioCdevAccess() digitalPinsSystemSysfsOption {
 // package, to the legacy sysfs Kernel ABI.
 func WithGpioSysfsAccess() digitalPinsSystemSysfsOption {
 	return digitalPinsSystemSysfsOption(true)
-}
-
-// WithSpiGpioAccess can be used to switch the default SPI implementation to GPIO usage.
-func WithSpiGpioAccess(sclkPin, ncsPin, sdoPin, sdiPin string) digitalPinsForSystemSpiOption {
-	o := digitalPinsForSystemSpiOption{
-		sclkPin: sclkPin,
-		ncsPin:  ncsPin,
-		sdoPin:  sdoPin,
-		sdiPin:  sdiPin,
-	}
-
-	return o
 }
 
 // WithGpiosActiveLow prepares the given pins for inverse reaction on next initialize.
@@ -196,69 +163,16 @@ func (a *DigitalPinsAdaptor) Connect() error {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
-	if a.pinOptions != nil {
+	if a.digitalPinsCfg.debug {
+		fmt.Println("connect the digital pins adaptor")
+	}
+
+	if a.pins != nil {
 		return fmt.Errorf("digital pin adaptor already connected, please call Finalize() for re-connect")
 	}
 
-	cfg := a.digitalPinsCfg
-
-	if cfg.useSysfs != nil {
-		if *cfg.useSysfs {
-			system.WithDigitalPinSysfsAccess()(a.sys)
-		} else {
-			system.WithDigitalPinCdevAccess()(a.sys)
-		}
-	}
-
-	if cfg.gpiosForSPI != nil {
-		system.WithSpiGpioAccess(a, cfg.gpiosForSPI.sclkPin, cfg.gpiosForSPI.ncsPin, cfg.gpiosForSPI.sdoPin,
-			cfg.gpiosForSPI.sdiPin)(a.sys)
-	}
-
-	a.pinOptions = make(map[string][]func(gobot.DigitalPinOptioner) bool)
-
-	for _, pin := range cfg.activeLowPins {
-		a.pinOptions[pin] = append(a.pinOptions[pin], system.WithPinActiveLow())
-	}
-
-	for _, pin := range cfg.pullDownPins {
-		a.pinOptions[pin] = append(a.pinOptions[pin], system.WithPinPullDown())
-	}
-
-	for _, pin := range cfg.pullUpPins {
-		a.pinOptions[pin] = append(a.pinOptions[pin], system.WithPinPullUp())
-	}
-
-	for _, pin := range cfg.openDrainPins {
-		a.pinOptions[pin] = append(a.pinOptions[pin], system.WithPinOpenDrain())
-	}
-
-	for _, pin := range cfg.openSourcePins {
-		a.pinOptions[pin] = append(a.pinOptions[pin], system.WithPinOpenSource())
-	}
-
-	for _, pin := range cfg.debouncePins {
-		a.pinOptions[pin.id] = append(a.pinOptions[pin.id], system.WithPinDebounce(pin.period))
-	}
-
-	for _, pin := range cfg.eventOnFallingEdgePins {
-		a.pinOptions[pin.id] = append(a.pinOptions[pin.id], system.WithPinEventOnFallingEdge(pin.handler))
-	}
-
-	for _, pin := range cfg.eventOnRisingEdgePins {
-		a.pinOptions[pin.id] = append(a.pinOptions[pin.id], system.WithPinEventOnRisingEdge(pin.handler))
-	}
-
-	for _, pin := range cfg.eventOnBothEdgesPins {
-		a.pinOptions[pin.id] = append(a.pinOptions[pin.id], system.WithPinEventOnBothEdges(pin.handler))
-	}
-
-	for _, pin := range cfg.pollForEdgeDetectionPins {
-		a.pinOptions[pin.id] = append(a.pinOptions[pin.id],
-			system.WithPinPollForEdgeDetection(pin.pollInterval, pin.pollQuitChan))
-	}
-
 	a.pins = make(map[string]gobot.DigitalPinner)
+
 	return nil
 }
 
@@ -266,6 +180,10 @@ func (a *DigitalPinsAdaptor) Connect() error {
 func (a *DigitalPinsAdaptor) Finalize() error {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
+
+	if a.digitalPinsCfg.debug {
+		fmt.Println("finalize the digital pins adaptor")
+	}
 
 	var err error
 	for _, pin := range a.pins {
@@ -276,7 +194,7 @@ func (a *DigitalPinsAdaptor) Finalize() error {
 		}
 	}
 	a.pins = nil
-	a.pinOptions = nil
+
 	return err
 }
 
@@ -321,7 +239,7 @@ func (a *DigitalPinsAdaptor) digitalPin(
 		return nil, fmt.Errorf("not connected for pin %s", id)
 	}
 
-	o := append(a.pinOptions[id], opts...)
+	o := append(a.digitalPinsCfg.pinOptions[id], opts...)
 	pin := a.pins[id]
 
 	if pin == nil {

@@ -22,7 +22,7 @@ func initConnectedTestProAdaptorWithMockedFilesystem() (*Adaptor, *system.MockFi
 func TestNewProAdaptor(t *testing.T) {
 	a := NewProAdaptor()
 	assert.True(t, strings.HasPrefix(a.Name(), "CHIP Pro"))
-	assert.True(t, a.sys.IsSysfsDigitalPinAccess())
+	assert.True(t, a.sys.HasDigitalPinSysfsAccess())
 }
 
 func TestProDigitalIO(t *testing.T) {

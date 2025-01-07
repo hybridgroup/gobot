@@ -19,7 +19,7 @@ func TestDigitalPinsWithGpiosActiveLow(t *testing.T) {
 	a := NewDigitalPinsAdaptor(system.NewAccesser(), nil, WithGpiosActiveLow("1", "12", "33"))
 	require.NoError(t, a.Connect())
 	// assert
-	assert.Len(t, a.pinOptions, 3)
+	assert.Len(t, a.digitalPinsCfg.pinOptions, 3)
 }
 
 func TestDigitalPinsWithDigitalPinInitializer(t *testing.T) {
@@ -51,30 +51,18 @@ func TestDigitalPinsWithDigitalPinInitializer(t *testing.T) {
 
 func TestDigitalPinsWithSysfsAccess(t *testing.T) {
 	// arrange
-	a := NewDigitalPinsAdaptor(system.NewAccesser(), nil)
-	require.NoError(t, a.Connect())
-	require.True(t, a.sys.IsCdevDigitalPinAccess())
-	require.NoError(t, a.Finalize())
-	// act, connect is mandatory to set options to the system
-	WithGpioSysfsAccess().apply(a.digitalPinsCfg)
-	require.NoError(t, a.Connect())
+	a := NewDigitalPinsAdaptor(system.NewAccesser(), nil, WithGpioSysfsAccess())
 	// assert
-	assert.True(t, a.sys.IsSysfsDigitalPinAccess())
+	assert.True(t, a.sys.HasDigitalPinSysfsAccess())
 }
 
 func TestDigitalPinsWithCdevAccess(t *testing.T) {
 	// arrange
-	a := NewDigitalPinsAdaptor(system.NewAccesser(system.WithDigitalPinSysfsAccess()), nil)
-	require.NoError(t, a.Connect())
-	require.True(t, a.sys.IsSysfsDigitalPinAccess())
-	require.NoError(t, a.Finalize())
-	// we have to mock the fs at this point to ensure the option can be applied on each test environment
-	a.sys.UseMockFilesystem([]string{"/dev/gpiochip0"})
-	// act, connect is mandatory to set options to the system
-	WithGpioCdevAccess().apply(a.digitalPinsCfg)
-	require.NoError(t, a.Connect())
+	sys := system.NewAccesser(system.WithDigitalPinSysfsAccess())
+	sys.UseMockFilesystem([]string{"/dev/gpiochip0"})
+	a := NewDigitalPinsAdaptor(sys, nil, WithGpioCdevAccess())
 	// assert
-	assert.True(t, a.sys.IsCdevDigitalPinAccess())
+	assert.True(t, a.sys.HasDigitalPinCdevAccess())
 }
 
 func TestDigitalReadWithGpiosActiveLow(t *testing.T) {
@@ -185,37 +173,6 @@ func TestDigitalWriteWithGpiosActiveLow(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "2", fs.Files["/sys/class/gpio/gpio19/value"].Contents)
 	assert.Equal(t, "1", fs.Files["/sys/class/gpio/gpio19/active_low"].Contents)
-}
-
-func TestDigitalPinsWithSpiGpioAccess(t *testing.T) {
-	// arrange
-	const (
-		sclkPin           = "1"
-		ncsPin            = "2"
-		sdoPin            = "3"
-		sdiPin            = "4"
-		sclkPinTranslated = "12"
-		ncsPinTranslated  = "13"
-		sdoPinTranslated  = "14"
-		sdiPinTranslated  = "15"
-	)
-	a := NewDigitalPinsAdaptor(system.NewAccesser(), testDigitalPinTranslator)
-	dpa := a.sys.UseMockDigitalPinAccess()
-	// act
-	WithSpiGpioAccess(sclkPin, ncsPin, sdoPin, sdiPin).apply(a.digitalPinsCfg)
-	require.NoError(t, a.Connect())
-	bus, err := a.sys.NewSpiDevice(0, 0, 0, 0, 1111)
-	// assert
-	require.NoError(t, err)
-	assert.NotNil(t, bus)
-	assert.Equal(t, 1, dpa.AppliedOptions("", sclkPinTranslated))
-	assert.Equal(t, 1, dpa.AppliedOptions("", ncsPinTranslated))
-	assert.Equal(t, 1, dpa.AppliedOptions("", sdoPinTranslated))
-	assert.Equal(t, 0, dpa.AppliedOptions("", sdiPinTranslated)) // already input, so no option applied
-	assert.Equal(t, 1, dpa.Exported("", sclkPinTranslated))
-	assert.Equal(t, 1, dpa.Exported("", ncsPinTranslated))
-	assert.Equal(t, 1, dpa.Exported("", sdoPinTranslated))
-	assert.Equal(t, 1, dpa.Exported("", sdiPinTranslated))
 }
 
 func gpioTestEventHandler(o int, t time.Duration, et string, sn uint32, lsn uint32) {

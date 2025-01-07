@@ -46,7 +46,7 @@ suitable:
 Also those findings needs to be replaced, which usually affects developers, but not users:
 
 * `system.WithDigitalPinGpiodAccess()` --> `system.WithDigitalPinCdevAccess()`
-* `IsGpiodDigitalPinAccess()` --> `IsCdevDigitalPinAccess()`
+* `IsGpiodDigitalPinAccess()` --> `HasDigitalPinCdevAccess()`
 
 ### PocketBeagle adaptor goes cdev
 

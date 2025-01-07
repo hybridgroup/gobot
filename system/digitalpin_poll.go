@@ -55,7 +55,7 @@ func startEdgePolling(
 				readStart = time.Now()
 				readValue, err := pinReadFunc()
 				if err != nil {
-					fmt.Printf("edge polling error occurred while reading the pin %s: %v", pinLabel, err)
+					fmt.Printf("edge polling error occurred while reading the pin %s: %v\n", pinLabel, err)
 					readValue = oldState // keep the value
 				}
 				if readValue != oldState {

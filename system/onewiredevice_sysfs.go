@@ -1,6 +1,7 @@
 package system
 
 import (
+	"fmt"
 	"path"
 )
 
@@ -32,6 +33,10 @@ func (o *onewireDeviceSysfs) ReadData(command string, data []byte) error {
 		return err
 	}
 	copy(data, buf)
+
+	if len(buf) < len(data) {
+		return fmt.Errorf("count of read bytes (%d) is smaller than expected (%d)", len(buf), len(data))
+	}
 
 	return nil
 }

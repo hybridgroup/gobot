@@ -49,8 +49,6 @@ func NewAdaptor(opts ...interface{}) *PocketBeagleAdaptor {
 			digitalPinsOpts = append(digitalPinsOpts, o)
 		case adaptors.PwmPinsOptionApplier:
 			pwmPinsOpts = append(pwmPinsOpts, o)
-		case func(system.Optioner):
-			// do nothing, already applied on NewAdaptor(opts)
 		default:
 			panic(fmt.Sprintf("'%s' can not be applied on adaptor '%s'", opt, a.Name()))
 		}
@@ -73,7 +71,7 @@ func (a *PocketBeagleAdaptor) getTranslateAndMuxDigitalPinFunc(
 	digitalPinTranslate func(id string) (string, int, error),
 ) func(id string) (string, int, error) {
 	return func(id string) (string, int, error) {
-		if a.sys.IsSysfsDigitalPinAccess() {
+		if a.sys.HasDigitalPinSysfsAccess() {
 			// mux is done by id, not by line
 			if err := a.muxPin(id, "gpio"); err != nil {
 				return "", -1, err

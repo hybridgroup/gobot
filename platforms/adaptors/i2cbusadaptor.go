@@ -25,12 +25,15 @@ type I2cBusAdaptor struct {
 // NewI2cBusAdaptor provides the access to i2c buses of the board. The validator is used to check the bus number,
 // which is given by user, to the abilities of the board.
 func NewI2cBusAdaptor(sys *system.Accesser, v i2cBusNumberValidator, defaultBusNr int) *I2cBusAdaptor {
-	a := &I2cBusAdaptor{
+	a := I2cBusAdaptor{
 		sys:              sys,
 		validateNumber:   v,
 		defaultBusNumber: defaultBusNr,
 	}
-	return a
+
+	sys.AddI2CSupport()
+
+	return &a
 }
 
 // Connect prepares the connection to i2c buses.

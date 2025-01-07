@@ -11,7 +11,11 @@ import (
 	"gobot.io/x/gobot/v2/system"
 )
 
-const defaultI2cBusNumber = 0
+const (
+	defaultI2cBusNumber = 0
+
+	defaultSpiMaxSpeed = 5000 // 5kHz (more than 15kHz not possible with SPI over GPIO)
+)
 
 type sysfsPin struct {
 	pin    int
@@ -26,6 +30,7 @@ type Adaptor struct {
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.PWMPinsAdaptor
 	*adaptors.I2cBusAdaptor
+	*adaptors.SpiBusAdaptor // for usage of "adaptors.WithSpiGpioAccess()"
 }
 
 // NewAdaptor returns a new Joule Adaptor
@@ -45,12 +50,15 @@ func NewAdaptor(opts ...interface{}) *Adaptor {
 
 	var digitalPinsOpts []adaptors.DigitalPinsOptionApplier
 	pwmPinsOpts := []adaptors.PwmPinsOptionApplier{adaptors.WithPWMPinInitializer(pwmPinInitializer)}
+	var spiBusOpts []adaptors.SpiBusOptionApplier
 	for _, opt := range opts {
 		switch o := opt.(type) {
 		case adaptors.DigitalPinsOptionApplier:
 			digitalPinsOpts = append(digitalPinsOpts, o)
 		case adaptors.PwmPinsOptionApplier:
 			pwmPinsOpts = append(pwmPinsOpts, o)
+		case adaptors.SpiBusOptionApplier:
+			spiBusOpts = append(spiBusOpts, o)
 		default:
 			panic(fmt.Sprintf("'%s' can not be applied on adaptor '%s'", opt, a.name))
 		}
@@ -62,6 +70,13 @@ func NewAdaptor(opts ...interface{}) *Adaptor {
 	a.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, a.translateDigitalPin, digitalPinsOpts...)
 	a.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, a.translatePWMPin, pwmPinsOpts...)
 	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, i2cBusNumberValidator.Validate, defaultI2cBusNumber)
+
+	// SPI is only supported when "adaptors.WithSpiGpioAccess()" is given
+	if len(spiBusOpts) > 0 {
+		a.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, func(int) error { return nil }, 0, 0, 0, 0, defaultSpiMaxSpeed,
+			a.DigitalPinsAdaptor, spiBusOpts...)
+	}
+
 	return a
 }
 

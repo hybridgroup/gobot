@@ -21,8 +21,10 @@ type OneWireBusAdaptor struct {
 
 // NewOneWireBusAdaptor provides the access to 1-wire devices of the board.
 func NewOneWireBusAdaptor(sys *system.Accesser) *OneWireBusAdaptor {
-	a := &OneWireBusAdaptor{sys: sys, mutex: &sync.Mutex{}}
-	return a
+	a := OneWireBusAdaptor{sys: sys, mutex: &sync.Mutex{}}
+	sys.AddOneWireSupport()
+
+	return &a
 }
 
 // Connect prepares the connection to 1-wire devices.

@@ -49,14 +49,14 @@ led := gpio.NewLedDriver(r, "7")
 Compile your Gobot program on your workstation like this:
 
 ```sh
-GOARM=7 GOARCH=arm GOOS=linux go build examples/nanopi_blink.go
+GOARM=7 GOARCH=arm GOOS=linux go build -o output/ examples/nanopi_blink.go
 ```
 
 Once you have compiled your code, you can upload your program and execute it on the board from your workstation
 using the `scp` and `ssh` commands like this:
 
 ```sh
-scp nanopi_blink nan@nanopineo:~
+scp output/nanopi_blink nan@nanopineo:~
 ssh -t nan@nanopineo "./nanopi_blink"
 ```
 

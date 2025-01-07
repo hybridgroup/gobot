@@ -30,24 +30,24 @@ type spiGpio struct {
 }
 
 // newSpiGpio creates and returns a new SPI connection based on given GPIO's.
-func newSpiGpio(cfg spiGpioConfig, maxSpeed int64) (*spiGpio, error) {
+func newSpiGpio(cfg spiGpioConfig, maxSpeedHz int64) (*spiGpio, error) {
 	spi := &spiGpio{cfg: cfg}
-	spi.initializeTime(maxSpeed)
+	spi.initializeTime(maxSpeedHz)
 	return spi, spi.initializeGpios()
 }
 
-func (s *spiGpio) initializeTime(maxSpeed int64) {
-	// maxSpeed is given in Hz, tclk is half the cycle time, tclk=1/(2*f), tclk[ns]=1 000 000 000/(2*maxSpeed)
+func (s *spiGpio) initializeTime(maxSpeedHz int64) {
+	// maxSpeedHz is given in Hz, tclk is half the cycle time, tclk=1/(2*f), tclk[ns]=1 000 000 000/(2*maxSpeed)
 	// but with gpio's a speed of more than ~15kHz is most likely not possible, so we limit to 10kHz
-	if maxSpeed > 10000 {
+	if maxSpeedHz > 10000 {
 		if s.cfg.debug {
 			fmt.Printf("reduce SPI speed for GPIO usage to 10Khz")
 		}
-		maxSpeed = 10000
+		maxSpeedHz = 10000
 	}
-	tclk := time.Duration(1000000000/2/maxSpeed) * time.Nanosecond
+	s.tclk = time.Duration(1000000000/2/maxSpeedHz) * time.Nanosecond
 	if s.cfg.debug {
-		fmt.Println("clk", tclk)
+		fmt.Println("clk", s.tclk)
 	}
 }
 
