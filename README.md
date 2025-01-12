@@ -273,6 +273,7 @@ platforms are currently supported:
 - [Parrot Bebop](http://www.parrot.com/usa/products/bebop-drone/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/parrot/bebop)
 - [Parrot Minidrone](https://www.parrot.com/us/minidrones) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/parrot/minidrone)
 - [Pebble](https://www.getpebble.com/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/pebble)
+- [PINE64 ROCK64](https://pine64.org/documentation/ROCK64/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/pine64/rock64)
 - [Radxa Rock Pi 4](https://wiki.radxa.com/Rock4/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/rockpi)
 - [Raspberry Pi](http://www.raspberrypi.org/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/raspi)
 - [Serial Port](https://en.wikipedia.org/wiki/Serial_port) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/serialport)
