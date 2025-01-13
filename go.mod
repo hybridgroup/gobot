@@ -19,7 +19,7 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/warthog618/go-gpiocdev v0.9.1
 	go.bug.st/serial v1.6.2
-	gocv.io/x/gocv v0.39.0
+	gocv.io/x/gocv v0.40.0
 	golang.org/x/net v0.30.0
 	golang.org/x/sys v0.26.0
 	periph.io/x/conn/v3 v3.7.1
