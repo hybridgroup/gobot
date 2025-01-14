@@ -1,7 +1,6 @@
 package gobot
 
 import (
-	"errors"
 	"sync"
 )
 
@@ -19,6 +18,9 @@ type eventer struct {
 
 	// the in/out channel length
 	bufferSize int
+
+	// controls the maximum number of concurrent executions when eventer is Published to
+	workerCount int
 
 	// mutex to protect the eventChannel map
 	eventsMutex sync.Mutex
@@ -63,22 +65,49 @@ type Eventer interface {
 	Once(name string, f func(s interface{})) (err error)
 }
 
-// NewEventer returns a new Eventer.
-func NewEventer() Eventer {
-	return NewEventerWithBufferSize(eventChanBufferSize)
+// EventerOptionFn allows the configurable parameters of an eventer to be modified
+type EventerOptionFn func(*eventer)
+
+// WithBufferSize allows an eventer's buffer size to be configured
+func WithBufferSize(bufferSize int) EventerOptionFn {
+	return func(e *eventer) {
+		if bufferSize >= maxEventChanBufferSize {
+			e.bufferSize = maxEventChanBufferSize
+		} else if bufferSize <= 0 {
+			e.bufferSize = eventChanBufferSize
+		} else {
+			e.bufferSize = bufferSize
+		}
+	}
 }
 
-func NewEventerWithBufferSize(bufferSize int) Eventer {
-	if bufferSize >= maxEventChanBufferSize {
-		bufferSize = maxEventChanBufferSize
+// WithWorkerCount allows an eventer's workerCount to be configured
+func WithWorkerCount(workerCount int) EventerOptionFn {
+	return func(e *eventer) {
+		if workerCount >= maxChanWorkerCount {
+			e.workerCount = maxChanWorkerCount
+		} else if workerCount <= 0 {
+			e.workerCount = 1
+		} else {
+			e.workerCount = workerCount
+		}
+	}
+}
+
+// NewEventer returns a new Eventer.
+func NewEventer(fns ...EventerOptionFn) Eventer {
+	evtr := &eventer{
+		eventnames:  make(map[string]string),
+		bufferSize:  eventChanBufferSize,
+		workerCount: 1,
 	}
 
-	evtr := &eventer{
-		eventnames: make(map[string]string),
-		in:         make(eventChannel, bufferSize),
-		outs:       make(map[eventChannel]eventChannel),
-		bufferSize: bufferSize,
+	for _, fn := range fns {
+		fn(evtr)
 	}
+
+	evtr.in = make(eventChannel, eventChanBufferSize)
+	evtr.outs = make(map[eventChannel]eventChannel)
 
 	// goroutine to cascade "in" events to all "out" event channels
 	go func() {
@@ -139,16 +168,8 @@ func (e *eventer) Unsubscribe(events eventChannel) {
 
 // On executes the event handler f when e is Published to.
 func (e *eventer) On(n string, f func(s interface{})) (err error) {
-	return e.OnWithParallel(n, 1, f)
-}
-
-// Multi goroutines On executes the event handler f when e is Published to.
-func (e *eventer) OnWithParallel(n string, workerCnt int, f func(s interface{})) (err error) {
-	if workerCnt > maxChanWorkerCount {
-		return errors.New("out of max worker count")
-	}
 	out := e.Subscribe()
-	for i := 0; i < workerCnt; i++ {
+	for i := 0; i < e.workerCount; i++ {
 		go func() {
 			// Add panic handling for goroutines to prevent panics caused by the callback function `f`
 			defer func() {
