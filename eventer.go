@@ -153,7 +153,7 @@ func (e *eventer) OnWithParallel(n string, workerCnt int, f func(s interface{}))
 	out := e.Subscribe()
 	for i := 0; i < workerCnt; i++ {
 		go func() {
-			// 增加goroutine的panic处理，防止因回调f引起panic
+			// Add panic handling for goroutines to prevent panics caused by the callback function `f`
 			defer func() {
 				if r := recover(); r != nil {
 					e.Publish(EventCrash, r)
