@@ -4,6 +4,13 @@ import (
 	"sync"
 )
 
+const (
+	defaultEventChanBufferSize = 10
+	maxEventChanBufferSize     = 10240
+	maxChanWorkerCount         = 128
+	EventCrash                 = "crash"
+)
+
 type eventChannel chan *Event
 
 type eventer struct {
@@ -25,13 +32,6 @@ type eventer struct {
 	// mutex to protect the eventChannel map
 	eventsMutex sync.Mutex
 }
-
-const (
-	eventChanBufferSize    = 10
-	maxEventChanBufferSize = 10240
-	maxChanWorkerCount     = 128
-	EventCrash             = "crash"
-)
 
 // Eventer is the interface which describes how a Driver or Adaptor
 // handles events.
@@ -74,7 +74,7 @@ func WithBufferSize(bufferSize int) EventerOptionFn {
 		if bufferSize >= maxEventChanBufferSize {
 			e.bufferSize = maxEventChanBufferSize
 		} else if bufferSize <= 0 {
-			e.bufferSize = eventChanBufferSize
+			e.bufferSize = defaultEventChanBufferSize
 		} else {
 			e.bufferSize = bufferSize
 		}
@@ -98,7 +98,7 @@ func WithWorkerCount(workerCount int) EventerOptionFn {
 func NewEventer(fns ...EventerOptionFn) Eventer {
 	evtr := &eventer{
 		eventnames:  make(map[string]string),
-		bufferSize:  eventChanBufferSize,
+		bufferSize:  defaultEventChanBufferSize,
 		workerCount: 1,
 	}
 
@@ -106,7 +106,7 @@ func NewEventer(fns ...EventerOptionFn) Eventer {
 		fn(evtr)
 	}
 
-	evtr.in = make(eventChannel, eventChanBufferSize)
+	evtr.in = make(eventChannel, defaultEventChanBufferSize)
 	evtr.outs = make(map[eventChannel]eventChannel)
 
 	// goroutine to cascade "in" events to all "out" event channels
