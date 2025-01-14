@@ -82,15 +82,12 @@ func NewEventerWithBufferSize(bufferSize int) Eventer {
 
 	// goroutine to cascade "in" events to all "out" event channels
 	go func() {
-		for {
-			select {
-			case evt := <-evtr.in:
-				evtr.eventsMutex.Lock()
-				for _, out := range evtr.outs {
-					out <- evt
-				}
-				evtr.eventsMutex.Unlock()
+		for evt := range evtr.in {
+			evtr.eventsMutex.Lock()
+			for _, out := range evtr.outs {
+				out <- evt
 			}
+			evtr.eventsMutex.Unlock()
 		}
 	}()
 
@@ -160,12 +157,9 @@ func (e *eventer) OnWithParallel(n string, workerCnt int, f func(s interface{}))
 				}
 			}()
 
-			for {
-				select {
-				case evt := <-out:
-					if evt.Name == n {
-						f(evt.Data)
-					}
+			for evt := range out {
+				if evt.Name == n {
+					f(evt.Data)
 				}
 			}
 		}()
