@@ -98,6 +98,7 @@ func WithWorkerCount(workerCount int) EventerOptionFn {
 func NewEventer(fns ...EventerOptionFn) Eventer {
 	evtr := &eventer{
 		eventnames:  make(map[string]string),
+		outs:        make(map[eventChannel]eventChannel),
 		bufferSize:  defaultEventChanBufferSize,
 		workerCount: 1,
 	}
@@ -106,10 +107,8 @@ func NewEventer(fns ...EventerOptionFn) Eventer {
 		fn(evtr)
 	}
 
-	evtr.in = make(eventChannel, defaultEventChanBufferSize)
-	evtr.outs = make(map[eventChannel]eventChannel)
-
 	// goroutine to cascade "in" events to all "out" event channels
+	evtr.in = make(eventChannel, evtr.bufferSize)
 	go func() {
 		for evt := range evtr.in {
 			evtr.eventsMutex.Lock()
