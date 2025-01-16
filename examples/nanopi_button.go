@@ -12,7 +12,7 @@ import (
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/gpio"
 	"gobot.io/x/gobot/v2/platforms/adaptors"
-	"gobot.io/x/gobot/v2/platforms/nanopi"
+	"gobot.io/x/gobot/v2/platforms/friendlyelec/nanopi"
 )
 
 // PWR  NanoPi: 1, 17 (+3.3V, VCC); 2, 4 (+5V, VDD); 6, 9, 14, 20 (GND)

@@ -1,4 +1,4 @@
-package tinkerboard
+package nanopct6
 
 import (
 	"strings"
@@ -16,10 +16,10 @@ import (
 )
 
 const (
-	pwmDir           = "/sys/devices/platform/ff680020.pwm/pwm/pwmchip2/" //nolint:gosec // false positive
-	pwmPwmDir        = pwmDir + "pwm0/"
+	pwmDir           = "/sys/devices/platform/febf0030.pwm/pwm/pwmchip7/" //nolint:gosec // false positive
 	pwmExportPath    = pwmDir + "export"
 	pwmUnexportPath  = pwmDir + "unexport"
+	pwmPwmDir        = pwmDir + "pwm0/"
 	pwmEnablePath    = pwmPwmDir + "enable"
 	pwmPeriodPath    = pwmPwmDir + "period"
 	pwmDutyCyclePath = pwmPwmDir + "duty_cycle"
@@ -44,8 +44,6 @@ var (
 	_ gobot.PWMPinnerProvider     = (*Adaptor)(nil)
 	_ gpio.DigitalReader          = (*Adaptor)(nil)
 	_ gpio.DigitalWriter          = (*Adaptor)(nil)
-	_ gpio.PwmWriter              = (*Adaptor)(nil)
-	_ gpio.ServoWriter            = (*Adaptor)(nil)
 	_ aio.AnalogReader            = (*Adaptor)(nil)
 	_ i2c.Connector               = (*Adaptor)(nil)
 )
@@ -76,7 +74,7 @@ func TestNewAdaptor(t *testing.T) {
 	a := NewAdaptor()
 	// assert
 	assert.IsType(t, &Adaptor{}, a)
-	assert.True(t, strings.HasPrefix(a.Name(), "Tinker Board"))
+	assert.True(t, strings.HasPrefix(a.Name(), "NanoPC-T6"))
 	assert.NotNil(t, a.sys)
 	assert.NotNil(t, a.mutex)
 	assert.NotNil(t, a.AnalogPinsAdaptor)
@@ -84,7 +82,6 @@ func TestNewAdaptor(t *testing.T) {
 	assert.NotNil(t, a.PWMPinsAdaptor)
 	assert.NotNil(t, a.I2cBusAdaptor)
 	assert.NotNil(t, a.SpiBusAdaptor)
-	assert.NotNil(t, a.OneWireBusAdaptor)
 	assert.True(t, a.sys.HasDigitalPinCdevAccess())
 	// act & assert
 	a.SetName("NewName")
@@ -108,9 +105,9 @@ func TestDigitalIO(t *testing.T) {
 	// act & assert write
 	err := a.DigitalWrite("7", 1)
 	require.NoError(t, err)
-	assert.Equal(t, []int{1}, dpa.Written("gpiochip0", "17"))
+	assert.Equal(t, []int{1}, dpa.Written("gpiochip3", "10"))
 	// arrange, act & assert read
-	dpa.UseValues("gpiochip5", "8", []int{3})
+	dpa.UseValues("gpiochip0", "20", []int{3})
 	i, err := a.DigitalRead("10")
 	require.NoError(t, err)
 	assert.Equal(t, 3, i)
@@ -118,8 +115,8 @@ func TestDigitalIO(t *testing.T) {
 	require.ErrorContains(t, a.DigitalWrite("99", 1), "'99' is not a valid id for a digital pin")
 	// act and assert finalize
 	require.NoError(t, a.Finalize())
-	assert.Equal(t, 0, dpa.Exported("gpiochip0", "17"))
-	assert.Equal(t, 0, dpa.Exported("gpiochip5", "8"))
+	assert.Equal(t, 0, dpa.Exported("gpiochip3", "10"))
+	assert.Equal(t, 0, dpa.Exported("gpiochip0", "20"))
 }
 
 func TestDigitalIOSysfs(t *testing.T) {
@@ -132,9 +129,9 @@ func TestDigitalIOSysfs(t *testing.T) {
 	// act & assert write
 	err := a.DigitalWrite("7", 1)
 	require.NoError(t, err)
-	assert.Equal(t, []int{1}, dpa.Written("", "17"))
+	assert.Equal(t, []int{1}, dpa.Written("", "106"))
 	// arrange, act & assert read
-	dpa.UseValues("", "160", []int{4})
+	dpa.UseValues("", "20", []int{4})
 	i, err := a.DigitalRead("10")
 	require.NoError(t, err)
 	assert.Equal(t, 4, i)
@@ -142,8 +139,8 @@ func TestDigitalIOSysfs(t *testing.T) {
 	require.ErrorContains(t, a.DigitalWrite("99", 1), "'99' is not a valid id for a digital pin")
 	// act and assert finalize
 	require.NoError(t, a.Finalize())
-	assert.Equal(t, 0, dpa.Exported("", "17"))
-	assert.Equal(t, 0, dpa.Exported("", "160"))
+	assert.Equal(t, 0, dpa.Exported("", "106"))
+	assert.Equal(t, 0, dpa.Exported("", "20"))
 }
 
 func TestAnalogRead(t *testing.T) {
@@ -154,7 +151,7 @@ func TestAnalogRead(t *testing.T) {
 	a, fs := initConnectedTestAdaptorWithMockedFilesystem(mockPaths)
 
 	fs.Files["/sys/class/thermal/thermal_zone0/temp"].Contents = "567\n"
-	got, err := a.AnalogRead("thermal_zone0")
+	got, err := a.AnalogRead("soc_thermal")
 	require.NoError(t, err)
 	assert.Equal(t, 567, got)
 
@@ -162,7 +159,7 @@ func TestAnalogRead(t *testing.T) {
 	require.ErrorContains(t, err, "'thermal_zone10' is not a valid id for an analog pin")
 
 	fs.WithReadError = true
-	_, err = a.AnalogRead("thermal_zone0")
+	_, err = a.AnalogRead("soc_thermal")
 	require.ErrorContains(t, err, "read error")
 	fs.WithReadError = false
 
@@ -175,7 +172,7 @@ func TestFinalizeErrorAfterGPIO(t *testing.T) {
 	dpa := a.sys.UseMockDigitalPinAccess()
 	require.True(t, a.sys.HasDigitalPinCdevAccess())
 	require.NoError(t, a.DigitalWrite("7", 1))
-	dpa.UseUnexportError("gpiochip0", "17")
+	dpa.UseUnexportError("gpiochip3", "10")
 	// act
 	err := a.Finalize()
 	// assert
@@ -187,7 +184,7 @@ func TestFinalizeErrorAfterPWM(t *testing.T) {
 	// arrange
 	a, fs := initConnectedTestAdaptorWithMockedFilesystem(pwmMockPaths)
 	preparePwmFs(fs)
-	require.NoError(t, a.PwmWrite("33", 1))
+	require.NoError(t, a.PwmWrite("13", 1))
 	fs.WithWriteError = true
 	// act
 	err := a.Finalize()
@@ -207,7 +204,7 @@ func TestSpiDefaultValues(t *testing.T) {
 
 func TestI2cDefaultBus(t *testing.T) {
 	a := NewAdaptor()
-	assert.Equal(t, 1, a.DefaultI2cBus())
+	assert.Equal(t, 8, a.DefaultI2cBus())
 }
 
 func TestI2cFinalizeWithErrors(t *testing.T) {

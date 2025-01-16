@@ -161,15 +161,16 @@ func TestFinalizeErrorAfterGPIO(t *testing.T) {
 }
 
 func TestFinalizeErrorAfterPWM(t *testing.T) {
+	// indirect test for PWM.Finalize() is called for the adaptor
+	// arrange
 	a, fs := initConnectedTestAdaptorWithMockedFilesystem(pwmMockPaths)
 	fs.Files[pwmDutyCyclePath].Contents = "0"
 	fs.Files[pwmPeriodPath].Contents = "0"
-
 	require.NoError(t, a.PwmWrite("32", 1))
-
 	fs.WithWriteError = true
-
+	// act
 	err := a.Finalize()
+	// assert
 	require.ErrorContains(t, err, "write error")
 }
 

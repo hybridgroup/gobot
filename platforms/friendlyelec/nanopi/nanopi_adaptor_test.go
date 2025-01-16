@@ -1,8 +1,6 @@
 package nanopi
 
 import (
-	"fmt"
-	"strconv"
 	"strings"
 	"testing"
 
@@ -169,107 +167,6 @@ func TestAnalog(t *testing.T) {
 	require.NoError(t, a.Finalize())
 }
 
-func TestInvalidPWMPin(t *testing.T) {
-	a, fs := initConnectedTestAdaptorWithMockedFilesystem(pwmMockPaths)
-	preparePwmFs(fs)
-
-	err := a.PwmWrite("666", 42)
-	require.ErrorContains(t, err, "'666' is not a valid id for a PWM pin")
-
-	err = a.ServoWrite("666", 120)
-	require.ErrorContains(t, err, "'666' is not a valid id for a PWM pin")
-
-	err = a.PwmWrite("3", 42)
-	require.ErrorContains(t, err, "'3' is not a valid id for a PWM pin")
-
-	err = a.ServoWrite("3", 120)
-	require.ErrorContains(t, err, "'3' is not a valid id for a PWM pin")
-}
-
-func TestPwmWrite(t *testing.T) {
-	// arrange
-	a, fs := initConnectedTestAdaptorWithMockedFilesystem(pwmMockPaths)
-	preparePwmFs(fs)
-	// act
-	err := a.PwmWrite("PWM", 100)
-	// assert
-	require.NoError(t, err)
-	assert.Equal(t, "0", fs.Files[pwmExportPath].Contents)
-	assert.Equal(t, "1", fs.Files[pwmEnablePath].Contents)
-	assert.Equal(t, strconv.Itoa(10000000), fs.Files[pwmPeriodPath].Contents)
-	assert.Equal(t, "3921568", fs.Files[pwmDutyCyclePath].Contents)
-	assert.Equal(t, "normal", fs.Files[pwmPolarityPath].Contents)
-
-	require.NoError(t, a.Finalize())
-}
-
-func TestServoWrite(t *testing.T) {
-	// arrange: prepare 50Hz for servos
-	const (
-		pin         = "PWM"
-		fiftyHzNano = 20000000
-	)
-	a := NewNeoAdaptor(adaptors.WithPWMDefaultPeriodForPin(pin, fiftyHzNano))
-	fs := a.sys.UseMockFilesystem(pwmMockPaths)
-	preparePwmFs(fs)
-	require.NoError(t, a.Connect())
-	// act & assert for 0° (min default value)
-	err := a.ServoWrite(pin, 0)
-	require.NoError(t, err)
-	assert.Equal(t, strconv.Itoa(fiftyHzNano), fs.Files[pwmPeriodPath].Contents)
-	assert.Equal(t, "500000", fs.Files[pwmDutyCyclePath].Contents)
-	// act & assert for 180° (max default value)
-	err = a.ServoWrite(pin, 180)
-	require.NoError(t, err)
-	assert.Equal(t, strconv.Itoa(fiftyHzNano), fs.Files[pwmPeriodPath].Contents)
-	assert.Equal(t, "2500000", fs.Files[pwmDutyCyclePath].Contents)
-	// act & assert invalid pins
-	err = a.ServoWrite("3", 120)
-	require.ErrorContains(t, err, "'3' is not a valid id for a PWM pin")
-
-	require.NoError(t, a.Finalize())
-}
-
-func TestSetPeriod(t *testing.T) {
-	// arrange
-	a, fs := initConnectedTestAdaptorWithMockedFilesystem(pwmMockPaths)
-	preparePwmFs(fs)
-
-	newPeriod := uint32(2550000)
-	// act
-	err := a.SetPeriod("PWM", newPeriod)
-	// assert
-	require.NoError(t, err)
-	assert.Equal(t, "0", fs.Files[pwmExportPath].Contents)
-	assert.Equal(t, "1", fs.Files[pwmEnablePath].Contents)
-	assert.Equal(t, fmt.Sprintf("%d", newPeriod), fs.Files[pwmPeriodPath].Contents) //nolint:perfsprint // ok here
-	assert.Equal(t, "0", fs.Files[pwmDutyCyclePath].Contents)
-	assert.Equal(t, "normal", fs.Files[pwmPolarityPath].Contents)
-
-	// arrange test for automatic adjustment of duty cycle to lower value
-	err = a.PwmWrite("PWM", 127) // 127 is a little bit smaller than 50% of period
-	require.NoError(t, err)
-	assert.Equal(t, strconv.Itoa(1270000), fs.Files[pwmDutyCyclePath].Contents)
-	newPeriod = newPeriod / 10
-
-	// act
-	err = a.SetPeriod("PWM", newPeriod)
-
-	// assert
-	require.NoError(t, err)
-	assert.Equal(t, strconv.Itoa(127000), fs.Files[pwmDutyCyclePath].Contents)
-
-	// arrange test for automatic adjustment of duty cycle to higher value
-	newPeriod = newPeriod * 20
-
-	// act
-	err = a.SetPeriod("PWM", newPeriod)
-
-	// assert
-	require.NoError(t, err)
-	assert.Equal(t, strconv.Itoa(2540000), fs.Files[pwmDutyCyclePath].Contents)
-}
-
 func TestFinalizeErrorAfterGPIO(t *testing.T) {
 	// arrange
 	a := initConnectedTestAdaptor()
@@ -284,14 +181,15 @@ func TestFinalizeErrorAfterGPIO(t *testing.T) {
 }
 
 func TestFinalizeErrorAfterPWM(t *testing.T) {
+	// indirect test for PWM.Finalize() is called for the adaptor
+	// arrange
 	a, fs := initConnectedTestAdaptorWithMockedFilesystem(pwmMockPaths)
 	preparePwmFs(fs)
-
 	require.NoError(t, a.PwmWrite("PWM", 1))
-
 	fs.WithWriteError = true
-
+	// act
 	err := a.Finalize()
+	// assert
 	require.ErrorContains(t, err, "write error")
 }
 

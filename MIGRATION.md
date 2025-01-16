@@ -9,6 +9,23 @@ are listed here and a migration strategy is provided.
 
 ## Switch from version 2.4.0 (applications using the gpiod options affected)
 
+### NanoPi NEO adaptor was moved to friendlyelec folder
+
+With introduce of FriendlyELEC NanoPC-T6 a second adaptor from FriendlyELEC (formerly friendlarm) now exists. Please
+search and replace to change the import path as follows.
+
+```go
+// old
+...
+  "gobot.io/x/gobot/v2/platforms/nanopi"
+...
+
+// new
+...
+  "gobot.io/x/gobot/v2/platforms/friendlyelec/nanopi"
+...
+```
+
 ### The term gpiod was renamed to cdev
 
 Using the term "cdev" (short for character device Kernel ABI for GPIO access) is more suitable than using "gpiod" (the

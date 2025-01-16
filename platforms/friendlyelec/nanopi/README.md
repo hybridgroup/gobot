@@ -1,9 +1,9 @@
 # NanoPi Boards
 
-The FriendlyARM NanoPi Boards are single board SoC computers with different hardware design. It has built-in GPIO, PWM,
+The FriendlyELEC NanoPi Boards are single board SoC computers with different hardware design. It has built-in GPIO, PWM,
 SPI, and I2C interfaces.
 
-For more info about the NanoPi Boards, go to [https://wiki.friendlyelec.com/wiki/index.php/Main_Page](https://wiki.friendlyelec.com/wiki/index.php/Main_Page).
+For more info about the NanoPi Boards, go to [https://wiki.friendlyelec.com/wiki/index.php/NanoPi_NEO](https://wiki.friendlyelec.com/wiki/index.php/NanoPi_NEO).
 
 ## How to Install
 

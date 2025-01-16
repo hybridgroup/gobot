@@ -13,12 +13,12 @@ import (
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/gpio"
 	"gobot.io/x/gobot/v2/platforms/adaptors"
-	"gobot.io/x/gobot/v2/platforms/friendlyelec/nanopi"
+	"gobot.io/x/gobot/v2/platforms/friendlyelec/nanopct6"
 )
 
 // Wiring
-// PWR  NanoPi: 1, 17 (+3.3V, VCC); 2, 4 (+5V, VDD); 6, 9, 14, 20 (GND)
-// GPIO NanoPi: header pin 22 is input, pin 23 is normal output, pin 24 is inverted output
+// PWR   : 1, 17 (+3.3V, VCC), 2, 4 (+5V), 6, 9, 14, 20, 25, 30, 34, 39 (GND)
+// GPIO  : header pin 36 is input, pin 37 used as normal output, pin 38 used as inverted output
 // Button: the input pin is wired with a button to GND, the internal pull up resistor is used
 // LED's: the output pins are wired to the cathode of the LED, the anode is wired with a resistor (70-130Ohm for 20mA)
 // to VCC
@@ -26,13 +26,13 @@ import (
 // changes
 func main() {
 	const (
-		inPinNum          = "22" // 7, 8, 10, 11, 12, 13, 15, 16, 18, 22
-		outPinNum         = "23"
-		outPinInvertedNum = "24"
+		inPinNum          = "36"
+		outPinNum         = "37"
+		outPinInvertedNum = "38"
 		debounceTime      = 2 * time.Second
 	)
 	// note: WithGpiosOpenDrain() is optional, if using WithGpiosOpenSource() the LED's will not light up
-	board := nanopi.NewNeoAdaptor(adaptors.WithGpiosActiveLow(outPinInvertedNum),
+	board := nanopct6.NewAdaptor(adaptors.WithGpiosActiveLow(outPinInvertedNum),
 		adaptors.WithGpiosOpenDrain(outPinNum, outPinInvertedNum),
 		adaptors.WithGpiosPullUp(inPinNum),
 		adaptors.WithGpioDebounce(inPinNum, debounceTime))

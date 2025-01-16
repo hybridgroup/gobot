@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/platforms/nanopi"
+	"gobot.io/x/gobot/v2/platforms/friendlyelec/nanopi"
 	"gobot.io/x/gobot/v2/system"
 )
 
