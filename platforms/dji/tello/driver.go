@@ -194,6 +194,7 @@ type Driver struct {
 	rx, ry, lx, ly float32
 	throttle       int
 	bouncing       bool
+	ExternalVideo  bool
 	gobot.Eventer
 	doneCh            chan struct{}
 	doneChReaderCount int32
@@ -272,8 +273,11 @@ func (d *Driver) Start() error {
 			if err := d.SendDateTime(); err != nil {
 				panic(err)
 			}
-			if err := d.processVideo(); err != nil {
-				panic(err)
+			// start processing video frames unless being handled by external processor
+			if !d.ExternalVideo {
+				if err := d.processVideo(); err != nil {
+					panic(err)
+				}
 			}
 		})
 		if err != nil {
