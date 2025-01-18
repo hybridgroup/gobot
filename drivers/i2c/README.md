@@ -1,7 +1,7 @@
 # I2C
 
 This package provides drivers for [i2c](https://en.wikipedia.org/wiki/I%C2%B2C)devices. It must be used along with an
-adaptor such as [Tinker Board](https://gobot.io/documentation/platforms/tinkerboard/) that supports the needed
+adaptor such as [Tinker Board](https://gobot.io/documentation/platforms/asus/tinkerboard/) that supports the needed
 interfaces for i2c devices.
 
 ## Getting Started

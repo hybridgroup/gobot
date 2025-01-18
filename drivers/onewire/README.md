@@ -1,7 +1,7 @@
 # 1-wire
 
 This package provides drivers for [1-wire](https://en.wikipedia.org/wiki/1-Wire) devices supported by Linux Kernel w1-gpio
-drivers. It must be used along with an adaptor such as [Tinker Board](https://gobot.io/documentation/platforms/tinkerboard/)
+drivers. It must be used along with an adaptor such as [Tinker Board](https://gobot.io/documentation/platforms/asus/tinkerboard/)
 that supports the needed interfaces for 1-wire devices.
 
 ## Getting Started

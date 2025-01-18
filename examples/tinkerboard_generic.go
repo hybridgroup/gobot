@@ -13,7 +13,7 @@ import (
 
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/i2c"
-	"gobot.io/x/gobot/v2/platforms/tinkerboard"
+	"gobot.io/x/gobot/v2/platforms/asus/tinkerboard"
 )
 
 // Attention! Possibly this will not work, because the current kernel of Tinker-OS 4.4.194 (2021-10-06) needs the

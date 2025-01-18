@@ -13,10 +13,10 @@ import (
 
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/onewire"
-	"gobot.io/x/gobot/v2/platforms/tinkerboard"
+	"gobot.io/x/gobot/v2/platforms/asus/tinkerboard"
 )
 
-// Preparation: see /gobot/system/ONEWIRE.md and /gobot/platforms/tinkerboard/README.md
+// Preparation: see /gobot/system/ONEWIRE.md and /gobot/platforms/asus/tinkerboard/README.md
 //
 // Wiring:
 // PWR  Tinkerboard: 1 (+3.3V, VCC), 6, 9, 14, 20 (GND)

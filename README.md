@@ -242,9 +242,11 @@ Gobot has a extensible system for connecting to hardware devices. The following 
 platforms are currently supported:
 
 - [Arduino](http://www.arduino.cc/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/firmata)
+- [ASUS Tinker Board](https://www.asus.com/us/Single-Board-Computer/Tinker-Board/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/asus/tinkerboard)
+- [ASUS Tinker Board 2](https://tinker-board.asus.com/series/tinker-board-2.html/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/asus/tinkerboard2)
 - Audio <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/audio)
-- [Beaglebone Black](http://beagleboard.org/boards) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/beaglebone)
-- [Beaglebone PocketBeagle](http://beagleboard.org/pocket/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/beaglebone)
+- [BeagleBoard BeagleBone Black](http://beagleboard.org/boards) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/beagleboard/beaglebone)
+- [BeagleBoard PocketBeagle](http://beagleboard.org/pocket/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/beagleboard/pocketbeagle)
 - [Bluetooth LE](https://www.bluetooth.com/what-is-bluetooth-technology/bluetooth-technology-basics/low-energy) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/bleclient)
 - [C.H.I.P](http://www.nextthing.co/pages/chip) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/chip)
 - [C.H.I.P Pro](https://docs.getchip.com/chip_pro.html) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/chip)
@@ -275,15 +277,13 @@ platforms are currently supported:
 - [Parrot Minidrone](https://www.parrot.com/us/minidrones) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/parrot/minidrone)
 - [Pebble](https://www.getpebble.com/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/pebble)
 - [PINE64 ROCK64](https://pine64.org/documentation/ROCK64/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/pine64/rock64)
-- [Radxa Rock Pi 4](https://wiki.radxa.com/Rock4/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/rockpi)
+- [Radxa Rock Pi 4](https://wiki.radxa.com/Rock4/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/radxa/rockpi)
 - [Raspberry Pi](http://www.raspberrypi.org/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/raspi)
 - [Serial Port](https://en.wikipedia.org/wiki/Serial_port) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/serialport)
 - [Sphero](http://www.sphero.com/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/sphero/sphero)
 - [Sphero BB-8](http://www.sphero.com/bb8) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/sphero/bb8)
 - [Sphero Ollie](http://www.sphero.com/ollie) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/sphero/ollie)
 - [Sphero SPRK+](http://www.sphero.com/sprk-plus) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/sphero/sprkplus)
-- [Tinker Board](https://www.asus.com/us/Single-Board-Computer/Tinker-Board/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/tinkerboard)
-- [Tinker Board 2](https://tinker-board.asus.com/series/tinker-board-2.html/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/tinkerboard/tinkerboard2)
 - [UP2](http://www.up-board.org/upsquared/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/upboard/up2)
 
 Support for many devices that use Analog Input/Output (AIO) have a shared set of drivers provided using

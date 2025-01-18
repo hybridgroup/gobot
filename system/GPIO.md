@@ -88,7 +88,7 @@ gpiochip0 - 54 lines:
 For Tinkerboard and in general for all other boards:
 
 * the name on system level differ from the header name (normally pin1..pin40)
-* the mapping is done in gobot by a file named something like [pin_map.go](../platforms/tinkerboard/pin_map.go)
+* the mapping is done in gobot by a file named something like [pinmap.go](../platforms/asus/tinkerboard/pinmap.go)
 * for the next tests the system level name is needed
 
 Connect an oscilloscope or at least a meter to the pin (used header pin26 for example). For the output tests a LED with

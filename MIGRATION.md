@@ -7,12 +7,59 @@ a driver or platform with changed API.
 To prevent this scenario for most users, the main version will not always increased, but affected drivers and platforms
 are listed here and a migration strategy is provided.
 
-## Switch from version 2.4.0 (applications using the gpiod options affected)
+## Switch from version 2.4.0 (applications using the gpiod options and some import paths affected)
+
+### RockPi adaptor was moved to radxa folder
+
+For cleanup purposes and future preparation the folders and files were moved. Please search and replace to change the
+import path as follows.
+
+```go
+// old
+...
+  "gobot.io/x/gobot/v2/platforms/rockpi"
+...
+
+// new
+...
+  "gobot.io/x/gobot/v2/platforms/radxa/rockpi"
+...
+```
+
+### Tinkerboard adaptors were moved to asus folder
+
+For cleanup purposes and future preparation the folders and files were moved. Please search and replace to change the
+import path as follows.
+
+```go
+// old
+...
+  "gobot.io/x/gobot/v2/platforms/tinkerboard/tinkerboard2"
+...
+
+// new
+...
+  "gobot.io/x/gobot/v2/platforms/asus/tinkerboard2"
+...
+
+```
+
+```go
+// old
+...
+  "gobot.io/x/gobot/v2/platforms/tinkerboard"
+...
+
+// new
+...
+  "gobot.io/x/gobot/v2/platforms/asus/tinkerboard"
+...
+```
 
 ### NanoPi NEO adaptor was moved to friendlyelec folder
 
 With introduce of FriendlyELEC NanoPC-T6 a second adaptor from FriendlyELEC (formerly friendlarm) now exists. Please
-search and replace to change the import path as follows.
+search and replace to change the import path of nanopi as follows.
 
 ```go
 // old
