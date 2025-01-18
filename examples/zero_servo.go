@@ -13,25 +13,26 @@ import (
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/gpio"
 	"gobot.io/x/gobot/v2/platforms/adaptors"
-	"gobot.io/x/gobot/v2/platforms/asus/tinkerboard"
+	"gobot.io/x/gobot/v2/platforms/radxa/zero"
 )
 
 // Wiring
-// PWR Tinkerboard: 1 (+3.3V, VCC), 2(+5V), 6, 9, 14, 20 (GND)
-// PWM Tinkerboard: header pin 33 (PWM2) or pin 32 (PWM3)
+// PWR: 1, 17 (+3.3V, VCC), 2, 4 (+5V), 6, 9, 14, 20, 25, 30, 34, 39 (GND)
+// PWM: header pin 18 (PWM_C), 40 (PWMAO_A)
+// Servo SG90: red (+5V), brown (GND), orange (PWM)
 func main() {
 	const (
-		pwmPin = "32"
+		pwmPin = "18"
 		wait   = 3 * time.Second
 
 		fiftyHzNanos = 20 * 1000 * 1000 // 50Hz = 0.02 sec = 20 ms
 	)
 	// usually a frequency of 50Hz is used for servos, most servos have 0.5 ms..2.5 ms for 0-180°,
 	// however the mapping can be changed with options:
-	adaptor := tinkerboard.NewAdaptor(
+	adaptor := zero.NewAdaptor(
 		adaptors.WithPWMDefaultPeriodForPin(pwmPin, fiftyHzNanos),
-		adaptors.WithPWMServoDutyCycleRangeForPin(pwmPin, time.Millisecond, 2*time.Millisecond),
-		adaptors.WithPWMServoAngleRangeForPin(pwmPin, 0, 270),
+		adaptors.WithPWMServoDutyCycleRangeForPin(pwmPin, 500*time.Microsecond, 2500*time.Microsecond),
+		adaptors.WithPWMServoAngleRangeForPin(pwmPin, 0, 180),
 	)
 	servo := gpio.NewServoDriver(adaptor, pwmPin)
 

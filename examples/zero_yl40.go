@@ -13,19 +13,19 @@ import (
 
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/i2c"
-	"gobot.io/x/gobot/v2/platforms/asus/tinkerboard"
+	"gobot.io/x/gobot/v2/platforms/radxa/zero"
 )
 
 func main() {
 	// Wiring
-	// PWR  Tinkerboard: 1 (+3.3V, VCC), 6, 9, 14, 20 (GND)
-	// I2C1 Tinkerboard: 3 (SDA), 5 (SCL)
+	// PWR : 1, 17 (+3.3V, VCC), 6, 9, 14, 20, 25, 30, 34, 39 (GND)
+	// I2C3: 3 (SDA), 5 (SCL), I2C1: 24/16 (SDA), 23/13 (SCL), I2C4: 7 (SDA), 11 (SCL)
 	// YL-40 module: wire AOUT --> AIN2 for this example
 	//
 	// Note: temperature measurement is often buggy, because sensor is not properly grounded
 	//       fix it by soldering a small bridge to the adjacent ground pin of brightness sensor
-	board := tinkerboard.NewAdaptor()
-	yl := i2c.NewYL40Driver(board, i2c.WithBus(1))
+	board := zero.NewAdaptor()
+	yl := i2c.NewYL40Driver(board, i2c.WithBus(3))
 
 	work := func() {
 		// the LED light is visible above ~1.7V
