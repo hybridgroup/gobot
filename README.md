@@ -271,6 +271,7 @@ platforms are currently supported:
 - [NATS](http://nats.io/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/nats)
 - [Neurosky](http://neurosky.com/products-markets/eeg-biosensors/hardware/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/neurosky)
 - [OpenCV](http://opencv.org/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/opencv)
+- [OrangePi 5 Pro](http://www.orangepi.org/html/hardWare/computerAndMicrocontrollers/details/Orange-Pi-5-Pro.html) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/orangepi/orangepi5pro)
 - [Particle](https://www.particle.io/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/particle)
 - [Parrot ARDrone 2.0](http://ardrone2.parrot.com/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/parrot/ardrone)
 - [Parrot Bebop](http://www.parrot.com/usa/products/bebop-drone/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/parrot/bebop)
