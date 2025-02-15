@@ -83,16 +83,16 @@ func NewSpheroDriver(a spheroSerialAdaptor, opts ...serial.OptionApplier) *Spher
 		return nil
 	})
 
-	d.AddCommand("Stop", func(params map[string]interface{}) interface{} {
+	d.AddCommand("Stop", func(_ map[string]interface{}) interface{} {
 		d.Stop()
 		return nil
 	})
 
-	d.AddCommand("GetRGB", func(params map[string]interface{}) interface{} {
+	d.AddCommand("GetRGB", func(_ map[string]interface{}) interface{} {
 		return d.GetRGB()
 	})
 
-	d.AddCommand("ReadLocator", func(params map[string]interface{}) interface{} {
+	d.AddCommand("ReadLocator", func(_ map[string]interface{}) interface{} {
 		return d.ReadLocator()
 	})
 

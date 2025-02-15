@@ -27,21 +27,21 @@ func NewLedDriver(a DigitalWriter, pin string, opts ...interface{}) *LedDriver {
 	d := &LedDriver{
 		driver: newDriver(a.(gobot.Connection), "LED", append(opts, withPin(pin))...),
 	}
-
+	//nolint:forcetypeassert // ok here
 	d.AddCommand("Brightness", func(params map[string]interface{}) interface{} {
-		level := byte(params["level"].(float64)) //nolint:forcetypeassert // ok here
+		level := byte(params["level"].(float64))
 		return d.Brightness(level)
 	})
 
-	d.AddCommand("Toggle", func(params map[string]interface{}) interface{} {
+	d.AddCommand("Toggle", func(_ map[string]interface{}) interface{} {
 		return d.Toggle()
 	})
 
-	d.AddCommand("On", func(params map[string]interface{}) interface{} {
+	d.AddCommand("On", func(_ map[string]interface{}) interface{} {
 		return d.On()
 	})
 
-	d.AddCommand("Off", func(params map[string]interface{}) interface{} {
+	d.AddCommand("Off", func(_ map[string]interface{}) interface{} {
 		return d.Off()
 	})
 

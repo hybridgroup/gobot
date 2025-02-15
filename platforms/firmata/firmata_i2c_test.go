@@ -42,21 +42,21 @@ func (t *i2cMockFirmataBoard) I2cWrite(address int, data []byte) error {
 	t.i2cWritten = append(t.i2cWritten, data...)
 	return nil
 }
-func (i2cMockFirmataBoard) I2cConfig(int) error { return nil }
+func (*i2cMockFirmataBoard) I2cConfig(int) error { return nil }
 
 // GPIO, PWM and servo functions unused in this test scenarios
-func (i2cMockFirmataBoard) Connect(io.ReadWriteCloser) error { return nil }
-func (i2cMockFirmataBoard) Disconnect() error                { return nil }
-func (i2cMockFirmataBoard) Pins() []client.Pin               { return nil }
-func (i2cMockFirmataBoard) AnalogWrite(int, int) error       { return nil }
-func (i2cMockFirmataBoard) SetPinMode(int, int) error        { return nil }
-func (i2cMockFirmataBoard) ReportAnalog(int, int) error      { return nil }
-func (i2cMockFirmataBoard) ReportDigital(int, int) error     { return nil }
-func (i2cMockFirmataBoard) DigitalWrite(int, int) error      { return nil }
-func (i2cMockFirmataBoard) ServoConfig(int, int, int) error  { return nil }
+func (*i2cMockFirmataBoard) Connect(io.ReadWriteCloser) error { return nil }
+func (*i2cMockFirmataBoard) Disconnect() error                { return nil }
+func (*i2cMockFirmataBoard) Pins() []client.Pin               { return nil }
+func (*i2cMockFirmataBoard) AnalogWrite(int, int) error       { return nil }
+func (*i2cMockFirmataBoard) SetPinMode(int, int) error        { return nil }
+func (*i2cMockFirmataBoard) ReportAnalog(int, int) error      { return nil }
+func (*i2cMockFirmataBoard) ReportDigital(int, int) error     { return nil }
+func (*i2cMockFirmataBoard) DigitalWrite(int, int) error      { return nil }
+func (*i2cMockFirmataBoard) ServoConfig(int, int, int) error  { return nil }
 
 // WriteSysex of the client implementation not tested here
-func (i2cMockFirmataBoard) WriteSysex([]byte) error { return nil }
+func (*i2cMockFirmataBoard) WriteSysex([]byte) error { return nil }
 
 func newI2cMockFirmataBoard() *i2cMockFirmataBoard {
 	m := &i2cMockFirmataBoard{

@@ -177,6 +177,8 @@ type SpiSystemDevicer interface {
 }
 
 // OneWireSystemDevicer is the interface to a 1-wire device at system level.
+//
+//nolint:iface // ok for now
 type OneWireSystemDevicer interface {
 	// ID returns the device id in the form "family code"-"serial number".
 	ID() string
@@ -230,6 +232,8 @@ type SpiOperations interface {
 }
 
 // OneWireOperations are the wrappers around the actual functions used by the 1-wire device interface
+//
+//nolint:iface // ok for now
 type OneWireOperations interface {
 	// ID returns the device id in the form "family code"-"serial number".
 	ID() string

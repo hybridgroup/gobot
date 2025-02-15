@@ -48,7 +48,7 @@ func NewDriver(adaptor *Adaptor) *Driver {
 		return nil
 	})
 
-	p.AddCommand("pending_message", func(params map[string]interface{}) interface{} {
+	p.AddCommand("pending_message", func(_ map[string]interface{}) interface{} {
 		return p.PendingMessage()
 	})
 

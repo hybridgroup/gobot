@@ -117,27 +117,29 @@ func NewStepperDriver(
 	d.sleepFunc = d.sleepOuputs
 	d.beforeHalt = d.shutdown
 
+	//nolint:forcetypeassert // ok here
 	d.AddCommand("MoveDeg", func(params map[string]interface{}) interface{} {
 		degs, _ := strconv.Atoi(params["degs"].(string))
 		return d.MoveDeg(degs)
 	})
+	//nolint:forcetypeassert // ok here
 	d.AddCommand("Move", func(params map[string]interface{}) interface{} {
 		steps, _ := strconv.Atoi(params["steps"].(string))
 		return d.Move(steps)
 	})
-	d.AddCommand("Step", func(params map[string]interface{}) interface{} {
+	d.AddCommand("Step", func(_ map[string]interface{}) interface{} {
 		return d.Move(1)
 	})
-	d.AddCommand("Run", func(params map[string]interface{}) interface{} {
+	d.AddCommand("Run", func(_ map[string]interface{}) interface{} {
 		return d.Run()
 	})
-	d.AddCommand("Sleep", func(params map[string]interface{}) interface{} {
+	d.AddCommand("Sleep", func(_ map[string]interface{}) interface{} {
 		return d.Sleep()
 	})
-	d.AddCommand("Stop", func(params map[string]interface{}) interface{} {
+	d.AddCommand("Stop", func(_ map[string]interface{}) interface{} {
 		return d.Stop()
 	})
-	d.AddCommand("Halt", func(params map[string]interface{}) interface{} {
+	d.AddCommand("Halt", func(_ map[string]interface{}) interface{} {
 		return d.Halt()
 	})
 

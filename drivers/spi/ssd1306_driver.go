@@ -153,19 +153,19 @@ func NewSSD1306Driver(a gobot.Adaptor, options ...func(Config)) *SSD1306Driver {
 	s.rstDriver = gpio.NewDirectPinDriver(a, s.RSTPin)
 	s.pageSize = s.DisplayHeight / 8
 	s.buffer = NewDisplayBuffer(s.DisplayWidth, s.DisplayHeight, s.pageSize)
-	s.AddCommand("Display", func(params map[string]interface{}) interface{} {
+	s.AddCommand("Display", func(_ map[string]interface{}) interface{} {
 		err := s.Display()
 		return map[string]interface{}{"err": err}
 	})
-	s.AddCommand("On", func(params map[string]interface{}) interface{} {
+	s.AddCommand("On", func(_ map[string]interface{}) interface{} {
 		err := s.On()
 		return map[string]interface{}{"err": err}
 	})
-	s.AddCommand("Off", func(params map[string]interface{}) interface{} {
+	s.AddCommand("Off", func(_ map[string]interface{}) interface{} {
 		err := s.Off()
 		return map[string]interface{}{"err": err}
 	})
-	s.AddCommand("Clear", func(params map[string]interface{}) interface{} {
+	s.AddCommand("Clear", func(_ map[string]interface{}) interface{} {
 		err := s.Clear()
 		return map[string]interface{}{"err": err}
 	})

@@ -31,28 +31,16 @@ issues:
   # note: folders/files can not be excluded from "typecheck" anymore since v1.61.0
 
 linters:
-  # currently active linters:
-  #
-  # INFO [lintersdb] Active 67 linters: [asasalint asciicheck bidichk bodyclose canonicalheader containedctx
-  # contextcheck decorder depguard dogsled dupword durationcheck errcheck errchkjson errorlint fatcontext
-  # forcetypeassert gci gocheckcompilerdirectives gochecknoinits gochecksumtype gocritic gofmt gofumpt goimports
-  # gomoddirectives gomodguard goprintffuncname gosec gosimple govet grouper inamedparam ineffassign lll makezero
-  # mirror misspell mnd musttag nakedret nilerr nilnil noctx nolintlint nonamedreturns nosprintfhostport perfsprint
-  # prealloc predeclared protogetter reassign revive sloglint spancheck staticcheck tagalign tenv testableexamples
-  # testifylint thelper tparallel unconvert unparam unused usestdlibvars wastedassign]
-
   enable-all: true
 
   # https://golangci-lint.run/usage/linters/#enabled-by-default
   # note: typecheck can not be disabled, it is used to check code compilation
   disable:
     # deprecated:
-    - exportloopref # Since Go1.22 (loopvar) this linter is no longer relevant. Replaced by copyloopvar
-    - gomnd # The linter has been renamed. Replaced by mnd.
+    - tenv # replaced by usetesting
     # not used for this go version: none
     # not used for any reason
     - err113 # not used (we allow error creation at return statement)
-    - execinquery # not needed (no sql)
     - exhaustive # not used (we allow incomplete usage of enum switch, e.g. with default case)
     - forbidigo # not used (we allow print statements)
     - ginkgolinter # not needed (enforces standards of using ginkgo and gomega)

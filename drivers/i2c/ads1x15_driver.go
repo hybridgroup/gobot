@@ -112,8 +112,9 @@ func newADS1x15Driver(c Connector, name string, drs map[int]uint16, ddr int, opt
 		option(d)
 	}
 
+	//nolint:forcetypeassert // ok here
 	d.AddCommand("ReadDifferenceWithDefaults", func(params map[string]interface{}) interface{} {
-		channel := params["channel"].(int) //nolint:forcetypeassert // ok here
+		channel := params["channel"].(int)
 		val, err := d.ReadDifferenceWithDefaults(channel)
 		return map[string]interface{}{"val": val, "err": err}
 	})
@@ -127,8 +128,9 @@ func newADS1x15Driver(c Connector, name string, drs map[int]uint16, ddr int, opt
 		return map[string]interface{}{"val": val, "err": err}
 	})
 
+	//nolint:forcetypeassert // ok here
 	d.AddCommand("ReadWithDefaults", func(params map[string]interface{}) interface{} {
-		channel := params["channel"].(int) //nolint:forcetypeassert // ok here
+		channel := params["channel"].(int)
 		val, err := d.ReadWithDefaults(channel)
 		return map[string]interface{}{"val": val, "err": err}
 	})
@@ -142,8 +144,9 @@ func newADS1x15Driver(c Connector, name string, drs map[int]uint16, ddr int, opt
 		return map[string]interface{}{"val": val, "err": err}
 	})
 
+	//nolint:forcetypeassert // ok here
 	d.AddCommand("AnalogRead", func(params map[string]interface{}) interface{} {
-		pin := params["pin"].(string) //nolint:forcetypeassert // ok here
+		pin := params["pin"].(string)
 		val, err := d.AnalogRead(pin)
 		return map[string]interface{}{"val": val, "err": err}
 	})

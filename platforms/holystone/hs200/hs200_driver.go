@@ -125,7 +125,7 @@ func (d *Driver) sendUDP() {
 }
 
 // Enable enables the drone to start flying.
-func (d Driver) Enable() {
+func (d *Driver) Enable() {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 	if !d.enabled {
@@ -135,7 +135,7 @@ func (d Driver) Enable() {
 }
 
 // Disable disables the drone from flying.
-func (d Driver) Disable() {
+func (d *Driver) Disable() {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 	if d.enabled {
@@ -144,7 +144,7 @@ func (d Driver) Disable() {
 }
 
 // TakeOff tells drones to liftoff and start flying.
-func (d Driver) TakeOff() {
+func (d *Driver) TakeOff() {
 	d.mutex.Lock()
 	d.cmd[9] = 0x40
 	d.cmd[10] = checksum(d.cmd)
@@ -157,7 +157,7 @@ func (d Driver) TakeOff() {
 }
 
 // Land tells drone to come in for landing.
-func (d Driver) Land() {
+func (d *Driver) Land() {
 	d.mutex.Lock()
 	d.cmd[9] = 0x80
 	d.cmd[10] = checksum(d.cmd)

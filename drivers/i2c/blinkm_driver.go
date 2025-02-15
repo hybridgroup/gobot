@@ -47,12 +47,12 @@ func NewBlinkMDriver(c Connector, options ...func(Config)) *BlinkMDriver {
 		return b.Fade(red, green, blue)
 	})
 
-	b.AddCommand("FirmwareVersion", func(params map[string]interface{}) interface{} {
+	b.AddCommand("FirmwareVersion", func(_ map[string]interface{}) interface{} {
 		version, err := b.FirmwareVersion()
 		return map[string]interface{}{"version": version, "err": err}
 	})
 
-	b.AddCommand("Color", func(params map[string]interface{}) interface{} {
+	b.AddCommand("Color", func(_ map[string]interface{}) interface{} {
 		color, err := b.Color()
 		return map[string]interface{}{"color": color, "err": err}
 	})

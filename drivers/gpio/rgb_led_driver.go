@@ -45,15 +45,15 @@ func NewRgbLedDriver(a PwmWriter, redPin string, greenPin string, bluePin string
 		return d.SetRGB(r, g, b)
 	})
 
-	d.AddCommand("Toggle", func(params map[string]interface{}) interface{} {
+	d.AddCommand("Toggle", func(_ map[string]interface{}) interface{} {
 		return d.Toggle()
 	})
 
-	d.AddCommand("On", func(params map[string]interface{}) interface{} {
+	d.AddCommand("On", func(_ map[string]interface{}) interface{} {
 		return d.On()
 	})
 
-	d.AddCommand("Off", func(params map[string]interface{}) interface{} {
+	d.AddCommand("Off", func(_ map[string]interface{}) interface{} {
 		return d.Off()
 	})
 

@@ -87,7 +87,7 @@ func NewPCF8583Driver(c Connector, options ...func(Config)) *PCF8583Driver {
 		err := d.WriteTime(val)
 		return map[string]interface{}{"err": err}
 	})
-	d.AddCommand("ReadTime", func(params map[string]interface{}) interface{} {
+	d.AddCommand("ReadTime", func(_ map[string]interface{}) interface{} {
 		val, err := d.ReadTime()
 		return map[string]interface{}{"val": val, "err": err}
 	})
@@ -97,7 +97,7 @@ func NewPCF8583Driver(c Connector, options ...func(Config)) *PCF8583Driver {
 		err := d.WriteCounter(val)
 		return map[string]interface{}{"err": err}
 	})
-	d.AddCommand("ReadCounter", func(params map[string]interface{}) interface{} {
+	d.AddCommand("ReadCounter", func(_ map[string]interface{}) interface{} {
 		val, err := d.ReadCounter()
 		return map[string]interface{}{"val": val, "err": err}
 	})

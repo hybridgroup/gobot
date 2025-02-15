@@ -77,12 +77,12 @@ func NewAnalogSensorDriver(a AnalogReader, pin string, opts ...interface{}) *Ana
 		}
 	}
 
-	d.AddCommand("Read", func(params map[string]interface{}) interface{} {
+	d.AddCommand("Read", func(_ map[string]interface{}) interface{} {
 		val, err := d.Read()
 		return map[string]interface{}{"val": val, "err": err}
 	})
 
-	d.AddCommand("ReadRaw", func(params map[string]interface{}) interface{} {
+	d.AddCommand("ReadRaw", func(_ map[string]interface{}) interface{} {
 		val, err := d.ReadRaw()
 		return map[string]interface{}{"val": val, "err": err}
 	})
