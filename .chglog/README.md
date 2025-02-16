@@ -8,7 +8,7 @@ It is possible to test the tool by `git-chglog --init` without overriding anythi
 
 ## Usage
 
-Example for a new release "v2.4.0":
+Example for a new release "v2.5.0":
 
 ```sh
 # optional update tool by: go install github.com/git-chglog/git-chglog/cmd/git-chglog@latest
@@ -16,15 +16,15 @@ git checkout release
 git pull
 git fetch --tags
 git checkout dev
-git pull upstream  dev
-git checkout -b rel/prepare_for_release_v240
-git-chglog --config .chglog/config_gobot.yml --no-case --next-tag v2.4.0 v2.3.0.. > .chglog/chglog_tmp.md
+git pull upstream dev
+git checkout -b rel/prepare_for_release_v250
+git-chglog --config .chglog/config_gobot.yml --no-case --next-tag v2.5.0 v2.4.0.. > .chglog/chglog_tmp.md
 ```
 
 ## Compare
 
 If unsure about any result of running git-chglog, just use:
-`git log  --since=2024-01-07 --pretty="- %s"`
+`git log  --since=2024-11-05 --pretty="- %s"`
 
 ## Manual adjustment
 

@@ -1,6 +1,75 @@
 # CHANGELOG
 
-## [Unreleased](https://github.com/hybridgroup/gobot/compare/v2.4.0...HEAD)
+## [Unreleased](https://github.com/hybridgroup/gobot/compare/v2.5.0...HEAD)
+
+## [v2.5.0](https://github.com/hybridgroup/gobot/compare/v2.4.0...v2.5.0) (2025-02-15)
+
+### Build
+
+* **deps:** update modules ([#1131](https://github.com/hybridgroup/gobot/issues/1131))
+* **linter:** update linter to v1.64.5 and fix issues ([#1130](https://github.com/hybridgroup/gobot/issues/1130))
+
+### Core
+
+* **system:** split system accesser features ([#1121](https://github.com/hybridgroup/gobot/issues/1121))
+
+### Doc
+
+* **core:** prepare for release v2.5.0
+
+### Drivers
+
+* fix some function names in comment ([#1103](https://github.com/hybridgroup/gobot/issues/1103))
+
+### Examples
+
+* correct all usage of ps3 joystick reads, which are now int instead of int16 ([#1085](https://github.com/hybridgroup/gobot/issues/1085))
+
+### Gpio
+
+* rename gpiod to gpiocdev ([#1116](https://github.com/hybridgroup/gobot/issues/1116))
+* **adaptors:** fix so now gpiodev is used as default ([#1112](https://github.com/hybridgroup/gobot/issues/1112))
+* **core:** fix sporadic hang on finish for discrete edge polling ([#1107](https://github.com/hybridgroup/gobot/issues/1107))
+
+### Nanopct6
+
+* introduce adaptor for FriendlyELEC NanoPC-T6 ([#1126](https://github.com/hybridgroup/gobot/issues/1126))
+
+### Onewire
+
+* **ds18b20:** introduce 1-wire device access by sysfs and temp driver ([#1091](https://github.com/hybridgroup/gobot/issues/1091))
+
+### Orangepi5pro
+
+* introduce adaptor for OrangePi 5 Pro ([#1129](https://github.com/hybridgroup/gobot/issues/1129))
+
+### Platforms
+
+* file name and folder unification ([#1127](https://github.com/hybridgroup/gobot/issues/1127))
+
+### Pocketbeagle
+
+* introduce and use cdev by default ([#1118](https://github.com/hybridgroup/gobot/issues/1118))
+
+### Rock64
+
+* introduce adaptor for PINE64-ROCK64 ([#1122](https://github.com/hybridgroup/gobot/issues/1122))
+
+### Sphero
+
+* fix panic by removing unnecessary go routine ([#1117](https://github.com/hybridgroup/gobot/issues/1117))
+
+### Tests
+
+* fix for arm64 environment and stabilize ([#1115](https://github.com/hybridgroup/gobot/issues/1115))
+
+### Tinkerboard2
+
+* introduce adapter for Asus Tinker Board 2 ([#1108](https://github.com/hybridgroup/gobot/issues/1108))
+
+### Zero
+
+* introduce adaptor for Radxa Zero ([#1128](https://github.com/hybridgroup/gobot/issues/1128))
 
 ## [v2.4.0](https://github.com/hybridgroup/gobot/compare/v2.3.0...v2.4.0) (2024-11-05)
 
