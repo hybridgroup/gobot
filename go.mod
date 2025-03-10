@@ -1,8 +1,7 @@
 module gobot.io/x/gobot/v2
 
 go 1.22.6
-
-toolchain go1.22.11
+toolchain go1.23.7
 
 require (
 	github.com/0xcafed00d/joystick v1.0.1
@@ -21,7 +20,7 @@ require (
 	go.bug.st/serial v1.6.2
 	gocv.io/x/gocv v0.40.0
 	golang.org/x/net v0.35.0
-	golang.org/x/sys v0.30.0
+	golang.org/x/sys v0.31.0
 	periph.io/x/conn/v3 v3.7.2
 	periph.io/x/host/v3 v3.8.3
 	tinygo.org/x/bluetooth v0.11.0
