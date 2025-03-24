@@ -1,8 +1,7 @@
 module gobot.io/x/gobot/v2
 
 go 1.22.6
-
-toolchain go1.22.11
+toolchain go1.24.1
 
 require (
 	github.com/0xcafed00d/joystick v1.0.1
@@ -13,7 +12,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/hybridgroup/go-ardrone v0.0.0-20140402002621-b9750d8d7b78
 	github.com/hybridgroup/mjpeg v0.0.0-20140228234708-4680f319790e
-	github.com/nats-io/nats.go v1.39.0
+	github.com/nats-io/nats.go v1.40.0
 	github.com/nsf/termbox-go v1.1.1
 	github.com/sigurn/crc8 v0.0.0-20220107193325-2243fe600f9f
 	github.com/stretchr/testify v1.10.0
@@ -34,7 +33,7 @@ require (
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
-	github.com/klauspost/compress v1.17.11 // indirect
+	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/nats-io/nkeys v0.4.10 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
