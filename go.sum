@@ -74,8 +74,8 @@ github.com/warthog618/go-gpiocdev v0.9.1 h1:pwHPaqjJfhCipIQl78V+O3l9OKHivdRDdmgX
 github.com/warthog618/go-gpiocdev v0.9.1/go.mod h1:dN3e3t/S2aSNC+hgigGE/dBW8jE1ONk9bDSEYfoPyl8=
 github.com/warthog618/go-gpiosim v0.1.1 h1:MRAEv+T+itmw+3GeIGpQJBfanUVyg0l3JCTwHtwdre4=
 github.com/warthog618/go-gpiosim v0.1.1/go.mod h1:YXsnB+I9jdCMY4YAlMSRrlts25ltjmuIsrnoUrBLdqU=
-go.bug.st/serial v1.6.2 h1:kn9LRX3sdm+WxWKufMlIRndwGfPWsH1/9lCWXQCasq8=
-go.bug.st/serial v1.6.2/go.mod h1:UABfsluHAiaNI+La2iESysd9Vetq7VRdpxvjx7CmmOE=
+go.bug.st/serial v1.6.3 h1:S3OG1bH+IDyokVndKrzwxI9ywiGBd8sWOn08dzSqEQI=
+go.bug.st/serial v1.6.3/go.mod h1:nofMJxTeNVny/m6+KaafC6vJGj3miwQZ6vW4BZUGJPI=
 gocv.io/x/gocv v0.40.0 h1:kGBu/UVj+dO6A9dhQmGOnCICSL7ke7b5YtX3R3azdXI=
 gocv.io/x/gocv v0.40.0/go.mod h1:zYdWMj29WAEznM3Y8NsU3A0TRq/wR/cy75jeUypThqU=
 golang.org/x/crypto v0.33.0 h1:IOBPskki6Lysi0lo9qQvbxiQ+FvsCC/YWOecCHAixus=
