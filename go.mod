@@ -2,7 +2,7 @@ module gobot.io/x/gobot/v2
 
 go 1.22.6
 
-toolchain go1.22.11
+toolchain go1.24.1
 
 require (
 	github.com/0xcafed00d/joystick v1.0.1
@@ -18,7 +18,7 @@ require (
 	github.com/sigurn/crc8 v0.0.0-20220107193325-2243fe600f9f
 	github.com/stretchr/testify v1.10.0
 	github.com/warthog618/go-gpiocdev v0.9.1
-	go.bug.st/serial v1.6.2
+	go.bug.st/serial v1.6.4
 	gocv.io/x/gocv v0.40.0
 	golang.org/x/net v0.35.0
 	golang.org/x/sys v0.30.0
