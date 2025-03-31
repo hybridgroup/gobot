@@ -1,8 +1,7 @@
 module gobot.io/x/gobot/v2
 
 go 1.22.6
-
-toolchain go1.22.11
+toolchain go1.24.1
 
 require (
 	github.com/0xcafed00d/joystick v1.0.1
@@ -20,8 +19,8 @@ require (
 	github.com/warthog618/go-gpiocdev v0.9.1
 	go.bug.st/serial v1.6.2
 	gocv.io/x/gocv v0.40.0
-	golang.org/x/net v0.35.0
-	golang.org/x/sys v0.30.0
+	golang.org/x/net v0.38.0
+	golang.org/x/sys v0.31.0
 	periph.io/x/conn/v3 v3.7.2
 	periph.io/x/host/v3 v3.8.3
 	tinygo.org/x/bluetooth v0.11.0
@@ -46,7 +45,7 @@ require (
 	github.com/soypat/seqs v0.0.0-20250124201400-0d65bc7c1710 // indirect
 	github.com/tinygo-org/cbgo v0.0.4 // indirect
 	github.com/tinygo-org/pio v0.0.0-20250213135117-cf4fcca6512b // indirect
-	golang.org/x/crypto v0.33.0 // indirect
+	golang.org/x/crypto v0.36.0 // indirect
 	golang.org/x/exp v0.0.0-20250210185358-939b2ce775ac // indirect
 	golang.org/x/sync v0.11.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
