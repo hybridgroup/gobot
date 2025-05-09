@@ -25,7 +25,7 @@ func TestNewDriver(t *testing.T) {
 	var di interface{} = NewDriver(newSpiTestAdaptor(), "SPI_BASIC")
 	d, ok := di.(*Driver)
 	if !ok {
-		t.Errorf("NewDriver() should have returned a *Driver")
+		require.Fail(t, "NewDriver() should have returned a *Driver")
 	}
 	assert.True(t, strings.HasPrefix(d.Name(), "SPI_BASIC"))
 }

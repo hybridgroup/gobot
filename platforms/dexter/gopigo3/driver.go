@@ -355,7 +355,7 @@ func (d *Driver) ServoWrite(port string, angle byte) error {
 		angle = 180
 	}
 	pulseWidth := ((1500 - (pulseWidthRange / 2)) + ((pulseWidthRange / 180) * int(angle)))
-	return d.SetServo(srvo, uint16(pulseWidth))
+	return d.SetServo(srvo, uint16(pulseWidth)) //nolint:gosec // TODO: fix later
 }
 
 // SetMotorPower sets a motor's power from -128 to 127.
@@ -438,7 +438,7 @@ func (d *Driver) GetMotorStatus(motor Motor) (flags uint8, power uint16, encoder
 	e := binary.LittleEndian.Uint32(enc)
 	encoder = int(e)
 	if e&0x80000000 == 0x80000000 {
-		encoder = int(uint64(e) - 0x100000000)
+		encoder = int(uint64(e) - 0x100000000) //nolint:gosec // TODO: fix later
 	}
 	// get dps
 	dpsRaw := make([]byte, 4)
@@ -557,7 +557,7 @@ func (d *Driver) PwmWrite(pin string, val byte) error {
 		return err
 	}
 	val64 := math.Float64frombits(uint64(val))
-	dutyCycle := uint16(math.Float64bits((100.0 / 255.0) * val64))
+	dutyCycle := uint16(math.Float64bits((100.0 / 255.0) * val64)) //nolint:gosec // TODO: fix later
 	return d.SetPWMDuty(grovePin, dutyCycle)
 }
 

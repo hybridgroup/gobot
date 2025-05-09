@@ -24,58 +24,96 @@ import (
 )
 
 func resetDronePostion(drone *tello.Driver) {
-	drone.Forward(0)
-	drone.Backward(0)
-	drone.Up(0)
-	drone.Down(0)
-	drone.Left(0)
-	drone.Right(0)
-	drone.Clockwise(0)
+	if err := drone.Forward(0); err != nil {
+		fmt.Println(err)
+	}
+	if err := drone.Backward(0); err != nil {
+		fmt.Println(err)
+	}
+	if err := drone.Up(0); err != nil {
+		fmt.Println(err)
+	}
+	if err := drone.Down(0); err != nil {
+		fmt.Println(err)
+	}
+	if err := drone.Left(0); err != nil {
+		fmt.Println(err)
+	}
+	if err := drone.Right(0); err != nil {
+		fmt.Println(err)
+	}
+	if err := drone.Clockwise(0); err != nil {
+		fmt.Println(err)
+	}
 }
 
 func main() {
 	drone := tello.NewDriver("8888")
 	keys := keyboard.NewDriver()
 
-	keys.On(keyboard.Key, func(data interface{}) {
+	_ = keys.On(keyboard.Key, func(data interface{}) {
 		key := data.(keyboard.KeyEvent)
 		switch key.Key {
 		case keyboard.A:
 			fmt.Println(key.Char)
-			drone.Clockwise(-25)
+			if err := drone.Clockwise(-25); err != nil {
+				fmt.Println(err)
+			}
 		case keyboard.D:
 			fmt.Println(key.Char)
-			drone.Clockwise(25)
+			if err := drone.Clockwise(25); err != nil {
+				fmt.Println(err)
+			}
 		case keyboard.W:
 			fmt.Println(key.Char)
-			drone.Forward(20)
+			if err := drone.Forward(20); err != nil {
+				fmt.Println(err)
+			}
 		case keyboard.S:
 			fmt.Println(key.Char)
-			drone.Backward(20)
+			if err := drone.Backward(20); err != nil {
+				fmt.Println(err)
+			}
 		case keyboard.K:
 			fmt.Println(key.Char)
-			drone.Down(20)
+			if err := drone.Down(20); err != nil {
+				fmt.Println(err)
+			}
 		case keyboard.J:
 			fmt.Println(key.Char)
-			drone.Up(20)
+			if err := drone.Up(20); err != nil {
+				fmt.Println(err)
+			}
 		case keyboard.Q:
 			fmt.Println(key.Char)
-			drone.Land()
+			if err := drone.Land(); err != nil {
+				fmt.Println(err)
+			}
 		case keyboard.P:
 			fmt.Println(key.Char)
-			drone.TakeOff()
+			if err := drone.TakeOff(); err != nil {
+				fmt.Println(err)
+			}
 		case keyboard.ArrowUp:
 			fmt.Println(key.Char)
-			drone.FrontFlip()
+			if err := drone.FrontFlip(); err != nil {
+				fmt.Println(err)
+			}
 		case keyboard.ArrowDown:
 			fmt.Println(key.Char)
-			drone.BackFlip()
+			if err := drone.BackFlip(); err != nil {
+				fmt.Println(err)
+			}
 		case keyboard.ArrowLeft:
 			fmt.Println(key.Char)
-			drone.LeftFlip()
+			if err := drone.LeftFlip(); err != nil {
+				fmt.Println(err)
+			}
 		case keyboard.ArrowRight:
 			fmt.Println(key.Char)
-			drone.RightFlip()
+			if err := drone.RightFlip(); err != nil {
+				fmt.Println(err)
+			}
 		case keyboard.Escape:
 			resetDronePostion(drone)
 		}
@@ -83,7 +121,7 @@ func main() {
 
 	var flightData *tello.FlightData
 	work := func() {
-		drone.On(tello.FlightDataEvent, func(data interface{}) {
+		_ = drone.On(tello.FlightDataEvent, func(data interface{}) {
 			flightData = data.(*tello.FlightData)
 			fmt.Println("Height:", flightData.Height)
 		})
@@ -95,5 +133,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

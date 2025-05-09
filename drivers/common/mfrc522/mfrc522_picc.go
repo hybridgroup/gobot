@@ -336,7 +336,7 @@ func (d *MFRC522Common) piccActivate() ([]byte, error) {
 			bcc = bcc ^ v
 		}
 		if bcc != backData[4] {
-			return nil, fmt.Errorf(fmt.Sprintf("BCC mismatch, expected %02x actual %02x", bcc, backData[4]))
+			return nil, fmt.Errorf("BCC mismatch, expected %02x actual %02x", bcc, backData[4])
 		}
 
 		if backData[0] == piccCascadeTag {

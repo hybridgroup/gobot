@@ -23,7 +23,9 @@ Example:
 
 		work := func() {
 			gobot.Every(1*time.Second, func() {
-				led.Toggle()
+				if err := led.Toggle(); err != nil {
+				fmt.Println(err)
+			}
 			})
 		}
 
@@ -33,10 +35,12 @@ Example:
 			work,
 		)
 
-		robot.Start()
+		if err := robot.Start(); err != nil {
+			panic(err)
+		}
 	}
 
 For further information refer to Particle readme:
-https://github.com/hybridgroup/gobot/blob/master/platforms/particle/README.md
+https://github.com/hybridgroup/gobot/blob/release/platforms/particle/README.md
 */
 package particle // import "gobot.io/x/gobot/v2/platforms/particle"

@@ -14,7 +14,7 @@ import (
 
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/gpio"
-	"gobot.io/x/gobot/v2/platforms/tinkerboard"
+	"gobot.io/x/gobot/v2/platforms/asus/tinkerboard"
 )
 
 // Wiring
@@ -92,6 +92,6 @@ func main() {
 	)
 
 	if err := robot.Start(); err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 }

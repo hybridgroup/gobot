@@ -5,6 +5,6 @@ This package currently supports the following hardware:
 - UP2 (Squared)
 
 For further information refer to the Upboard README:
-https://gobot.io/x/gobot/v2/blob/master/platforms/upboard/README.md
+https://github.com/hybridgroup/gobot/blob/release/platforms/upboard/README.md
 */
 package upboard

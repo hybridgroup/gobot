@@ -5,7 +5,7 @@
 [![Appveyor Build status](https://ci.appveyor.com/api/projects/status/ix29evnbdrhkr7ud/branch/dev?svg=true)](https://ci.appveyor.com/project/deadprogram/gobot/branch/dev)
 [![codecov](https://codecov.io/gh/hybridgroup/gobot/branch/dev/graph/badge.svg)](https://codecov.io/gh/hybridgroup/gobot)
 [![Go Report Card](https://goreportcard.com/badge/hybridgroup/gobot)](https://goreportcard.com/report/hybridgroup/gobot)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/hybridgroup/gobot/blob/master/LICENSE.txt)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/hybridgroup/gobot/blob/release/LICENSE.txt)
 
 Gobot (<https://gobot.io/>) is a framework using the Go programming language (<https://golang.org/>) for robotics, physical
 computing, and the Internet of Things.
@@ -77,7 +77,9 @@ func main() {
 
   work := func() {
     gobot.Every(1*time.Second, func() {
-      led.Toggle()
+      if err := led.Toggle(); err != nil {
+        fmt.Println(err)
+      }
     })
   }
 
@@ -87,7 +89,9 @@ func main() {
     work,
   )
 
-  robot.Start()
+  if err := robot.Start(); err != nil {
+    panic(err)
+  }
 }
 ```
 
@@ -101,11 +105,12 @@ import (
   "time"
 
   "gobot.io/x/gobot/v2"
-  "gobot.io/x/gobot/v2/platforms/sphero"
+  "gobot.io/x/gobot/v2/drivers/serial"
+  "gobot.io/x/gobot/v2/platforms/serialport"
 )
 
 func main() {
-  adaptor := sphero.NewAdaptor("/dev/rfcomm0")
+  adaptor := serialport.NewAdaptor("/dev/rfcomm0")
   driver := sphero.NewSpheroDriver(adaptor)
 
   work := func() {
@@ -120,7 +125,9 @@ func main() {
     work,
   )
 
-  robot.Start()
+  if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }
 ```
 
@@ -140,21 +147,27 @@ import (
 
 func main() {
   e := edison.NewAdaptor()
-  e.Connect()
+  if err := e.Connect(); err != nil {
+    fmt.Println(err)
+  }
 
   led := gpio.NewLedDriver(e, "13")
-  led.Start()
+  if err := led.Start(); err != nil {
+    fmt.Println(err)
+  }
 
   for {
-    led.Toggle()
+    if err := led.Toggle(); err != nil {
+      fmt.Println(err)
+    }
     time.Sleep(1000 * time.Millisecond)
   }
 }
 ```
 
-### "Master" Gobot
+### "Manager" Gobot
 
-You can also use the full capabilities of the framework aka "Master Gobot" to control swarms of robots or other features
+You can also use the full capabilities of the framework aka "Manager Gobot" to control swarms of robots or other features
 such as the built-in API server. For example:
 
 ```go
@@ -166,18 +179,19 @@ import (
 
   "gobot.io/x/gobot/v2"
   "gobot.io/x/gobot/v2/api"
-  "gobot.io/x/gobot/v2/platforms/sphero"
+  "gobot.io/x/gobot/v2/drivers/common/spherocommon"
+  "gobot.io/x/gobot/v2/drivers/serial"
+  "gobot.io/x/gobot/v2/platforms/serialport"
 )
 
 func NewSwarmBot(port string) *gobot.Robot {
-  spheroAdaptor := sphero.NewAdaptor(port)
-  spheroDriver := sphero.NewSpheroDriver(spheroAdaptor)
-  spheroDriver.SetName("Sphero" + port)
+  spheroAdaptor := serialport.NewAdaptor(port)
+  spheroDriver := sphero.NewSpheroDriver(spheroAdaptor, serial.WithName("Sphero" + port))
 
   work := func() {
     spheroDriver.Stop()
 
-    spheroDriver.On(sphero.Collision, func(data interface{}) {
+    _ = spheroDriver.On(sphero.CollisionEvent, func(data interface{}) {
       fmt.Println("Collision Detected!")
     })
 
@@ -202,8 +216,8 @@ func NewSwarmBot(port string) *gobot.Robot {
 }
 
 func main() {
-  master := gobot.NewMaster()
-  api.NewAPI(master).Start()
+  manager := gobot.NewManager()
+  api.NewAPI(manager).Start()
 
   spheros := []string{
     "/dev/rfcomm0",
@@ -213,10 +227,12 @@ func main() {
   }
 
   for _, port := range spheros {
-    master.AddRobot(NewSwarmBot(port))
+    manager.AddRobot(NewSwarmBot(port))
   }
 
-  master.Start()
+  if err := manager.Start(); err != nil {
+    panic(err)
+  }
 }
 ```
 
@@ -225,51 +241,87 @@ func main() {
 Gobot has a extensible system for connecting to hardware devices. The following robotics and physical computing
 platforms are currently supported:
 
-- [Arduino](http://www.arduino.cc/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/firmata)
-- Audio <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/audio)
-- [Beaglebone Black](http://beagleboard.org/boards) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/beaglebone)
-- [Beaglebone PocketBeagle](http://beagleboard.org/pocket/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/beaglebone)
-- [Bluetooth LE](https://www.bluetooth.com/what-is-bluetooth-technology/bluetooth-technology-basics/low-energy) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/ble)
-- [C.H.I.P](http://www.nextthing.co/pages/chip) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/chip)
-- [C.H.I.P Pro](https://docs.getchip.com/chip_pro.html) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/chip)
-- [Digispark](http://digistump.com/products/1) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/digispark)
-- [DJI Tello](https://www.ryzerobotics.com/tello) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/dji/tello)
-- [DragonBoard](https://developer.qualcomm.com/hardware/dragonboard-410c) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/dragonboard)
-- [ESP8266](http://esp8266.net/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/firmata)
-- [GoPiGo 3](https://www.dexterindustries.com/gopigo3/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/dexter/gopigo3)
-- [Intel Curie](https://www.intel.com/content/www/us/en/products/boards-kits/curie.html) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/intel-iot/curie)
-- [Intel Edison](http://www.intel.com/content/www/us/en/do-it-yourself/edison.html) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/intel-iot/edison)
-- [Intel Joule](http://intel.com/joule/getstarted) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/intel-iot/joule)
-- [Jetson Nano](https://developer.nvidia.com/embedded/jetson-nano/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/jetson)
-- [Joystick](http://en.wikipedia.org/wiki/Joystick) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/joystick)
-- [Keyboard](https://en.wikipedia.org/wiki/Computer_keyboard) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/keyboard)
-- [Leap Motion](https://www.leapmotion.com/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/leap)
-- [MavLink](http://qgroundcontrol.org/mavlink/start) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/mavlink)
-- [MegaPi](http://www.makeblock.com/megapi) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/megapi)
-- [Microbit](http://microbit.org/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/microbit)
-- [MQTT](http://mqtt.org/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/mqtt)
-- [NanoPi NEO](https://wiki.friendlyelec.com/wiki/index.php/NanoPi_NEO) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/nanopi)
-- [NATS](http://nats.io/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/nats)
-- [Neurosky](http://neurosky.com/products-markets/eeg-biosensors/hardware/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/neurosky)
-- [OpenCV](http://opencv.org/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/opencv)
-- [Particle](https://www.particle.io/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/particle)
-- [Parrot ARDrone 2.0](http://ardrone2.parrot.com/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/parrot/ardrone)
-- [Parrot Bebop](http://www.parrot.com/usa/products/bebop-drone/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/parrot/bebop)
-- [Parrot Minidrone](https://www.parrot.com/us/minidrones) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/parrot/minidrone)
-- [Pebble](https://www.getpebble.com/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/pebble)
-- [Radxa Rock Pi 4](https://wiki.radxa.com/Rock4/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/rockpi)
-- [Raspberry Pi](http://www.raspberrypi.org/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/raspi)
-- [Sphero](http://www.sphero.com/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/sphero)
-- [Sphero BB-8](http://www.sphero.com/bb8) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/sphero/bb8)
-- [Sphero Ollie](http://www.sphero.com/ollie) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/sphero/ollie)
-- [Sphero SPRK+](http://www.sphero.com/sprk-plus) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/sphero/sprkplus)
-- [Tinker Board](https://www.asus.com/us/Single-Board-Computer/Tinker-Board/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/tinkerboard)
-- [UP2](http://www.up-board.org/upsquared/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/upboard/up2)
+- [Arduino](http://www.arduino.cc/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/firmata)
+- [ASUS Tinker Board](https://www.asus.com/us/Single-Board-Computer/Tinker-Board/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/asus/tinkerboard)
+- [ASUS Tinker Board 2](https://tinker-board.asus.com/series/tinker-board-2.html/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/asus/tinkerboard2)
+- Audio <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/audio)
+- [BeagleBoard BeagleBone Black](http://beagleboard.org/boards) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/beagleboard/beaglebone)
+- [BeagleBoard PocketBeagle](http://beagleboard.org/pocket/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/beagleboard/pocketbeagle)
+- [Bluetooth LE](https://www.bluetooth.com/what-is-bluetooth-technology/bluetooth-technology-basics/low-energy) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/bleclient)
+- [C.H.I.P](http://www.nextthing.co/pages/chip) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/chip)
+- [C.H.I.P Pro](https://docs.getchip.com/chip_pro.html) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/chip)
+- [Digispark](http://digistump.com/products/1) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/digispark)
+- [DJI Tello](https://www.ryzerobotics.com/tello) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/dji/tello)
+- [DragonBoard](https://developer.qualcomm.com/hardware/dragonboard-410c) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/dragonboard)
+- [ESP8266](http://esp8266.net/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/firmata)
+- [FriendlyELEC NanoPi NEO](https://wiki.friendlyelec.com/wiki/index.php/NanoPi_NEO) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/friendlyelec/nanopi)
+- [FriendlyELEC NanoPC-T6](https://wiki.friendlyelec.com/wiki/index.php/NanoPC-T6) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/friendlyelec/nanopct6)
+- [GoPiGo 3](https://www.dexterindustries.com/gopigo3/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/dexter/gopigo3)
+- [Intel Curie](https://www.intel.com/content/www/us/en/products/boards-kits/curie.html) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/intel-iot/curie)
+- [Intel Edison](http://www.intel.com/content/www/us/en/do-it-yourself/edison.html) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/intel-iot/edison)
+- [Intel Joule](http://intel.com/joule/getstarted) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/intel-iot/joule)
+- [Jetson Nano](https://developer.nvidia.com/embedded/jetson-nano/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/jetson)
+- [Joystick](http://en.wikipedia.org/wiki/Joystick) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/joystick)
+- [Keyboard](https://en.wikipedia.org/wiki/Computer_keyboard) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/keyboard)
+- [Leap Motion](https://www.leapmotion.com/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/leap)
+- [MavLink](http://qgroundcontrol.org/mavlink/start) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/mavlink)
+- [MegaPi](http://www.makeblock.com/megapi) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/megapi)
+- [Microbit](http://microbit.org/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/microbit)
+- [MQTT](http://mqtt.org/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/mqtt)
+- [NATS](http://nats.io/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/nats)
+- [Neurosky](http://neurosky.com/products-markets/eeg-biosensors/hardware/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/neurosky)
+- [OpenCV](http://opencv.org/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/opencv)
+- [OrangePi 5 Pro](http://www.orangepi.org/html/hardWare/computerAndMicrocontrollers/details/Orange-Pi-5-Pro.html) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/orangepi/orangepi5pro)
+- [Particle](https://www.particle.io/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/particle)
+- [Parrot ARDrone 2.0](http://ardrone2.parrot.com/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/parrot/ardrone)
+- [Parrot Bebop](http://www.parrot.com/usa/products/bebop-drone/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/parrot/bebop)
+- [Parrot Minidrone](https://www.parrot.com/us/minidrones) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/parrot/minidrone)
+- [Pebble](https://www.getpebble.com/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/pebble)
+- [PINE64 ROCK64](https://pine64.org/documentation/ROCK64/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/pine64/rock64)
+- [Radxa Rock Pi 4](https://wiki.radxa.com/Rock4/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/radxa/rockpi)
+- [Raspberry Pi](http://www.raspberrypi.org/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/raspi)
+- [Serial Port](https://en.wikipedia.org/wiki/Serial_port) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/serialport)
+- [Sphero](http://www.sphero.com/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/sphero/sphero)
+- [Sphero BB-8](http://www.sphero.com/bb8) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/sphero/bb8)
+- [Sphero Ollie](http://www.sphero.com/ollie) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/sphero/ollie)
+- [Sphero SPRK+](http://www.sphero.com/sprk-plus) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/sphero/sprkplus)
+- [UP2](http://www.up-board.org/upsquared/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/upboard/up2)
 
-Support for many devices that use General Purpose Input/Output (GPIO) have
-a shared set of drivers provided using the `gobot/drivers/gpio` package:
+Support for many devices that use Analog Input/Output (AIO) have a shared set of drivers provided using
+the `gobot/drivers/aio` package:
 
-- [GPIO](https://en.wikipedia.org/wiki/General_Purpose_Input/Output) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/gpio)
+- [AIO](https://en.wikipedia.org/wiki/Analog-to-digital_converter) <=> [Drivers](https://github.com/hybridgroup/gobot/blob/release/drivers/aio)
+  - Analog Actuator
+  - Analog Sensor
+  - Grove Light Sensor
+  - Grove Piezo Vibration Sensor
+  - Grove Rotary Dial
+  - Grove Sound Sensor
+  - Grove Temperature Sensor
+  - Temperature Sensor (supports linear and NTC thermistor in normal and inverse mode)
+  - Thermal Zone Temperature Sensor
+
+Support for many devices that use Bluetooth LE (BLE) have a shared set of drivers provided using
+the `gobot/drivers/ble` package:
+
+- [BLE](http://en.wikipedia.org/wiki/Bluetooth_low_energy) <=> [Drivers](https://github.com/hybridgroup/gobot/blob/release/drivers/ble)
+  - Battery Service
+  - Device Information Service
+  - Generic Access Service
+  - Microbit: AccelerometerDriver
+  - Microbit: ButtonDriver
+  - Microbit: IOPinDriver
+  - Microbit: LEDDriver
+  - Microbit: MagnetometerDriver
+  - Microbit: TemperatureDriver
+  - Sphero: BB8
+  - Sphero: Ollie
+  - Sphero: SPRK+
+
+Support for many devices that use General Purpose Input/Output (GPIO) have a shared set of drivers provided using
+the `gobot/drivers/gpio` package:
+
+- [GPIO](https://en.wikipedia.org/wiki/General_Purpose_Input/Output) <=> [Drivers](https://github.com/hybridgroup/gobot/blob/release/drivers/gpio)
   - AIP1640 LED Dot Matrix/7 Segment Controller
   - Button
   - Buzzer
@@ -294,24 +346,10 @@ a shared set of drivers provided using the `gobot/drivers/gpio` package:
   - Stepper Motor
   - TM1638 LED Controller
 
-Support for many devices that use Analog Input/Output (AIO) have
-a shared set of drivers provided using the `gobot/drivers/aio` package:
+Support for devices that use Inter-Integrated Circuit (I2C) have a shared set of drivers provided using
+the `gobot/drivers/i2c` package:
 
-- [AIO](https://en.wikipedia.org/wiki/Analog-to-digital_converter) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/aio)
-  - Analog Actuator
-  - Analog Sensor
-  - Grove Light Sensor
-  - Grove Piezo Vibration Sensor
-  - Grove Rotary Dial
-  - Grove Sound Sensor
-  - Grove Temperature Sensor
-  - Temperature Sensor (supports linear and NTC thermistor in normal and inverse mode)
-  - Thermal Zone Temperature Sensor
-
-Support for devices that use Inter-Integrated Circuit (I2C) have a shared set of
-drivers provided using the `gobot/drivers/i2c` package:
-
-- [I2C](https://en.wikipedia.org/wiki/I%C2%B2C) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/i2c)
+- [I2C](https://en.wikipedia.org/wiki/I%C2%B2C) <=> [Drivers](https://github.com/hybridgroup/gobot/blob/release/drivers/i2c)
   - Adafruit 1109 2x16 RGB-LCD with 5 keys
   - Adafruit 2327 16-Channel PWM/Servo HAT Hat
   - Adafruit 2348 DC and Stepper Motor Hat
@@ -351,10 +389,18 @@ drivers provided using the `gobot/drivers/i2c` package:
   - Wii Nunchuck Controller
   - YL-40 Brightness/Temperature sensor, Potentiometer, analog input, analog output Driver
 
+Support for many devices that use Serial communication (UART) have a shared set of drivers provided using
+the `gobot/drivers/serial` package:
+
+- [UART](https://en.wikipedia.org/wiki/Serial_port) <=> [Drivers](https://github.com/hybridgroup/gobot/blob/release/drivers/serial)
+  - Sphero: Sphero
+  - Neurosky: MindWave
+  - MegaPi: MotorDriver
+
 Support for devices that use Serial Peripheral Interface (SPI) have
 a shared set of drivers provided using the `gobot/drivers/spi` package:
 
-- [SPI](https://en.wikipedia.org/wiki/Serial_Peripheral_Interface_Bus) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/spi)
+- [SPI](https://en.wikipedia.org/wiki/Serial_Peripheral_Interface_Bus) <=> [Drivers](https://github.com/hybridgroup/gobot/blob/release/drivers/spi)
   - APA102 Programmable LEDs
   - MCP3002 Analog/Digital Converter
   - MCP3004 Analog/Digital Converter
@@ -366,7 +412,11 @@ a shared set of drivers provided using the `gobot/drivers/spi` package:
   - MFRC522 RFID Card Reader
   - SSD1306 OLED Display Controller
 
-More platforms and drivers are coming soon...
+Support for devices that use 1-wire bus with Linux Kernel support (w1-gpio) have
+a shared set of drivers provided using the `gobot/drivers/onewire` package:
+
+- [1-wire](https://en.wikipedia.org/wiki/1-Wire) <=> [Drivers](https://github.com/hybridgroup/gobot/blob/release/drivers/onewire)
+  - DS18B20 Temperature Sensor
 
 ## API
 
@@ -376,15 +426,15 @@ device status, and execute device commands.
 To activate the API, import the `gobot.io/x/gobot/v2/api` package and instantiate the `API` like this:
 
 ```go
-  master := gobot.NewMaster()
-  api.NewAPI(master).Start()
+  manager := gobot.NewManager()
+  api.NewAPI(manager).Start()
 ```
 
 You can also specify the api host and port, and turn on authentication:
 
 ```go
-  master := gobot.NewMaster()
-  server := api.NewAPI(master)
+  manager := gobot.NewManager()
+  server := api.NewAPI(manager)
   server.Port = "4000"
   server.AddHandler(api.BasicAuth("gort", "klatuu"))
   server.Start()
@@ -413,12 +463,12 @@ Thank you!
 
 ## Contributing
 
-For our contribution guidelines, please go to [https://github.com/hybridgroup/gobot/blob/master/CONTRIBUTING.md
-](https://github.com/hybridgroup/gobot/blob/master/CONTRIBUTING.md
+For our contribution guidelines, please go to [https://github.com/hybridgroup/gobot/blob/release/CONTRIBUTING.md
+](https://github.com/hybridgroup/gobot/blob/release/CONTRIBUTING.md
 ).
 
 Gobot is released with a Contributor Code of Conduct. By participating in this project you agree to abide by its terms.
-[You can read about it here](https://github.com/hybridgroup/gobot/tree/master/CODE_OF_CONDUCT.md).
+[You can read about it here](https://github.com/hybridgroup/gobot/blob/release/CODE_OF_CONDUCT.md).
 
 ## License
 

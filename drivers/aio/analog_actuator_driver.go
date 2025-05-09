@@ -60,6 +60,7 @@ func NewAnalogActuatorDriver(a AnalogWriter, pin string, opts ...interface{}) *A
 		}
 	}
 
+	//nolint:forcetypeassert // ok here
 	d.AddCommand("Write", func(params map[string]interface{}) interface{} {
 		val, err := strconv.ParseFloat(params["val"].(string), 64)
 		if err != nil {
@@ -67,7 +68,7 @@ func NewAnalogActuatorDriver(a AnalogWriter, pin string, opts ...interface{}) *A
 		}
 		return d.Write(val)
 	})
-
+	//nolint:forcetypeassert // ok here
 	d.AddCommand("WriteRaw", func(params map[string]interface{}) interface{} {
 		val, _ := strconv.Atoi(params["val"].(string))
 		return d.WriteRaw(val)

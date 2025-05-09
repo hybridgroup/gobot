@@ -50,7 +50,7 @@ func TestDriver(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(100 * time.Millisecond):
-		t.Errorf("Button Event was not published")
+		require.Fail(t, "Button Event was not published")
 	}
 
 	_ = d.On(d.Event("accel"), func(data interface{}) {
@@ -62,7 +62,7 @@ func TestDriver(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(100 * time.Millisecond):
-		t.Errorf("Accel Event was not published")
+		require.Fail(t, "Accel Event was not published")
 	}
 
 	d.Command("send_notification")(map[string]interface{}{"message": "Hey buddy!"})

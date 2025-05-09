@@ -18,40 +18,40 @@ func main() {
 	stick := joystick.NewDriver(joystickAdaptor, joystick.Xbox360)
 
 	work := func() {
-		stick.On(joystick.APress, func(data interface{}) {
+		_ = stick.On(joystick.APress, func(data interface{}) {
 			fmt.Println("a_press")
 		})
-		stick.On(joystick.ARelease, func(data interface{}) {
+		_ = stick.On(joystick.ARelease, func(data interface{}) {
 			fmt.Println("a_release")
 		})
-		stick.On(joystick.BPress, func(data interface{}) {
+		_ = stick.On(joystick.BPress, func(data interface{}) {
 			fmt.Println("b_press")
 		})
-		stick.On(joystick.BRelease, func(data interface{}) {
+		_ = stick.On(joystick.BRelease, func(data interface{}) {
 			fmt.Println("b_release")
 		})
-		stick.On(joystick.UpPress, func(data interface{}) {
+		_ = stick.On(joystick.UpPress, func(data interface{}) {
 			fmt.Println("up", data)
 		})
-		stick.On(joystick.DownPress, func(data interface{}) {
+		_ = stick.On(joystick.DownPress, func(data interface{}) {
 			fmt.Println("down", data)
 		})
-		stick.On(joystick.LeftPress, func(data interface{}) {
+		_ = stick.On(joystick.LeftPress, func(data interface{}) {
 			fmt.Println("left", data)
 		})
-		stick.On(joystick.RightPress, func(data interface{}) {
+		_ = stick.On(joystick.RightPress, func(data interface{}) {
 			fmt.Println("right", data)
 		})
-		stick.On(joystick.LeftX, func(data interface{}) {
+		_ = stick.On(joystick.LeftX, func(data interface{}) {
 			fmt.Println("left_x", data)
 		})
-		stick.On(joystick.LeftY, func(data interface{}) {
+		_ = stick.On(joystick.LeftY, func(data interface{}) {
 			fmt.Println("left_y", data)
 		})
-		stick.On(joystick.RightX, func(data interface{}) {
+		_ = stick.On(joystick.RightX, func(data interface{}) {
 			fmt.Println("right_x", data)
 		})
-		stick.On(joystick.RightY, func(data interface{}) {
+		_ = stick.On(joystick.RightY, func(data interface{}) {
 			fmt.Println("right_y", data)
 		})
 	}
@@ -62,5 +62,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

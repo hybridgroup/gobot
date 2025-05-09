@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
+	gbot := gobot.NewManager()
 
 	api.NewAPI(gbot).Start()
 
@@ -42,7 +42,9 @@ func main() {
 	})
 
 	gbot.AddRobot(r)
-	gbot.Start()
+	if err := gbot.Start(); err != nil {
+		fmt.Println(err)
+	}
 }
 
 var _ gobot.Adaptor = (*loopbackAdaptor)(nil)

@@ -1,7 +1,7 @@
 package system
 
 import (
-	"fmt"
+	"errors"
 	"sync"
 	"testing"
 	"time"
@@ -150,7 +150,7 @@ func Test_startEdgePolling(t *testing.T) {
 				readVal := tc.simulateReadValues[numCallsRead-1]
 				var err error
 				if readVal.err != "" {
-					err = fmt.Errorf(readVal.err)
+					err = errors.New(readVal.err)
 				}
 				if numCallsRead >= len(tc.simulateReadValues) {
 					close(quitChan) // ensure no further read call

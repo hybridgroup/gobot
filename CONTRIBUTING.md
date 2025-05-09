@@ -29,8 +29,7 @@ Descriptions for each of these will eventually be provided below.
 
 ## General Guidelines
 
-* All active development is in the `dev` branch. New or updated features must be added to the `dev` branch. Hotfixes
-  will be considered on the `master` branch in situations where it does not alter behavior or features, only fixes a bug.
+* All active development is in the `dev` branch. New or updated features must be added to the `dev` branch.
 * All patches must be provided under the Apache 2.0 License
 * Please use the -S option in git to "sign off" that the commit is your work and you are providing it under the
   Apache 2.0 License
@@ -142,4 +141,4 @@ Gobot is released with a Contributor Code of Conduct. By participating in this p
 
 ## Origins
 
-This document is based on the original [io.js contribution guidelines](https://github.com/nodejs/io.js/blob/master/CONTRIBUTING.md)
+This document is based on the original [io.js contribution guidelines](https://github.com/nodejs/io.js/blob/main/CONTRIBUTING.md)

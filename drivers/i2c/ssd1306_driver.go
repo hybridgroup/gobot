@@ -163,7 +163,7 @@ func (d *DisplayBuffer) Clear() {
 // SetPixel sets the x, y pixel with c color.
 func (d *DisplayBuffer) SetPixel(x, y, c int) {
 	idx := x + (y/d.pageSize)*d.width
-	bit := uint(y) % uint(d.pageSize)
+	bit := uint(y) % uint(d.pageSize) //nolint:gosec // TODO: fix later
 	if c == 0 {
 		d.buffer[idx] &= ^(1 << bit)
 	} else {
@@ -218,19 +218,19 @@ func NewSSD1306Driver(c Connector, options ...func(Config)) *SSD1306Driver {
 	// set display buffer
 	s.buffer = NewDisplayBuffer(s.displayWidth, s.displayHeight, s.pageSize)
 	// add commands
-	s.AddCommand("Display", func(params map[string]interface{}) interface{} {
+	s.AddCommand("Display", func(_ map[string]interface{}) interface{} {
 		err := s.Display()
 		return map[string]interface{}{"err": err}
 	})
-	s.AddCommand("On", func(params map[string]interface{}) interface{} {
+	s.AddCommand("On", func(_ map[string]interface{}) interface{} {
 		err := s.On()
 		return map[string]interface{}{"err": err}
 	})
-	s.AddCommand("Off", func(params map[string]interface{}) interface{} {
+	s.AddCommand("Off", func(_ map[string]interface{}) interface{} {
 		err := s.Off()
 		return map[string]interface{}{"err": err}
 	})
-	s.AddCommand("Clear", func(params map[string]interface{}) interface{} {
+	s.AddCommand("Clear", func(_ map[string]interface{}) interface{} {
 		s.Clear()
 		return map[string]interface{}{}
 	})

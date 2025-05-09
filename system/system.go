@@ -1,13 +1,26 @@
 package system
 
 import (
+	"fmt"
 	"os"
 	"unsafe"
 
 	"gobot.io/x/gobot/v2"
 )
 
-const systemDebug = false
+type digitalPinAccesserType int
+
+const (
+	digitalPinAccesserTypeCdev digitalPinAccesserType = iota
+	digitalPinAccesserTypeSysfs
+)
+
+type spiBusAccesserType int
+
+const (
+	spiBusAccesserTypePeriphio spiBusAccesserType = iota
+	spiBusAccesserTypeGPIO
+)
 
 // A File represents basic IO interactions with the underlying file system
 type File interface {
@@ -45,6 +58,7 @@ type systemCaller interface {
 // digitalPinAccesser represents unexposed interface to allow the switch between different implementations and
 // a mocked one
 type digitalPinAccesser interface {
+	isType(accesserType digitalPinAccesserType) bool
 	isSupported() bool
 	createPin(chip string, pin int, o ...func(gobot.DigitalPinOptioner) bool) gobot.DigitalPinner
 	setFs(fs filesystem)
@@ -52,12 +66,22 @@ type digitalPinAccesser interface {
 
 // spiAccesser represents unexposed interface to allow the switch between different implementations and a mocked one
 type spiAccesser interface {
+	isType(accesserType spiBusAccesserType) bool
 	isSupported() bool
 	createDevice(busNum, chipNum, mode, bits int, maxSpeed int64) (gobot.SpiSystemDevicer, error)
 }
 
+type accesserConfiguration struct {
+	debug           bool
+	debugSpi        bool
+	debugDigitalPin bool
+	useGpioSysfs    *bool
+	spiGpioConfig   *spiGpioConfig
+}
+
 // Accesser provides access to system calls, filesystem, implementation for digital pin and SPI
 type Accesser struct {
+	accesserCfg      *accesserConfiguration
 	sys              systemCaller
 	fs               filesystem
 	digitalPinAccess digitalPinAccesser
@@ -66,34 +90,159 @@ type Accesser struct {
 
 // NewAccesser returns a accesser to native system call, native file system and the chosen digital pin access.
 // Digital pin accesser can be empty or "sysfs", otherwise it will be automatically chosen.
-func NewAccesser(options ...func(Optioner)) *Accesser {
-	s := &Accesser{
-		sys: &nativeSyscall{},
-		fs:  &nativeFilesystem{},
+func NewAccesser(options ...AccesserOptionApplier) *Accesser {
+	a := &Accesser{
+		accesserCfg: &accesserConfiguration{},
 	}
-	s.spiAccess = &periphioSpiAccess{fs: s.fs}
-	s.digitalPinAccess = &sysfsDigitalPinAccess{sfa: &sysfsFileAccess{fs: s.fs, readBufLen: 2}}
-	for _, option := range options {
-		option(s)
+
+	for _, o := range options {
+		if o == nil {
+			continue
+		}
+		o.apply(a.accesserCfg)
 	}
-	return s
+	return a
 }
 
-// UseDigitalPinAccessWithMockFs sets the digital pin handler accesser to the chosen one. Used only for tests.
-func (a *Accesser) UseDigitalPinAccessWithMockFs(digitalPinAccess string, files []string) digitalPinAccesser {
-	fs := newMockFilesystem(files)
-	var dph digitalPinAccesser
-	switch digitalPinAccess {
-	case "sysfs":
-		dph = &sysfsDigitalPinAccess{sfa: &sysfsFileAccess{fs: fs, readBufLen: 2}}
-	case "cdev":
-		dph = &gpiodDigitalPinAccess{fs: fs}
-	default:
-		dph = &mockDigitalPinAccess{fs: fs}
+// AddAnalogSupport adds the support to access the analog features of the system, usually by sysfs.
+func (a *Accesser) AddAnalogSupport() {
+	if a.fs == nil {
+		a.fs = &nativeFilesystem{} // for sysfs access
 	}
-	a.fs = fs
-	a.digitalPinAccess = dph
-	return dph
+}
+
+// AddPWMSupport adds the support to access the PWM features of the system, usually by sysfs.
+func (a *Accesser) AddPWMSupport() {
+	if a.fs == nil {
+		a.fs = &nativeFilesystem{} // for sysfs access
+	}
+}
+
+// AddDigitalPinSupport adds the support to access the GPIO features of the system. Usually by character device or
+// sysfs Kernel API. Related options can be applied here.
+func (a *Accesser) AddDigitalPinSupport(options ...AccesserOptionApplier) {
+	for _, o := range options {
+		if o == nil {
+			continue
+		}
+		o.apply(a.accesserCfg)
+	}
+
+	if a.fs == nil {
+		a.fs = &nativeFilesystem{} // for sysfs access or check for /dev/gpiochip* in cdev
+	}
+
+	if a.accesserCfg.useGpioSysfs == nil || !*a.accesserCfg.useGpioSysfs {
+		dpa := &cdevDigitalPinAccess{fs: a.fs}
+
+		if dpa.isSupported() || a.accesserCfg.useGpioSysfs == nil {
+			a.digitalPinAccess = dpa
+
+			if a.accesserCfg.debug || a.accesserCfg.debugDigitalPin {
+				fmt.Printf("use cdev driver for digital pins with this chips: %v\n", dpa.chips)
+			}
+
+			return
+		}
+
+		if a.accesserCfg.debug || a.accesserCfg.debugDigitalPin {
+			fmt.Println("cdev driver not supported, fallback to sysfs driver")
+		}
+	}
+
+	// currently sysfs is supported by all Kernels
+	dpa := &sysfsDigitalPinAccess{sfa: &sysfsFileAccess{fs: a.fs, readBufLen: 2}}
+	a.digitalPinAccess = dpa
+	if a.accesserCfg.debug || a.accesserCfg.debugDigitalPin {
+		fmt.Println("use sysfs driver for digital pins")
+	}
+}
+
+// HasDigitalPinSysfsAccess returns whether the used digital pin accesser is a sysfs one.
+// If no digital pin accesser is defined, returns false.
+func (a *Accesser) HasDigitalPinSysfsAccess() bool {
+	return a.digitalPinAccess != nil && a.digitalPinAccess.isType(digitalPinAccesserTypeSysfs)
+}
+
+// HasDigitalPinCdevAccess returns whether the used digital pin accesser is a sysfs one.
+// If no digital pin accesser is defined, returns false.
+func (a *Accesser) HasDigitalPinCdevAccess() bool {
+	return a.digitalPinAccess != nil && a.digitalPinAccess.isType(digitalPinAccesserTypeCdev)
+}
+
+// AddI2CSupport adds the support to access the I2C features of the system, usually by syscall with character device.
+func (a *Accesser) AddI2CSupport() {
+	if a.fs == nil {
+		a.fs = &nativeFilesystem{} // for access to the i2c character device, e.g. /dev/i2c-2
+	}
+
+	a.sys = &nativeSyscall{}
+}
+
+// AddSPISupport adds the support to access the SPI features of the system, usually by character device or GPIOs.
+// Related options can be applied here.
+func (a *Accesser) AddSPISupport(options ...AccesserOptionApplier) {
+	for _, o := range options {
+		if o == nil {
+			continue
+		}
+		o.apply(a.accesserCfg)
+	}
+
+	if a.fs == nil {
+		a.fs = &nativeFilesystem{} // to check for "/dev/spidev*" or access by GPIO (see AddDigitalPinSupport())
+	}
+
+	if a.accesserCfg.spiGpioConfig != nil {
+		// currently GPIO SPI access is always supported
+		a.accesserCfg.spiGpioConfig.debug = a.accesserCfg.debugSpi
+		a.spiAccess = &gpioSpiAccess{cfg: *a.accesserCfg.spiGpioConfig}
+
+		if a.accesserCfg.debug || a.accesserCfg.debugSpi {
+			fmt.Printf("use gpio driver for SPI with this config: %s\n", a.accesserCfg.spiGpioConfig.String())
+		}
+
+		return
+	}
+
+	gsa := &periphioSpiAccess{fs: a.fs}
+	if !gsa.isSupported() {
+		if a.accesserCfg.debug || a.accesserCfg.debugSpi {
+			fmt.Println("periphio driver not supported for SPI, please activate SPI or try to use GPIOs")
+		}
+		return
+	}
+
+	a.spiAccess = gsa
+	if a.accesserCfg.debug || a.accesserCfg.debugSpi {
+		fmt.Println("use periphio driver for SPI")
+	}
+}
+
+// HasSpiPeriphioAccess returns whether the used SPI accesser is periphio based.
+// If SPI accesser is defined, returns false.
+func (a *Accesser) HasSpiPeriphioAccess() bool {
+	return a.spiAccess != nil && a.spiAccess.isType(spiBusAccesserTypePeriphio)
+}
+
+// HasSpiGpioAccess returns whether the used SPI accesser is GPIO based.
+// If SPI accesser is defined, returns false.
+func (a *Accesser) HasSpiGpioAccess() bool {
+	return a.spiAccess != nil && a.spiAccess.isType(spiBusAccesserTypeGPIO)
+}
+
+// AddOneWireSupport adds the support to access the one wire features of the system, usually by sysfs.
+func (a *Accesser) AddOneWireSupport() {
+	if a.fs == nil {
+		a.fs = &nativeFilesystem{} // for sysfs access
+	}
+}
+
+// UseMockDigitalPinAccess sets the digital pin handler accesser to the chosen one. Used only for tests.
+func (a *Accesser) UseMockDigitalPinAccess() *mockDigitalPinAccess {
+	dpa := newMockDigitalPinAccess(a.digitalPinAccess)
+	a.digitalPinAccess = dpa
+	return dpa
 }
 
 // UseMockSyscall sets the Syscall implementation of the accesser to the mocked one. Used only for tests.
@@ -107,30 +256,25 @@ func (a *Accesser) UseMockSyscall() *mockSyscall {
 func (a *Accesser) UseMockFilesystem(files []string) *MockFilesystem {
 	fs := newMockFilesystem(files)
 	a.fs = fs
-	a.digitalPinAccess.setFs(fs)
+	if a.digitalPinAccess != nil {
+		a.digitalPinAccess.setFs(fs)
+	}
+
 	return fs
 }
 
 // UseMockSpi sets the SPI implementation of the accesser to the mocked one. Used only for tests.
 func (a *Accesser) UseMockSpi() *MockSpiAccess {
-	msc := &MockSpiAccess{}
+	msc := newMockSpiAccess(a.spiAccess)
 	a.spiAccess = msc
 	return msc
 }
 
 // NewDigitalPin returns a new system digital pin, according to the given pin number.
 func (a *Accesser) NewDigitalPin(chip string, pin int,
-	o ...func(gobot.DigitalPinOptioner) bool,
+	options ...func(gobot.DigitalPinOptioner) bool,
 ) gobot.DigitalPinner {
-	return a.digitalPinAccess.createPin(chip, pin, o...)
-}
-
-// IsSysfsDigitalPinAccess returns whether the used digital pin accesser is a sysfs one.
-func (a *Accesser) IsSysfsDigitalPinAccess() bool {
-	if _, ok := a.digitalPinAccess.(*sysfsDigitalPinAccess); ok {
-		return true
-	}
-	return false
+	return a.digitalPinAccess.createPin(chip, pin, options...)
 }
 
 // NewPWMPin returns a new system PWM pin, according to the given pin number.
@@ -139,16 +283,27 @@ func (a *Accesser) NewPWMPin(path string, pin int, polNormIdent string, polInvId
 	return newPWMPinSysfs(sfa, path, pin, polNormIdent, polInvIdent)
 }
 
-func (a *Accesser) NewAnalogPin(path string, r, w bool, readBufLen uint16) gobot.AnalogPinner {
+func (a *Accesser) NewAnalogPin(path string, w bool, readBufLen uint16) gobot.AnalogPinner {
+	r := readBufLen > 0
 	if readBufLen == 0 {
 		readBufLen = 32 // max. count of characters for int value is 20
 	}
+
 	return newAnalogPinSysfs(&sysfsFileAccess{fs: a.fs, readBufLen: readBufLen}, path, r, w)
 }
 
 // NewSpiDevice returns a new connection to SPI with the given parameters.
 func (a *Accesser) NewSpiDevice(busNum, chipNum, mode, bits int, maxSpeed int64) (gobot.SpiSystemDevicer, error) {
 	return a.spiAccess.createDevice(busNum, chipNum, mode, bits, maxSpeed)
+}
+
+// NewOneWireDevice returns a new 1-wire device with the given parameters.
+// note: this is a basic implementation without using the possibilities of bus controller
+// it depends on automatic device search, see https://www.kernel.org/doc/Documentation/w1/w1.generic
+func (a *Accesser) NewOneWireDevice(familyCode byte, serialNumber uint64) (gobot.OneWireSystemDevicer, error) {
+	sfa := &sysfsFileAccess{fs: a.fs, readBufLen: 200}
+	deviceID := fmt.Sprintf("%02x-%012x", familyCode, serialNumber)
+	return newOneWireDeviceSysfs(sfa, deviceID), nil
 }
 
 // OpenFile opens file of given name from native or the mocked file system

@@ -24,8 +24,13 @@ func main() {
 			r := byte(gobot.Rand(255))
 			g := byte(gobot.Rand(255))
 			b := byte(gobot.Rand(255))
-			blinkm.Rgb(r, g, b)
-			color, _ := blinkm.Color()
+			if err := blinkm.Rgb(r, g, b); err != nil {
+				fmt.Println(err)
+			}
+			color, err := blinkm.Color()
+			if err != nil {
+				fmt.Println(err)
+			}
 			fmt.Println("color", color)
 		})
 	}
@@ -36,5 +41,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

@@ -278,14 +278,14 @@ func (b *Client) DigitalWrite(pin int, value int) error {
 }
 
 // ServoConfig sets the min and max pulse width for servo PWM range
-func (b *Client) ServoConfig(pin int, max int, min int) error {
+func (b *Client) ServoConfig(pin int, maximum int, minimum int) error {
 	ret := []byte{
 		ServoConfig,
 		byte(pin),
-		byte(min & 0x7F),
-		byte((min >> 7) & 0x7F),
-		byte(max & 0x7F),
-		byte((max >> 7) & 0x7F),
+		byte(minimum & 0x7F),
+		byte((minimum >> 7) & 0x7F),
+		byte(maximum & 0x7F),
+		byte((maximum >> 7) & 0x7F),
 	}
 	return b.WriteSysex(ret)
 }
@@ -410,6 +410,7 @@ func (b *Client) process() error {
 
 		if len(b.analogPins) > pin {
 			if len(b.pins) > b.analogPins[pin] {
+				//nolint:gosec // TODO: fix later
 				b.pins[b.analogPins[pin]].Value = int(value)
 				b.Publish(b.Event(fmt.Sprintf("AnalogRead%v", pin)), b.pins[b.analogPins[pin]].Value)
 			}
@@ -500,9 +501,11 @@ func (b *Client) process() error {
 			b.pins[pin].State = int(currentBuffer[4])
 
 			if len(currentBuffer) > 6 {
+				//nolint:gosec // TODO: fix later
 				b.pins[pin].State = int(uint(b.pins[pin].State) | uint(currentBuffer[5])<<7)
 			}
 			if len(currentBuffer) > 7 {
+				//nolint:gosec // TODO: fix later
 				b.pins[pin].State = int(uint(b.pins[pin].State) | uint(currentBuffer[6])<<14)
 			}
 

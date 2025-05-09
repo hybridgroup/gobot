@@ -16,9 +16,9 @@ const (
 const (
 	// From  /usr/include/linux/i2c-dev.h:
 	// ioctl signals
-	I2C_SLAVE = 0x0703
-	I2C_FUNCS = 0x0705
-	I2C_SMBUS = 0x0720
+	I2C_TARGET = 0x0703
+	I2C_FUNCS  = 0x0705
+	I2C_SMBUS  = 0x0720
 	// Read/write markers
 	I2C_SMBUS_READ  = 1
 	I2C_SMBUS_WRITE = 0
@@ -371,7 +371,7 @@ func (d *i2cDevice) setAddress(address int) error {
 		return nil
 	}
 
-	if err := d.syscallIoctl(I2C_SLAVE, nil, address, "Setting address"); err != nil {
+	if err := d.syscallIoctl(I2C_TARGET, nil, address, "Setting address"); err != nil {
 		return err
 	}
 	d.lastAddress = address
@@ -382,6 +382,7 @@ func (d *i2cDevice) syscallIoctl(signal uintptr, payload unsafe.Pointer, address
 	if err := d.openFileLazy(sender); err != nil {
 		return err
 	}
+	//nolint:gosec // TODO: fix later
 	if _, _, errno := d.sys.syscall(Syscall_SYS_IOCTL, d.file, signal, payload, uint16(address)); errno != 0 {
 		return fmt.Errorf("%s failed with syscall.Errno %v", sender, errno)
 	}

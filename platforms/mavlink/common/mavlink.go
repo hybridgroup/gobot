@@ -28,7 +28,7 @@ var sequence uint16 = 0
 
 func generateSequence() uint8 {
 	sequence = (sequence + 1) % 256
-	return uint8(sequence)
+	return uint8(sequence) //nolint:gosec // ok here
 }
 
 // The MAVLinkMessage interface is implemented by MAVLink messages
@@ -194,7 +194,7 @@ func crcAccumulate(data uint8, crcAccum uint16) uint16 {
 	/*Accumulate one byte of data into the CRC*/
 	var tmp uint8
 
-	tmp = data ^ (uint8)(crcAccum&0xff)
+	tmp = data ^ (uint8)(crcAccum&0xff) //nolint:gosec // ok here
 	tmp ^= (tmp << 4)
 	crcAccum = (crcAccum >> 8) ^ (uint16(tmp) << 8) ^ (uint16(tmp) << 3) ^ (uint16(tmp) >> 4)
 	return crcAccum

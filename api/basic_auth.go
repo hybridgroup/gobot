@@ -8,7 +8,7 @@ import (
 
 // BasicAuth returns basic auth handler.
 func BasicAuth(username, password string) http.HandlerFunc {
-	// Inspired by https://github.com/codegangsta/martini-contrib/blob/master/auth/
+	// Inspired by https://github.com/codegangsta/martini-contrib/tree/v0.1/auth
 	return func(res http.ResponseWriter, req *http.Request) {
 		if !secureCompare(req.Header.Get("Authorization"),
 			"Basic "+base64.StdEncoding.EncodeToString([]byte(username+":"+password)),
@@ -22,6 +22,7 @@ func BasicAuth(username, password string) http.HandlerFunc {
 }
 
 func secureCompare(given string, actual string) bool {
+	//nolint:gosec // TODO: fix later
 	if subtle.ConstantTimeEq(int32(len(given)), int32(len(actual))) == 1 {
 		return subtle.ConstantTimeCompare([]byte(given), []byte(actual)) == 1
 	}

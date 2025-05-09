@@ -1,3 +1,4 @@
+//nolint:gosec // ok for test
 package system
 
 import (
@@ -34,7 +35,7 @@ func getSyscallFuncImpl(
 				I2C_FUNC_SMBUS_WRITE_WORD_DATA
 		}
 		// set address
-		if (trap == Syscall_SYS_IOCTL) && (a2 == I2C_SLAVE) {
+		if (trap == Syscall_SYS_IOCTL) && (a2 == I2C_TARGET) {
 			if errorMask&0x02 == 0x02 {
 				return 0, 0, 1
 			}

@@ -29,7 +29,7 @@ func TestNewBlinkMDriver(t *testing.T) {
 	var di interface{} = NewBlinkMDriver(newI2cTestAdaptor())
 	d, ok := di.(*BlinkMDriver)
 	if !ok {
-		t.Errorf("NewBlinkMDriver() should have returned a *BlinkMDriver")
+		require.Fail(t, "NewBlinkMDriver() should have returned a *BlinkMDriver")
 	}
 	assert.NotNil(t, d.Driver)
 	assert.True(t, strings.HasPrefix(d.Name(), "BlinkM"))

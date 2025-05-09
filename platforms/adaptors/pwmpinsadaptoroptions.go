@@ -2,7 +2,7 @@ package adaptors
 
 import "time"
 
-// pwmPinOptionApplier needs to be implemented by each configurable option type
+// PwmPinsOptionApplier needs to be implemented by each configurable option type
 type PwmPinsOptionApplier interface {
 	apply(cfg *pwmPinsConfiguration)
 }

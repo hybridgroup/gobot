@@ -30,17 +30,18 @@ func NewServoDriver(a ServoWriter, pin string, opts ...interface{}) *ServoDriver
 		driver: newDriver(a.(gobot.Connection), "Servo", append(opts, withPin(pin))...),
 	}
 
+	//nolint:forcetypeassert // ok here
 	d.AddCommand("Move", func(params map[string]interface{}) interface{} {
-		angle := byte(params["angle"].(float64)) //nolint:forcetypeassert // ok here
+		angle := byte(params["angle"].(float64))
 		return d.Move(angle)
 	})
-	d.AddCommand("ToMin", func(params map[string]interface{}) interface{} {
+	d.AddCommand("ToMin", func(_ map[string]interface{}) interface{} {
 		return d.ToMin()
 	})
-	d.AddCommand("ToCenter", func(params map[string]interface{}) interface{} {
+	d.AddCommand("ToCenter", func(_ map[string]interface{}) interface{} {
 		return d.ToCenter()
 	})
-	d.AddCommand("ToMax", func(params map[string]interface{}) interface{} {
+	d.AddCommand("ToMax", func(_ map[string]interface{}) interface{} {
 		return d.ToMax()
 	})
 

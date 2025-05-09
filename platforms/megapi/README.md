@@ -15,16 +15,19 @@ Please refer to the main [README.md](https://github.com/hybridgroup/gobot/blob/r
 package main
 
 import (
-  "gobot.io/x/gobot/v2"
-  "gobot.io/x/gobot/v2/platforms/megapi"
+  "fmt"
   "time"
+
+  "gobot.io/x/gobot/v2"
+  "gobot.io/x/gobot/v2/drivers/serial/megapi"
+  "gobot.io/x/gobot/v2/platforms/serialport"
 )
 
 func main() {
   // use "/dev/ttyUSB0" if connecting with USB cable
   // use "/dev/ttyAMA0" on devices older than Raspberry Pi 3 Model B
-  megaPiAdaptor := megapi.NewAdaptor("/dev/ttyS0")
-  motor := megapi.NewMotorDriver(megaPiAdaptor, 1)
+  adaptor := serialport.NewAdaptor("/dev/ttyS0", serialport.WithName("MegaPi"))
+  motor := megapi.NewMotorDriver(adaptor, 1)
 
   work := func() {
     speed := int16(0)
@@ -40,11 +43,13 @@ func main() {
   }
 
   robot := gobot.NewRobot("megaPiBot",
-    []gobot.Connection{megaPiAdaptor},
+    []gobot.Connection{adaptor},
     []gobot.Device{motor},
     work,
   )
 
-  robot.Start()
+  if err := robot.Start(); err != nil {
+    panic(err)
+  }
 }
 ```

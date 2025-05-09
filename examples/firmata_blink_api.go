@@ -7,6 +7,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"gobot.io/x/gobot/v2"
@@ -16,8 +17,8 @@ import (
 )
 
 func main() {
-	master := gobot.NewMaster()
-	a := api.NewAPI(master)
+	manager := gobot.NewManager()
+	a := api.NewAPI(manager)
 	a.Start()
 
 	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
@@ -25,7 +26,9 @@ func main() {
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {
-			led.Toggle()
+			if err := led.Toggle(); err != nil {
+				fmt.Println(err)
+			}
 		})
 	}
 
@@ -35,7 +38,9 @@ func main() {
 		work,
 	)
 
-	master.AddRobot(robot)
+	manager.AddRobot(robot)
 
-	master.Start()
+	if err := manager.Start(); err != nil {
+		panic(err)
+	}
 }

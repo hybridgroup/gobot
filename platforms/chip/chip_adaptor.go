@@ -15,7 +15,11 @@ import (
 	"gobot.io/x/gobot/v2/system"
 )
 
-const defaultI2cBusNumber = 1
+const (
+	defaultI2cBusNumber = 1
+
+	defaultSpiMaxSpeed = 5000 // 5kHz (more than 15kHz not possible with SPI over GPIO)
+)
 
 // Valids pins are the XIO-P0 through XIO-P7 pins from the
 // extender (pins 13-20 on header 14), as well as the SoC pins
@@ -28,60 +32,66 @@ type sysfsPin struct {
 // Adaptor represents a Gobot Adaptor for a C.H.I.P.
 type Adaptor struct {
 	name   string
-	sys    *system.Accesser
+	sys    *system.Accesser // used for unit tests only
 	mutex  sync.Mutex
-	pinmap map[string]sysfsPin
+	pinMap map[string]sysfsPin
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.PWMPinsAdaptor
 	*adaptors.I2cBusAdaptor
+	*adaptors.SpiBusAdaptor // for usage of "adaptors.WithSpiGpioAccess()"
 }
 
 // NewAdaptor creates a C.H.I.P. Adaptor
 //
 // Optional parameters:
 //
-//	adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs
-//	adaptors.WithSpiGpioAccess(sclk, nss, mosi, miso):	use GPIO's instead of /dev/spidev#.#
+//	adaptors.WithGpioCdevAccess():	use character device driver instead of sysfs
+//	adaptors.WithSpiGpioAccess(sclk, ncs, sdo, sdi):	use GPIO's instead of /dev/spidev#.#
 //
 //	Optional parameters for PWM, see [adaptors.NewPWMPinsAdaptor]
 func NewAdaptor(opts ...interface{}) *Adaptor {
-	sys := system.NewAccesser()
+	sys := system.NewAccesser(system.WithDigitalPinSysfsAccess())
 	a := &Adaptor{
 		name: gobot.DefaultName("CHIP"),
 		sys:  sys,
 	}
 
-	a.pinmap = chipPins
+	a.pinMap = chipPins
 	baseAddr, _ := getXIOBase()
 	for i := 0; i < 8; i++ {
 		pin := fmt.Sprintf("XIO-P%d", i)
-		a.pinmap[pin] = sysfsPin{pin: baseAddr + i, pwmPin: -1}
+		a.pinMap[pin] = sysfsPin{pin: baseAddr + i, pwmPin: -1}
 	}
 
-	var digitalPinsOpts []func(adaptors.DigitalPinsOptioner)
+	var digitalPinsOpts []adaptors.DigitalPinsOptionApplier
 	var pwmPinsOpts []adaptors.PwmPinsOptionApplier
+	var spiBusOpts []adaptors.SpiBusOptionApplier
 	for _, opt := range opts {
 		switch o := opt.(type) {
-		case func(adaptors.DigitalPinsOptioner):
+		case adaptors.DigitalPinsOptionApplier:
 			digitalPinsOpts = append(digitalPinsOpts, o)
 		case adaptors.PwmPinsOptionApplier:
 			pwmPinsOpts = append(pwmPinsOpts, o)
+		case adaptors.SpiBusOptionApplier:
+			spiBusOpts = append(spiBusOpts, o)
 		default:
 			panic(fmt.Sprintf("'%s' can not be applied on adaptor '%s'", opt, a.name))
 		}
 	}
 
+	// Valid bus numbers are [0..2] which corresponds to /dev/i2c-0 through /dev/i2c-2.
+	i2cBusNumberValidator := adaptors.NewBusNumberValidator([]int{0, 1, 2})
+
 	a.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, a.translateDigitalPin, digitalPinsOpts...)
 	a.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, a.translatePWMPin, pwmPinsOpts...)
-	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, a.validateI2cBusNumber, defaultI2cBusNumber)
-	return a
-}
+	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, i2cBusNumberValidator.Validate, defaultI2cBusNumber)
 
-// NewProAdaptor creates a C.H.I.P. Pro Adaptor
-func NewProAdaptor() *Adaptor {
-	a := NewAdaptor()
-	a.name = gobot.DefaultName("CHIP Pro")
-	a.pinmap = chipProPins
+	// SPI is only supported when "adaptors.WithSpiGpioAccess()" is given
+	if len(spiBusOpts) > 0 {
+		a.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, func(int) error { return nil }, 0, 0, 0, 0, defaultSpiMaxSpeed,
+			a.DigitalPinsAdaptor, spiBusOpts...)
+	}
+
 	return a
 }
 
@@ -154,23 +164,15 @@ func getXIOBase() (int, error) {
 	return baseAddr, nil
 }
 
-func (a *Adaptor) validateI2cBusNumber(busNr int) error {
-	// Valid bus number is [0..2] which corresponds to /dev/i2c-0 through /dev/i2c-2.
-	if (busNr < 0) || (busNr > 2) {
-		return fmt.Errorf("Bus number %d out of range", busNr)
-	}
-	return nil
-}
-
 func (a *Adaptor) translateDigitalPin(id string) (string, int, error) {
-	if val, ok := a.pinmap[id]; ok {
+	if val, ok := a.pinMap[id]; ok {
 		return "", val.pin, nil
 	}
 	return "", -1, fmt.Errorf("'%s' is not a valid id for a digital pin", id)
 }
 
 func (a *Adaptor) translatePWMPin(id string) (string, int, error) {
-	sysPin, ok := a.pinmap[id]
+	sysPin, ok := a.pinMap[id]
 	if !ok {
 		return "", -1, fmt.Errorf("'%s' is not a valid id for a pin", id)
 	}

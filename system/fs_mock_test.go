@@ -80,7 +80,7 @@ func TestMockFilesystemWrite(t *testing.T) {
 
 	_, _ = f2.WriteString("testing")
 	// Was written.
-	assert.Greater(t, f1.Seq, 0)
+	assert.Positive(t, f1.Seq)
 	assert.Equal(t, "testing", f1.Contents)
 }
 
@@ -98,7 +98,7 @@ func TestMockFilesystemRead(t *testing.T) {
 	n, _ := f2.Read(buffer)
 
 	// Was read.
-	assert.Greater(t, f1.Seq, 0)
+	assert.Positive(t, f1.Seq)
 	assert.Equal(t, 3, n)
 	assert.Equal(t, "Yip", string(buffer[:3]))
 

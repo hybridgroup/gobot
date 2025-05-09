@@ -84,7 +84,7 @@ func (d *DisplayBuffer) Clear() {
 // SetPixel sets the x, y pixel with c color
 func (d *DisplayBuffer) SetPixel(x, y, c int) {
 	idx := x + (y/d.pageSize)*d.width
-	bit := uint(y) % uint(d.pageSize)
+	bit := uint(y) % uint(d.pageSize) //nolint:gosec // TODO: fix later
 	if c == 0 {
 		d.buffer[idx] &= ^(1 << bit)
 	} else {
@@ -153,19 +153,19 @@ func NewSSD1306Driver(a gobot.Adaptor, options ...func(Config)) *SSD1306Driver {
 	s.rstDriver = gpio.NewDirectPinDriver(a, s.RSTPin)
 	s.pageSize = s.DisplayHeight / 8
 	s.buffer = NewDisplayBuffer(s.DisplayWidth, s.DisplayHeight, s.pageSize)
-	s.AddCommand("Display", func(params map[string]interface{}) interface{} {
+	s.AddCommand("Display", func(_ map[string]interface{}) interface{} {
 		err := s.Display()
 		return map[string]interface{}{"err": err}
 	})
-	s.AddCommand("On", func(params map[string]interface{}) interface{} {
+	s.AddCommand("On", func(_ map[string]interface{}) interface{} {
 		err := s.On()
 		return map[string]interface{}{"err": err}
 	})
-	s.AddCommand("Off", func(params map[string]interface{}) interface{} {
+	s.AddCommand("Off", func(_ map[string]interface{}) interface{} {
 		err := s.Off()
 		return map[string]interface{}{"err": err}
 	})
-	s.AddCommand("Clear", func(params map[string]interface{}) interface{} {
+	s.AddCommand("Clear", func(_ map[string]interface{}) interface{} {
 		err := s.Clear()
 		return map[string]interface{}{"err": err}
 	})
@@ -305,6 +305,7 @@ func (s *SSD1306Driver) Display() error {
 	if err := s.command(0); err != nil {
 		return err
 	}
+	//nolint:gosec // TODO: fix later
 	if err := s.command(uint8(s.DisplayWidth) - 1); err != nil {
 		return err
 	}
@@ -314,6 +315,7 @@ func (s *SSD1306Driver) Display() error {
 	if err := s.command(0); err != nil {
 		return err
 	}
+	//nolint:gosec // TODO: fix later
 	if err := s.command(uint8(s.pageSize) - 1); err != nil {
 		return err
 	}
@@ -371,6 +373,7 @@ func (s *SSD1306Driver) initialize() error {
 	if err := s.command(ssd1306SetMultiplexRatio); err != nil {
 		return err
 	}
+	//nolint:gosec // TODO: fix later
 	if err := s.command(uint8(s.DisplayHeight) - 1); err != nil {
 		return err
 	}

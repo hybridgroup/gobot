@@ -56,15 +56,15 @@ func NewRelayDriver(a DigitalWriter, pin string, opts ...interface{}) *RelayDriv
 		}
 	}
 
-	d.AddCommand("Toggle", func(params map[string]interface{}) interface{} {
+	d.AddCommand("Toggle", func(_ map[string]interface{}) interface{} {
 		return d.Toggle()
 	})
 
-	d.AddCommand("On", func(params map[string]interface{}) interface{} {
+	d.AddCommand("On", func(_ map[string]interface{}) interface{} {
 		return d.On()
 	})
 
-	d.AddCommand("Off", func(params map[string]interface{}) interface{} {
+	d.AddCommand("Off", func(_ map[string]interface{}) interface{} {
 		return d.Off()
 	})
 

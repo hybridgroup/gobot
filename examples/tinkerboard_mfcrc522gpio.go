@@ -13,23 +13,23 @@ import (
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/spi"
 	"gobot.io/x/gobot/v2/platforms/adaptors"
-	"gobot.io/x/gobot/v2/platforms/tinkerboard"
+	"gobot.io/x/gobot/v2/platforms/asus/tinkerboard"
 )
 
 // Wiring
 // PWR  Tinkerboard: 1 (+3.3V, VCC), 2(+5V), 6, 9, 14, 20 (GND)
 // GPIO-SPI Tinkerboard (same as SPI2): 23 (CLK), 19 (TXD), 21 (RXD), 24 (CSN0)
-// MFRC522 plate: VCC, GND, SCK (CLK), MOSI (->TXD), MISO (->RXD), NSS/SDA (CSN0/CSN1?)
+// MFRC522 plate: VCC, GND, SCK (CLK), SDO (->TXD), SDI (->RXD), NCS/SDA (CSN0/CSN1?)
 const (
 	sclk    = "23"
-	nss     = "24"
-	mosi    = "19"
-	miso    = "21"
+	ncs     = "24"
+	sdo     = "19"
+	sdi     = "21"
 	speedHz = 5000 // more than 15kHz is not possible with GPIO's, so we choose 5kHz
 )
 
 func main() {
-	a := tinkerboard.NewAdaptor(adaptors.WithSpiGpioAccess(sclk, nss, mosi, miso))
+	a := tinkerboard.NewAdaptor(adaptors.WithSpiGpioAccess(sclk, ncs, sdo, sdi))
 	d := spi.NewMFRC522Driver(a, spi.WithSpeed(speedHz))
 
 	wasCardDetected := false
@@ -72,5 +72,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

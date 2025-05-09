@@ -12,7 +12,7 @@ import (
 
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/i2c"
-	"gobot.io/x/gobot/v2/platforms/beaglebone"
+	"gobot.io/x/gobot/v2/platforms/beagleboard/beaglebone"
 )
 
 func main() {
@@ -36,5 +36,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

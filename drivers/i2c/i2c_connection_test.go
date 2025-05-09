@@ -37,7 +37,7 @@ func getSyscallFuncImpl(
 				system.I2C_FUNC_SMBUS_WRITE_WORD_DATA
 		}
 		// set address
-		if (trap == system.Syscall_SYS_IOCTL) && (a2 == system.I2C_SLAVE) {
+		if (trap == system.Syscall_SYS_IOCTL) && (a2 == system.I2C_TARGET) {
 			if errorMask&0x02 == 0x02 {
 				return 0, 0, 1
 			}
@@ -189,16 +189,4 @@ func TestI2CWriteBlockDataAddressError(t *testing.T) {
 	c := NewConnection(initI2CDeviceAddressError(), 0x06)
 	err := c.WriteBlockData(0x01, []byte{0x01, 0x02})
 	require.ErrorContains(t, err, "Setting address failed with syscall.Errno operation not permitted")
-}
-
-func Test_setBit(t *testing.T) {
-	var wantVal uint8 = 129
-	gotVal := setBit(1, 7)
-	assert.Equal(t, wantVal, gotVal)
-}
-
-func Test_clearBit(t *testing.T) {
-	var wantVal uint8
-	gotVal := clearBit(128, 7)
-	assert.Equal(t, wantVal, gotVal)
 }

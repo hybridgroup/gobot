@@ -132,7 +132,7 @@ func NewPCF8591Driver(c Connector, options ...func(Config)) *PCF8591Driver {
 	return p
 }
 
-// WithPCF8591With400kbitStabilisation option sets the PCF8591 additionalReadWrite and additionalRead value
+// WithPCF8591With400kbitStabilization option sets the PCF8591 additionalReadWrite and additionalRead value
 func WithPCF8591With400kbitStabilization(additionalReadWrite, additionalRead int) func(Config) {
 	return func(c Config) {
 		p, ok := c.(*PCF8591Driver)
@@ -143,8 +143,8 @@ func WithPCF8591With400kbitStabilization(additionalReadWrite, additionalRead int
 			if additionalRead < 0 {
 				additionalRead = 2 // works in most cases
 			}
-			p.additionalReadWrite = uint8(additionalReadWrite)
-			p.additionalRead = uint8(additionalRead)
+			p.additionalReadWrite = uint8(additionalReadWrite) //nolint:gosec // checked before
+			p.additionalRead = uint8(additionalRead)           //nolint:gosec // checked before
 			if pcf8591Debug {
 				log.Printf("400 kbit stabilization for PCF8591Driver set rw: %d, r: %d", p.additionalReadWrite, p.additionalRead)
 			}
@@ -154,7 +154,7 @@ func WithPCF8591With400kbitStabilization(additionalReadWrite, additionalRead int
 	}
 }
 
-// WithPCF8591ForceWrite option modifies the PCF8591Driver forceRefresh option
+// WithPCF8591ForceRefresh option modifies the PCF8591Driver forceRefresh option
 // Setting to true (1) will force refresh operation to register, although there is no change.
 // Normally this is not needed, so default is off (0).
 // When there is something flaky, there is a small chance to stabilize by setting this flag to true.

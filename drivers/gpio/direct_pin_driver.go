@@ -28,18 +28,21 @@ func NewDirectPinDriver(a gobot.Connection, pin string, opts ...interface{}) *Di
 		driver: newDriver(a, "DirectPin", append(opts, withPin(pin))...),
 	}
 
-	d.AddCommand("DigitalRead", func(params map[string]interface{}) interface{} {
+	d.AddCommand("DigitalRead", func(_ map[string]interface{}) interface{} {
 		val, err := d.DigitalRead()
 		return map[string]interface{}{"val": val, "err": err}
 	})
+	//nolint:forcetypeassert // ok here
 	d.AddCommand("DigitalWrite", func(params map[string]interface{}) interface{} {
 		level, _ := strconv.Atoi(params["level"].(string))
 		return d.DigitalWrite(byte(level))
 	})
+	//nolint:forcetypeassert // ok here
 	d.AddCommand("PwmWrite", func(params map[string]interface{}) interface{} {
 		level, _ := strconv.Atoi(params["level"].(string))
 		return d.PwmWrite(byte(level))
 	})
+	//nolint:forcetypeassert // ok here
 	d.AddCommand("ServoWrite", func(params map[string]interface{}) interface{} {
 		level, _ := strconv.Atoi(params["level"].(string))
 		return d.ServoWrite(byte(level))

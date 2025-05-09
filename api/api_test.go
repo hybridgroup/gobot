@@ -19,7 +19,7 @@ import (
 
 func initTestAPI() *API {
 	log.SetOutput(NullReadWriteCloser{})
-	g := gobot.NewMaster()
+	g := gobot.NewManager()
 	a := NewAPI(g)
 	a.start = func(m *API) {}
 	a.Start()
@@ -38,7 +38,7 @@ func initTestAPI() *API {
 
 func TestStartWithoutDefaults(t *testing.T) {
 	log.SetOutput(NullReadWriteCloser{})
-	g := gobot.NewMaster()
+	g := gobot.NewManager()
 	a := NewAPI(g)
 	a.start = func(m *API) {}
 
@@ -396,29 +396,23 @@ func TestRobotDeviceEvent(t *testing.T) {
 		respc <- resp
 	}()
 
-	event := a.master.Robot("Robot1").
+	event := a.manager.Robot("Robot1").
 		Device("Device1").(gobot.Eventer).
 		Event("TestEvent")
 
 	go func() {
-		time.Sleep(time.Millisecond * 5)
-		a.master.Robot("Robot1").
+		time.Sleep(time.Millisecond * 10) // wait some time, so select below is ready
+		a.manager.Robot("Robot1").
 			Device("Device1").(gobot.Eventer).Publish(event, "event-data")
 	}()
 
-	done := false
-
-	for !done {
-		select {
-		case resp := <-respc:
-			reader := bufio.NewReader(resp.Body)
-			data, _ := reader.ReadString('\n')
-			assert.Equal(t, "data: \"event-data\"\n", data)
-			done = true
-		case <-time.After(200 * time.Millisecond):
-			t.Error("Not receiving data")
-			done = true
-		}
+	select {
+	case resp := <-respc:
+		reader := bufio.NewReader(resp.Body)
+		data, _ := reader.ReadString('\n')
+		assert.Equal(t, "data: \"event-data\"\n", data)
+	case <-time.After(50 * time.Millisecond):
+		t.Error("Not receiving data")
 	}
 
 	server.CloseClientConnections()

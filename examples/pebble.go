@@ -15,8 +15,8 @@ import (
 )
 
 func main() {
-	master := gobot.NewMaster()
-	api := api.NewAPI(master)
+	manager := gobot.NewManager()
+	api := api.NewAPI(manager)
 	api.Port = "8080"
 	api.Start()
 
@@ -25,11 +25,11 @@ func main() {
 
 	work := func() {
 		pebbleDriver.SendNotification("Hello Pebble!")
-		pebbleDriver.On(pebbleDriver.Event("button"), func(data interface{}) {
+		_ = pebbleDriver.On(pebbleDriver.Event("button"), func(data interface{}) {
 			fmt.Println("Button pushed: " + data.(string))
 		})
 
-		pebbleDriver.On(pebbleDriver.Event("tap"), func(data interface{}) {
+		_ = pebbleDriver.On(pebbleDriver.Event("tap"), func(data interface{}) {
 			fmt.Println("Tap event detected")
 		})
 	}
@@ -40,7 +40,9 @@ func main() {
 		work,
 	)
 
-	master.AddRobot(robot)
+	manager.AddRobot(robot)
 
-	master.Start()
+	if err := manager.Start(); err != nil {
+		panic(err)
+	}
 }

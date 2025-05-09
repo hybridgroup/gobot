@@ -29,7 +29,8 @@ func getDummyResponseForPath(t *testing.T, path string, dummyResponse string) *h
 	return createTestServer(func(w http.ResponseWriter, r *http.Request) {
 		actualPath := "/v1/devices" + path
 		if r.URL.Path != actualPath {
-			t.Errorf("Path doesn't match, expected %#v, got %#v", actualPath, r.URL.Path)
+			//nolint:testifylint // TODO: fix later
+			require.Fail(t, "Path doesn't match, expected %#v, got %#v", actualPath, r.URL.Path)
 		}
 		_, _ = w.Write(dummyData)
 	})
@@ -48,7 +49,8 @@ func getDummyResponseForPathWithParams(
 	return createTestServer(func(w http.ResponseWriter, r *http.Request) {
 		actualPath := "/v1/devices" + path
 		if r.URL.Path != actualPath {
-			t.Errorf("Path doesn't match, expected %#v, got %#v", actualPath, r.URL.Path)
+			//nolint:testifylint // TODO: fix later
+			require.Fail(t, "Path doesn't match, expected %#v, got %#v", actualPath, r.URL.Path)
 		}
 
 		_ = r.ParseForm()
@@ -78,7 +80,7 @@ func TestAdaptor(t *testing.T) {
 	var a interface{} = initTestAdaptor()
 	_, ok := a.(gobot.Adaptor)
 	if !ok {
-		t.Errorf("Adaptor{} should be a gobot.Adaptor")
+		require.Fail(t, "Adaptor{} should be a gobot.Adaptor")
 	}
 }
 
@@ -87,7 +89,7 @@ func TestNewAdaptor(t *testing.T) {
 	var a interface{} = initTestAdaptor()
 	core, ok := a.(*Adaptor)
 	if !ok {
-		t.Errorf("NewAdaptor() should have returned a *Adaptor")
+		require.Fail(t, "NewAdaptor() should have returned a *Adaptor")
 	}
 
 	assert.Equal(t, "https://api.particle.io", core.APIServer)

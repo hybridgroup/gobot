@@ -81,6 +81,9 @@ func (f *MockFile) Read(b []byte) (int, error) {
 
 	count := len(b)
 	if len(f.Contents) < count {
+		// note: if length of content is smaller than given b than b will not completely overridden, e.g. if content
+		// is empty, than b is not changed at all. This is fine for this MockFile, but in real world, on different
+		// length, an error will be created.
 		count = len(f.Contents)
 	}
 	copy(b, []byte(f.Contents)[:count])
@@ -149,7 +152,10 @@ func (fs *MockFilesystem) stat(name string) (os.FileInfo, error) {
 			log.Println("A")
 			return nil, err
 		}
-		defer os.Remove(tmpFile.Name())
+		defer func() {
+			tmpFile.Close()
+			os.Remove(tmpFile.Name())
+		}()
 
 		return os.Stat(tmpFile.Name())
 	}

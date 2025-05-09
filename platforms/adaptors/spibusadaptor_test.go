@@ -24,8 +24,11 @@ func initTestSpiBusAdaptorWithMockedSpi() (*SpiBusAdaptor, *system.MockSpiAccess
 		return nil
 	}
 	sys := system.NewAccesser()
-	spi := sys.UseMockSpi()
-	a := NewSpiBusAdaptor(sys, validator, 1, 2, 3, 4, 5)
+	// arrange for periphio needed
+	sys.UseMockFilesystem([]string{"/dev/spidev"})
+	dpa := sys.UseMockDigitalPinAccess()
+	a := NewSpiBusAdaptor(sys, validator, 1, 2, 3, 4, 5, dpa)
+	spi := a.sys.UseMockSpi()
 	if err := a.Connect(); err != nil {
 		panic(err)
 	}
@@ -34,7 +37,11 @@ func initTestSpiBusAdaptorWithMockedSpi() (*SpiBusAdaptor, *system.MockSpiAccess
 
 func TestNewSpiAdaptor(t *testing.T) {
 	// arrange
-	a := NewSpiBusAdaptor(nil, nil, 1, 2, 3, 4, 5)
+	sys := system.NewAccesser()
+	// arrange for periphio needed
+	sys.UseMockFilesystem([]string{"/dev/spidev"})
+	dpa := sys.UseMockDigitalPinAccess()
+	a := NewSpiBusAdaptor(sys, nil, 1, 2, 3, 4, 5, dpa)
 	// act & assert
 	assert.Equal(t, 1, a.SpiDefaultBusNumber())
 	assert.Equal(t, 2, a.SpiDefaultChipNumber())

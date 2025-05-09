@@ -14,8 +14,8 @@ import (
 )
 
 func main() {
-	master := gobot.NewMaster()
-	api.NewAPI(master).Start()
+	manager := gobot.NewManager()
+	api.NewAPI(manager).Start()
 
 	digisparkAdaptor := digispark.NewAdaptor()
 	led := gpio.NewLedDriver(digisparkAdaptor, "0")
@@ -25,7 +25,9 @@ func main() {
 		[]gobot.Device{led},
 	)
 
-	master.AddRobot(robot)
+	manager.AddRobot(robot)
 
-	master.Start()
+	if err := manager.Start(); err != nil {
+		panic(err)
+	}
 }

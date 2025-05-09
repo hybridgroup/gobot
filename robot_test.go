@@ -55,8 +55,9 @@ func TestRobotStartAutoRun(t *testing.T) {
 		// work,
 	)
 
+	errChan := make(chan error, 1)
 	go func() {
-		require.NoError(t, r.Start())
+		errChan <- r.Start() // if no strange things happen, this runs until os.signal occurs
 	}()
 
 	time.Sleep(10 * time.Millisecond)
@@ -65,4 +66,10 @@ func TestRobotStartAutoRun(t *testing.T) {
 	// stop it
 	require.NoError(t, r.Stop())
 	assert.False(t, r.Running())
+	select {
+	case err := <-errChan:
+		require.NoError(t, err)
+	case <-time.After(10 * time.Millisecond):
+		// because the Start() will run forever, until os.Signal, this is ok here
+	}
 }

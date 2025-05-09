@@ -28,9 +28,9 @@ func main() {
 	// parse args
 	deviceID := os.Args[1]
 
-	master := gobot.NewMaster()
+	manager := gobot.NewManager()
 
-	a := api.NewAPI(master)
+	a := api.NewAPI(manager)
 
 	// add the standard C3PIO API routes manually.
 	a.AddC3PIORoutes()
@@ -40,7 +40,7 @@ func main() {
 	// means the REST API will be available, but not the web interface.
 	a.StartWithoutDefaults()
 
-	hello := master.AddRobot(gobot.NewRobot("hello"))
+	hello := manager.AddRobot(gobot.NewRobot("hello"))
 
 	hello.AddCommand("hi_there", func(params map[string]interface{}) interface{} {
 		return fmt.Sprintf("This command is attached to the robot %v", hello.Name)
@@ -61,7 +61,9 @@ func main() {
 	// start capturing
 	go mjpegCapture()
 
-	master.Start()
+	if err := manager.Start(); err != nil {
+		panic(err)
+	}
 }
 
 func mjpegCapture() {

@@ -13,7 +13,7 @@ import (
 
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/i2c"
-	"gobot.io/x/gobot/v2/platforms/tinkerboard"
+	"gobot.io/x/gobot/v2/platforms/asus/tinkerboard"
 )
 
 // Attention! Possibly this will not work, because the current kernel of Tinker-OS 4.4.194 (2021-10-06) needs the
@@ -97,13 +97,13 @@ func main() {
 		work,
 	)
 
-	err = robot.Start()
-	if err != nil {
-		fmt.Println(err)
+	if err := robot.Start(); err != nil {
+		panic(err)
 	}
 }
 
-// workaround for some boards (e.g. tinkerboard), because Read*Data not working together with PCA9501 caused by bad timing
+// workaround for some boards (e.g. tinkerboard), because Read*Data not working together with PCA9501,
+// caused by bad timing
 func readBlockDataBadTiming(drv *i2c.GenericDriver, reg uint8, data []byte) error {
 	// set a value to the dummy address
 	if err := drv.WriteByteData(reg-1, 0x00); err != nil {

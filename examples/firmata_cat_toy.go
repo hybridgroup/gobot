@@ -35,7 +35,7 @@ func main() {
 	work := func() {
 		x := 90.0
 		z := 90.0
-		leapDriver.On(leap.MessageEvent, func(data interface{}) {
+		_ = leapDriver.On(leap.MessageEvent, func(data interface{}) {
 			if len(data.(leap.Frame).Hands) > 0 {
 				hand := data.(leap.Frame).Hands[0]
 				x = gobot.ToScale(gobot.FromScale(hand.X(), -300, 300), 30, 150)
@@ -43,8 +43,12 @@ func main() {
 			}
 		})
 		gobot.Every(10*time.Millisecond, func() {
-			servo1.Move(uint8(x))
-			servo2.Move(uint8(z))
+			if err := servo1.Move(uint8(x)); err != nil {
+				fmt.Println(err)
+			}
+			if err := servo2.Move(uint8(z)); err != nil {
+				fmt.Println(err)
+			}
 			fmt.Println("Current Angle: ", servo1.Angle(), ",", servo2.Angle())
 		})
 	}
@@ -55,5 +59,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

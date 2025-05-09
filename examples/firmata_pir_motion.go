@@ -29,13 +29,17 @@ func main() {
 	led := gpio.NewLedDriver(firmataAdaptor, "13")
 
 	work := func() {
-		sensor.On(gpio.MotionDetected, func(data interface{}) {
+		_ = sensor.On(gpio.MotionDetected, func(data interface{}) {
 			fmt.Println(gpio.MotionDetected)
-			led.On()
+			if err := led.On(); err != nil {
+				fmt.Println(err)
+			}
 		})
-		sensor.On(gpio.MotionStopped, func(data interface{}) {
+		_ = sensor.On(gpio.MotionStopped, func(data interface{}) {
 			fmt.Println(gpio.MotionStopped)
-			led.Off()
+			if err := led.Off(); err != nil {
+				fmt.Println(err)
+			}
 		})
 	}
 
@@ -45,5 +49,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

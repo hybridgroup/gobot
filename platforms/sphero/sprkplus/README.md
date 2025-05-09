@@ -16,13 +16,13 @@ import (
   "time"
 
   "gobot.io/x/gobot/v2"
-  "gobot.io/x/gobot/v2/platforms/ble"
-  "gobot.io/x/gobot/v2/platforms/sphero/sprkplus"
+  "gobot.io/x/gobot/v2/platforms/bleclient"
+  "gobot.io/x/gobot/v2/drivers/ble/sphero"
 )
 
 func main() {
-  bleAdaptor := ble.NewClientAdaptor(os.Args[1])
-  sprk := sprkplus.NewDriver(bleAdaptor)
+  bleAdaptor := bleclient.NewAdaptor(os.Args[1])
+  sprk := sphero.NewSPRKPlusDriver(bleAdaptor)
 
   work := func() {
     gobot.Every(1*time.Second, func() {
@@ -39,7 +39,10 @@ func main() {
     work,
   )
 
-  robot.Start()
+  err := robot.Start()
+  if err != nil {
+    fmt.Println(err)
+  }
 }
 ```
 

@@ -45,6 +45,9 @@ func startEdgePolling(
 		for {
 			select {
 			case <-quitChan:
+				if !firstLoopDone {
+					wg.Done()
+				}
 				return
 			default:
 				// note: pure reading takes between 30us and 1ms on rasperry Pi1, typically 50us, with sysfs also 500us
@@ -52,7 +55,7 @@ func startEdgePolling(
 				readStart = time.Now()
 				readValue, err := pinReadFunc()
 				if err != nil {
-					fmt.Printf("edge polling error occurred while reading the pin %s: %v", pinLabel, err)
+					fmt.Printf("edge polling error occurred while reading the pin %s: %v\n", pinLabel, err)
 					readValue = oldState // keep the value
 				}
 				if readValue != oldState {

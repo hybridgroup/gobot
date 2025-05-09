@@ -17,7 +17,7 @@ func main() {
 	mqttAdaptor := mqtt.NewAdaptor("tcp://iot.eclipse.org:1883", "conductor")
 
 	work := func() {
-		keys.On(keyboard.Key, func(data interface{}) {
+		_ = keys.On(keyboard.Key, func(data interface{}) {
 			key := data.(keyboard.KeyEvent)
 
 			switch key.Key {
@@ -39,5 +39,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

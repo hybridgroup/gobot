@@ -22,6 +22,14 @@ If this is a new driver or adaptor:
 - [ ] I have added an example to see how to setup and use it
 - [ ] I have checked or build at least my new example (e.g. by run `make examples_check`)
 
+If this is a Go version update:
+
+- [ ] go.mod to new version updated
+- [ ] modules updated (go get -u -t ./...)
+- [ ] CI files updated
+- [ ] linter setting and linter version (if a newer one exist) updated
+- [ ] linter issues fixed or suppressed by config
+
 If this is a PR for release:
 
 - [ ] The PR's target branch is 'hybridgroup:release'

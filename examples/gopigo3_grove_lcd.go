@@ -7,6 +7,8 @@
 package main
 
 import (
+	"fmt"
+
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/i2c"
 	"gobot.io/x/gobot/v2/platforms/dexter/gopigo3"
@@ -19,17 +21,24 @@ func main() {
 	screen := i2c.NewGroveLcdDriver(raspiAdaptor)
 
 	work := func() {
-		manufacturerName := ""
-		boardName := ""
-		hardwareVersion := ""
-		manufacturerName, _ = gpg3.GetManufacturerName()
-		boardName, _ = gpg3.GetBoardName()
-		hardwareVersion, _ = gpg3.GetHardwareVersion()
-		screen.Write(manufacturerName[0:15])
-		screen.SetPosition(16)
-		screen.Write(boardName + " " + hardwareVersion)
-		screen.SetRGB(0, 0, 255)
-		screen.Home()
+		manufacturerName, _ := gpg3.GetManufacturerName()
+		boardName, _ := gpg3.GetBoardName()
+		hardwareVersion, _ := gpg3.GetHardwareVersion()
+		if err := screen.Write(manufacturerName[0:15]); err != nil {
+			fmt.Println(err)
+		}
+		if err := screen.SetPosition(16); err != nil {
+			fmt.Println(err)
+		}
+		if err := screen.Write(boardName + " " + hardwareVersion); err != nil {
+			fmt.Println(err)
+		}
+		if err := screen.SetRGB(0, 0, 255); err != nil {
+			fmt.Println(err)
+		}
+		if err := screen.Home(); err != nil {
+			fmt.Println(err)
+		}
 	}
 
 	robot := gobot.NewRobot("gopigo3lcd",
@@ -38,5 +47,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

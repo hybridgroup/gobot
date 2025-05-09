@@ -29,7 +29,7 @@ func TestNewMFRC522Driver(t *testing.T) {
 	var di interface{} = NewMFRC522Driver(newSpiTestAdaptor())
 	d, ok := di.(*MFRC522Driver)
 	if !ok {
-		t.Errorf("NewMFRC522Driver() should have returned a *MFRC522Driver")
+		require.Fail(t, "NewMFRC522Driver() should have returned a *MFRC522Driver")
 	}
 	assert.NotNil(t, d.Driver)
 	assert.True(t, strings.HasPrefix(d.Name(), "MFRC522"))

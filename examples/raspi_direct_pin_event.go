@@ -31,8 +31,10 @@ var (
 // PWR  Raspi: 1 (+3.3V, VCC), 2(+5V), 6, 9, 14, 20 (GND)
 // GPIO Raspi: header pin 21 (GPIO9) is input, pin 24 (GPIO8) is normal output, pin 26 (GPIO7) is inverted output
 // Button: the input pin is wired with a button to GND, the internal pull up resistor is used
-// LED's: the output pins are wired to the cathode of a LED, the anode is wired with a resistor (70-130Ohm for 20mA) to VCC
-// Expected behavior: always one LED is on, the other in opposite state, if button is pressed for >2 seconds the state changes
+// LED's: the output pins are wired to the cathode of a LED, the anode is wired with a resistor (70-130Ohm for 20mA)
+// to VCC
+// Expected behavior: always one LED is on, the other in opposite state, if button is pressed for >2 seconds the state
+// changes
 func main() {
 	board := raspi.NewAdaptor()
 
@@ -73,7 +75,9 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }
 
 func buttonEventHandler(offset int, t time.Duration, et string, sn uint32, lsn uint32) {

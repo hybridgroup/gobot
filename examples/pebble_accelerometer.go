@@ -15,8 +15,8 @@ import (
 )
 
 func main() {
-	master := gobot.NewMaster()
-	a := api.NewAPI(master)
+	manager := gobot.NewManager()
+	a := api.NewAPI(manager)
 	a.Port = "8080"
 	a.Start()
 
@@ -24,7 +24,7 @@ func main() {
 	pebbleDriver := pebble.NewDriver(pebbleAdaptor)
 
 	work := func() {
-		pebbleDriver.On(pebbleDriver.Event("accel"), func(data interface{}) {
+		_ = pebbleDriver.On(pebbleDriver.Event("accel"), func(data interface{}) {
 			fmt.Println(data.(string))
 		})
 	}
@@ -35,7 +35,9 @@ func main() {
 		work,
 	)
 
-	master.AddRobot(robot)
+	manager.AddRobot(robot)
 
-	master.Start()
+	if err := manager.Start(); err != nil {
+		panic(err)
+	}
 }

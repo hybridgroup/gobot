@@ -27,19 +27,19 @@ func main() {
 	wiichuck := i2c.NewWiichuckDriver(firmataAdaptor)
 
 	work := func() {
-		wiichuck.On(wiichuck.Event("joystick"), func(data interface{}) {
+		_ = wiichuck.On(wiichuck.Event("joystick"), func(data interface{}) {
 			fmt.Println("joystick", data)
 		})
 
-		wiichuck.On(wiichuck.Event("c"), func(data interface{}) {
+		_ = wiichuck.On(wiichuck.Event("c"), func(data interface{}) {
 			fmt.Println("c")
 		})
 
-		wiichuck.On(wiichuck.Event("z"), func(data interface{}) {
+		_ = wiichuck.On(wiichuck.Event("z"), func(data interface{}) {
 			fmt.Println("z")
 		})
 
-		wiichuck.On(wiichuck.Event("error"), func(data interface{}) {
+		_ = wiichuck.On(wiichuck.Event("error"), func(data interface{}) {
 			fmt.Println("Wiichuck error:", data)
 		})
 	}
@@ -50,5 +50,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

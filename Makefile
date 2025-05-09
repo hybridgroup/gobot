@@ -5,14 +5,14 @@ EXAMPLES_NO_GOCV := $(shell grep -L 'gocv' $(ALL_EXAMPLES))
 # used examples
 EXAMPLES := $(EXAMPLES_NO_GOCV)
 
-.PHONY: test test_race test_cover robeaux version_check fmt_check fmt_fix examples examples_check $(EXAMPLES)
+.PHONY: test test_race test_cover robeaux version_check fmt_check fmt_fix examples examples_check examples_fmt_fix $(EXAMPLES)
 
 # opencv platform currently skipped to prevent install of preconditions
 including_except := $(shell go list ./... | grep -v platforms/opencv)
 
 # Run tests on nearly all directories without test cache, with race detection
 test_race:
-	go test -failfast -count=1 -v -race $(including_except)
+	go test -failfast -count=1 -race $(including_except) -tags libusb
 
 # Run tests on nearly all directories without test cache
 test:
@@ -65,9 +65,15 @@ examples: $(EXAMPLES)
 examples_check: 
 	$(MAKE) CHECK=ON examples
 
+examples_fmt_fix: 
+	$(MAKE) CHECK=FMT examples
+
 $(EXAMPLES):
 ifeq ($(CHECK),ON)
-	go vet ./$@
+	go vet -tags libusb ./$@
+else ifeq ($(CHECK),FMT)
+	gofumpt -l -w ./$@
+	golangci-lint run ./$@ --fix --build-tags example,libusb --disable forcetypeassert --disable noctx
 else
-	go build -o /tmp/gobot_examples/$@ ./$@
+	go build -tags libusb -o /tmp/gobot_examples/$@ ./$@
 endif

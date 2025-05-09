@@ -64,6 +64,10 @@ func main() {
     work,
   )
 
-  robot.Start()
+  if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }
 ```
+
+Build your application with build tag "gocv".

@@ -12,9 +12,10 @@ import (
 type spiGpioConfig struct {
 	pinProvider gobot.DigitalPinnerProvider
 	sclkPinID   string
-	nssPinID    string
-	mosiPinID   string
-	misoPinID   string
+	ncsPinID    string
+	sdoPinID    string
+	sdiPinID    string
+	debug       bool
 }
 
 // spiGpio is the implementation of the SPI interface using GPIO's.
@@ -23,30 +24,30 @@ type spiGpio struct {
 	// time between clock edges (i.e. half the cycle time)
 	tclk    time.Duration
 	sclkPin gobot.DigitalPinner
-	nssPin  gobot.DigitalPinner
-	mosiPin gobot.DigitalPinner
-	misoPin gobot.DigitalPinner
+	ncsPin  gobot.DigitalPinner
+	sdoPin  gobot.DigitalPinner
+	sdiPin  gobot.DigitalPinner
 }
 
 // newSpiGpio creates and returns a new SPI connection based on given GPIO's.
-func newSpiGpio(cfg spiGpioConfig, maxSpeed int64) (*spiGpio, error) {
+func newSpiGpio(cfg spiGpioConfig, maxSpeedHz int64) (*spiGpio, error) {
 	spi := &spiGpio{cfg: cfg}
-	spi.initializeTime(maxSpeed)
+	spi.initializeTime(maxSpeedHz)
 	return spi, spi.initializeGpios()
 }
 
-func (s *spiGpio) initializeTime(maxSpeed int64) {
-	// maxSpeed is given in Hz, tclk is half the cycle time, tclk=1/(2*f), tclk[ns]=1 000 000 000/(2*maxSpeed)
+func (s *spiGpio) initializeTime(maxSpeedHz int64) {
+	// maxSpeedHz is given in Hz, tclk is half the cycle time, tclk=1/(2*f), tclk[ns]=1 000 000 000/(2*maxSpeed)
 	// but with gpio's a speed of more than ~15kHz is most likely not possible, so we limit to 10kHz
-	if maxSpeed > 10000 {
-		if systemDebug {
+	if maxSpeedHz > 10000 {
+		if s.cfg.debug {
 			fmt.Printf("reduce SPI speed for GPIO usage to 10Khz")
 		}
-		maxSpeed = 10000
+		maxSpeedHz = 10000
 	}
-	tclk := time.Duration(1000000000/2/maxSpeed) * time.Nanosecond
-	if systemDebug {
-		fmt.Println("clk", tclk)
+	s.tclk = time.Duration(1000000000/2/maxSpeedHz) * time.Nanosecond
+	if s.cfg.debug {
+		fmt.Println("clk", s.tclk)
 	}
 }
 
@@ -60,7 +61,7 @@ func (s *spiGpio) TxRx(tx []byte, rx []byte) error {
 		}
 	}
 
-	if err := s.nssPin.Write(0); err != nil {
+	if err := s.ncsPin.Write(0); err != nil {
 		return err
 	}
 
@@ -74,7 +75,7 @@ func (s *spiGpio) TxRx(tx []byte, rx []byte) error {
 		}
 	}
 
-	return s.nssPin.Write(1)
+	return s.ncsPin.Write(1)
 }
 
 // Close the SPI connection. Implements gobot.SpiSystemDevicer.
@@ -85,18 +86,18 @@ func (s *spiGpio) Close() error {
 			err = multierror.Append(err, e)
 		}
 	}
-	if s.mosiPin != nil {
-		if e := s.mosiPin.Unexport(); e != nil {
+	if s.sdoPin != nil {
+		if e := s.sdoPin.Unexport(); e != nil {
 			err = multierror.Append(err, e)
 		}
 	}
-	if s.misoPin != nil {
-		if e := s.misoPin.Unexport(); e != nil {
+	if s.sdiPin != nil {
+		if e := s.sdiPin.Unexport(); e != nil {
 			err = multierror.Append(err, e)
 		}
 	}
-	if s.nssPin != nil {
-		if e := s.nssPin.Unexport(); e != nil {
+	if s.ncsPin != nil {
+		if e := s.ncsPin.Unexport(); e != nil {
 			err = multierror.Append(err, e)
 		}
 	}
@@ -104,7 +105,7 @@ func (s *spiGpio) Close() error {
 }
 
 func (cfg *spiGpioConfig) String() string {
-	return fmt.Sprintf("sclk: %s, nss: %s, mosi: %s, miso: %s", cfg.sclkPinID, cfg.nssPinID, cfg.mosiPinID, cfg.misoPinID)
+	return fmt.Sprintf("sclk: %s, ncs: %s, sdo: %s, sdi: %s", cfg.sclkPinID, cfg.ncsPinID, cfg.sdoPinID, cfg.sdiPinID)
 }
 
 // transferByte simultaneously transmit and receive a byte
@@ -116,7 +117,7 @@ func (s *spiGpio) transferByte(txByte uint8) (uint8, error) {
 	bitMask := uint8(0x80) // start at MSBit
 
 	for i := 0; i < 8; i++ {
-		if err := s.mosiPin.Write(int(txByte & bitMask)); err != nil {
+		if err := s.sdoPin.Write(int(txByte & bitMask)); err != nil {
 			return 0, err
 		}
 
@@ -125,7 +126,7 @@ func (s *spiGpio) transferByte(txByte uint8) (uint8, error) {
 			return 0, err
 		}
 
-		v, err := s.misoPin.Read()
+		v, err := s.sdiPin.Read()
 		if err != nil {
 			return 0, err
 		}
@@ -146,12 +147,12 @@ func (s *spiGpio) transferByte(txByte uint8) (uint8, error) {
 
 func (s *spiGpio) initializeGpios() error {
 	var err error
-	// nss is an output, negated (currently not implemented at pin level)
-	s.nssPin, err = s.cfg.pinProvider.DigitalPin(s.cfg.nssPinID)
+	// ncs is an output, negated (currently not implemented at pin level)
+	s.ncsPin, err = s.cfg.pinProvider.DigitalPin(s.cfg.ncsPinID)
 	if err != nil {
 		return err
 	}
-	if err := s.nssPin.ApplyOptions(WithPinDirectionOutput(1)); err != nil {
+	if err := s.ncsPin.ApplyOptions(WithPinDirectionOutput(1)); err != nil {
 		return err
 	}
 	// sclk is an output, CPOL = 0
@@ -162,15 +163,15 @@ func (s *spiGpio) initializeGpios() error {
 	if err := s.sclkPin.ApplyOptions(WithPinDirectionOutput(0)); err != nil {
 		return err
 	}
-	// miso is an input
-	s.misoPin, err = s.cfg.pinProvider.DigitalPin(s.cfg.misoPinID)
+	// sdi is an input
+	s.sdiPin, err = s.cfg.pinProvider.DigitalPin(s.cfg.sdiPinID)
 	if err != nil {
 		return err
 	}
-	// mosi is an output
-	s.mosiPin, err = s.cfg.pinProvider.DigitalPin(s.cfg.mosiPinID)
+	// sdo is an output
+	s.sdoPin, err = s.cfg.pinProvider.DigitalPin(s.cfg.sdoPinID)
 	if err != nil {
 		return err
 	}
-	return s.mosiPin.ApplyOptions(WithPinDirectionOutput(0))
+	return s.sdoPin.ApplyOptions(WithPinDirectionOutput(0))
 }

@@ -24,7 +24,7 @@ func TestNewMPL115A2Driver(t *testing.T) {
 	var di interface{} = NewMPL115A2Driver(newI2cTestAdaptor())
 	d, ok := di.(*MPL115A2Driver)
 	if !ok {
-		t.Errorf("NewMPL115A2Driver() should have returned a *MPL115A2Driver")
+		require.Fail(t, "NewMPL115A2Driver() should have returned a *MPL115A2Driver")
 	}
 	assert.NotNil(t, d.Connection())
 	assert.True(t, strings.HasPrefix(d.Name(), "MPL115A2"))
@@ -51,7 +51,7 @@ func TestMPL115A2ReadData(t *testing.T) {
 	//   * shift the temperature value right for 6 bits (resolution is 10 bit)
 	//   * shift the pressure value right for 6 bits (resolution is 10 bit)
 	// * calculate temperature in °C according to this implementation:
-	//   https://github.com/adafruit/Adafruit_MPL115A2/blob/master/Adafruit_MPL115A2.cpp
+	//   https://github.com/adafruit/Adafruit_MPL115A2/tree/2.0.2/Adafruit_MPL115A2.cpp
 	//
 	// arrange
 	d, a := initTestMPL115A2DriverWithStubbedAdaptor()
@@ -90,7 +90,7 @@ func TestMPL115A2ReadData(t *testing.T) {
 	assert.Equal(t, uint8(0x12), a.written[3])
 	assert.Equal(t, uint8(0x00), a.written[4])
 	assert.Equal(t, uint8(0x00), a.written[5])
-	assert.InDelta(t, float32(96.585915), press, 0.0)
+	assert.InDelta(t, float32(96.585915), press, 1.0e-5)
 	assert.InDelta(t, float32(23.317757), temp, 0.0)
 }
 

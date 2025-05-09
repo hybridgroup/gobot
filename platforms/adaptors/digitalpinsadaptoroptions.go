@@ -3,155 +3,198 @@ package adaptors
 import (
 	"time"
 
-	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/system"
 )
 
-// DigitalPinsOptioner is the interface for digital adaptors options. This provides the possibility for change the
+// DigitalPinsOptionApplier is the interface for digital adaptors options. This provides the possibility for change the
 // platform behavior by the user when creating the platform, e.g. by "NewAdaptor()".
-// TODO: change to applier-architecture, see options of pwmpinsadaptor.go
-type DigitalPinsOptioner interface {
-	setDigitalPinInitializer(initializer digitalPinInitializer)
-	setDigitalPinsForSystemGpiod()
-	setDigitalPinsForSystemSpi(sclkPin, nssPin, mosiPin, misoPin string)
-	prepareDigitalPinsActiveLow(pin string, otherPins ...string)
-	prepareDigitalPinsPullDown(pin string, otherPins ...string)
-	prepareDigitalPinsPullUp(pin string, otherPins ...string)
-	prepareDigitalPinsOpenDrain(pin string, otherPins ...string)
-	prepareDigitalPinsOpenSource(pin string, otherPins ...string)
-	prepareDigitalPinDebounce(pin string, period time.Duration)
-	prepareDigitalPinEventOnFallingEdge(pin string, handler func(lineOffset int, timestamp time.Duration,
-		detectedEdge string, seqno uint32, lseqno uint32))
-	prepareDigitalPinEventOnRisingEdge(pin string, handler func(lineOffset int, timestamp time.Duration,
-		detectedEdge string, seqno uint32, lseqno uint32))
-	prepareDigitalPinEventOnBothEdges(pin string, handler func(lineOffset int, timestamp time.Duration,
-		detectedEdge string, seqno uint32, lseqno uint32))
-	prepareDigitalPinPollForEdgeDetection(pin string, pollInterval time.Duration, pollQuitChan chan struct{})
+// The interface needs to be implemented by each configurable option type.
+type DigitalPinsOptionApplier interface {
+	apply(cfg *digitalPinsConfiguration)
 }
 
-func (a *DigitalPinsAdaptor) setDigitalPinInitializer(pinInit digitalPinInitializer) {
-	a.initialize = pinInit
+// digitalPinsDebugOption is the type to switch on digital pin related debug messages.
+type digitalPinsDebugOption bool
+
+// digitalPinInitializeOption is the type for applying another than the default initializer
+type digitalPinsInitializeOption digitalPinInitializer
+
+// digitalPinsSystemSysfsOption is the type to change the default character device implementation to the legacy
+// sysfs Kernel ABI
+type digitalPinsSystemSysfsOption bool
+
+// digitalPinsActiveLowOption is the type to prepare the given pins for inverse reaction on next initialize
+type digitalPinsActiveLowOption []string
+
+// digitalPinsPullDownOption is the type to prepare the given pins to be pulled down (high impedance to GND)
+// on next initialize
+type digitalPinsPullDownOption []string
+
+// digitalPinsPullUpOption is the type to prepare the given pins to be pulled up (high impedance to VDD)
+// on next initialize
+type digitalPinsPullUpOption []string
+
+// digitalPinsOpenDrainOption is the type to prepare the given output pins to be driven with open drain/collector
+// on next initialize
+type digitalPinsOpenDrainOption []string
+
+// digitalPinsOpenSourceOption is the type to prepares the given output pins to be driven with open source/emitter
+// on next initialize
+type digitalPinsOpenSourceOption []string
+
+// digitalPinsDebounceOption is the type to prepare the given input pin to be debounced on next initialize
+type digitalPinsDebounceOption struct {
+	id     string
+	period time.Duration
 }
 
-func (a *DigitalPinsAdaptor) setDigitalPinsForSystemGpiod() {
-	system.WithDigitalPinGpiodAccess()(a.sys)
+// digitalPinsEventOnFallingEdgeOption is the type to prepare the given input pin to be generate an event
+// on falling edge
+type digitalPinsEventOnFallingEdgeOption struct {
+	id      string
+	handler func(int, time.Duration, string, uint32, uint32)
 }
 
-func (a *DigitalPinsAdaptor) setDigitalPinsForSystemSpi(sclkPin, nssPin, mosiPin, misoPin string) {
-	system.WithSpiGpioAccess(a, sclkPin, nssPin, mosiPin, misoPin)(a.sys)
+// digitalPinsEventOnRisingEdgeOption is the type to prepare the given input pin to be generate an event
+// on rising edge
+type digitalPinsEventOnRisingEdgeOption struct {
+	id      string
+	handler func(int, time.Duration, string, uint32, uint32)
 }
 
-func (a *DigitalPinsAdaptor) prepareDigitalPinsActiveLow(id string, otherIDs ...string) {
-	ids := []string{id}
-	ids = append(ids, otherIDs...)
+// digitalPinsEventOnBothEdgesOption is the type to prepare the given input pin to be generate an event
+// on rising and falling edges
+type digitalPinsEventOnBothEdgesOption struct {
+	id      string
+	handler func(int, time.Duration, string, uint32, uint32)
+}
 
-	if a.pinOptions == nil {
-		a.pinOptions = make(map[string][]func(gobot.DigitalPinOptioner) bool)
-	}
+// digitalPinsPollForEdgeDetectionOption is the type to prepare the given input pin to use a discrete input pin polling
+// function together with edge detection.
+type digitalPinsPollForEdgeDetectionOption struct {
+	id           string
+	pollInterval time.Duration
+	pollQuitChan chan struct{}
+}
 
-	for _, i := range ids {
-		a.pinOptions[i] = append(a.pinOptions[i], system.WithPinActiveLow())
+func (o digitalPinsDebugOption) String() string {
+	return "switch on debugging for digital pins option"
+}
+
+func (o digitalPinsInitializeOption) String() string {
+	return "pin initializer option for digital IO's"
+}
+
+func (o digitalPinsSystemSysfsOption) String() string {
+	return "use sysfs vs. cdev system access option for digital pins"
+}
+
+func (o digitalPinsActiveLowOption) String() string {
+	return "digital pins set to active low option"
+}
+
+func (o digitalPinsPullDownOption) String() string {
+	return "digital pins set to pull down option"
+}
+
+func (o digitalPinsPullUpOption) String() string {
+	return "digital pins set to pull up option"
+}
+
+func (o digitalPinsOpenDrainOption) String() string {
+	return "digital pins set to open drain option"
+}
+
+func (o digitalPinsOpenSourceOption) String() string {
+	return "digital pins set to open source option"
+}
+
+func (o digitalPinsDebounceOption) String() string {
+	return "set debounce time for digital pin option"
+}
+
+func (o digitalPinsEventOnFallingEdgeOption) String() string {
+	return "set event on falling edge for digital pin option"
+}
+
+func (o digitalPinsEventOnRisingEdgeOption) String() string {
+	return "set event on rising edge for digital pin option"
+}
+
+func (o digitalPinsEventOnBothEdgesOption) String() string {
+	return "set event on rising and falling edge for digital pin option"
+}
+
+func (o digitalPinsPollForEdgeDetectionOption) String() string {
+	return "discrete polling function for edge detection on digital pin option"
+}
+
+func (o digitalPinsDebugOption) apply(cfg *digitalPinsConfiguration) {
+	cfg.debug = bool(o)
+	cfg.systemOptions = append(cfg.systemOptions, system.WithDigitalPinDebug())
+}
+
+func (o digitalPinsInitializeOption) apply(cfg *digitalPinsConfiguration) {
+	cfg.initialize = digitalPinInitializer(o)
+}
+
+func (o digitalPinsSystemSysfsOption) apply(cfg *digitalPinsConfiguration) {
+	useSysFs := bool(o)
+
+	if useSysFs {
+		cfg.systemOptions = append(cfg.systemOptions, system.WithDigitalPinSysfsAccess())
+	} else {
+		cfg.systemOptions = append(cfg.systemOptions, system.WithDigitalPinCdevAccess())
 	}
 }
 
-func (a *DigitalPinsAdaptor) prepareDigitalPinsPullDown(id string, otherIDs ...string) {
-	ids := []string{id}
-	ids = append(ids, otherIDs...)
-
-	if a.pinOptions == nil {
-		a.pinOptions = make(map[string][]func(gobot.DigitalPinOptioner) bool)
-	}
-
-	for _, i := range ids {
-		a.pinOptions[i] = append(a.pinOptions[i], system.WithPinPullDown())
+func (o digitalPinsActiveLowOption) apply(cfg *digitalPinsConfiguration) {
+	for _, pin := range o {
+		cfg.pinOptions[pin] = append(cfg.pinOptions[pin], system.WithPinActiveLow())
 	}
 }
 
-func (a *DigitalPinsAdaptor) prepareDigitalPinsPullUp(id string, otherIDs ...string) {
-	ids := []string{id}
-	ids = append(ids, otherIDs...)
-
-	if a.pinOptions == nil {
-		a.pinOptions = make(map[string][]func(gobot.DigitalPinOptioner) bool)
-	}
-
-	for _, i := range ids {
-		a.pinOptions[i] = append(a.pinOptions[i], system.WithPinPullUp())
+func (o digitalPinsPullDownOption) apply(cfg *digitalPinsConfiguration) {
+	for _, pin := range o {
+		cfg.pinOptions[pin] = append(cfg.pinOptions[pin], system.WithPinPullDown())
 	}
 }
 
-func (a *DigitalPinsAdaptor) prepareDigitalPinsOpenDrain(id string, otherIDs ...string) {
-	ids := []string{id}
-	ids = append(ids, otherIDs...)
-
-	if a.pinOptions == nil {
-		a.pinOptions = make(map[string][]func(gobot.DigitalPinOptioner) bool)
-	}
-
-	for _, i := range ids {
-		a.pinOptions[i] = append(a.pinOptions[i], system.WithPinOpenDrain())
+func (o digitalPinsPullUpOption) apply(cfg *digitalPinsConfiguration) {
+	for _, pin := range o {
+		cfg.pinOptions[pin] = append(cfg.pinOptions[pin], system.WithPinPullUp())
 	}
 }
 
-func (a *DigitalPinsAdaptor) prepareDigitalPinsOpenSource(id string, otherIDs ...string) {
-	ids := []string{id}
-	ids = append(ids, otherIDs...)
-
-	if a.pinOptions == nil {
-		a.pinOptions = make(map[string][]func(gobot.DigitalPinOptioner) bool)
-	}
-
-	for _, i := range ids {
-		a.pinOptions[i] = append(a.pinOptions[i], system.WithPinOpenSource())
+func (o digitalPinsOpenDrainOption) apply(cfg *digitalPinsConfiguration) {
+	for _, pin := range o {
+		cfg.pinOptions[pin] = append(cfg.pinOptions[pin], system.WithPinOpenDrain())
 	}
 }
 
-func (a *DigitalPinsAdaptor) prepareDigitalPinDebounce(id string, period time.Duration) {
-	if a.pinOptions == nil {
-		a.pinOptions = make(map[string][]func(gobot.DigitalPinOptioner) bool)
+func (o digitalPinsOpenSourceOption) apply(cfg *digitalPinsConfiguration) {
+	for _, pin := range o {
+		cfg.pinOptions[pin] = append(cfg.pinOptions[pin], system.WithPinOpenSource())
 	}
-
-	a.pinOptions[id] = append(a.pinOptions[id], system.WithPinDebounce(period))
 }
 
-func (a *DigitalPinsAdaptor) prepareDigitalPinEventOnFallingEdge(id string, handler func(int, time.Duration, string,
-	uint32, uint32),
-) {
-	if a.pinOptions == nil {
-		a.pinOptions = make(map[string][]func(gobot.DigitalPinOptioner) bool)
-	}
-
-	a.pinOptions[id] = append(a.pinOptions[id], system.WithPinEventOnFallingEdge(handler))
+func (o digitalPinsDebounceOption) apply(cfg *digitalPinsConfiguration) {
+	cfg.pinOptions[o.id] = append(cfg.pinOptions[o.id], system.WithPinDebounce(o.period))
 }
 
-func (a *DigitalPinsAdaptor) prepareDigitalPinEventOnRisingEdge(id string, handler func(int, time.Duration, string,
-	uint32, uint32),
-) {
-	if a.pinOptions == nil {
-		a.pinOptions = make(map[string][]func(gobot.DigitalPinOptioner) bool)
-	}
-
-	a.pinOptions[id] = append(a.pinOptions[id], system.WithPinEventOnRisingEdge(handler))
+func (o digitalPinsEventOnFallingEdgeOption) apply(cfg *digitalPinsConfiguration) {
+	cfg.pinOptions[o.id] = append(cfg.pinOptions[o.id], system.WithPinEventOnFallingEdge(o.handler))
 }
 
-func (a *DigitalPinsAdaptor) prepareDigitalPinEventOnBothEdges(id string, handler func(int, time.Duration, string,
-	uint32, uint32),
-) {
-	if a.pinOptions == nil {
-		a.pinOptions = make(map[string][]func(gobot.DigitalPinOptioner) bool)
-	}
-
-	a.pinOptions[id] = append(a.pinOptions[id], system.WithPinEventOnBothEdges(handler))
+func (o digitalPinsEventOnRisingEdgeOption) apply(cfg *digitalPinsConfiguration) {
+	cfg.pinOptions[o.id] = append(cfg.pinOptions[o.id], system.WithPinEventOnRisingEdge(o.handler))
 }
 
-func (a *DigitalPinsAdaptor) prepareDigitalPinPollForEdgeDetection(
-	id string,
-	pollInterval time.Duration,
-	pollQuitChan chan struct{},
-) {
-	if a.pinOptions == nil {
-		a.pinOptions = make(map[string][]func(gobot.DigitalPinOptioner) bool)
-	}
+func (o digitalPinsEventOnBothEdgesOption) apply(cfg *digitalPinsConfiguration) {
+	cfg.pinOptions[o.id] = append(cfg.pinOptions[o.id], system.WithPinEventOnBothEdges(o.handler))
+}
 
-	a.pinOptions[id] = append(a.pinOptions[id], system.WithPinPollForEdgeDetection(pollInterval, pollQuitChan))
+func (o digitalPinsPollForEdgeDetectionOption) apply(cfg *digitalPinsConfiguration) {
+	cfg.pinOptions[o.id] = append(cfg.pinOptions[o.id],
+		system.WithPinPollForEdgeDetection(o.pollInterval, o.pollQuitChan))
 }

@@ -25,7 +25,7 @@ func TestNewADXL345Driver(t *testing.T) {
 	var di interface{} = NewADXL345Driver(newI2cTestAdaptor())
 	d, ok := di.(*ADXL345Driver)
 	if !ok {
-		t.Errorf("NewADXL345Driver() should have returned a *ADXL345Driver")
+		require.Fail(t, "NewADXL345Driver() should have returned a *ADXL345Driver")
 	}
 	assert.NotNil(t, d.Driver)
 	assert.True(t, strings.HasPrefix(d.Name(), "ADXL345"))

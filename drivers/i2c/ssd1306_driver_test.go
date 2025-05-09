@@ -35,7 +35,7 @@ func TestNewSSD1306Driver(t *testing.T) {
 	var di interface{} = NewSSD1306Driver(newI2cTestAdaptor())
 	d, ok := di.(*SSD1306Driver)
 	if !ok {
-		t.Errorf("new should have returned a *SSD1306Driver")
+		require.Fail(t, "new should have returned a *SSD1306Driver")
 	}
 	assert.NotNil(t, d.Driver)
 	assert.True(t, strings.HasPrefix(d.Name(), "SSD1306"))
@@ -271,11 +271,11 @@ func TestDisplayBuffer(t *testing.T) {
 	display := NewDisplayBuffer(width, height, 8)
 
 	if display.Size() != size {
-		t.Errorf("invalid Size() (%d, expected %d)",
+		require.Fail(t, "invalid Size() (%d, expected %d)",
 			display.Size(), size)
 	}
 	if len(display.buffer) != size {
-		t.Errorf("allocated buffer size invalid (%d, expected %d)",
+		require.Fail(t, "allocated buffer size invalid (%d, expected %d)",
 			len(display.buffer), size)
 	}
 

@@ -29,8 +29,8 @@ import (
 )
 
 func main() {
-  master := gobot.NewMaster()
-  api.NewAPI(master).Start()
+  manager := gobot.NewManager()
+  api.NewAPI(manager).Start()
 
   pebbleAdaptor := pebble.NewAdaptor()
   watch := pebble.NewDriver(pebbleAdaptor)
@@ -52,9 +52,11 @@ func main() {
     work,
   )
 
-  master.AddRobot(robot)
+  manager.AddRobot(robot)
 
-  master.Start()
+  if err := manager.Start(); err != nil {
+    panic(err)
+  }
 }
 
 ```

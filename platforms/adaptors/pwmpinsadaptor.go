@@ -31,7 +31,7 @@ type pwmPinServoScale struct {
 	minDuty, maxDuty     time.Duration
 }
 
-// pwmPinConfiguration contains all changeable attributes of the adaptor.
+// pwmPinsConfiguration contains all changeable attributes of the adaptor.
 type pwmPinsConfiguration struct {
 	initialize                 pwmPinInitializer
 	usePiBlasterPin            bool
@@ -68,7 +68,7 @@ type PWMPinsAdaptor struct {
 //	"WithPWMServoDutyCycleRangeForPin"
 //	"WithPWMServoAngleRangeForPin"
 func NewPWMPinsAdaptor(sys *system.Accesser, t pwmPinTranslator, opts ...PwmPinsOptionApplier) *PWMPinsAdaptor {
-	a := &PWMPinsAdaptor{
+	a := PWMPinsAdaptor{
 		sys:       sys,
 		translate: t,
 		pwmPinsCfg: &pwmPinsConfiguration{
@@ -86,7 +86,9 @@ func NewPWMPinsAdaptor(sys *system.Accesser, t pwmPinTranslator, opts ...PwmPins
 		o.apply(a.pwmPinsCfg)
 	}
 
-	return a
+	sys.AddPWMSupport()
+
+	return &a
 }
 
 // WithPWMPinInitializer substitute the default initializer.
@@ -135,14 +137,14 @@ func WithPWMDefaultPeriodForPin(pin string, periodNanoSec uint32) pwmPinsDefault
 
 // WithPWMServoDutyCycleRangeForPin set new values for range of duty cycle for servo calls, which replaces the default
 // 0.5-2.5 ms range. The given duration values will be internally converted to nanoseconds.
-func WithPWMServoDutyCycleRangeForPin(pin string, min, max time.Duration) pwmPinsServoDutyScaleForPinOption {
-	return pwmPinsServoDutyScaleForPinOption{id: pin, min: min, max: max}
+func WithPWMServoDutyCycleRangeForPin(pin string, minimum, maximum time.Duration) pwmPinsServoDutyScaleForPinOption {
+	return pwmPinsServoDutyScaleForPinOption{id: pin, min: minimum, max: maximum}
 }
 
 // WithPWMServoAngleRangeForPin set new values for range of angle for servo calls, which replaces
 // the default 0.0-180.0° range.
-func WithPWMServoAngleRangeForPin(pin string, min, max float64) pwmPinsServoAngleScaleForPinOption {
-	return pwmPinsServoAngleScaleForPinOption{id: pin, minDegree: min, maxDegree: max}
+func WithPWMServoAngleRangeForPin(pin string, minimum, maximum float64) pwmPinsServoAngleScaleForPinOption {
+	return pwmPinsServoAngleScaleForPinOption{id: pin, minDegree: minimum, maxDegree: maximum}
 }
 
 // Connect prepare new connection to PWM pins.
@@ -384,6 +386,8 @@ func setPeriod(pin gobot.PWMPinner, period uint32, adjustDuty bool) error {
 		if err != nil {
 			return fmt.Errorf("%s with '%v'", errorBase, err)
 		}
+
+		//nolint:gosec // TODO: fix later
 		duty := uint32(uint64(oldDuty) * uint64(period) / uint64(oldPeriod))
 
 		// the order depends on value (duty must not be bigger than period in any situation)

@@ -6,11 +6,19 @@ import (
 
 	multierror "github.com/hashicorp/go-multierror"
 
+	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/spi"
 	"gobot.io/x/gobot/v2/system"
 )
 
 type spiBusNumberValidator func(busNumber int) error
+
+// spiBusConfiguration contains all changeable attributes of the adaptor.
+type spiBusConfiguration struct {
+	debug                 bool
+	spiGpioPinnerProvider gobot.DigitalPinnerProvider
+	systemOptions         []system.AccesserOptionApplier
+}
 
 // SpiBusAdaptor is a adaptor for SPI bus, normally used for composition in platforms.
 type SpiBusAdaptor struct {
@@ -20,17 +28,23 @@ type SpiBusAdaptor struct {
 	defaultChipNumber int
 	defaultMode       int
 	defaultBitCount   int
-	defaultMaxSpeed   int64
+	defaultMaxSpeed   int64 // Hz
+	spiBusCfg         *spiBusConfiguration
 	mutex             sync.Mutex
 	connections       map[string]spi.Connection
 }
 
 // NewSpiBusAdaptor provides the access to SPI buses of the board. The validator is used to check the
 // bus number (given by user) to the abilities of the board.
-func NewSpiBusAdaptor(sys *system.Accesser, v spiBusNumberValidator, busNum, chipNum, mode, bits int,
+func NewSpiBusAdaptor(
+	sys *system.Accesser,
+	v spiBusNumberValidator,
+	busNum, chipNum, mode, bits int,
 	maxSpeed int64,
+	spiGpioPinnerProvider gobot.DigitalPinnerProvider,
+	opts ...SpiBusOptionApplier,
 ) *SpiBusAdaptor {
-	a := &SpiBusAdaptor{
+	a := SpiBusAdaptor{
 		sys:               sys,
 		validateBusNumber: v,
 		defaultBusNumber:  busNum,
@@ -38,14 +52,43 @@ func NewSpiBusAdaptor(sys *system.Accesser, v spiBusNumberValidator, busNum, chi
 		defaultMode:       mode,
 		defaultBitCount:   bits,
 		defaultMaxSpeed:   maxSpeed,
+		spiBusCfg:         &spiBusConfiguration{spiGpioPinnerProvider: spiGpioPinnerProvider},
 	}
-	return a
+
+	for _, o := range opts {
+		o.apply(a.spiBusCfg)
+	}
+
+	sys.AddSPISupport(a.spiBusCfg.systemOptions...)
+
+	return &a
+}
+
+// WithSpiDebug can be used to switch on debugging for SPI implementation.
+func WithSpiDebug() spiBusDebugOption {
+	return spiBusDebugOption(true)
+}
+
+// WithSpiGpioAccess can be used to switch the default SPI implementation to GPIO usage.
+func WithSpiGpioAccess(sclkPin, ncsPin, sdoPin, sdiPin string) spiBusDigitalPinsForSystemSpiOption {
+	o := spiBusDigitalPinsForSystemSpiOption{
+		sclkPin: sclkPin,
+		ncsPin:  ncsPin,
+		sdoPin:  sdoPin,
+		sdiPin:  sdiPin,
+	}
+
+	return o
 }
 
 // Connect prepares the connection to SPI buses.
 func (a *SpiBusAdaptor) Connect() error {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
+
+	if a.spiBusCfg.debug {
+		fmt.Println("connect the SPI bus adaptor")
+	}
 
 	a.connections = make(map[string]spi.Connection)
 	return nil
@@ -55,6 +98,10 @@ func (a *SpiBusAdaptor) Connect() error {
 func (a *SpiBusAdaptor) Finalize() error {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
+
+	if a.spiBusCfg.debug {
+		fmt.Println("finalize the SPI bus adaptor")
+	}
 
 	var err error
 	for _, con := range a.connections {
@@ -73,6 +120,10 @@ func (a *SpiBusAdaptor) Finalize() error {
 func (a *SpiBusAdaptor) GetSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (spi.Connection, error) {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
+
+	if a.spiBusCfg.debug {
+		fmt.Println("get SPI connection")
+	}
 
 	if a.connections == nil {
 		return nil, fmt.Errorf("not connected")

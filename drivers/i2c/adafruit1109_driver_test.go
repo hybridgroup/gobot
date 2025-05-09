@@ -23,7 +23,7 @@ func TestNewAdafruit1109Driver(t *testing.T) {
 	var di interface{} = NewAdafruit1109Driver(newI2cTestAdaptor())
 	d, ok := di.(*Adafruit1109Driver)
 	if !ok {
-		t.Errorf("NewAdafruit1109Driver() should have returned a *Adafruit1109Driver")
+		require.Fail(t, "NewAdafruit1109Driver() should have returned a *Adafruit1109Driver")
 	}
 	assert.NotNil(t, d.Driver)
 	assert.NotNil(t, d.Connection())

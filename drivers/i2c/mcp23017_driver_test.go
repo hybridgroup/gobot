@@ -1,4 +1,4 @@
-//nolint:forcetypeassert // ok here
+//nolint:forcetypeassert,gosec // ok here
 package i2c
 
 import (
@@ -46,7 +46,7 @@ func TestNewMCP23017Driver(t *testing.T) {
 	var di interface{} = NewMCP23017Driver(newI2cTestAdaptor())
 	d, ok := di.(*MCP23017Driver)
 	if !ok {
-		t.Errorf("NewMCP23017Driver() should have returned a *MCP23017Driver")
+		require.Fail(t, "NewMCP23017Driver() should have returned a *MCP23017Driver")
 	}
 	assert.NotNil(t, d.Driver)
 	assert.True(t, strings.HasPrefix(d.Name(), "MCP23017"))

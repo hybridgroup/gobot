@@ -1,6 +1,6 @@
 # GPIOs
 
-This document describes some basics for developers. This is useful to understand programming in gobot's [digital pin driver](digital_pin.go).
+This document describes some basics for developers. This is useful to understand programming in gobot's [digital pin driver](./digitalpin_access.go).
 
 ## GPIOs with sysfs
 
@@ -66,8 +66,8 @@ gpiochip0 - 54 lines:
   ...
   line   7:  "SPI_CE1_N"       unused   input  active-high 
   line   8:  "SPI_CE0_N"       unused   input  active-high 
-  line   9:   "SPI_MISO"       unused   input  active-high 
-  line  10:   "SPI_MOSI"       unused   input  active-high 
+  line   9:    "SPI_SDI"       unused   input  active-high
+  line  10:    "SPI_SDO"       unused   input  active-high
   line  11:   "SPI_SCLK"       unused   input  active-high 
   ...
   line  14:       "TXD0"       unused   input  active-high 
@@ -88,7 +88,7 @@ gpiochip0 - 54 lines:
 For Tinkerboard and in general for all other boards:
 
 * the name on system level differ from the header name (normally pin1..pin40)
-* the mapping is done in gobot by a file named something like [pin_map.go](../platforms/tinkerboard/pin_map.go)
+* the mapping is done in gobot by a file named something like [pinmap.go](../platforms/asus/tinkerboard/pinmap.go)
 * for the next tests the system level name is needed
 
 Connect an oscilloscope or at least a meter to the pin (used header pin26 for example). For the output tests a LED with
@@ -257,4 +257,4 @@ A connected LED with pull-up resistor lights up for setting to "1" (inverse reve
 ## Links
 
 * <https://www.kernel.org/doc/html/latest/admin-guide/gpio/sysfs.html>
-* <https://embeddedbits.org/linux-kernel-gpio-user-space-interface>
+* <https://embeddedbits.org/linux-kernel-gpio-user-space-interface-embeddedbits-2/>

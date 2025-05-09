@@ -43,16 +43,16 @@ const (
 	//  Power on default is 0/0
 	SHT2xAccuracyHigh = byte(0x00)
 
-	// SHT2xTriggerTempMeasureHold is the command for measureing temperature in hold master mode
+	// SHT2xTriggerTempMeasureHold is the command for measuring temperature in hold controller mode
 	SHT2xTriggerTempMeasureHold = 0xe3
 
-	// SHT2xTriggerHumdMeasureHold is the command for measureing humidity in hold master mode
+	// SHT2xTriggerHumdMeasureHold is the command for measuring humidity in hold controller mode
 	SHT2xTriggerHumdMeasureHold = 0xe5
 
-	// SHT2xTriggerTempMeasureNohold is the command for measureing humidity in no hold master mode
+	// SHT2xTriggerTempMeasureNohold is the command for measuring humidity in no hold controller mode
 	SHT2xTriggerTempMeasureNohold = 0xf3
 
-	// SHT2xTriggerHumdMeasureNohold is the command for measureing humidity in no hold master mode
+	// SHT2xTriggerHumdMeasureNohold is the command for measuring humidity in no hold controller mode
 	SHT2xTriggerHumdMeasureNohold = 0xf5
 
 	// SHT2xWriteUserReg is the command for writing user register

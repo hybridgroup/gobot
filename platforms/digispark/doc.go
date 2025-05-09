@@ -1,3 +1,6 @@
+//go:build libusb
+// +build libusb
+
 /*
 Package digispark provides the Gobot adaptor for the Digispark ATTiny-based USB development board.
 
@@ -26,7 +29,9 @@ Example:
 
 		work := func() {
 			gobot.Every(1*time.Second, func() {
-				led.Toggle()
+				if err := led.Toggle(); err != nil {
+				fmt.Println(err)
+			}
 			})
 		}
 
@@ -36,10 +41,12 @@ Example:
 			work,
 		)
 
-		robot.Start()
+		if err := robot.Start(); err != nil {
+			panic(err)
+		}
 	}
 
 For further information refer to digispark README:
-https://github.com/hybridgroup/gobot/blob/master/platforms/digispark/README.md
+https://github.com/hybridgroup/gobot/blob/release/platforms/digispark/README.md
 */
 package digispark // import "gobot.io/x/gobot/v2/platforms/digispark"

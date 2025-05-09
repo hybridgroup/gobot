@@ -11,7 +11,11 @@ import (
 	"gobot.io/x/gobot/v2/system"
 )
 
-const defaultI2cBusNumber = 0
+const (
+	defaultI2cBusNumber = 0
+
+	defaultSpiMaxSpeed = 5000 // 5kHz (more than 15kHz not possible with SPI over GPIO)
+)
 
 type sysfsPin struct {
 	pin    int
@@ -21,51 +25,65 @@ type sysfsPin struct {
 // Adaptor represents an Intel Joule
 type Adaptor struct {
 	name  string
-	sys   *system.Accesser
+	sys   *system.Accesser // used for unit tests only
 	mutex sync.Mutex
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.PWMPinsAdaptor
 	*adaptors.I2cBusAdaptor
+	*adaptors.SpiBusAdaptor // for usage of "adaptors.WithSpiGpioAccess()"
 }
 
 // NewAdaptor returns a new Joule Adaptor
 //
 // Optional parameters:
 //
-//	adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs
-//	adaptors.WithSpiGpioAccess(sclk, nss, mosi, miso):	use GPIO's instead of /dev/spidev#.#
+//	adaptors.WithGpioCdevAccess():	use character device driver instead of sysfs
+//	adaptors.WithSpiGpioAccess(sclk, ncs, sdo, sdi):	use GPIO's instead of /dev/spidev#.#
 //
 //	Optional parameters for PWM, see [adaptors.NewPWMPinsAdaptor]
 func NewAdaptor(opts ...interface{}) *Adaptor {
-	sys := system.NewAccesser()
+	sys := system.NewAccesser(system.WithDigitalPinSysfsAccess())
 	a := &Adaptor{
 		name: gobot.DefaultName("Joule"),
 		sys:  sys,
 	}
 
-	var digitalPinsOpts []func(adaptors.DigitalPinsOptioner)
+	var digitalPinsOpts []adaptors.DigitalPinsOptionApplier
 	pwmPinsOpts := []adaptors.PwmPinsOptionApplier{adaptors.WithPWMPinInitializer(pwmPinInitializer)}
+	var spiBusOpts []adaptors.SpiBusOptionApplier
 	for _, opt := range opts {
 		switch o := opt.(type) {
-		case func(adaptors.DigitalPinsOptioner):
+		case adaptors.DigitalPinsOptionApplier:
 			digitalPinsOpts = append(digitalPinsOpts, o)
 		case adaptors.PwmPinsOptionApplier:
 			pwmPinsOpts = append(pwmPinsOpts, o)
+		case adaptors.SpiBusOptionApplier:
+			spiBusOpts = append(spiBusOpts, o)
 		default:
 			panic(fmt.Sprintf("'%s' can not be applied on adaptor '%s'", opt, a.name))
 		}
 	}
 
+	// Valid bus numbers are [0..2] which corresponds to /dev/i2c-0 through /dev/i2c-2.
+	i2cBusNumberValidator := adaptors.NewBusNumberValidator([]int{0, 1, 2})
+
 	a.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, a.translateDigitalPin, digitalPinsOpts...)
 	a.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, a.translatePWMPin, pwmPinsOpts...)
-	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, a.validateI2cBusNumber, defaultI2cBusNumber)
+	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, i2cBusNumberValidator.Validate, defaultI2cBusNumber)
+
+	// SPI is only supported when "adaptors.WithSpiGpioAccess()" is given
+	if len(spiBusOpts) > 0 {
+		a.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, func(int) error { return nil }, 0, 0, 0, 0, defaultSpiMaxSpeed,
+			a.DigitalPinsAdaptor, spiBusOpts...)
+	}
+
 	return a
 }
 
-// Name returns the Adaptors name
+// Name returns the adaptors name
 func (a *Adaptor) Name() string { return a.name }
 
-// SetName sets the Adaptors name
+// SetName sets the adaptors name
 func (a *Adaptor) SetName(n string) { a.name = n }
 
 // Connect create new connection to board and pins.
@@ -99,14 +117,6 @@ func (a *Adaptor) Finalize() error {
 	}
 
 	return err
-}
-
-func (a *Adaptor) validateI2cBusNumber(busNr int) error {
-	// Valid bus number is [0..2] which corresponds to /dev/i2c-0 through /dev/i2c-2.
-	if (busNr < 0) || (busNr > 2) {
-		return fmt.Errorf("Bus number %d out of range", busNr)
-	}
-	return nil
 }
 
 func (a *Adaptor) translateDigitalPin(id string) (string, int, error) {

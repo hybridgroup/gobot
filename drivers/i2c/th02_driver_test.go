@@ -29,7 +29,7 @@ func TestNewTH02Driver(t *testing.T) {
 	var di interface{} = NewTH02Driver(newI2cTestAdaptor())
 	d, ok := di.(*TH02Driver)
 	if !ok {
-		t.Errorf("NewTH02Driver() should have returned a *NewTH02Driver")
+		require.Fail(t, "NewTH02Driver() should have returned a *NewTH02Driver")
 	}
 	assert.NotNil(t, d.Driver)
 	assert.True(t, strings.HasPrefix(d.Name(), "TH02"))
@@ -56,7 +56,7 @@ func TestTH02SetAccuracy(t *testing.T) {
 	}
 
 	if acc := b.Accuracy(); acc != TH02LowAccuracy {
-		t.Errorf("Accuracy() didn't return what was expected")
+		require.Fail(t, "Accuracy() didn't return what was expected")
 	}
 }
 

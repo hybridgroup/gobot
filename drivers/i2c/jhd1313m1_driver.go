@@ -107,26 +107,30 @@ func NewJHD1313M1Driver(a Connector, options ...func(Config)) *JHD1313M1Driver {
 		option(d)
 	}
 
+	//nolint:forcetypeassert // ok here
 	d.AddCommand("SetRGB", func(params map[string]interface{}) interface{} {
 		r, _ := strconv.Atoi(params["r"].(string))
 		g, _ := strconv.Atoi(params["g"].(string))
 		b, _ := strconv.Atoi(params["b"].(string))
 		return d.SetRGB(r, g, b)
 	})
-	d.AddCommand("Clear", func(params map[string]interface{}) interface{} {
+	d.AddCommand("Clear", func(_ map[string]interface{}) interface{} {
 		return d.Clear()
 	})
-	d.AddCommand("Home", func(params map[string]interface{}) interface{} {
+	d.AddCommand("Home", func(_ map[string]interface{}) interface{} {
 		return d.Home()
 	})
+	//nolint:forcetypeassert // ok here
 	d.AddCommand("Write", func(params map[string]interface{}) interface{} {
-		msg := params["msg"].(string) //nolint:forcetypeassert // ok here
+		msg := params["msg"].(string)
 		return d.Write(msg)
 	})
+	//nolint:forcetypeassert // ok here
 	d.AddCommand("SetPosition", func(params map[string]interface{}) interface{} {
 		pos, _ := strconv.Atoi(params["pos"].(string))
 		return d.SetPosition(pos)
 	})
+	//nolint:forcetypeassert // ok here
 	d.AddCommand("Scroll", func(params map[string]interface{}) interface{} {
 		lr, _ := strconv.ParseBool(params["lr"].(string))
 		return d.Scroll(lr)
@@ -303,7 +307,7 @@ func (d *JHD1313M1Driver) SetCustomChar(pos int, charMap [8]byte) error {
 	if pos > 7 {
 		return fmt.Errorf("can't set a custom character at a position greater than 7")
 	}
-	location := uint8(pos)
+	location := uint8(pos) //nolint:gosec // checked before
 	if err := d.command([]byte{LCD_SETCGRAMADDR | (location << 3)}); err != nil {
 		return err
 	}

@@ -28,14 +28,9 @@ however you do not need this source code to install the firmware using the insta
 
 ## How to Use
 
-The Gobot platform for the Microbit includes several different drivers, each one corresponding to a different capability:
-
-- AccelerometerDriver
-- ButtonDriver
-- IOPinDriver
-- LEDDriver
-- MagnetometerDriver
-- TemperatureDriver
+The Gobot package for the Microbit includes several [different drivers](https://github.com/hybridgroup/gobot/blob/release/drivers/ble/README.md).
+The platform itself is represented by the generic Bluetooth LE [Client adaptor](https://github.com/hybridgroup/gobot/blob/release/platforms/bleclient/ble_client_adaptor.go),
+see examples below.
 
 The following example uses the LEDDriver:
 
@@ -47,16 +42,18 @@ import (
   "time"
 
   "gobot.io/x/gobot/v2"
-  "gobot.io/x/gobot/v2/platforms/ble"
-  "gobot.io/x/gobot/v2/platforms/microbit"
+  "gobot.io/x/gobot/v2/platforms/bleclient"
+  "gobot.io/x/gobot/v2/drivers/ble/microbit"
 )
 
 func main() {
-  bleAdaptor := ble.NewClientAdaptor(os.Args[1])
+  bleAdaptor := bleclient.NewAdaptor(os.Args[1])
   ubit := microbit.NewLEDDriver(bleAdaptor)
 
   work := func() {
-    ubit.Blank()
+    if err := ubit.Blank(); err != nil {
+      fmt.Println(err)
+    }
     gobot.After(1*time.Second, func() {
       ubit.WriteText("Hello")
     })
@@ -71,7 +68,9 @@ func main() {
     work,
   )
 
-  robot.Start()
+  if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }
 ```
 
@@ -89,23 +88,27 @@ import (
 
   "gobot.io/x/gobot/v2"
   "gobot.io/x/gobot/v2/drivers/gpio"
-  "gobot.io/x/gobot/v2/platforms/ble"
-  "gobot.io/x/gobot/v2/platforms/microbit"
+  "gobot.io/x/gobot/v2/platforms/bleclient"
+  "gobot.io/x/gobot/v2/drivers/ble/microbit"
 )
 
 func main() {
-  bleAdaptor := ble.NewClientAdaptor(os.Args[1])
+  bleAdaptor := bleclient.NewAdaptor(os.Args[1])
 
   ubit := microbit.NewIOPinDriver(bleAdaptor)
   button := gpio.NewButtonDriver(ubit, "0")
   led := gpio.NewLedDriver(ubit, "1")
 
   work := func() {
-    button.On(gpio.ButtonPush, func(data interface{}) {
-      led.On()
+    _ = button.On(gpio.ButtonPush, func(data interface{}) {
+      if err := led.On(); err != nil {
+				fmt.Println(err)
+			}
     })
-    button.On(gpio.ButtonRelease, func(data interface{}) {
-      led.Off()
+    _ = button.On(gpio.ButtonRelease, func(data interface{}) {
+      if err := led.Off(); err != nil {
+		fmt.Println(err)
+	}
     })
   }
 
@@ -115,7 +118,9 @@ func main() {
     work,
   )
 
-  robot.Start()
+  if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }
 ```
 

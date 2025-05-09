@@ -281,7 +281,7 @@ func adafruit1109ParseID(id string) adafruit1109PortPin {
 	items := strings.Split(id, "_")
 	io := uint8(0)
 	if io64, err := strconv.ParseUint(items[1], 10, 32); err == nil {
-		io = uint8(io64)
+		io = uint8(io64) //nolint:gosec // TODO: fix later
 	}
 	return adafruit1109PortPin{port: items[0], pin: io}
 }

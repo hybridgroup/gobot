@@ -14,6 +14,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -30,15 +31,19 @@ func main() {
 	imu := curie.NewIMUDriver(firmataAdaptor)
 
 	work := func() {
-		imu.On("Steps", func(data interface{}) {
+		_ = imu.On("Steps", func(data interface{}) {
 			log.Println("Steps", data)
 		})
 
 		gobot.Every(1*time.Second, func() {
-			led.Toggle()
+			if err := led.Toggle(); err != nil {
+				fmt.Println(err)
+			}
 		})
 
-		imu.EnableStepCounter(true)
+		if err := imu.EnableStepCounter(true); err != nil {
+			fmt.Println(err)
+		}
 	}
 
 	robot := gobot.NewRobot("curieBot",
@@ -47,5 +52,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

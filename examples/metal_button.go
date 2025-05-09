@@ -15,22 +15,29 @@ import (
 
 func main() {
 	e := edison.NewAdaptor()
-	e.Connect()
+	if err := e.Connect(); err != nil {
+		fmt.Println(err)
+	}
 
 	led := gpio.NewLedDriver(e, "13")
-	led.Start()
-	led.Off()
+	if err := led.Start(); err != nil {
+		fmt.Println(err)
+	}
+	if err := led.Off(); err != nil {
+		fmt.Println(err)
+	}
 
 	button := gpio.NewButtonDriver(e, "5")
-	button.Start()
+	if err := button.Start(); err != nil {
+		fmt.Println(err)
+	}
 
 	buttonEvents := button.Subscribe()
-	for {
-		select {
-		case event := <-buttonEvents:
-			fmt.Println("Event:", event.Name, event.Data)
-			if event.Name == gpio.ButtonPush {
-				led.Toggle()
+	for event := range buttonEvents {
+		fmt.Println("Event:", event.Name, event.Data)
+		if event.Name == gpio.ButtonPush {
+			if err := led.Toggle(); err != nil {
+				fmt.Println(err)
 			}
 		}
 	}

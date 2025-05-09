@@ -29,7 +29,7 @@ func TestNewMMA7660Driver(t *testing.T) {
 	var di interface{} = NewMMA7660Driver(newI2cTestAdaptor())
 	d, ok := di.(*MMA7660Driver)
 	if !ok {
-		t.Errorf("NewMMA7660Driver() should have returned a *MMA7660Driver")
+		require.Fail(t, "NewMMA7660Driver() should have returned a *MMA7660Driver")
 	}
 	assert.NotNil(t, d.Driver)
 	assert.True(t, strings.HasPrefix(d.Name(), "MMA7660"))

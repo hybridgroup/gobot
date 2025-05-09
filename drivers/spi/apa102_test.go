@@ -28,7 +28,7 @@ func TestNewAPA102Driver(t *testing.T) {
 	var di interface{} = NewAPA102Driver(newSpiTestAdaptor(), 10, 31)
 	d, ok := di.(*APA102Driver)
 	if !ok {
-		t.Errorf("NewAPA102Driver() should have returned a *APA102Driver")
+		require.Fail(t, "NewAPA102Driver() should have returned a *APA102Driver")
 	}
 	assert.NotNil(t, d.Driver)
 	assert.True(t, strings.HasPrefix(d.Name(), "APA102"))

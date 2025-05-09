@@ -33,7 +33,7 @@ func TestNewL3GD20HDriver(t *testing.T) {
 	var di interface{} = NewL3GD20HDriver(newI2cTestAdaptor())
 	d, ok := di.(*L3GD20HDriver)
 	if !ok {
-		t.Errorf("NewL3GD20HDriver() should have returned a *L3GD20HDriver")
+		require.Fail(t, "NewL3GD20HDriver() should have returned a *L3GD20HDriver")
 	}
 	assert.NotNil(t, d.Driver)
 	assert.True(t, strings.HasPrefix(d.Name(), "L3GD20H"))

@@ -1,4 +1,4 @@
-//nolint:forcetypeassert // ok here
+//nolint:forcetypeassert,nilnil // ok here
 package mavlink
 
 import (
@@ -69,17 +69,17 @@ func TestMavlinkDriverStart(t *testing.T) {
 		require.NoError(t, d.SendPacket(p))
 
 	case <-time.After(100 * time.Millisecond):
-		t.Errorf("packet was not emitted")
+		require.Fail(t, "packet was not emitted")
 	}
 	select {
 	case <-message:
 	case <-time.After(100 * time.Millisecond):
-		t.Errorf("message was not emitted")
+		require.Fail(t, "message was not emitted")
 	}
 	select {
 	case <-err:
 	case <-time.After(100 * time.Millisecond):
-		t.Errorf("error was not emitted")
+		require.Fail(t, "error was not emitted")
 	}
 }
 

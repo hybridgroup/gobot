@@ -13,14 +13,14 @@ Example:
 	)
 
 	func main() {
-	  gbot := gobot.NewMaster()
+	  gbot := gobot.NewManager()
 
 	  // Starts the API server on default port 3000
 	  api.NewAPI(gbot).Start()
 
 	  // Accessible via http://localhost:3000/api/commands/say_hello
 	  gbot.AddCommand("say_hello", func(params map[string]interface{}) interface{} {
-	    return "Master says hello!"
+	    return "Manager says hello!"
 	  })
 
 	  hello := gbot.AddRobot(gobot.NewRobot("Eve"))

@@ -7,6 +7,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"gobot.io/x/gobot/v2"
@@ -16,8 +17,8 @@ import (
 )
 
 func main() {
-	master := gobot.NewMaster()
-	a := api.NewAPI(master)
+	manager := gobot.NewManager()
+	a := api.NewAPI(manager)
 	a.Start()
 
 	board := edison.NewAdaptor()
@@ -29,9 +30,15 @@ func main() {
 
 	enabled := true
 	work := func() {
-		red.Brightness(0xff)
-		green.Brightness(0x00)
-		blue.Brightness(0x00)
+		if err := red.Brightness(0xff); err != nil {
+			fmt.Println(err)
+		}
+		if err := green.Brightness(0x00); err != nil {
+			fmt.Println(err)
+		}
+		if err := blue.Brightness(0x00); err != nil {
+			fmt.Println(err)
+		}
 
 		flash := false
 		on := true
@@ -40,29 +47,47 @@ func main() {
 			if enabled {
 				if flash {
 					if on {
-						red.Brightness(0x00)
-						green.Brightness(0xff)
-						blue.Brightness(0x00)
+						if err := red.Brightness(0x00); err != nil {
+							fmt.Println(err)
+						}
+						if err := green.Brightness(0xff); err != nil {
+							fmt.Println(err)
+						}
+						if err := blue.Brightness(0x00); err != nil {
+							fmt.Println(err)
+						}
 						on = false
 					} else {
-						red.Brightness(0x00)
-						green.Brightness(0x00)
-						blue.Brightness(0xff)
+						if err := red.Brightness(0x00); err != nil {
+							fmt.Println(err)
+						}
+						if err := green.Brightness(0x00); err != nil {
+							fmt.Println(err)
+						}
+						if err := blue.Brightness(0xff); err != nil {
+							fmt.Println(err)
+						}
 						on = true
 					}
 				}
 			}
 		})
 
-		button.On(gpio.ButtonPush, func(data interface{}) {
+		_ = button.On(gpio.ButtonPush, func(data interface{}) {
 			flash = true
 		})
 
-		button.On(gpio.ButtonRelease, func(data interface{}) {
+		_ = button.On(gpio.ButtonRelease, func(data interface{}) {
 			flash = false
-			red.Brightness(0x00)
-			green.Brightness(0x00)
-			blue.Brightness(0xff)
+			if err := red.Brightness(0x00); err != nil {
+				fmt.Println(err)
+			}
+			if err := green.Brightness(0x00); err != nil {
+				fmt.Println(err)
+			}
+			if err := blue.Brightness(0xff); err != nil {
+				fmt.Println(err)
+			}
 		})
 	}
 
@@ -78,7 +103,9 @@ func main() {
 		return enabled
 	})
 
-	master.AddRobot(robot)
+	manager.AddRobot(robot)
 
-	master.Start()
+	if err := manager.Start(); err != nil {
+		panic(err)
+	}
 }

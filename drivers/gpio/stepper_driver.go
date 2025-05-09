@@ -117,27 +117,29 @@ func NewStepperDriver(
 	d.sleepFunc = d.sleepOuputs
 	d.beforeHalt = d.shutdown
 
+	//nolint:forcetypeassert // ok here
 	d.AddCommand("MoveDeg", func(params map[string]interface{}) interface{} {
 		degs, _ := strconv.Atoi(params["degs"].(string))
 		return d.MoveDeg(degs)
 	})
+	//nolint:forcetypeassert // ok here
 	d.AddCommand("Move", func(params map[string]interface{}) interface{} {
 		steps, _ := strconv.Atoi(params["steps"].(string))
 		return d.Move(steps)
 	})
-	d.AddCommand("Step", func(params map[string]interface{}) interface{} {
+	d.AddCommand("Step", func(_ map[string]interface{}) interface{} {
 		return d.Move(1)
 	})
-	d.AddCommand("Run", func(params map[string]interface{}) interface{} {
+	d.AddCommand("Run", func(_ map[string]interface{}) interface{} {
 		return d.Run()
 	})
-	d.AddCommand("Sleep", func(params map[string]interface{}) interface{} {
+	d.AddCommand("Sleep", func(_ map[string]interface{}) interface{} {
 		return d.Sleep()
 	})
-	d.AddCommand("Stop", func(params map[string]interface{}) interface{} {
+	d.AddCommand("Stop", func(_ map[string]interface{}) interface{} {
 		return d.Stop()
 	})
-	d.AddCommand("Halt", func(params map[string]interface{}) interface{} {
+	d.AddCommand("Halt", func(_ map[string]interface{}) interface{} {
 		return d.Halt()
 	})
 
@@ -308,6 +310,7 @@ func (d *StepperDriver) stepAsynch(stepsToMove float64) error {
 	// t [min] = steps [st] / (steps_per_revolution [st/u] * speed [u/min]) or
 	// t [min] = steps [st] * delay_per_step [min/st], use safety factor 2 and a small offset of 100 ms
 	// prepare this timeout outside of stop function to prevent data race with stepsLeft
+	//nolint:gosec // TODO: fix later
 	stopTimeout := time.Duration(2*stepsLeft)*d.getDelayPerStep() + 100*time.Millisecond
 	endlessMovement := false
 

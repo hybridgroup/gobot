@@ -14,6 +14,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"gobot.io/x/gobot/v2"
@@ -28,11 +29,15 @@ func main() {
 	led := gpio.NewLedDriver(firmataAdaptor, "3")
 
 	work := func() {
-		button.On(gpio.ButtonPush, func(data interface{}) {
-			led.On()
+		_ = button.On(gpio.ButtonPush, func(data interface{}) {
+			if err := led.On(); err != nil {
+				fmt.Println(err)
+			}
 		})
-		button.On(gpio.ButtonRelease, func(data interface{}) {
-			led.Off()
+		_ = button.On(gpio.ButtonRelease, func(data interface{}) {
+			if err := led.Off(); err != nil {
+				fmt.Println(err)
+			}
 		})
 	}
 
@@ -42,5 +47,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

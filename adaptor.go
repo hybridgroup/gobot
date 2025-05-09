@@ -29,7 +29,7 @@ type DigitalPinOptioner interface {
 		lseqno uint32), edge int) (changed bool)
 	// SetPollForEdgeDetection use a discrete input polling method to detect edges. A poll interval of zero or smaller
 	// will deactivate this function. Please note: Using this feature is CPU consuming and less accurate than using cdev
-	// event handler (gpiod implementation) and should be done only if the former is not implemented or not working for
+	// event handler (go-gpiocdev package) and should be done only if the former is not implemented or not working for
 	// the adaptor. E.g. sysfs driver in gobot has not implemented edge detection yet. The function is only useful
 	// together with SetEventHandlerForEdge() and its corresponding With*() functions.
 	SetPollForEdgeDetection(pollInterval time.Duration, pollQuitChan chan struct{}) (changed bool)
@@ -176,6 +176,24 @@ type SpiSystemDevicer interface {
 	Close() error
 }
 
+// OneWireSystemDevicer is the interface to a 1-wire device at system level.
+//
+//nolint:iface // ok for now
+type OneWireSystemDevicer interface {
+	// ID returns the device id in the form "family code"-"serial number".
+	ID() string
+	// ReadData reads byte data from the device
+	ReadData(command string, data []byte) error
+	// WriteData writes byte data to the device
+	WriteData(command string, data []byte) error
+	// ReadInteger reads an integer value from the device
+	ReadInteger(command string) (int, error)
+	// WriteInteger writes an integer value to the device
+	WriteInteger(command string, val int) error
+	// Close the 1-wire connection.
+	Close() error
+}
+
 // BusOperations are functions provided by a bus device, e.g. SPI, i2c.
 type BusOperations interface {
 	// ReadByteData reads a byte from the given register of bus device.
@@ -213,6 +231,24 @@ type SpiOperations interface {
 	Close() error
 }
 
+// OneWireOperations are the wrappers around the actual functions used by the 1-wire device interface
+//
+//nolint:iface // ok for now
+type OneWireOperations interface {
+	// ID returns the device id in the form "family code"-"serial number".
+	ID() string
+	// ReadData reads from the device
+	ReadData(command string, data []byte) error
+	// WriteData writes to the device
+	WriteData(command string, data []byte) error
+	// ReadInteger reads an integer value from the device
+	ReadInteger(command string) (int, error)
+	// WriteInteger writes an integer value to the device
+	WriteInteger(command string, val int) error
+	// Close the connection.
+	Close() error
+}
+
 // Adaptor is the interface that describes an adaptor in gobot
 type Adaptor interface {
 	// Name returns the label for the Adaptor
@@ -223,6 +259,20 @@ type Adaptor interface {
 	Connect() error
 	// Finalize terminates the Adaptor
 	Finalize() error
+}
+
+// BLEConnector is the interface that a BLE ClientAdaptor must implement
+type BLEConnector interface {
+	Adaptor
+
+	Reconnect() error
+	Disconnect() error
+	Address() string
+
+	ReadCharacteristic(cUUID string) ([]byte, error)
+	WriteCharacteristic(cUUID string, data []byte) error
+	Subscribe(cUUID string, f func(data []byte)) error
+	WithoutResponses(use bool)
 }
 
 // Porter is the interface that describes an adaptor's port

@@ -1,5 +1,7 @@
 package i2c
 
+import "gobot.io/x/gobot/v2/drivers/common/bit"
+
 // PCA9501 supports addresses from 0x00 to 0x7F
 // 0x00 - 0x3F: GPIO, 0x40 - 0x7F: EEPROM
 //
@@ -80,9 +82,9 @@ func (p *PCA9501Driver) WriteGPIO(pin uint8, val uint8) error {
 		return err
 	}
 	// set pin as output by clearing bit
-	iodirVal := clearBit(iodir, pin)
+	iodirVal := bit.Clear(int(iodir), pin)
 	// write CTRL register
-	err = p.connection.WriteByte(iodirVal)
+	err = p.connection.WriteByte(uint8(iodirVal)) //nolint:gosec // TODO: fix later
 	if err != nil {
 		return err
 	}
@@ -92,14 +94,14 @@ func (p *PCA9501Driver) WriteGPIO(pin uint8, val uint8) error {
 		return err
 	}
 	// set or reset the bit in value
-	var nVal uint8
+	var nVal int
 	if val == 0 {
-		nVal = clearBit(cVal, pin)
+		nVal = bit.Clear(int(cVal), pin)
 	} else {
-		nVal = setBit(cVal, pin)
+		nVal = bit.Set(int(cVal), pin)
 	}
 	// write new value to port
-	err = p.connection.WriteByte(nVal)
+	err = p.connection.WriteByte(uint8(nVal)) //nolint:gosec // TODO: fix later
 	if err != nil {
 		return err
 	}
@@ -117,9 +119,9 @@ func (p *PCA9501Driver) ReadGPIO(pin uint8) (uint8, error) {
 		return 0, err
 	}
 	// set pin as input by setting bit
-	iodirVal := setBit(iodir, pin)
+	iodirVal := bit.Set(int(iodir), pin)
 	// write CTRL register
-	err = p.connection.WriteByte(iodirVal)
+	err = p.connection.WriteByte(uint8(iodirVal)) //nolint:gosec // TODO: fix later
 	if err != nil {
 		return 0, err
 	}

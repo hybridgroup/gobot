@@ -1,7 +1,6 @@
 package joule
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 
@@ -11,6 +10,7 @@ import (
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/gpio"
 	"gobot.io/x/gobot/v2/drivers/i2c"
+	"gobot.io/x/gobot/v2/platforms/adaptors"
 	"gobot.io/x/gobot/v2/system"
 )
 
@@ -25,7 +25,7 @@ var (
 	_ i2c.Connector               = (*Adaptor)(nil)
 )
 
-func initTestAdaptorWithMockedFilesystem() (*Adaptor, *system.MockFilesystem) {
+func initConnectedTestAdaptorWithMockedFilesystem() (*Adaptor, *system.MockFilesystem) {
 	a := NewAdaptor()
 	mockPaths := []string{
 		"/sys/class/pwm/pwmchip0/export",
@@ -99,16 +99,39 @@ func initTestAdaptorWithMockedFilesystem() (*Adaptor, *system.MockFilesystem) {
 	return a, fs
 }
 
-func TestName(t *testing.T) {
-	a, _ := initTestAdaptorWithMockedFilesystem()
-
+func TestNewAdaptor(t *testing.T) {
+	// arrange & act
+	a := NewAdaptor()
+	// assert
+	assert.IsType(t, &Adaptor{}, a)
 	assert.True(t, strings.HasPrefix(a.Name(), "Joule"))
+	assert.NotNil(t, a.sys)
+	assert.NotNil(t, a.DigitalPinsAdaptor)
+	assert.NotNil(t, a.PWMPinsAdaptor)
+	assert.NotNil(t, a.I2cBusAdaptor)
+	assert.Nil(t, a.SpiBusAdaptor)
+	assert.True(t, a.sys.HasDigitalPinSysfsAccess())
+	// act & assert
 	a.SetName("NewName")
 	assert.Equal(t, "NewName", a.Name())
 }
 
+func TestNewAdaptorWithOption(t *testing.T) {
+	// arrange & act
+	a := NewAdaptor(adaptors.WithSpiGpioAccess("1", "2", "3", "4"))
+	// assert
+	assert.IsType(t, &Adaptor{}, a)
+	assert.True(t, strings.HasPrefix(a.Name(), "Joule"))
+	assert.NotNil(t, a.sys)
+	assert.NotNil(t, a.DigitalPinsAdaptor)
+	assert.NotNil(t, a.PWMPinsAdaptor)
+	assert.NotNil(t, a.I2cBusAdaptor)
+	assert.NotNil(t, a.SpiBusAdaptor)
+	assert.True(t, a.sys.HasDigitalPinSysfsAccess())
+}
+
 func TestFinalize(t *testing.T) {
-	a, _ := initTestAdaptorWithMockedFilesystem()
+	a, _ := initConnectedTestAdaptorWithMockedFilesystem()
 
 	_ = a.DigitalWrite("J12_1", 1)
 	_ = a.PwmWrite("J12_26", 100)
@@ -123,7 +146,7 @@ func TestFinalize(t *testing.T) {
 }
 
 func TestDigitalIO(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
+	a, fs := initConnectedTestAdaptorWithMockedFilesystem()
 
 	_ = a.DigitalWrite("J12_1", 1)
 	assert.Equal(t, "1", fs.Files["/sys/class/gpio/gpio451/value"].Contents)
@@ -139,7 +162,7 @@ func TestDigitalIO(t *testing.T) {
 }
 
 func TestPwm(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
+	a, fs := initConnectedTestAdaptorWithMockedFilesystem()
 
 	err := a.PwmWrite("J12_26", 100)
 	require.NoError(t, err)
@@ -153,7 +176,7 @@ func TestPwm(t *testing.T) {
 }
 
 func TestPwmPinExportError(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
+	a, fs := initConnectedTestAdaptorWithMockedFilesystem()
 	delete(fs.Files, "/sys/class/pwm/pwmchip0/export")
 
 	err := a.PwmWrite("J12_26", 100)
@@ -161,7 +184,7 @@ func TestPwmPinExportError(t *testing.T) {
 }
 
 func TestPwmPinEnableError(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
+	a, fs := initConnectedTestAdaptorWithMockedFilesystem()
 	delete(fs.Files, "/sys/class/pwm/pwmchip0/pwm0/enable")
 
 	err := a.PwmWrite("J12_26", 100)
@@ -188,39 +211,4 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	err = a.Finalize()
 	// assert
 	require.ErrorContains(t, err, "close error")
-}
-
-func Test_validateI2cBusNumber(t *testing.T) {
-	tests := map[string]struct {
-		busNr   int
-		wantErr error
-	}{
-		"number_negative_error": {
-			busNr:   -1,
-			wantErr: fmt.Errorf("Bus number -1 out of range"),
-		},
-		"number_0_ok": {
-			busNr: 0,
-		},
-		"number_1_ok": {
-			busNr: 1,
-		},
-		"number_2_ok": {
-			busNr: 2,
-		},
-		"number_3_error": {
-			busNr:   3,
-			wantErr: fmt.Errorf("Bus number 3 out of range"),
-		},
-	}
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			// arrange
-			a := NewAdaptor()
-			// act
-			err := a.validateI2cBusNumber(tc.busNr)
-			// assert
-			assert.Equal(t, tc.wantErr, err)
-		})
-	}
 }

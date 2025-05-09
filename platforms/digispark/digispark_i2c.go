@@ -1,3 +1,6 @@
+//go:build libusb
+// +build libusb
+
 package digispark
 
 import (
@@ -155,8 +158,8 @@ func (c *digisparkI2cConnection) WriteWordData(reg uint8, val uint16) error {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
-	low := uint8(val & 0xff)
-	high := uint8((val >> 8) & 0xff)
+	low := uint8(val & 0xff)         //nolint:gosec // ok here
+	high := uint8((val >> 8) & 0xff) //nolint:gosec // ok here
 	buf := []byte{reg, low, high}
 	return c.writeAndCheckCount(buf, true)
 }

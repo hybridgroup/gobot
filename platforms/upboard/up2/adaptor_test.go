@@ -59,7 +59,7 @@ var gpioMockPaths = []string{
 	"/sys/class/leds/upboard:green:/brightness",
 }
 
-func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.MockFilesystem) {
+func initConnectedTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.MockFilesystem) {
 	a := NewAdaptor()
 	fs := a.sys.UseMockFilesystem(mockPaths)
 	if err := a.Connect(); err != nil {
@@ -68,15 +68,26 @@ func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.
 	return a, fs
 }
 
-func TestName(t *testing.T) {
+func TestNewAdaptor(t *testing.T) {
+	// arrange & act
 	a := NewAdaptor()
+	// assert
+	assert.IsType(t, &Adaptor{}, a)
 	assert.True(t, strings.HasPrefix(a.Name(), "UP2"))
+	assert.NotNil(t, a.sys)
+	assert.Equal(t, "/sys/class/leds/upboard:%s:/brightness", a.ledPath)
+	assert.NotNil(t, a.DigitalPinsAdaptor)
+	assert.NotNil(t, a.PWMPinsAdaptor)
+	assert.NotNil(t, a.I2cBusAdaptor)
+	assert.NotNil(t, a.SpiBusAdaptor)
+	assert.True(t, a.sys.HasDigitalPinSysfsAccess())
+	// act & assert
 	a.SetName("NewName")
 	assert.Equal(t, "NewName", a.Name())
 }
 
 func TestDigitalIO(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem(gpioMockPaths)
+	a, fs := initConnectedTestAdaptorWithMockedFilesystem(gpioMockPaths)
 
 	_ = a.DigitalWrite("7", 1)
 	assert.Equal(t, "1", fs.Files["/sys/class/gpio/gpio462/value"].Contents)
@@ -97,7 +108,7 @@ func TestDigitalIO(t *testing.T) {
 
 func TestPWMWrite(t *testing.T) {
 	// arrange
-	a, fs := initTestAdaptorWithMockedFilesystem(pwmMockPaths)
+	a, fs := initConnectedTestAdaptorWithMockedFilesystem(pwmMockPaths)
 	fs.Files[pwmDutyCyclePath].Contents = "0"
 	fs.Files[pwmPeriodPath].Contents = "0"
 	// act
@@ -139,7 +150,7 @@ func TestServoWrite(t *testing.T) {
 }
 
 func TestFinalizeErrorAfterGPIO(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem(gpioMockPaths)
+	a, fs := initConnectedTestAdaptorWithMockedFilesystem(gpioMockPaths)
 
 	require.NoError(t, a.DigitalWrite("7", 1))
 
@@ -150,15 +161,16 @@ func TestFinalizeErrorAfterGPIO(t *testing.T) {
 }
 
 func TestFinalizeErrorAfterPWM(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem(pwmMockPaths)
+	// indirect test for PWM.Finalize() is called for the adaptor
+	// arrange
+	a, fs := initConnectedTestAdaptorWithMockedFilesystem(pwmMockPaths)
 	fs.Files[pwmDutyCyclePath].Contents = "0"
 	fs.Files[pwmPeriodPath].Contents = "0"
-
 	require.NoError(t, a.PwmWrite("32", 1))
-
 	fs.WithWriteError = true
-
+	// act
 	err := a.Finalize()
+	// assert
 	require.ErrorContains(t, err, "write error")
 }
 
@@ -168,38 +180,6 @@ func TestSpiDefaultValues(t *testing.T) {
 	assert.Equal(t, 0, a.SpiDefaultBusNumber())
 	assert.Equal(t, 0, a.SpiDefaultMode())
 	assert.Equal(t, int64(500000), a.SpiDefaultMaxSpeed())
-}
-
-func Test_validateSpiBusNumber(t *testing.T) {
-	tests := map[string]struct {
-		busNr   int
-		wantErr error
-	}{
-		"number_negative_error": {
-			busNr:   -1,
-			wantErr: fmt.Errorf("Bus number -1 out of range"),
-		},
-		"number_0_ok": {
-			busNr: 0,
-		},
-		"number_1_ok": {
-			busNr: 1,
-		},
-		"number_2_error": {
-			busNr:   2,
-			wantErr: fmt.Errorf("Bus number 2 out of range"),
-		},
-	}
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			// arrange
-			a := NewAdaptor()
-			// act
-			err := a.validateSpiBusNumber(tc.busNr)
-			// assert
-			assert.Equal(t, tc.wantErr, err)
-		})
-	}
 }
 
 func TestI2cDefaultBus(t *testing.T) {
@@ -222,42 +202,6 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	err = a.Finalize()
 	// assert
 	require.ErrorContains(t, err, "close error")
-}
-
-func Test_validateI2cBusNumber(t *testing.T) {
-	tests := map[string]struct {
-		busNr   int
-		wantErr error
-	}{
-		"number_negative_error": {
-			busNr:   -1,
-			wantErr: fmt.Errorf("Bus number -1 out of range"),
-		},
-		"number_4_error": {
-			busNr:   4,
-			wantErr: fmt.Errorf("Bus number 4 out of range"),
-		},
-		"number_5_ok": {
-			busNr: 5,
-		},
-		"number_6_ok": {
-			busNr: 6,
-		},
-		"number_7_error": {
-			busNr:   7,
-			wantErr: fmt.Errorf("Bus number 7 out of range"),
-		},
-	}
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			// arrange
-			a := NewAdaptor()
-			// act
-			err := a.validateI2cBusNumber(tc.busNr)
-			// assert
-			assert.Equal(t, tc.wantErr, err)
-		})
-	}
 }
 
 func Test_translatePWMPin(t *testing.T) {

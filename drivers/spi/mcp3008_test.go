@@ -32,7 +32,7 @@ func TestNewMCP3008Driver(t *testing.T) {
 	var di interface{} = NewMCP3008Driver(newSpiTestAdaptor())
 	d, ok := di.(*MCP3008Driver)
 	if !ok {
-		t.Errorf("NewMCP3008Driver() should have returned a *MCP3008Driver")
+		require.Fail(t, "NewMCP3008Driver() should have returned a *MCP3008Driver")
 	}
 	assert.NotNil(t, d.Driver)
 	assert.True(t, strings.HasPrefix(d.Name(), "MCP3008"))

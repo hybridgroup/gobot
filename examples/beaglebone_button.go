@@ -11,7 +11,7 @@ import (
 
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/gpio"
-	"gobot.io/x/gobot/v2/platforms/beaglebone"
+	"gobot.io/x/gobot/v2/platforms/beagleboard/beaglebone"
 )
 
 func main() {
@@ -19,11 +19,11 @@ func main() {
 	button := gpio.NewButtonDriver(beagleboneAdaptor, "P8_09")
 
 	work := func() {
-		button.On(gpio.ButtonPush, func(data interface{}) {
+		_ = button.On(gpio.ButtonPush, func(data interface{}) {
 			fmt.Println("button pressed")
 		})
 
-		button.On(gpio.ButtonRelease, func(data interface{}) {
+		_ = button.On(gpio.ButtonRelease, func(data interface{}) {
 			fmt.Println("button released")
 		})
 	}
@@ -34,5 +34,7 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }

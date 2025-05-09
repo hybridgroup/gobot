@@ -16,9 +16,9 @@ import (
 )
 
 func main() {
-	master := gobot.NewMaster()
+	manager := gobot.NewManager()
 
-	a := api.NewAPI(master)
+	a := api.NewAPI(manager)
 	a.AddHandler(api.BasicAuth("gort", "klatuu"))
 	a.Debug()
 
@@ -27,16 +27,18 @@ func main() {
 	})
 	a.Start()
 
-	master.AddCommand("custom_gobot_command",
+	manager.AddCommand("custom_gobot_command",
 		func(params map[string]interface{}) interface{} {
 			return "This command is attached to the mcp!"
 		})
 
-	hello := master.AddRobot(gobot.NewRobot("hello"))
+	hello := manager.AddRobot(gobot.NewRobot("hello"))
 
 	hello.AddCommand("hi_there", func(params map[string]interface{}) interface{} {
 		return fmt.Sprintf("This command is attached to the robot %v", hello.Name)
 	})
 
-	master.Start()
+	if err := manager.Start(); err != nil {
+		panic(err)
+	}
 }

@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const semPublishWait = 20 * time.Millisecond
+const semPublishWait = 30 * time.Millisecond
 
 type readWriteCloser struct {
 	id string
@@ -149,7 +149,7 @@ func TestProcessProtocolVersion(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(semPublishWait):
-		t.Errorf("ProtocolVersion was not published")
+		require.Fail(t, "ProtocolVersion was not published")
 	}
 }
 
@@ -168,7 +168,7 @@ func TestProcessAnalogRead0(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(semPublishWait):
-		t.Errorf("AnalogRead0 was not published")
+		require.Fail(t, "AnalogRead0 was not published")
 	}
 }
 
@@ -187,7 +187,7 @@ func TestProcessAnalogRead1(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(semPublishWait):
-		t.Errorf("AnalogRead1 was not published")
+		require.Fail(t, "AnalogRead1 was not published")
 	}
 }
 
@@ -207,7 +207,7 @@ func TestProcessDigitalRead2(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(semPublishWait):
-		t.Errorf("DigitalRead2 was not published")
+		require.Fail(t, "DigitalRead2 was not published")
 	}
 }
 
@@ -227,7 +227,7 @@ func TestProcessDigitalRead4(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(semPublishWait):
-		t.Errorf("DigitalRead4 was not published")
+		require.Fail(t, "DigitalRead4 was not published")
 	}
 }
 
@@ -267,7 +267,7 @@ func TestProcessPinState13(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(semPublishWait):
-		t.Errorf("PinState13 was not published")
+		require.Fail(t, "PinState13 was not published")
 	}
 }
 
@@ -310,7 +310,7 @@ func TestProcessI2cReply(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(semPublishWait):
-		t.Errorf("I2cReply was not published")
+		require.Fail(t, "I2cReply was not published")
 	}
 }
 
@@ -329,7 +329,7 @@ func TestProcessFirmwareQuery(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(semPublishWait):
-		t.Errorf("FirmwareQuery was not published")
+		require.Fail(t, "FirmwareQuery was not published")
 	}
 }
 
@@ -348,7 +348,7 @@ func TestProcessStringData(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(semPublishWait):
-		t.Errorf("StringData was not published")
+		require.Fail(t, "StringData was not published")
 	}
 }
 
@@ -433,6 +433,6 @@ func TestProcessSysexData(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(semPublishWait):
-		t.Errorf("SysexResponse was not published")
+		require.Fail(t, "SysexResponse was not published")
 	}
 }

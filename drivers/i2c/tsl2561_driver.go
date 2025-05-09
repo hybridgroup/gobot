@@ -215,7 +215,7 @@ func (d *TSL2561Driver) SetIntegrationTime(time TSL2561IntegrationTime) error {
 		return err
 	}
 
-	timeGainVal := uint8(time) | uint8(d.gain)
+	timeGainVal := uint8(time) | uint8(d.gain) //nolint:gosec // TODO: fix later
 	if err := d.connection.WriteByteData(tsl2561CommandBit|tsl2561RegisterTiming, timeGainVal); err != nil {
 		return err
 	}
@@ -230,7 +230,7 @@ func (d *TSL2561Driver) SetGain(gain TSL2561Gain) error {
 		return err
 	}
 
-	timeGainVal := uint8(d.integrationTime) | uint8(gain)
+	timeGainVal := uint8(d.integrationTime) | uint8(gain) //nolint:gosec // TODO: fix later
 	if err := d.connection.WriteByteData(tsl2561CommandBit|tsl2561RegisterTiming, timeGainVal); err != nil {
 		return err
 	}

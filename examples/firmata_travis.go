@@ -42,13 +42,21 @@ type TravisResponse struct {
 }
 
 func turnOn(robot *gobot.Robot, device string) {
-	robot.Device(device).(*gpio.LedDriver).On()
+	if err := robot.Device(device).(*gpio.LedDriver).On(); err != nil {
+		fmt.Println(err)
+	}
 }
 
 func resetLeds(robot *gobot.Robot) {
-	robot.Device("red").(*gpio.LedDriver).Off()
-	robot.Device("green").(*gpio.LedDriver).Off()
-	robot.Device("blue").(*gpio.LedDriver).Off()
+	if err := robot.Device("red").(*gpio.LedDriver).Off(); err != nil {
+		fmt.Println(err)
+	}
+	if err := robot.Device("green").(*gpio.LedDriver).Off(); err != nil {
+		fmt.Println(err)
+	}
+	if err := robot.Device("blue").(*gpio.LedDriver).Off(); err != nil {
+		fmt.Println(err)
+	}
 }
 
 func checkTravis(robot *gobot.Robot) {
@@ -68,7 +76,9 @@ func checkTravis(robot *gobot.Robot) {
 		panic(err)
 	}
 	var travis TravisResponse
-	json.Unmarshal(body, &travis)
+	if err := json.Unmarshal(body, &travis); err != nil {
+		fmt.Println(err)
+	}
 	resetLeds(robot)
 	if travis.LastBuildStatus == 0 {
 		turnOn(robot, "green")
@@ -78,16 +88,16 @@ func checkTravis(robot *gobot.Robot) {
 }
 
 func main() {
-	master := gobot.NewMaster()
+	manager := gobot.NewManager()
 	firmataAdaptor := firmata.NewAdaptor(os.Args[1])
 	red := gpio.NewLedDriver(firmataAdaptor, "7", gpio.WithName("red"))
 	green := gpio.NewLedDriver(firmataAdaptor, "6", gpio.WithName("green"))
 	blue := gpio.NewLedDriver(firmataAdaptor, "5", gpio.WithName("blue"))
 
 	work := func() {
-		checkTravis(master.Robot("travis"))
+		checkTravis(manager.Robot("travis"))
 		gobot.Every(10*time.Second, func() {
-			checkTravis(master.Robot("travis"))
+			checkTravis(manager.Robot("travis"))
 		})
 	}
 
@@ -97,6 +107,8 @@ func main() {
 		work,
 	)
 
-	master.AddRobot(robot)
-	master.Start()
+	manager.AddRobot(robot)
+	if err := manager.Start(); err != nil {
+		panic(err)
+	}
 }

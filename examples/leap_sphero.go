@@ -10,19 +10,20 @@ import (
 	"math"
 
 	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/serial/sphero"
 	"gobot.io/x/gobot/v2/platforms/leap"
-	"gobot.io/x/gobot/v2/platforms/sphero"
+	"gobot.io/x/gobot/v2/platforms/serialport"
 )
 
 func main() {
 	leapAdaptor := leap.NewAdaptor("127.0.0.1:6437")
-	spheroAdaptor := sphero.NewAdaptor("/dev/tty.Sphero-YBW-RN-SPP")
+	spheroAdaptor := serialport.NewAdaptor("/dev/tty.Sphero-YBW-RN-SPP")
 
 	leapDriver := leap.NewDriver(leapAdaptor)
 	spheroDriver := sphero.NewSpheroDriver(spheroAdaptor)
 
 	work := func() {
-		leapDriver.On(leap.MessageEvent, func(data interface{}) {
+		_ = leapDriver.On(leap.MessageEvent, func(data interface{}) {
 			hands := data.(leap.Frame).Hands
 
 			if len(hands) > 0 {
@@ -40,7 +41,9 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	if err := robot.Start(); err != nil {
+		panic(err)
+	}
 }
 
 func scale(position float64) uint8 {

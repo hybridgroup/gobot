@@ -6,6 +6,6 @@ This package currently supports the following Parrot drones:
 - Intel Joule developer kit
 
 For further information refer to Parrot README:
-https://gobot.io/x/gobot/v2/blob/master/platforms/parrot/README.md
+https://gobot.io/x/gobot/v2/blob/release/platforms/parrot/README.md
 */
 package parrot
