@@ -130,7 +130,11 @@ func (btd *btDevice) discoverServices(uuids []bluetooth.UUID) ([]bluetooth.Devic
 
 // Disconnect from the BLE device. This method is non-blocking and does not wait until the connection is fully gone.
 func (btd *btDevice) disconnect() error {
-	return btd.extDevice.Disconnect()
+	if btd != nil && btd.extDevice != nil {
+		return btd.extDevice.Disconnect()
+	}
+
+	return nil
 }
 
 func readFromCharacteristic(chara bluetoothExtCharacteristicer) ([]byte, error) {
@@ -149,6 +153,6 @@ func writeToCharacteristicWithoutResponse(chara bluetoothExtCharacteristicer, da
 	return nil
 }
 
-func enableNotificationsForCharacteristic(chara bluetoothExtCharacteristicer, f func(data []byte)) error {
+func adjustNotificationsForCharacteristic(chara bluetoothExtCharacteristicer, f func(data []byte)) error {
 	return chara.EnableNotifications(f)
 }
