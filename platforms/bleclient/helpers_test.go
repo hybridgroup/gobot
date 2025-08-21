@@ -97,6 +97,7 @@ func (btd btTestDevice) Disconnect() error {
 	return nil
 }
 
+// btTestChara implements bluetoothExtCharacteristicer
 type btTestChara struct {
 	readData         []byte
 	writtenData      []byte
