@@ -29,8 +29,8 @@ func TestNewAdafruit2348Driver(t *testing.T) {
 	// assert
 	assert.IsType(t, &Adafruit2348Driver{}, d)
 	assert.True(t, strings.HasPrefix(d.Name(), "Adafruit2348MotorHat"))
-	assert.Equal(t, 0x40, d.defaultAddress)                               // the default address of PCA9685 driver
-	assert.Equal(t, 0x60, d.Config.GetAddressOrDefault(d.defaultAddress)) // the really used address
+	assert.Equal(t, 0x40, d.defaultAddress)                        // the default address of PCA9685 driver
+	assert.Equal(t, 0x60, d.GetAddressOrDefault(d.defaultAddress)) // the really used address
 }
 
 func TestAdafruit2348Options(t *testing.T) {

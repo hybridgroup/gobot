@@ -22,6 +22,7 @@ type relayInvertedOption bool
 // RelayDriver represents a digital relay
 type RelayDriver struct {
 	*driver
+
 	relayCfg *relayConfiguration
 	high     bool
 }

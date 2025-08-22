@@ -39,15 +39,16 @@ type sysfsPin struct {
 
 // Adaptor represents a Gobot Adaptor for the Upboard UP2
 type Adaptor struct {
+	*adaptors.DigitalPinsAdaptor
+	*adaptors.PWMPinsAdaptor
+	*adaptors.I2cBusAdaptor
+	*adaptors.SpiBusAdaptor
+
 	name    string
 	sys     *system.Accesser
 	mutex   sync.Mutex
 	pinMap  map[string]sysfsPin
 	ledPath string
-	*adaptors.DigitalPinsAdaptor
-	*adaptors.PWMPinsAdaptor
-	*adaptors.I2cBusAdaptor
-	*adaptors.SpiBusAdaptor
 }
 
 // NewAdaptor creates a UP2 Adaptor

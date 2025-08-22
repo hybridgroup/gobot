@@ -83,7 +83,7 @@ func TestRand(t *testing.T) {
 	a := Rand(10000)
 	b := Rand(10000)
 	if a == b {
-		require.Fail(t, "%v should not equal %v", a, b)
+		require.NotEqual(t, a, b)
 	}
 }
 

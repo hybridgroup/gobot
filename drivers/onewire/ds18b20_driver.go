@@ -40,6 +40,7 @@ type ds18b20ConversionTimeOption uint16
 // DS18B20Driver is a driver for the DS18B20 1-wire temperature sensor.
 type DS18B20Driver struct {
 	*driver
+
 	ds18b20Cfg *ds18b20Configuration
 }
 

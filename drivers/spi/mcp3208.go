@@ -41,7 +41,7 @@ func NewMCP3208Driver(a Connector, options ...func(Config)) *MCP3208Driver {
 // Read reads the current analog data for the desired channel.
 func (d *MCP3208Driver) Read(channel int) (int, error) {
 	if channel < 0 || channel > MCP3208DriverMaxChannel-1 {
-		return 0, fmt.Errorf("Invalid channel '%d' for read", channel)
+		return 0, fmt.Errorf("invalid channel '%d' for read", channel)
 	}
 
 	tx := make([]byte, 3)

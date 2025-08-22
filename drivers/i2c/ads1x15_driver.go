@@ -51,6 +51,7 @@ type ads1x15ChanCfg struct {
 // * https://github.com/Wh1teRabbitHU/ADS1115-Driver
 type ADS1x15Driver struct {
 	*Driver
+
 	dataRates        map[int]uint16
 	channelCfgs      map[int]*ads1x15ChanCfg
 	waitOnlyOneCycle bool
@@ -435,7 +436,7 @@ func (d *ADS1x15Driver) rawRead(channel int, channelOffset int, gain int, dataRa
 
 func (d *ADS1x15Driver) checkChannel(channel int) error {
 	if channel < 0 || channel > 3 {
-		return fmt.Errorf("Invalid channel (%d), must be between 0 and 3", channel)
+		return fmt.Errorf("invalid channel (%d), must be between 0 and 3", channel)
 	}
 	return nil
 }
@@ -446,7 +447,7 @@ func (d *ADS1x15Driver) waitForConversionFinished(delay time.Duration) error {
 	for i := 0; i < ads1x15WaitMaxCount; i++ {
 		if i == ads1x15WaitMaxCount-1 {
 			// most likely the last try will also not finish, so we stop with an error
-			return fmt.Errorf("The conversion is not finished within %s", time.Since(start))
+			return fmt.Errorf("the conversion is not finished within %s", time.Since(start))
 		}
 
 		data, err := d.readWordBigEndian(ads1x15PointerConfig)
@@ -509,7 +510,7 @@ func ads1x15GetFullScaleRange(gain int) (float64, error) {
 	}
 	sort.Ints(keys)
 
-	return 0, fmt.Errorf("Gain (%d) must be one of: %d", gain, keys)
+	return 0, fmt.Errorf("gain (%d) must be one of: %d", gain, keys)
 }
 
 func ads1x15GetDataRateBits(dataRates map[int]uint16, dataRate int) (uint16, error) {
@@ -523,7 +524,7 @@ func ads1x15GetDataRateBits(dataRates map[int]uint16, dataRate int) (uint16, err
 	}
 	sort.Ints(keys)
 
-	return 0, fmt.Errorf("Invalid data rate (%d). Accepted values: %d", dataRate, keys)
+	return 0, fmt.Errorf("invalid data rate (%d). Accepted values: %d", dataRate, keys)
 }
 
 // ads1x15BestGainForVoltage returns the gain the most adapted to read up to the specified difference of potential.
@@ -542,7 +543,7 @@ func ads1x15BestGainForVoltage(voltage float64) (int, error) {
 	}
 
 	if currentBestGain < 0 {
-		return 0, fmt.Errorf("The maximum voltage which can be read is %f", maximum)
+		return 0, fmt.Errorf("the maximum voltage which can be read is %f", maximum)
 	}
 
 	return currentBestGain, nil

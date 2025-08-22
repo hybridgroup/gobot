@@ -24,13 +24,14 @@ type sysfsPin struct {
 
 // Adaptor represents an Intel Joule
 type Adaptor struct {
-	name  string
-	sys   *system.Accesser // used for unit tests only
-	mutex sync.Mutex
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.PWMPinsAdaptor
 	*adaptors.I2cBusAdaptor
 	*adaptors.SpiBusAdaptor // for usage of "adaptors.WithSpiGpioAccess()"
+
+	name  string
+	sys   *system.Accesser // used for unit tests only
+	mutex sync.Mutex
 }
 
 // NewAdaptor returns a new Joule Adaptor

@@ -119,6 +119,7 @@ func (mm *CCS811MeasMode) GetMeasMode() byte {
 // CCS811Driver is the Gobot driver for the CCS811 (air quality sensor) Adafruit breakout board
 type CCS811Driver struct {
 	*Driver
+
 	measMode           *CCS811MeasMode
 	ntcResistanceValue uint32
 }
@@ -262,7 +263,7 @@ func (d *CCS811Driver) HasData() (bool, error) {
 		return false, err
 	}
 
-	if !(s.DataReady == 0x01) || (s.HasError == 0x01) {
+	if (s.DataReady != 0x01) || (s.HasError == 0x01) {
 		return false, nil
 	}
 
@@ -290,27 +291,27 @@ func (d *CCS811Driver) DisableExternalInterrupt() error {
 func (d *CCS811Driver) initialize() error {
 	deviceID, err := d.connection.ReadByteData(ccs811RegHwID)
 	if err != nil {
-		return fmt.Errorf("Failed to get the device id from ccs811RegHwID with error: %s", err.Error())
+		return fmt.Errorf("failed to get the device id from ccs811RegHwID with error: %s", err.Error())
 	}
 
 	// Verify that the connected device is the CCS811 sensor
 	if deviceID != ccs811HwIDCode {
-		return fmt.Errorf("The fetched device id %d is not the known id %d with error", deviceID, ccs811HwIDCode)
+		return fmt.Errorf("the fetched device id %d is not the known id %d with error", deviceID, ccs811HwIDCode)
 	}
 
 	if err := d.resetDevice(); err != nil {
-		return fmt.Errorf("Was not able to reset the device with error: %s", err.Error())
+		return fmt.Errorf("was not able to reset the device with error: %s", err.Error())
 	}
 
 	// Required sleep to allow device to switch states
 	time.Sleep(100 * time.Millisecond)
 
 	if err := d.startApp(); err != nil {
-		return fmt.Errorf("Failed to start app code with error: %s", err.Error())
+		return fmt.Errorf("failed to start app code with error: %s", err.Error())
 	}
 
 	if err := d.updateMeasMode(); err != nil {
-		return fmt.Errorf("Failed to update the measMode register with error: %s", err.Error())
+		return fmt.Errorf("failed to update the measMode register with error: %s", err.Error())
 	}
 
 	return nil

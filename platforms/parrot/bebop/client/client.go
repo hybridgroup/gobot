@@ -174,20 +174,18 @@ func (b *Bebop) Discover() error {
 		return err
 	}
 
-	if _, err := b.discoveryClient.Write(
-		[]byte(
-			fmt.Sprintf(`{
+	if _, err := fmt.Fprintf(b.discoveryClient,
+
+		`{
 						"controller_type": "computer",
 						"controller_name": "go-bebop",
 						"d2c_port": "%d",
 						"arstream2_client_stream_port": "%d",
 						"arstream2_client_control_port": "%d",
 						}`,
-				b.D2cPort,
-				b.RTPStreamPort,
-				b.RTPControlPort),
-		),
-	); err != nil {
+		b.D2cPort,
+		b.RTPStreamPort,
+		b.RTPControlPort); err != nil {
 		return err
 	}
 

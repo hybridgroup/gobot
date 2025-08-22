@@ -84,11 +84,11 @@ func TestApplyOptionsSysfs(t *testing.T) {
 			pin, fs := initTestDigitalPinSysfsWithMockedFilesystem(mockPaths)
 
 			optionFunction1 := func(gobot.DigitalPinOptioner) bool {
-				pin.digitalPinConfig.direction = OUT
+				pin.direction = OUT
 				return tc.changed[0]
 			}
 			optionFunction2 := func(gobot.DigitalPinOptioner) bool {
-				pin.digitalPinConfig.drive = 15
+				pin.drive = 15
 				return tc.changed[1]
 			}
 			// act
@@ -99,8 +99,8 @@ func TestApplyOptionsSysfs(t *testing.T) {
 			} else {
 				require.NoError(t, err)
 			}
-			assert.Equal(t, OUT, pin.digitalPinConfig.direction)
-			assert.Equal(t, 15, pin.digitalPinConfig.drive)
+			assert.Equal(t, OUT, pin.direction)
+			assert.Equal(t, 15, pin.drive)
 			// marker for call of reconfigure, correct reconfigure is tested independently
 			assert.Equal(t, tc.wantExport, fs.Files["/sys/class/gpio/export"].Contents)
 		})

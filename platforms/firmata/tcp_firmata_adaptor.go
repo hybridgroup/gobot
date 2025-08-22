@@ -31,5 +31,6 @@ func NewTCPAdaptor(args ...interface{}) *TCPAdaptor {
 }
 
 func connect(address string) (io.ReadWriteCloser, error) {
-	return net.Dial("tcp", address)
+	dialer := net.Dialer{}
+	return dialer.Dial("tcp", address)
 }

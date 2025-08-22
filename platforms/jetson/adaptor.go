@@ -27,13 +27,14 @@ const (
 
 // Adaptor is the Gobot adaptor for the Jetson Nano
 type Adaptor struct {
-	name  string
-	sys   *system.Accesser // used for unit tests only
-	mutex *sync.Mutex
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.PWMPinsAdaptor
 	*adaptors.I2cBusAdaptor
 	*adaptors.SpiBusAdaptor
+
+	name  string
+	sys   *system.Accesser // used for unit tests only
+	mutex *sync.Mutex
 }
 
 // NewAdaptor creates a Jetson Nano adaptor

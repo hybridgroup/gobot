@@ -57,6 +57,7 @@ const (
 // TH02Driver is a Driver for a TH02 humidity and temperature sensor
 type TH02Driver struct {
 	*Driver
+
 	Units    string
 	heating  bool
 	fastMode bool

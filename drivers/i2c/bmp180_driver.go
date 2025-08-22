@@ -53,6 +53,7 @@ type bmp180CalibrationCoefficients struct {
 // Device datasheet: https://cdn-shop.adafruit.com/datasheets/BST-BMP180-DS000-09.pdf
 type BMP180Driver struct {
 	*Driver
+
 	oversampling BMP180OversamplingMode
 	calCoeffs    *bmp180CalibrationCoefficients
 }

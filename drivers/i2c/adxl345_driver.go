@@ -86,6 +86,7 @@ const (
 // Ported from the Arduino driver https://github.com/jakalada/Arduino-ADXL345
 type ADXL345Driver struct {
 	*Driver
+
 	powerCtl   adxl345PowerCtl
 	dataFormat adxl345DataFormat
 	bwRate     adxl345BwRate

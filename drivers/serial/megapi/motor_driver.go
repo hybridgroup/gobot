@@ -21,6 +21,7 @@ type megapiMotorSerialAdaptor interface {
 // MotorDriver represents a motor
 type MotorDriver struct {
 	*serial.Driver
+
 	port              byte
 	halted            bool
 	writeBytesChannel chan []byte

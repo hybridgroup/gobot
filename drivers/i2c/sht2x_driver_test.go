@@ -119,7 +119,7 @@ func TestSHT2xTemperatureCrcError(t *testing.T) {
 		return buf.Len(), nil
 	}
 	temp, err := d.Temperature()
-	require.ErrorContains(t, err, "Invalid crc")
+	require.ErrorContains(t, err, "invalid crc")
 	assert.InDelta(t, float32(0.0), temp, 0.0)
 }
 
@@ -136,7 +136,7 @@ func TestSHT2xHumidityCrcError(t *testing.T) {
 		return buf.Len(), nil
 	}
 	hum, err := d.Humidity()
-	require.ErrorContains(t, err, "Invalid crc")
+	require.ErrorContains(t, err, "invalid crc")
 	assert.InDelta(t, float32(0.0), hum, 0.0)
 }
 

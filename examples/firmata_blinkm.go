@@ -39,7 +39,7 @@ func main() {
 			if err != nil {
 				fmt.Println(err)
 			}
-			fmt.Println("color", color)
+			fmt.Printf("color %v\n", color)
 		})
 	}
 

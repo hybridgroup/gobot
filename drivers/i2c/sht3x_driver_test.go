@@ -118,8 +118,8 @@ func TestSHT3xSampleUnits(t *testing.T) {
 // Test internal sendCommandDelayGetResponse
 func TestSHT3xSCDGRIoFailures(t *testing.T) {
 	d, a := initTestSHT3xDriverWithStubbedAdaptor()
-	invalidRead := errors.New("Read error")
-	invalidWrite := errors.New("Write error")
+	invalidRead := errors.New("read error")
+	invalidWrite := errors.New("write error")
 
 	// Only send 5 bytes
 	a.i2cReadImpl = func(b []byte) (int, error) {

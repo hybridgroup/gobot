@@ -100,6 +100,7 @@ func (d *DisplayBuffer) Set(buf []byte) {
 // SSD1306Driver is a Gobot Driver for a SSD1306 Display
 type SSD1306Driver struct {
 	*Driver
+
 	dcDriver      *gpio.DirectPinDriver
 	rstDriver     *gpio.DirectPinDriver
 	pageSize      int
@@ -328,7 +329,7 @@ func (s *SSD1306Driver) Display() error {
 // ShowImage takes a standard Go image and shows it on the display in monochrome.
 func (s *SSD1306Driver) ShowImage(img image.Image) error {
 	if img.Bounds().Dx() != s.DisplayWidth || img.Bounds().Dy() != s.DisplayHeight {
-		return fmt.Errorf("Image must match the display width and height")
+		return fmt.Errorf("image must match the display width and height")
 	}
 
 	if err := s.Clear(); err != nil {

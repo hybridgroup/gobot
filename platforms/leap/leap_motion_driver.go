@@ -21,10 +21,11 @@ const (
 
 // Driver the Gobot software device to the Leap Motion
 type Driver struct {
+	gobot.Eventer
+
 	name       string
 	connection gobot.Connection
 	receive    func(ws io.ReadWriteCloser, msg *[]byte)
-	gobot.Eventer
 }
 
 // NewDriver creates a new leap motion driver

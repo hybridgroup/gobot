@@ -43,9 +43,10 @@ func (readWriteCloser) Close() error {
 }
 
 type mockFirmataBoard struct {
-	disconnectError error
 	gobot.Eventer
-	pins []client.Pin
+
+	disconnectError error
+	pins            []client.Pin
 }
 
 func newMockFirmataBoard() *mockFirmataBoard {
@@ -124,7 +125,7 @@ func TestIMUDriverReadAccelerometer(t *testing.T) {
 
 func TestIMUDriverReadAccelerometerData(t *testing.T) {
 	_, err := parseAccelerometerData([]byte{})
-	require.ErrorContains(t, err, "Invalid data")
+	require.ErrorContains(t, err, "invalid data")
 
 	result, err := parseAccelerometerData([]byte{0xF0, 0x11, 0x00, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x0f, 0xf7})
 	require.NoError(t, err)
@@ -139,7 +140,7 @@ func TestIMUDriverReadGyroscope(t *testing.T) {
 
 func TestIMUDriverReadGyroscopeData(t *testing.T) {
 	_, err := parseGyroscopeData([]byte{})
-	require.ErrorContains(t, err, "Invalid data")
+	require.ErrorContains(t, err, "invalid data")
 
 	result, err := parseGyroscopeData([]byte{0xF0, 0x11, 0x01, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x0f, 0xf7})
 	require.NoError(t, err)
@@ -154,7 +155,7 @@ func TestIMUDriverReadTemperature(t *testing.T) {
 
 func TestIMUDriverReadTemperatureData(t *testing.T) {
 	_, err := parseTemperatureData([]byte{})
-	require.ErrorContains(t, err, "Invalid data")
+	require.ErrorContains(t, err, "invalid data")
 
 	result, err := parseTemperatureData([]byte{0xF0, 0x11, 0x02, 0x00, 0x02, 0x03, 0x04, 0xf7})
 	require.NoError(t, err)
@@ -169,7 +170,7 @@ func TestIMUDriverEnableShockDetection(t *testing.T) {
 
 func TestIMUDriverShockDetectData(t *testing.T) {
 	_, err := parseShockData([]byte{})
-	require.ErrorContains(t, err, "Invalid data")
+	require.ErrorContains(t, err, "invalid data")
 
 	result, err := parseShockData([]byte{0xF0, 0x11, 0x03, 0x00, 0x02, 0xf7})
 	require.NoError(t, err)
@@ -184,7 +185,7 @@ func TestIMUDriverEnableStepCounter(t *testing.T) {
 
 func TestIMUDriverStepCountData(t *testing.T) {
 	_, err := parseStepData([]byte{})
-	require.ErrorContains(t, err, "Invalid data")
+	require.ErrorContains(t, err, "invalid data")
 
 	result, err := parseStepData([]byte{0xF0, 0x11, 0x04, 0x00, 0x02, 0xf7})
 	require.NoError(t, err)
@@ -199,7 +200,7 @@ func TestIMUDriverEnableTapDetection(t *testing.T) {
 
 func TestIMUDriverTapDetectData(t *testing.T) {
 	_, err := parseTapData([]byte{})
-	require.ErrorContains(t, err, "Invalid data")
+	require.ErrorContains(t, err, "invalid data")
 
 	result, err := parseTapData([]byte{0xF0, 0x11, 0x05, 0x00, 0x02, 0xf7})
 	require.NoError(t, err)
@@ -214,7 +215,7 @@ func TestIMUDriverEnableReadMotion(t *testing.T) {
 
 func TestIMUDriverReadMotionData(t *testing.T) {
 	_, err := parseMotionData([]byte{})
-	require.ErrorContains(t, err, "Invalid data")
+	require.ErrorContains(t, err, "invalid data")
 
 	result, err := parseMotionData([]byte{
 		0xF0, 0x11, 0x06, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x0f, 0xf7,

@@ -136,7 +136,7 @@ func NewMAVLinkMessage(msgid uint8, data []byte) (MAVLinkMessage, error) {
 		message.Decode(data)
 		return message, nil
 	}
-	return nil, fmt.Errorf("Unknown Message ID: %v", msgid)
+	return nil, fmt.Errorf("unknown Message ID: %v", msgid)
 }
 
 //

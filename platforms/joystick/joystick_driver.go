@@ -42,6 +42,8 @@ const (
 
 // Driver represents a joystick
 type Driver struct {
+	gobot.Eventer
+
 	name        string
 	interval    time.Duration
 	connection  gobot.Connection
@@ -51,7 +53,6 @@ type Driver struct {
 	axisState   map[int]int
 
 	halt chan bool
-	gobot.Eventer
 }
 
 // pair is a JSON representation of name and id
@@ -212,7 +213,7 @@ func (j *Driver) handleButtons(state js.State) error {
 			//nolint:gosec // TODO: fix later
 			name := j.findName(uint8(button), j.config.Buttons)
 			if name == "" {
-				return fmt.Errorf("Unknown button: %v", button)
+				return fmt.Errorf("unknown button: %v", button)
 			}
 
 			if buttonPressed {
@@ -231,7 +232,7 @@ func (j *Driver) handleAxes(state js.State) error {
 		//nolint:gosec // TODO: fix later
 		name := j.findName(uint8(axis), j.config.Axis)
 		if name == "" {
-			return fmt.Errorf("Unknown Axis: %v", axis)
+			return fmt.Errorf("unknown Axis: %v", axis)
 		}
 
 		if j.axisState[axis] != state.AxisData[axis] {

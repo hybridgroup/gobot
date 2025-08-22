@@ -37,6 +37,7 @@ const (
 type MPL115A2Driver struct {
 	*Driver
 	gobot.Eventer
+
 	a0  float32
 	b1  float32
 	b2  float32

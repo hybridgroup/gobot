@@ -36,5 +36,5 @@ func NewMFRC522Driver(c Connector, options ...func(Config)) *MFRC522Driver {
 }
 
 func (d *MFRC522Driver) initialize() error {
-	return d.MFRC522Common.Initialize(d.connection)
+	return d.Initialize(d.connection)
 }

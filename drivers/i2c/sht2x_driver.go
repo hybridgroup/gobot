@@ -68,6 +68,7 @@ const (
 // SHT2xDriver is a Driver for a SHT2x humidity and temperature sensor
 type SHT2xDriver struct {
 	*Driver
+
 	Units    string
 	accuracy byte
 	crcTable *crc8.Table
@@ -189,7 +190,7 @@ func (d *SHT2xDriver) readSensor(cmd byte) (uint16, error) {
 	// Store the result
 	crc := crc8.Checksum(buf[0:2], d.crcTable)
 	if buf[2] != crc {
-		return 0, errors.New("Invalid crc")
+		return 0, errors.New("invalid crc")
 	}
 	read := uint16(buf[0])<<8 | uint16(buf[1])
 	read &= 0xfffc // clear two low bits (status bits)

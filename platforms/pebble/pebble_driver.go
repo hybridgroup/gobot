@@ -5,11 +5,12 @@ import (
 )
 
 type Driver struct {
-	name       string
-	connection gobot.Connection
 	gobot.Commander
 	gobot.Eventer
-	Messages []string
+
+	name       string
+	connection gobot.Connection
+	Messages   []string
 }
 
 // NewDriver creates a new pebble driver

@@ -42,6 +42,7 @@ type hcsr04UseEdgePollingOption bool
 // HCSR04Driver is a driver for ultrasonic range measurement.
 type HCSR04Driver struct {
 	*driver
+
 	hcsr04Cfg                    *hcsr04Configuration
 	triggerPinID                 string
 	echoPinID                    string

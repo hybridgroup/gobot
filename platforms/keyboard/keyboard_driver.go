@@ -14,11 +14,12 @@ const (
 
 // Driver is gobot software device to the keyboard
 type Driver struct {
+	gobot.Eventer
+
 	name    string
 	connect func(*Driver) error
 	listen  func(*Driver)
 	stdin   *os.File
-	gobot.Eventer
 }
 
 // NewDriver returns a new keyboard Driver.

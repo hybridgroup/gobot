@@ -35,13 +35,14 @@ type nameOption string
 
 // Driver implements the interface gobot.Driver.
 type driver struct {
+	gobot.Commander
+
 	driverCfg  *configuration
 	connector  connector
 	connection Connection
 	afterStart func() error
 	beforeHalt func() error
-	gobot.Commander
-	mutex *sync.Mutex // mutex often needed to ensure that write-read sequences are not interrupted
+	mutex      *sync.Mutex // mutex often needed to ensure that write-read sequences are not interrupted
 }
 
 // newDriver creates a new generic and basic 1-wire gobot driver.

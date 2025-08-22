@@ -39,7 +39,7 @@ func NewMCP3002Driver(a Connector, options ...func(Config)) *MCP3002Driver {
 // Read reads the current analog data for the desired channel.
 func (d *MCP3002Driver) Read(channel int) (int, error) {
 	if channel < 0 || channel > MCP3002DriverMaxChannel-1 {
-		return 0, fmt.Errorf("Invalid channel '%d' for read", channel)
+		return 0, fmt.Errorf("invalid channel '%d' for read", channel)
 	}
 
 	tx := make([]byte, 2)

@@ -8,6 +8,7 @@ import (
 // APA102Driver is a driver for the APA102 programmable RGB LEDs.
 type APA102Driver struct {
 	*Driver
+
 	vals       []color.RGBA
 	brightness uint8
 }

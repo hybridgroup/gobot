@@ -180,7 +180,7 @@ func (c *firmataI2cConnection) readAndCheckCount(buf []byte) error {
 	}
 	expectedCount := len(buf)
 	if countRead != expectedCount {
-		return fmt.Errorf("Firmata i2c read %d bytes, expected %d bytes", countRead, expectedCount)
+		return fmt.Errorf("firmata i2c read %d bytes, expected %d bytes", countRead, expectedCount)
 	}
 	return nil
 }
@@ -192,7 +192,7 @@ func (c *firmataI2cConnection) writeAndCheckCount(buf []byte) error {
 	}
 	expectedCount := len(buf)
 	if countWritten != expectedCount {
-		return fmt.Errorf("Firmata i2c write %d bytes, expected %d bytes", countWritten, expectedCount)
+		return fmt.Errorf("firmata i2c write %d bytes, expected %d bytes", countWritten, expectedCount)
 	}
 	return nil
 }

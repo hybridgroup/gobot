@@ -59,9 +59,10 @@ type mcp23017Behavior struct {
 // MCP23017Driver contains the driver configuration parameters.
 type MCP23017Driver struct {
 	*Driver
+	gobot.Eventer
+
 	mcpConf  mcp23017Config
 	mcpBehav mcp23017Behavior
-	gobot.Eventer
 }
 
 // NewMCP23017Driver creates a new Gobot Driver to the MCP23017 i2c port expander.
@@ -362,10 +363,10 @@ func (m *MCP23017Driver) read(reg uint8) (uint8, error) {
 // Port A is the default if an incorrect or no port is specified.
 func (m *MCP23017Driver) getPort(portStr string) port {
 	portStr = strings.ToUpper(portStr)
-	switch {
-	case portStr == "A":
+	switch portStr {
+	case "A":
 		return mcp23017GetBank(m.mcpConf.bank).portA
-	case portStr == "B":
+	case "B":
 		return mcp23017GetBank(m.mcpConf.bank).portB
 	default:
 		return mcp23017GetBank(m.mcpConf.bank).portA

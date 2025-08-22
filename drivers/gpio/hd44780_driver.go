@@ -83,6 +83,7 @@ type hd44780PinRWOption string
 // Datasheet: https://www.sparkfun.com/datasheets/LCD/HD44780.pdf
 type HD44780Driver struct {
 	*driver
+
 	hd44780Cfg  *hd44780Configuration
 	cols        int
 	rows        int
@@ -183,7 +184,7 @@ func WithHD44780RWPin(pin string) hd44780OptionApplier {
 func (d *HD44780Driver) initialize() error {
 	for _, bitPin := range d.pinDataBits {
 		if bitPin.Pin() == "" {
-			return errors.New("Initialization error")
+			return errors.New("initialization error")
 		}
 	}
 
@@ -478,7 +479,7 @@ func (d *HD44780Driver) clear() error {
 
 func (d *HD44780Driver) setCursor(col int, row int) error {
 	if col < 0 || row < 0 || col >= d.cols || row >= d.rows {
-		return fmt.Errorf("Invalid position value (%d, %d), range (%d, %d)", col, row, d.cols-1, d.rows-1)
+		return fmt.Errorf("invalid position value (%d, %d), range (%d, %d)", col, row, d.cols-1, d.rows-1)
 	}
 
 	return d.sendCommand(HD44780_SETDDRAMADDR | col + d.rowOffsets[row])

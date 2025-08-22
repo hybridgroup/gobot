@@ -56,9 +56,10 @@ type MotionData struct {
 
 // IMUDriver represents the IMU that is built-in to the Curie
 type IMUDriver struct {
+	gobot.Eventer
+
 	name       string
 	connection *firmata.Adaptor
-	gobot.Eventer
 }
 
 // NewIMUDriver returns a new IMUDriver
@@ -201,7 +202,7 @@ func (imu *IMUDriver) handleEvent(data []byte) error {
 
 func parseAccelerometerData(data []byte) (*AccelerometerData, error) {
 	if len(data) < 9 {
-		return nil, errors.New("Invalid data")
+		return nil, errors.New("invalid data")
 	}
 	x := int16(uint16(data[3]) | uint16(data[4])<<7) //nolint:gosec // ok here
 	y := int16(uint16(data[5]) | uint16(data[6])<<7) //nolint:gosec // ok here
@@ -213,7 +214,7 @@ func parseAccelerometerData(data []byte) (*AccelerometerData, error) {
 
 func parseGyroscopeData(data []byte) (*GyroscopeData, error) {
 	if len(data) < 9 {
-		return nil, errors.New("Invalid data")
+		return nil, errors.New("invalid data")
 	}
 	x := int16(uint16(data[3]) | uint16(data[4])<<7) //nolint:gosec // ok here
 	y := int16(uint16(data[5]) | uint16(data[6])<<7) //nolint:gosec // ok here
@@ -225,7 +226,7 @@ func parseGyroscopeData(data []byte) (*GyroscopeData, error) {
 
 func parseTemperatureData(data []byte) (float32, error) {
 	if len(data) < 8 {
-		return 0, errors.New("Invalid data")
+		return 0, errors.New("invalid data")
 	}
 	t1 := int16(uint16(data[3]) | uint16(data[4])<<7) //nolint:gosec // ok here
 	t2 := int16(uint16(data[5]) | uint16(data[6])<<7) //nolint:gosec // ok here
@@ -236,7 +237,7 @@ func parseTemperatureData(data []byte) (float32, error) {
 
 func parseShockData(data []byte) (*ShockData, error) {
 	if len(data) < 6 {
-		return nil, errors.New("Invalid data")
+		return nil, errors.New("invalid data")
 	}
 
 	res := &ShockData{Axis: data[3], Direction: data[4]}
@@ -245,7 +246,7 @@ func parseShockData(data []byte) (*ShockData, error) {
 
 func parseStepData(data []byte) (int16, error) {
 	if len(data) < 6 {
-		return 0, errors.New("Invalid data")
+		return 0, errors.New("invalid data")
 	}
 
 	res := int16(uint16(data[3]) | uint16(data[4])<<7) //nolint:gosec // ok here
@@ -254,7 +255,7 @@ func parseStepData(data []byte) (int16, error) {
 
 func parseTapData(data []byte) (*TapData, error) {
 	if len(data) < 6 {
-		return nil, errors.New("Invalid data")
+		return nil, errors.New("invalid data")
 	}
 
 	res := &TapData{Axis: data[3], Direction: data[4]}
@@ -263,7 +264,7 @@ func parseTapData(data []byte) (*TapData, error) {
 
 func parseMotionData(data []byte) (*MotionData, error) {
 	if len(data) < 16 {
-		return nil, errors.New("Invalid data")
+		return nil, errors.New("invalid data")
 	}
 	ax := int16(uint16(data[3]) | uint16(data[4])<<7) //nolint:gosec // ok here
 	ay := int16(uint16(data[5]) | uint16(data[6])<<7) //nolint:gosec // ok here

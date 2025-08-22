@@ -12,11 +12,12 @@ const (
 
 // Driver for NATS
 type Driver struct {
+	gobot.Eventer
+	gobot.Commander
+
 	name       string
 	topic      string
 	connection gobot.Connection
-	gobot.Eventer
-	gobot.Commander
 }
 
 // NewDriver returns a new Gobot NATS Driver

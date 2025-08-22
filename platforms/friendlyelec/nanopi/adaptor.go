@@ -23,14 +23,15 @@ const (
 
 // Adaptor represents a Gobot Adaptor for the FriendlyELEC NanoPi Boards
 type Adaptor struct {
-	name  string
-	sys   *system.Accesser // used for unit tests only
-	mutex sync.Mutex
 	*adaptors.AnalogPinsAdaptor
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.PWMPinsAdaptor
 	*adaptors.I2cBusAdaptor
 	*adaptors.SpiBusAdaptor
+
+	name  string
+	sys   *system.Accesser // used for unit tests only
+	mutex sync.Mutex
 }
 
 // NewNeoAdaptor creates a board adaptor for NanoPi NEO

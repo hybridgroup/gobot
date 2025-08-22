@@ -16,7 +16,7 @@ func TestEventerAddEvent(t *testing.T) {
 		require.Fail(t, "Could not add event to list of Event names")
 	}
 	assert.Equal(t, "test", e.Event("test"))
-	assert.Equal(t, "", e.Event("unknown"))
+	assert.Empty(t, e.Event("unknown"))
 }
 
 func TestEventerDeleteEvent(t *testing.T) {

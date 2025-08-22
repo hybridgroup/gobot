@@ -88,6 +88,7 @@ type bmp388CalibrationCoefficients struct {
 // BMP388Driver is a driver for the BMP388 temperature/pressure sensor
 type BMP388Driver struct {
 	*Driver
+
 	calCoeffs   *bmp388CalibrationCoefficients
 	ctrlPwrMode uint8
 	confFilter  BMP388IIRFilter
@@ -207,7 +208,7 @@ func (d *BMP388Driver) initialization() error {
 	}
 
 	if bmp388ChipID != chipID {
-		return fmt.Errorf("Incorrect BMP388 chip ID '0%x' Expected 0x%x", chipID, bmp388ChipID)
+		return fmt.Errorf("incorrect BMP388 chip ID '0%x' Expected 0x%x", chipID, bmp388ChipID)
 	}
 
 	var (
@@ -358,13 +359,13 @@ func (d *BMP388Driver) calculateTemp(rawTemp int32) float32 {
 
 func (d *BMP388Driver) calculatePress(rawPress int32, tLin float64) float32 {
 	pd1 := float64(d.calCoeffs.p6) * tLin
-	pd2 := float64(d.calCoeffs.p7) * math.Pow(tLin, 2)
-	pd3 := float64(d.calCoeffs.p8) * math.Pow(tLin, 3)
+	pd2 := float64(d.calCoeffs.p7) * tLin * tLin
+	pd3 := float64(d.calCoeffs.p8) * tLin * tLin * tLin
 	po1 := float64(d.calCoeffs.p5) + pd1 + pd2 + pd3
 
 	pd1 = float64(d.calCoeffs.p2) * tLin
-	pd2 = float64(d.calCoeffs.p3) * math.Pow(tLin, 2)
-	pd3 = float64(d.calCoeffs.p4) * math.Pow(tLin, 3)
+	pd2 = float64(d.calCoeffs.p3) * tLin * tLin
+	pd3 = float64(d.calCoeffs.p4) * tLin * tLin * tLin
 	po2 := float64(rawPress) * (float64(d.calCoeffs.p1) + pd1 + pd2 + pd3)
 
 	pd1 = math.Pow(float64(rawPress), 2)

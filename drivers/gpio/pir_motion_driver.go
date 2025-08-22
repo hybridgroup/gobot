@@ -27,10 +27,11 @@ type pirMotionReadIntervalOption time.Duration
 //	"WithName"
 type PIRMotionDriver struct {
 	*driver
-	pirMotionCfg *pirMotionConfiguration
 	gobot.Eventer
-	active bool
-	halt   chan struct{}
+
+	pirMotionCfg *pirMotionConfiguration
+	active       bool
+	halt         chan struct{}
 }
 
 // NewPIRMotionDriver returns a new driver for  PIR motion sensor with a polling interval of 10 Milliseconds,

@@ -343,7 +343,7 @@ func TestStepperSetDirection(t *testing.T) {
 		"error_invalid_direction": {
 			input:   "reverse",
 			wantVal: "forward",
-			wantErr: "Invalid direction 'reverse'",
+			wantErr: "invalid direction 'reverse'",
 		},
 	}
 	for name, tc := range tests {

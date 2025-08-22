@@ -383,9 +383,9 @@ func TestTH02_readData(t *testing.T) {
 					return len(b), nil
 				}
 				// data register
-				return len(b), fmt.Errorf("Nope")
+				return len(b), fmt.Errorf("nope")
 			},
-			wantErr: fmt.Errorf("Nope"),
+			wantErr: fmt.Errorf("nope"),
 			rtn:     0,
 		},
 		"unable to read doesn't provide enough data": {
@@ -399,7 +399,7 @@ func TestTH02_readData(t *testing.T) {
 				}
 				return len(b), nil
 			},
-			wantErr: fmt.Errorf("Read 1 bytes from device by i2c helpers, expected 2"),
+			wantErr: fmt.Errorf("read 1 bytes from device by i2c helpers, expected 2"),
 			rtn:     0,
 		},
 	}

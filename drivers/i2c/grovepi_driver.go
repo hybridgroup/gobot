@@ -33,6 +33,7 @@ const (
 // https://github.com/DexterInd/GrovePi/tree/1.3.0/README.md
 type GrovePiDriver struct {
 	*Driver
+
 	pins map[int]string
 }
 

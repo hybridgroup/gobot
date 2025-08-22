@@ -67,7 +67,7 @@ func Test_getPinTranslatorFunction(t *testing.T) {
 			pin:          "666",
 			model:        "whatever",
 			expectedLine: 0,
-			expectedErr:  fmt.Errorf("Not a valid pin"),
+			expectedErr:  fmt.Errorf("not a valid pin"),
 		},
 	}
 
@@ -81,7 +81,7 @@ func Test_getPinTranslatorFunction(t *testing.T) {
 			// act
 			chip, line, err := fn(tc.pin)
 			// assert
-			assert.Equal(t, "", chip)
+			assert.Empty(t, chip)
 			assert.Equal(t, tc.expectedErr, err)
 			assert.Equal(t, tc.expectedLine, line)
 		})

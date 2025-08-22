@@ -34,9 +34,10 @@ func main() {
 			if err := servo.Move(uint8(counter)); err != nil {
 				fmt.Println(err)
 			}
-			if counter == 140 {
+			switch counter {
+			case 140:
 				flg = false
-			} else if counter == 30 {
+			case 30:
 				flg = true
 			}
 

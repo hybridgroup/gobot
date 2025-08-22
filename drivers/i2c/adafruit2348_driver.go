@@ -57,6 +57,7 @@ type adafruit2348StepperMotor struct {
 // https://cdn-learn.adafruit.com/downloads/pdf/adafruit2348-dc-and-stepper-motor-hat-for-raspberry-pi.pdf
 type Adafruit2348Driver struct {
 	*PCA9685Driver
+
 	dcMotors              []adafruit2348DCMotor
 	stepperMotors         []adafruit2348StepperMotor
 	stepperMicrostepCurve []int
@@ -77,22 +78,22 @@ func NewAdafruit2348Driver(c Connector, options ...func(Config)) *Adafruit2348Dr
 	var dc []adafruit2348DCMotor
 	var st []adafruit2348StepperMotor
 	for i := 0; i < 4; i++ {
-		switch {
-		case i == 0:
+		switch i {
+		case 0:
 			dc = append(dc, adafruit2348DCMotor{pwmPin: 8, in1Pin: 10, in2Pin: 9})
 			st = append(st, adafruit2348StepperMotor{
 				pwmPinA: 8, pwmPinB: 13,
 				ain1: 10, ain2: 9, bin1: 11, bin2: 12, revSteps: 200, secPerStep: 0.1,
 			})
-		case i == 1:
+		case 1:
 			dc = append(dc, adafruit2348DCMotor{pwmPin: 13, in1Pin: 11, in2Pin: 12})
 			st = append(st, adafruit2348StepperMotor{
 				pwmPinA: 2, pwmPinB: 7,
 				ain1: 4, ain2: 3, bin1: 5, bin2: 6, revSteps: 200, secPerStep: 0.1,
 			})
-		case i == 2:
+		case 2:
 			dc = append(dc, adafruit2348DCMotor{pwmPin: 2, in1Pin: 4, in2Pin: 3})
-		case i == 3:
+		case 3:
 			dc = append(dc, adafruit2348DCMotor{pwmPin: 7, in1Pin: 5, in2Pin: 6})
 		}
 	}
@@ -130,22 +131,22 @@ func (a *Adafruit2348Driver) SetDCMotorSpeed(dcMotor int, speed int32) error {
 
 // RunDCMotor will set the appropriate pins to run the specified DC motor for the given direction.
 func (a *Adafruit2348Driver) RunDCMotor(dcMotor int, dir Adafruit2348Direction) error {
-	switch {
-	case dir == Adafruit2348Forward:
+	switch dir {
+	case Adafruit2348Forward:
 		if err := a.setPin(a.dcMotors[dcMotor].in2Pin, 0); err != nil {
 			return err
 		}
 		if err := a.setPin(a.dcMotors[dcMotor].in1Pin, 1); err != nil {
 			return err
 		}
-	case dir == Adafruit2348Backward:
+	case Adafruit2348Backward:
 		if err := a.setPin(a.dcMotors[dcMotor].in1Pin, 0); err != nil {
 			return err
 		}
 		if err := a.setPin(a.dcMotors[dcMotor].in2Pin, 1); err != nil {
 			return err
 		}
-	case dir == Adafruit2348Release:
+	case Adafruit2348Release:
 		if err := a.setPin(a.dcMotors[dcMotor].in1Pin, 0); err != nil {
 			return err
 		}
@@ -208,8 +209,8 @@ func (a *Adafruit2348Driver) oneStep(motor int, dir Adafruit2348Direction, style
 	pwmB := 255
 
 	// Determine the stepping procedure
-	switch {
-	case style == Adafruit2348Single:
+	switch style {
+	case Adafruit2348Single:
 		if (a.stepperMotors[motor].currentStep / (adafruit2348StepperMicrosteps / 2) % 2) != 0 {
 			// we're at an odd step
 			if dir == Adafruit2348Forward {
@@ -225,7 +226,7 @@ func (a *Adafruit2348Driver) oneStep(motor int, dir Adafruit2348Direction, style
 				a.stepperMotors[motor].currentStep -= adafruit2348StepperMicrosteps
 			}
 		}
-	case style == Adafruit2348Double:
+	case Adafruit2348Double:
 		if (a.stepperMotors[motor].currentStep / (adafruit2348StepperMicrosteps / 2) % 2) == 0 {
 			// we're at an even step, weird
 			if dir == Adafruit2348Forward {
@@ -241,13 +242,13 @@ func (a *Adafruit2348Driver) oneStep(motor int, dir Adafruit2348Direction, style
 				a.stepperMotors[motor].currentStep -= adafruit2348StepperMicrosteps
 			}
 		}
-	case style == Adafruit2348Interleave:
+	case Adafruit2348Interleave:
 		if dir == Adafruit2348Forward {
 			a.stepperMotors[motor].currentStep += adafruit2348StepperMicrosteps / 2
 		} else {
 			a.stepperMotors[motor].currentStep -= adafruit2348StepperMicrosteps / 2
 		}
-	case style == Adafruit2348Microstep:
+	case Adafruit2348Microstep:
 		if dir == Adafruit2348Forward {
 			a.stepperMotors[motor].currentStep++
 		} else {
@@ -333,5 +334,5 @@ func (a *Adafruit2348Driver) setPin(pin byte, value int32) error {
 	if value == 1 {
 		return a.SetPWM(int(pin), 4096, 0)
 	}
-	return errors.New("Invalid pin")
+	return errors.New("invalid pin")
 }

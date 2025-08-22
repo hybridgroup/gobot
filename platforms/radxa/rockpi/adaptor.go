@@ -26,13 +26,14 @@ const (
 
 // Adaptor is the Gobot Adaptor for Radxa's Rock Pi.
 type Adaptor struct {
+	*adaptors.DigitalPinsAdaptor
+	*adaptors.I2cBusAdaptor
+	*adaptors.SpiBusAdaptor
+
 	name     string
 	mutex    sync.Mutex
 	sys      *system.Accesser
 	revision string
-	*adaptors.DigitalPinsAdaptor
-	*adaptors.I2cBusAdaptor
-	*adaptors.SpiBusAdaptor
 }
 
 // NewAdaptor creates a RockPi Adaptor
@@ -136,7 +137,7 @@ func (a *Adaptor) getPinTranslatorFunction() func(string) (string, int, error) {
 		} else if val, ok := pins[pin]["*"]; ok {
 			line = val
 		} else {
-			return "", 0, errors.New("Not a valid pin")
+			return "", 0, errors.New("not a valid pin")
 		}
 		return "", line, nil
 	}

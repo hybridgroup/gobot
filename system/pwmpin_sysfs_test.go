@@ -59,7 +59,7 @@ func TestPwmPin(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "1", fs.Files["/sys/class/pwm/pwmchip0/pwm10/enable"].Contents)
 	err = pin.SetPolarity(true)
-	require.ErrorContains(t, err, "Cannot set PWM polarity when enabled")
+	require.ErrorContains(t, err, "cannot set PWM polarity when enabled")
 
 	fs.Files["/sys/class/pwm/pwmchip0/pwm10/period"].Contents = "6"
 	data, _ := pin.Period()

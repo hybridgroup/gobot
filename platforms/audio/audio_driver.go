@@ -9,13 +9,14 @@ import (
 
 // Driver is gobot software device for audio playback
 type Driver struct {
+	gobot.Eventer
+	gobot.Commander
+
 	name       string
 	connection gobot.Connection
 	interval   time.Duration
 	halt       chan bool
-	gobot.Eventer
-	gobot.Commander
-	filename string
+	filename   string
 }
 
 // NewDriver returns a new audio Driver. It accepts:

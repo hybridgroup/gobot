@@ -364,7 +364,7 @@ func TestConnectUnknown(t *testing.T) {
 	a := NewAdaptor("wha")
 
 	err := a.Connect()
-	require.ErrorContains(t, err, "Unknown board type: wha")
+	require.ErrorContains(t, err, "unknown board type: wha")
 }
 
 func TestFinalize(t *testing.T) {
@@ -590,11 +590,11 @@ func Test_validateAndSetupI2cBusNumber(t *testing.T) {
 	}{
 		"arduino_number_negative_error": {
 			busNr:   -1,
-			wantErr: "Unsupported I2C bus '-1'",
+			wantErr: "unsupported I2C bus '-1'",
 		},
 		"arduino_number_1_error": {
 			busNr:   1,
-			wantErr: "Unsupported I2C bus '1'",
+			wantErr: "unsupported I2C bus '1'",
 		},
 		"arduino_number_6_ok": {
 			busNr: 6,
@@ -602,7 +602,7 @@ func Test_validateAndSetupI2cBusNumber(t *testing.T) {
 		"sparkfun_number_negative_error": {
 			board:   "sparkfun",
 			busNr:   -1,
-			wantErr: "Unsupported I2C bus '-1'",
+			wantErr: "unsupported I2C bus '-1'",
 		},
 		"sparkfun_number_1_ok": {
 			board: "sparkfun",
@@ -611,7 +611,7 @@ func Test_validateAndSetupI2cBusNumber(t *testing.T) {
 		"miniboard_number_6_error": {
 			board:   "miniboard",
 			busNr:   6,
-			wantErr: "Unsupported I2C bus '6'",
+			wantErr: "unsupported I2C bus '6'",
 		},
 	}
 	for name, tc := range tests {

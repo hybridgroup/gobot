@@ -21,11 +21,11 @@ const (
 
 // CameraDriver is the Gobot Driver for the OpenCV camera
 type CameraDriver struct {
+	gobot.Eventer
 	name   string
 	camera capture
 	Source interface{}
 	start  func(*CameraDriver) error
-	gobot.Eventer
 }
 
 // NewCameraDriver creates a new driver with specified source.
@@ -42,7 +42,7 @@ func NewCameraDriver(source interface{}) *CameraDriver {
 			case int:
 				c.camera, _ = gocv.VideoCaptureDevice(v)
 			default:
-				return errors.New("Unknown camera source")
+				return errors.New("unknown camera source")
 			}
 			return nil
 		},

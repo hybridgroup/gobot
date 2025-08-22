@@ -167,10 +167,11 @@ const (
 
 // Driver is a Gobot Driver for the GoPiGo3 board.
 type Driver struct {
+	spi.Config
+
 	name       string
 	connector  spi.Connector
 	connection spi.Connection
-	spi.Config
 }
 
 // NewDriver creates a new Gobot Driver for the GoPiGo3 board.
@@ -669,21 +670,21 @@ func getGroveAddresses(pin string) (gPin, gPort Grove, analog, state byte, err e
 		analog = GET_GROVE_ANALOG_2_2
 		state = GET_GROVE_STATE_2_2
 	default:
-		err = fmt.Errorf("Invalid grove pin name")
+		err = fmt.Errorf("invalid grove pin name")
 	}
 	return gPin, gPort, analog, state, err
 }
 
 func (d *Driver) responseValid(response []byte) error {
 	if response[3] != 0xA5 {
-		return fmt.Errorf("No SPI response, response not valid")
+		return fmt.Errorf("no SPI response, response not valid")
 	}
 	return nil
 }
 
 func (d *Driver) valueValid(value []byte) error {
 	if value[4] != byte(VALID_DATA) {
-		return fmt.Errorf("Invalid value")
+		return fmt.Errorf("invalid value")
 	}
 	return nil
 }

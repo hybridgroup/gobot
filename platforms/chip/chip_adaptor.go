@@ -31,14 +31,15 @@ type sysfsPin struct {
 
 // Adaptor represents a Gobot Adaptor for a C.H.I.P.
 type Adaptor struct {
-	name   string
-	sys    *system.Accesser // used for unit tests only
-	mutex  sync.Mutex
-	pinMap map[string]sysfsPin
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.PWMPinsAdaptor
 	*adaptors.I2cBusAdaptor
 	*adaptors.SpiBusAdaptor // for usage of "adaptors.WithSpiGpioAccess()"
+
+	name   string
+	sys    *system.Accesser // used for unit tests only
+	mutex  sync.Mutex
+	pinMap map[string]sysfsPin
 }
 
 // NewAdaptor creates a C.H.I.P. Adaptor

@@ -24,6 +24,7 @@ type thermalZoneUnitscalerOption struct {
 // ThermalZoneDriver represents an driver for reading the system thermal zone temperature
 type ThermalZoneDriver struct {
 	*AnalogSensorDriver
+
 	thermalZoneCfg *thermalZoneConfiguration
 }
 

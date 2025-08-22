@@ -38,7 +38,7 @@ func NewMFRC522Driver(a Connector, options ...func(Config)) *MFRC522Driver {
 
 func (d *MFRC522Driver) initialize() error {
 	wrapper := &conWrapper{origCon: d.connection}
-	return d.MFRC522Common.Initialize(wrapper)
+	return d.Initialize(wrapper)
 }
 
 // this is necessary due to special behavior of shift bytes and set first bit
