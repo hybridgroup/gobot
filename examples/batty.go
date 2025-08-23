@@ -70,11 +70,12 @@ func NewLoopbackAdaptor(port string) *loopbackAdaptor {
 var _ gobot.Driver = (*pingDriver)(nil)
 
 type pingDriver struct {
+	gobot.Eventer
+	gobot.Commander
+
 	name       string
 	pin        string
 	connection gobot.Connection
-	gobot.Eventer
-	gobot.Commander
 }
 
 func (t *pingDriver) Start() error                 { return nil }

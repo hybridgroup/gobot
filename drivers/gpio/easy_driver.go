@@ -36,6 +36,7 @@ type easySleepPinOption string
 // with the specific additions for the board, e.g. direction, enable and sleep outputs.
 type EasyDriver struct {
 	*StepperDriver
+
 	easyCfg      *easyConfiguration
 	stepPin      string
 	anglePerStep float32
@@ -121,7 +122,7 @@ func (d *EasyDriver) SetDirection(direction string) error {
 
 	direction = strings.ToLower(direction)
 	if direction != StepperDriverForward && direction != StepperDriverBackward {
-		return fmt.Errorf("Invalid direction '%s'. Value should be '%s' or '%s'",
+		return fmt.Errorf("invalid direction '%s'. Value should be '%s' or '%s'",
 			direction, StepperDriverForward, StepperDriverBackward)
 	}
 

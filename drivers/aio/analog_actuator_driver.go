@@ -23,6 +23,7 @@ type actuatorScaleOption struct {
 // AnalogActuatorDriver represents an analog actuator
 type AnalogActuatorDriver struct {
 	*driver
+
 	pin          string
 	actuatorCfg  *actuatorConfiguration
 	lastValue    float64
@@ -117,7 +118,7 @@ func (a *AnalogActuatorDriver) RawWrite(val int) error {
 func (a *AnalogActuatorDriver) WriteRaw(val int) error {
 	writer, ok := a.connection.(AnalogWriter)
 	if !ok {
-		return fmt.Errorf("AnalogWrite is not supported by the platform '%s'", a.Connection().Name())
+		return fmt.Errorf("'AnalogWrite' is not supported by the platform '%s'", a.Connection().Name())
 	}
 	if err := writer.AnalogWrite(a.Pin(), val); err != nil {
 		return err

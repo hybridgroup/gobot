@@ -44,12 +44,13 @@ type FirmataAdaptor interface {
 
 // Adaptor is the Gobot Adaptor for Firmata based boards
 type Adaptor struct {
+	gobot.Eventer
+
 	name       string
 	port       string
 	Board      firmataBoard
 	conn       io.ReadWriteCloser
 	PortOpener func(port string) (io.ReadWriteCloser, error)
-	gobot.Eventer
 }
 
 // NewAdaptor returns a new Firmata Adaptor which optionally accepts:
@@ -243,7 +244,7 @@ func (f *Adaptor) digitalPin(pin int) int {
 // Only supports bus number 0
 func (f *Adaptor) GetI2cConnection(address int, bus int) (i2c.Connection, error) {
 	if bus != 0 {
-		return nil, fmt.Errorf("Invalid bus number %d, only 0 is supported", bus)
+		return nil, fmt.Errorf("invalid bus number %d, only 0 is supported", bus)
 	}
 	if err := f.Board.I2cConfig(0); err != nil {
 		return nil, err

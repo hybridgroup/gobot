@@ -23,15 +23,16 @@ const (
 
 // Adaptor represents a Gobot Adaptor for the Radxa Zero
 type Adaptor struct {
-	name  string
-	sys   *system.Accesser // used for unit tests only
-	mutex *sync.Mutex
 	*adaptors.AnalogPinsAdaptor
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.PWMPinsAdaptor
 	*adaptors.I2cBusAdaptor
 	*adaptors.SpiBusAdaptor
 	*adaptors.OneWireBusAdaptor
+
+	name  string
+	sys   *system.Accesser // used for unit tests only
+	mutex *sync.Mutex
 }
 
 // NewAdaptor creates a Zero Adaptor

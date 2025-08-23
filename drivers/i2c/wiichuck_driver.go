@@ -24,12 +24,13 @@ const wiichuckDefaultAddress = 0x52
 // WiichuckDriver contains the attributes for the i2c driver
 type WiichuckDriver struct {
 	*Driver
+	gobot.Eventer
+
 	interval  time.Duration
 	pauseTime time.Duration
-	gobot.Eventer
-	mtx      sync.Mutex
-	joystick map[string]float64
-	data     map[string]float64
+	mtx       sync.Mutex
+	joystick  map[string]float64
+	data      map[string]float64
 }
 
 // NewWiichuckDriver creates a WiichuckDriver with specified i2c interface.
@@ -87,7 +88,7 @@ func (w *WiichuckDriver) Joystick() map[string]float64 {
 // If value is encrypted, warning message is printed
 func (w *WiichuckDriver) update(value []byte) error {
 	if w.isEncrypted(value) {
-		return fmt.Errorf("Encrypted bytes")
+		return fmt.Errorf("encrypted bytes")
 	}
 
 	w.parse(value)

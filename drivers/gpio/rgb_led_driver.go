@@ -7,6 +7,7 @@ import (
 // RgbLedDriver represents a digital RGB Led
 type RgbLedDriver struct {
 	*driver
+
 	pinRed     string
 	redColor   byte
 	pinGreen   string

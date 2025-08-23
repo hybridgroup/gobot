@@ -63,7 +63,7 @@ func TestDigisparkAdaptorI2cGetI2cConnectionFailWithInvalidBus(t *testing.T) {
 	c, err := a.GetI2cConnection(0x40, 1)
 
 	// assert
-	require.ErrorContains(t, err, "Invalid bus number 1, only 0 is supported")
+	require.ErrorContains(t, err, "invalid bus number 1, only 0 is supported")
 	assert.Nil(t, c)
 }
 
@@ -78,7 +78,7 @@ func TestDigisparkAdaptorI2cStartFailWithWrongAddress(t *testing.T) {
 
 	// assert
 	assert.Equal(t, 0, count)
-	require.ErrorContains(t, err, fmt.Sprintf("Invalid address, only %d is supported", availableI2cAddress))
+	require.ErrorContains(t, err, fmt.Sprintf("invalid address, only %d is supported", availableI2cAddress))
 	assert.Equal(t, maxUint8, a.littleWire.(*i2cMock).direction)
 }
 
@@ -306,7 +306,7 @@ func (l *i2cMock) i2cInit() error {
 
 func (l *i2cMock) i2cStart(address7bit uint8, direction uint8) error {
 	if address7bit != availableI2cAddress {
-		return fmt.Errorf("Invalid address, only %d is supported", availableI2cAddress)
+		return fmt.Errorf("invalid address, only %d is supported", availableI2cAddress)
 	}
 	if err := l.error(); err != nil {
 		return err

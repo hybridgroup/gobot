@@ -39,9 +39,9 @@ func TestNewMotorDriver(t *testing.T) {
 	assert.NotNil(t, d.Commander)
 	assert.NotNil(t, d.mutex)
 	// assert: driver specific attributes
-	assert.Equal(t, "", d.motorCfg.directionPin)
-	assert.Equal(t, "", d.motorCfg.forwardPin)
-	assert.Equal(t, "", d.motorCfg.backwardPin)
+	assert.Empty(t, d.motorCfg.directionPin)
+	assert.Empty(t, d.motorCfg.forwardPin)
+	assert.Empty(t, d.motorCfg.backwardPin)
 	assert.False(t, d.motorCfg.modeIsAnalog)
 	assert.Equal(t, uint8(0), d.currentState)
 	assert.Equal(t, uint8(0), d.currentSpeed)

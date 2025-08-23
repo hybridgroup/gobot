@@ -19,10 +19,11 @@ const (
 )
 
 type Driver struct {
+	gobot.Eventer
+
 	name       string
 	connection gobot.Connection
 	interval   time.Duration
-	gobot.Eventer
 }
 
 type MavlinkInterface interface{}

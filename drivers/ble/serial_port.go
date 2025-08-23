@@ -10,6 +10,7 @@ import (
 // Inspired by https://github.com/monteslu/ble-serial by @monteslu
 type SerialPortDriver struct {
 	*Driver
+
 	rid string
 	tid string
 	// buffer of responseData and mutex to protect it

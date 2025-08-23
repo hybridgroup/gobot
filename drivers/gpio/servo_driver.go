@@ -9,6 +9,7 @@ import (
 // ServoDriver Represents a Servo
 type ServoDriver struct {
 	*driver
+
 	currentAngle byte
 }
 

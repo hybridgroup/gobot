@@ -215,7 +215,7 @@ func (d *StepperDriver) Sleep() error {
 func (d *StepperDriver) SetDirection(direction string) error {
 	direction = strings.ToLower(direction)
 	if direction != StepperDriverForward && direction != StepperDriverBackward {
-		return fmt.Errorf("Invalid direction '%s'. Value should be '%s' or '%s'",
+		return fmt.Errorf("invalid direction '%s'. Value should be '%s' or '%s'",
 			direction, StepperDriverForward, StepperDriverBackward)
 	}
 

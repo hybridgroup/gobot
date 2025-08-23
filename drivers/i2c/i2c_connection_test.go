@@ -30,7 +30,7 @@ func getSyscallFuncImpl(
 				return 0, 0, 1
 			}
 
-			var funcPtr *uint64 = (*uint64)(a3)
+			funcPtr := (*uint64)(a3)
 			*funcPtr = system.I2C_FUNC_SMBUS_READ_BYTE | system.I2C_FUNC_SMBUS_READ_BYTE_DATA |
 				system.I2C_FUNC_SMBUS_READ_WORD_DATA |
 				system.I2C_FUNC_SMBUS_WRITE_BYTE | system.I2C_FUNC_SMBUS_WRITE_BYTE_DATA |

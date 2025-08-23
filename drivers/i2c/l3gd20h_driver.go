@@ -51,6 +51,7 @@ var l3gdhSensibility = map[L3GD20HScale]float32{
 // Device datasheet: http://www.st.com/internet/com/TECHNICAL_RESOURCES/TECHNICAL_LITERATURE/DATASHEET/DM00036465.pdf
 type L3GD20HDriver struct {
 	*Driver
+
 	scale L3GD20HScale
 }
 

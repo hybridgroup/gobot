@@ -131,7 +131,7 @@ func TestGetDefaultBus(t *testing.T) {
 			a := NewAdaptor()
 			fs := a.sys.UseMockFilesystem([]string{infoFile})
 			fs.Files[infoFile].Contents = fmt.Sprintf(contentPattern, tc.revisionPart)
-			assert.Equal(t, "", a.revision)
+			assert.Empty(t, a.revision)
 			// act, will read and refresh the revision
 			gotBus := a.DefaultI2cBus()
 			// assert

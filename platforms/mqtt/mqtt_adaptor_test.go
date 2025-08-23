@@ -52,21 +52,21 @@ func TestMqttAdaptorUseSSL(t *testing.T) {
 
 func TestMqttAdaptorUseServerCert(t *testing.T) {
 	a := initTestMqttAdaptor()
-	assert.Equal(t, "", a.ServerCert())
+	assert.Empty(t, a.ServerCert())
 	a.SetServerCert("/path/to/server.cert")
 	assert.Equal(t, "/path/to/server.cert", a.ServerCert())
 }
 
 func TestMqttAdaptorUseClientCert(t *testing.T) {
 	a := initTestMqttAdaptor()
-	assert.Equal(t, "", a.ClientCert())
+	assert.Empty(t, a.ClientCert())
 	a.SetClientCert("/path/to/client.cert")
 	assert.Equal(t, "/path/to/client.cert", a.ClientCert())
 }
 
 func TestMqttAdaptorUseClientKey(t *testing.T) {
 	a := initTestMqttAdaptor()
-	assert.Equal(t, "", a.ClientKey())
+	assert.Empty(t, a.ClientKey())
 	a.SetClientKey("/path/to/client.key")
 	assert.Equal(t, "/path/to/client.key", a.ClientKey())
 }

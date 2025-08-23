@@ -188,7 +188,7 @@ func TestGroveDriverWithSensorCyclicReadPublishesError(t *testing.T) {
 		select {
 		case <-sem:
 		case <-time.After(time.Second):
-			require.Fail(t, "%s Event \"Error\" was not published", groveGetType(driver))
+			require.Fail(t, groveGetType(driver)+" Event \"Error\" was not published")
 		}
 
 		// Cleanup

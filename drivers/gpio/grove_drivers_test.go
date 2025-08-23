@@ -105,7 +105,7 @@ func TestDriverPublishesError(t *testing.T) {
 		select {
 		case <-sem:
 		case <-time.After(time.Second):
-			require.Fail(t, "%s Event \"Error\" was not published", getType(driver))
+			require.Fail(t, getType(driver)+" Event \"Error\" was not published")
 		}
 
 		// Cleanup

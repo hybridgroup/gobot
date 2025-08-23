@@ -277,7 +277,7 @@ func TestEasySetDirection(t *testing.T) {
 			dirPin:      "12",
 			wantWritten: 0xFF,
 			wantVal:     "forward",
-			wantErr:     "Invalid direction 'unknown'",
+			wantErr:     "invalid direction 'unknown'",
 		},
 		"error_no_pin": {
 			input:       "forward",

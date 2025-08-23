@@ -54,6 +54,7 @@ const (
 // This driver was tested with Tinkerboard.
 type PCF8583Driver struct {
 	*Driver
+
 	mode       PCF8583Control // clock 32.768kHz (default), clock 50Hz, event counter
 	yearOffset int
 	ramOffset  byte

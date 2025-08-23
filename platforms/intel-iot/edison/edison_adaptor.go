@@ -33,16 +33,17 @@ type sysfsPin struct {
 
 // Adaptor represents a Gobot Adaptor for an Intel Edison
 type Adaptor struct {
-	name        string
-	board       string
-	sys         *system.Accesser
-	mutex       sync.Mutex
-	pinMap      map[string]sysfsPin
-	tristate    gobot.DigitalPinner
-	digitalPins map[int]gobot.DigitalPinner
 	*adaptors.AnalogPinsAdaptor
 	*adaptors.PWMPinsAdaptor
 	*adaptors.I2cBusAdaptor
+
+	name                  string
+	board                 string
+	sys                   *system.Accesser
+	mutex                 sync.Mutex
+	pinMap                map[string]sysfsPin
+	tristate              gobot.DigitalPinner
+	digitalPins           map[int]gobot.DigitalPinner
 	arduinoI2cInitialized bool
 }
 
@@ -118,7 +119,7 @@ func (a *Adaptor) Connect() error {
 	case "miniboard":
 		a.pinMap = miniboardPinMap
 	default:
-		return fmt.Errorf("Unknown board type: %s", a.board)
+		return fmt.Errorf("unknown board type: %s", a.board)
 	}
 
 	return nil
@@ -214,7 +215,7 @@ func (a *Adaptor) validateAndSetupI2cBusNumber(busNr int) error {
 		return nil
 	}
 
-	return fmt.Errorf("Unsupported I2C bus '%d'", busNr)
+	return fmt.Errorf("unsupported I2C bus '%d'", busNr)
 }
 
 // arduinoSetup does needed setup for the Arduino compatible breakout board

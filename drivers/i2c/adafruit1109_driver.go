@@ -23,8 +23,10 @@ type adafruit1109PortPin struct {
 //
 // Have to implement DigitalWriter, DigitalReader interface
 type Adafruit1109Driver struct {
-	name string
 	*MCP23017Driver
+	*gpio.HD44780Driver
+
+	name      string
 	redPin    adafruit1109PortPin
 	greenPin  adafruit1109PortPin
 	bluePin   adafruit1109PortPin
@@ -40,7 +42,6 @@ type Adafruit1109Driver struct {
 	dataPinD5 adafruit1109PortPin
 	dataPinD6 adafruit1109PortPin
 	dataPinD7 adafruit1109PortPin
-	*gpio.HD44780Driver
 }
 
 // NewAdafruit1109Driver creates is a new driver for the 2x16 LCD display with RGB backlit and 5 keys.
@@ -178,7 +179,7 @@ func (d *Adafruit1109Driver) Halt() error {
 	}
 
 	if len(errors) > 0 {
-		return fmt.Errorf("Halt the driver %s", strings.Join(errors, ", "))
+		return fmt.Errorf("'Halt' the driver %s", strings.Join(errors, ", "))
 	}
 
 	return nil

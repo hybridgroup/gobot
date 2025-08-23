@@ -57,9 +57,10 @@ func (readWriteCloser) Close() error {
 }
 
 type mockFirmataBoard struct {
-	disconnectError error
 	gobot.Eventer
-	pins []client.Pin
+
+	disconnectError error
+	pins            []client.Pin
 }
 
 func newMockFirmataBoard() *mockFirmataBoard {

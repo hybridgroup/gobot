@@ -270,14 +270,8 @@ func TestDisplayBuffer(t *testing.T) {
 	size := 1024 // (width*height) / 8
 	display := NewDisplayBuffer(width, height, 8)
 
-	if display.Size() != size {
-		require.Fail(t, "invalid Size() (%d, expected %d)",
-			display.Size(), size)
-	}
-	if len(display.buffer) != size {
-		require.Fail(t, "allocated buffer size invalid (%d, expected %d)",
-			len(display.buffer), size)
-	}
+	require.Equal(t, size, display.Size())
+	require.Len(t, display.buffer, size)
 
 	assert.Equal(t, byte(0), display.buffer[0])
 	assert.Equal(t, byte(0), display.buffer[1])

@@ -31,6 +31,7 @@ type nameOption string
 // Driver implements the interface gobot.Driver.
 type Driver struct {
 	gobot.Commander
+
 	connection interface{}
 	driverCfg  *configuration
 	afterStart func() error

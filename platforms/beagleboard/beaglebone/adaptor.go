@@ -28,14 +28,15 @@ const (
 
 // Adaptor is the gobot.Adaptor representation for the Beaglebone Black/Green
 type Adaptor struct {
-	name  string
-	sys   *system.Accesser
-	mutex *sync.Mutex
 	*adaptors.AnalogPinsAdaptor
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.PWMPinsAdaptor
 	*adaptors.I2cBusAdaptor
 	*adaptors.SpiBusAdaptor
+
+	name   string
+	sys    *system.Accesser
+	mutex  *sync.Mutex
 	usrLed string
 }
 

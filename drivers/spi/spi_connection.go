@@ -134,7 +134,7 @@ func (c *spiConnection) txRxAndCheckReadLength(tx []byte, rx []byte) error {
 		return err
 	}
 	if len(rx) != dataLen {
-		return fmt.Errorf("Read length (%d) differ to expected (%d)", len(rx), dataLen)
+		return fmt.Errorf("read length (%d) differ to expected (%d)", len(rx), dataLen)
 	}
 	return nil
 }

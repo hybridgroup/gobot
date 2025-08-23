@@ -39,17 +39,19 @@ func TestSSD1306DriverShowImage(t *testing.T) {
 	d := initTestSSDDriver()
 	_ = d.Start()
 	img := image.NewRGBA(image.Rect(0, 0, 640, 480))
-	require.ErrorContains(t, d.ShowImage(img), "Image must match the display width and height")
+	require.ErrorContains(t, d.ShowImage(img), "image must match the display width and height")
 
 	img = image.NewRGBA(image.Rect(0, 0, 128, 64))
 	require.NoError(t, d.ShowImage(img))
 }
 
 type gpioTestAdaptor struct {
+	Connector
+
 	name string
 	port string
 	mtx  sync.Mutex
-	Connector
+
 	digitalWriteFunc func() error
 	servoWriteFunc   func() error
 	pwmWriteFunc     func() error

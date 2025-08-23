@@ -22,7 +22,7 @@ If this is a new driver or adaptor:
 - [ ] I have added an example to see how to setup and use it
 - [ ] I have checked or build at least my new example (e.g. by run `make examples_check`)
 
-If this is a Go version update:
+If this is a Go version or module update:
 
 - [ ] go.mod to new version updated
 - [ ] modules updated (go get -u -t ./...)

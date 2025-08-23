@@ -165,7 +165,7 @@ func TestGrovePiSomeRead(t *testing.T) {
 			case strings.Contains(name, "DHTRead"):
 				gotF1, gotF2, err = g.DHTRead(strconv.Itoa(tc.usedPin), 1, 2)
 			default:
-				require.Fail(t, "unknown command %s", name)
+				require.Fail(t, "unknown command "+name)
 				return
 			}
 			// assert
@@ -218,7 +218,7 @@ func TestGrovePiSomeWrite(t *testing.T) {
 			case "AnalogWrite":
 				err = g.AnalogWrite(strconv.Itoa(tc.usedPin), tc.usedValue)
 			default:
-				require.Fail(t, "unknown command %s", name)
+				require.Fail(t, "unknown command "+name)
 				return
 			}
 			// assert

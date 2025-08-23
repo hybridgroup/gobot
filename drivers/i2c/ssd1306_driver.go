@@ -179,6 +179,7 @@ func (d *DisplayBuffer) Set(buf []byte) {
 // SSD1306Driver is a Gobot Driver for a SSD1306 Display.
 type SSD1306Driver struct {
 	*Driver
+
 	initSequence  *SSD1306Init
 	displayWidth  int
 	displayHeight int

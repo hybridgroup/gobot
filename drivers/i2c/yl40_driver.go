@@ -66,6 +66,7 @@ var yl40Pins = map[YL40Pin]string{
 // https://www.makershop.de/download/YL_40_yl40.pdf
 type YL40Driver struct {
 	*PCF8591Driver
+
 	conf yl40Config
 
 	aBri  *aio.AnalogSensorDriver
@@ -233,7 +234,7 @@ func (y *YL40Driver) Halt() error {
 		errors = append(errors, err.Error())
 	}
 	if len(errors) > 0 {
-		return fmt.Errorf("Halt the driver %s", strings.Join(errors, ", "))
+		return fmt.Errorf("'Halt' the driver %s", strings.Join(errors, ", "))
 	}
 	return nil
 }
@@ -253,7 +254,7 @@ func (y *YL40Driver) Read(pin YL40Pin) (float64, error) {
 	case YL40AOUT:
 		return y.aOut.Value(), nil
 	default:
-		return 0, fmt.Errorf("Analog reading from pin '%s' not supported", pin)
+		return 0, fmt.Errorf("analog reading from pin '%s' not supported", pin)
 	}
 }
 
@@ -291,7 +292,7 @@ func (y *YL40Driver) Value(pin YL40Pin) (float64, error) {
 	case YL40AOUT:
 		return y.aOut.Value(), nil
 	default:
-		return 0, fmt.Errorf("Get analog value from pin '%s' not supported", pin)
+		return 0, fmt.Errorf("get analog value from pin '%s' not supported", pin)
 	}
 }
 

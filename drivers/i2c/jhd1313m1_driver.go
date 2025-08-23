@@ -68,17 +68,19 @@ var CustomLCDChars = map[string][8]byte{
 	"frowney": {0, 0, 10, 0, 0, 0, 14, 17},
 }
 
-var jhd1313m1ErrInvalidPosition = fmt.Errorf("Invalid position value")
+//nolint:staticcheck // prefix of the driver preferred for unexposed error
+var jhd1313m1ErrInvalidPosition = fmt.Errorf("invalid position value")
 
 // JHD1313M1Driver is a driver for the Jhd1313m1 LCD display which has two i2c addreses,
 // one belongs to a controller and the other controls solely the backlight.
 // This module was tested with the Seed Grove LCD RGB Backlight v2.0 display which requires 5V to operate.
 // http://www.seeedstudio.com/wiki/Grove_-_LCD_RGB_Backlight
 type JHD1313M1Driver struct {
-	name      string
-	connector Connector
 	Config
 	gobot.Commander
+
+	name          string
+	connector     Connector
 	lcdAddress    int
 	lcdConnection Connection
 	rgbAddress    int

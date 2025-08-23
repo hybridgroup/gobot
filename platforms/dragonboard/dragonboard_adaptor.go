@@ -19,13 +19,14 @@ const (
 
 // Adaptor represents a Gobot Adaptor for a DragonBoard 410c
 type Adaptor struct {
+	*adaptors.DigitalPinsAdaptor
+	*adaptors.I2cBusAdaptor
+	*adaptors.SpiBusAdaptor // for usage of "adaptors.WithSpiGpioAccess()"
+
 	name   string
 	sys    *system.Accesser // used for unit tests only
 	mutex  sync.Mutex
 	pinMap map[string]int
-	*adaptors.DigitalPinsAdaptor
-	*adaptors.I2cBusAdaptor
-	*adaptors.SpiBusAdaptor // for usage of "adaptors.WithSpiGpioAccess()"
 }
 
 // Valid pins are the GPIO_A through GPIO_L pins from the

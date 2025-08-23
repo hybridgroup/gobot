@@ -155,7 +155,7 @@ func TestPIRMotionHalt(t *testing.T) {
 		select {
 		case <-d.halt: // wait until halt is broadcasted by close the channel
 		case <-time.After(timeout): // otherwise run into the timeout
-			assert.Fail(t, "halt was not received within %s", timeout)
+			assert.Fail(t, fmt.Sprintf("halt was not received within %s", timeout))
 		}
 	}()
 	// act & assert

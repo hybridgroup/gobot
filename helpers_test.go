@@ -17,10 +17,11 @@ func (NullReadWriteCloser) Close() error {
 }
 
 type testDriver struct {
+	Commander
+
 	name       string
 	pin        string
 	connection Connection
-	Commander
 }
 
 var (

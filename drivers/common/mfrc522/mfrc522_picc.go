@@ -118,7 +118,7 @@ func (d *MFRC522Common) ReadText() (string, error) {
 		content = append(content, blockData...)
 	}
 	if piccDebug {
-		fmt.Println("content:", string(content), content)
+		fmt.Println("content:", string(content), len(content))
 	}
 
 	if err := d.piccHalt(); err != nil {
@@ -198,7 +198,7 @@ func (d *MFRC522Common) piccHalt() error {
 func (d *MFRC522Common) piccWrite(block uint8, blockData []byte) error {
 	if piccDebug {
 		fmt.Println("-write-")
-		fmt.Println("blockData:", blockData, len(blockData))
+		fmt.Println("blockData:", string(blockData), len(blockData))
 	}
 	if len(blockData) != 16 {
 		return fmt.Errorf("the block to write needs to be exactly 16 bytes long, but has %d bytes", len(blockData))
@@ -221,7 +221,7 @@ func (d *MFRC522Common) piccWrite(block uint8, blockData []byte) error {
 		return fmt.Errorf("preparation of write on MIFARE classic failed (%v)", backData)
 	}
 	if piccDebug {
-		fmt.Println("backData", backData)
+		fmt.Println("backData", string(backData))
 	}
 
 	// Step 2: Transfer the data

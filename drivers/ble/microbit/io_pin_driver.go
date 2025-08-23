@@ -21,9 +21,10 @@ const (
 // IOPinDriver is the Gobot driver for the Microbit's built-in digital and analog I/O
 type IOPinDriver struct {
 	*ble.Driver
+	gobot.Eventer
+
 	adMask int
 	ioMask int
-	gobot.Eventer
 }
 
 // pinData has the read data for a specific digital pin
@@ -249,7 +250,7 @@ func validatedPin(pin string) (int, error) {
 	}
 
 	if i < 0 || i > 2 {
-		return 0, errors.New("Invalid pin.")
+		return 0, errors.New("invalid pin")
 	}
 
 	return i, nil

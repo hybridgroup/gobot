@@ -76,14 +76,15 @@ type Config interface {
 
 // Driver implements the interface gobot.Driver for SPI devices.
 type Driver struct {
+	Config
+	gobot.Commander
+
 	name       string
 	connector  Connector
 	connection Connection
 	afterStart func() error
 	beforeHalt func() error
-	Config
-	gobot.Commander
-	mutex sync.Mutex
+	mutex      sync.Mutex
 }
 
 // NewDriver creates a new generic and basic SPI gobot driver.

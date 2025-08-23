@@ -66,6 +66,7 @@ const (
 // * https://github.com/adafruit/Adafruit_HMC5883_Unified
 type HMC5883LDriver struct {
 	*Driver
+
 	samplesAvg      uint8
 	outputRate      uint32 // in mHz
 	applyBias       int8
@@ -281,7 +282,7 @@ func hmc5883lValidateSamplesAveraged(samplesAvg int) error {
 	}
 	sort.Ints(keys)
 
-	return fmt.Errorf("Samples averaged must be one of: %d", keys)
+	return fmt.Errorf("samples averaged must be one of: %d", keys)
 }
 
 func hmc5883lValidateOutputRate(outputRate int) error {
@@ -296,7 +297,7 @@ func hmc5883lValidateOutputRate(outputRate int) error {
 	}
 	sort.Ints(keys)
 
-	return fmt.Errorf("Data output rate must be one of: %d", keys)
+	return fmt.Errorf("data output rate must be one of: %d", keys)
 }
 
 func hmc5883lValidateApplyBias(applyBias int) error {
@@ -311,7 +312,7 @@ func hmc5883lValidateApplyBias(applyBias int) error {
 	}
 	sort.Ints(keys)
 
-	return fmt.Errorf("Apply measurement bias must be one of: %d", keys)
+	return fmt.Errorf("apply measurement bias must be one of: %d", keys)
 }
 
 func hmc5883lValidateGain(gain int) error {
@@ -325,5 +326,5 @@ func hmc5883lValidateGain(gain int) error {
 	}
 	sort.Ints(keys)
 
-	return fmt.Errorf("Gain must be one of: %d", keys)
+	return fmt.Errorf("gain must be one of: %d", keys)
 }

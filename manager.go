@@ -32,12 +32,13 @@ func NewJSONManager(gobot *Manager) *JSONManager {
 // Manager is the main type of your Gobot application and contains a collection of
 // Robots, API commands that apply to the Manager, and Events that apply to the Manager.
 type Manager struct {
+	Commander
+	Eventer
+
 	robots  *Robots
 	trap    func(chan os.Signal)
 	AutoRun bool
 	running atomic.Value
-	Commander
-	Eventer
 }
 
 // NewManager returns a new Gobot Manager

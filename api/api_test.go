@@ -166,7 +166,7 @@ func TestRobot(t *testing.T) {
 	a.ServeHTTP(response, request)
 
 	_ = json.NewDecoder(response.Body).Decode(&body)
-	assert.Equal(t, "No Robot found with the name UnknownRobot1", body["error"])
+	assert.Equal(t, "no Robot found with the name UnknownRobot1", body["error"])
 }
 
 func TestRobotDevices(t *testing.T) {
@@ -206,7 +206,7 @@ func TestRobotCommands(t *testing.T) {
 	a.ServeHTTP(response, request)
 
 	_ = json.NewDecoder(response.Body).Decode(&body)
-	assert.Equal(t, "No Robot found with the name UnknownRobot1", body["error"])
+	assert.Equal(t, "no Robot found with the name UnknownRobot1", body["error"])
 }
 
 func TestExecuteRobotCommand(t *testing.T) {
@@ -245,7 +245,7 @@ func TestExecuteRobotCommand(t *testing.T) {
 	a.ServeHTTP(response, request)
 
 	_ = json.NewDecoder(response.Body).Decode(&body)
-	assert.Equal(t, "No Robot found with the name UnknownRobot1", body.(map[string]interface{})["error"])
+	assert.Equal(t, "no Robot found with the name UnknownRobot1", body.(map[string]interface{})["error"])
 }
 
 func TestRobotDevice(t *testing.T) {
@@ -269,7 +269,7 @@ func TestRobotDevice(t *testing.T) {
 	a.ServeHTTP(response, request)
 
 	_ = json.NewDecoder(response.Body).Decode(&body)
-	assert.Equal(t, "No Device found with the name UnknownDevice1", body["error"])
+	assert.Equal(t, "no Device found with the name UnknownDevice1", body["error"])
 }
 
 func TestRobotDeviceCommands(t *testing.T) {
@@ -294,7 +294,7 @@ func TestRobotDeviceCommands(t *testing.T) {
 	)
 	a.ServeHTTP(response, request)
 	_ = json.NewDecoder(response.Body).Decode(&body)
-	assert.Equal(t, "No Device found with the name UnknownDevice1", body["error"])
+	assert.Equal(t, "no Device found with the name UnknownDevice1", body["error"])
 }
 
 func TestExecuteRobotDeviceCommand(t *testing.T) {
@@ -334,7 +334,7 @@ func TestExecuteRobotDeviceCommand(t *testing.T) {
 	a.ServeHTTP(response, request)
 
 	_ = json.NewDecoder(response.Body).Decode(&body)
-	assert.Equal(t, "No Device found with the name UnknownDevice1", body.(map[string]interface{})["error"])
+	assert.Equal(t, "no Device found with the name UnknownDevice1", body.(map[string]interface{})["error"])
 }
 
 func TestRobotConnections(t *testing.T) {
@@ -379,7 +379,7 @@ func TestRobotConnection(t *testing.T) {
 	)
 	a.ServeHTTP(response, request)
 	_ = json.NewDecoder(response.Body).Decode(&body)
-	assert.Equal(t, "No Connection found with the name UnknownConnection1", body["error"])
+	assert.Equal(t, "no Connection found with the name UnknownConnection1", body["error"])
 }
 
 func TestRobotDeviceEvent(t *testing.T) {

@@ -34,10 +34,10 @@ func (pt *AnalogPinTranslator) Translate(id string) (string, bool, uint16, error
 	path := pinInfo.Path
 	info, err := pt.sys.Stat(path)
 	if err != nil {
-		return "", false, 0, fmt.Errorf("Error (%v) on access '%s'", err, path)
+		return "", false, 0, fmt.Errorf("error (%v) on access '%s'", err, path)
 	}
 	if info.IsDir() {
-		return "", false, 0, fmt.Errorf("The item '%s' is a directory, which is not expected", path)
+		return "", false, 0, fmt.Errorf("the item '%s' is a directory, which is not expected", path)
 	}
 
 	return path, pinInfo.W, pinInfo.ReadBufLen, nil

@@ -22,11 +22,12 @@ func (NullReadWriteCloser) Close() error {
 }
 
 type testDriver struct {
+	gobot.Commander
+	gobot.Eventer
+
 	name       string
 	pin        string
 	connection gobot.Connection
-	gobot.Commander
-	gobot.Eventer
 }
 
 func (t *testDriver) Start() error                 { return nil }

@@ -28,7 +28,7 @@ func getSyscallFuncImpl(
 				return 0, 0, 1
 			}
 
-			var funcPtr *uint64 = (*uint64)(a3)
+			funcPtr := (*uint64)(a3)
 			*funcPtr = I2C_FUNC_SMBUS_READ_BYTE | I2C_FUNC_SMBUS_READ_BYTE_DATA |
 				I2C_FUNC_SMBUS_READ_WORD_DATA |
 				I2C_FUNC_SMBUS_WRITE_BYTE | I2C_FUNC_SMBUS_WRITE_BYTE_DATA |
@@ -292,7 +292,7 @@ func TestReadBlockData(t *testing.T) {
 				"failed with syscall.Errno operation not permitted",
 		},
 		"error_from_used_fallback_if_not_supported": {
-			wantErr: "Read 1 bytes from device by sysfs, expected 10",
+			wantErr: "read 1 bytes from device by sysfs, expected 10",
 		},
 	}
 	for name, tc := range tests {
@@ -528,7 +528,7 @@ func TestWriteBlockDataTooMuch(t *testing.T) {
 	// act
 	err := d.WriteBlockData(10, 0x01, make([]byte, 33))
 	// assert
-	require.ErrorContains(t, err, "Writing blocks larger than 32 bytes (33) not supported")
+	require.ErrorContains(t, err, "writing blocks larger than 32 bytes (33) not supported")
 }
 
 func Test_setAddress(t *testing.T) {

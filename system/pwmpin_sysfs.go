@@ -45,7 +45,7 @@ func (p *pwmPinSysFs) Export() error {
 	if err := p.sfa.write(p.pwmExportPath(), []byte(p.pin)); err != nil {
 		// If EBUSY then the pin has already been exported, we suppress the error
 		var pathError *os.PathError
-		if !(errors.As(err, &pathError) && errors.Is(err, Syscall_EBUSY)) {
+		if !errors.As(err, &pathError) || !errors.Is(err, Syscall_EBUSY) {
 			return fmt.Errorf(pwmPinErrorPattern, "Export", p.pin, err)
 		}
 	}
@@ -118,7 +118,7 @@ func (p *pwmPinSysFs) Polarity() (bool, error) {
 func (p *pwmPinSysFs) SetPolarity(normal bool) error {
 	enabled, _ := p.Enabled()
 	if enabled {
-		return fmt.Errorf("Cannot set PWM polarity when enabled")
+		return fmt.Errorf("cannot set PWM polarity when enabled")
 	}
 	value := p.polarityNormalIdentifier
 	if !normal {

@@ -39,15 +39,16 @@ type Connector interface {
 
 // Driver implements the interface gobot.Driver.
 type Driver struct {
+	Config
+	gobot.Commander
+
 	name           string
 	defaultAddress int
 	connector      Connector
 	connection     Connection
 	afterStart     func() error
 	beforeHalt     func() error
-	Config
-	gobot.Commander
-	mutex *sync.Mutex // mutex often needed to ensure that write-read sequences are not interrupted
+	mutex          *sync.Mutex // mutex often needed to ensure that write-read sequences are not interrupted
 }
 
 // NewDriver creates a new generic and basic i2c gobot driver.
@@ -161,7 +162,7 @@ func (d *Driver) Read(pin string) (int, error) {
 func driverParseRegister(pin string) (uint8, error) {
 	register, err := strconv.ParseUint(pin, 10, 8)
 	if err != nil {
-		return 0, fmt.Errorf("Could not parse the register from given pin '%s'", pin)
+		return 0, fmt.Errorf("could not parse the register from given pin '%s'", pin)
 	}
 	return uint8(register), nil
 }

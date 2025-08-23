@@ -551,7 +551,7 @@ int littleWire_error () {
 char *littleWire_errorName () {
         if (lwStatus<0) switch (lwStatus) {
                 case -1: return "I/O Error"; break;
-                case -2: return "Invalid paramenter"; break;
+                case -2: return "Invalid parameter"; break;
                 case -3: return "Access error"; break;
                 case -4: return "No device"; break;
                 case -5: return "Not found"; break;

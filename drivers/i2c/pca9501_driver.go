@@ -19,8 +19,9 @@ const pca9501DefaultAddress = 0x3F // this applies, if all 6 address pins left o
 //
 // PCA9501 is the replacement for PCF8574, so this driver should also work for PCF8574 except EEPROM calls
 type PCA9501Driver struct {
-	connectionMem Connection
 	*Driver
+
+	connectionMem Connection
 }
 
 // NewPCA9501Driver creates a new driver with specified i2c interface

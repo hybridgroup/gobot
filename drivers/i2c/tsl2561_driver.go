@@ -113,6 +113,7 @@ const (
 // K. Townsend
 type TSL2561Driver struct {
 	*Driver
+
 	autoGain        bool
 	gain            TSL2561Gain
 	integrationTime TSL2561IntegrationTime

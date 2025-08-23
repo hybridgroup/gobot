@@ -145,7 +145,7 @@ func (d *i2cDevice) ReadBlockData(address int, reg uint8, data []byte) error {
 
 	dataLen := len(data)
 	if dataLen > 32 {
-		return fmt.Errorf("Reading blocks larger than 32 bytes (%v) not supported", len(data))
+		return fmt.Errorf("reading blocks larger than 32 bytes (%v) not supported", len(data))
 	}
 
 	data[0] = 0xFF // set value for debugging purposes
@@ -214,7 +214,7 @@ func (d *i2cDevice) WriteBlockData(address int, reg uint8, data []byte) error {
 
 	dataLen := len(data)
 	if dataLen > 32 {
-		return fmt.Errorf("Writing blocks larger than 32 bytes (%v) not supported", len(data))
+		return fmt.Errorf("writing blocks larger than 32 bytes (%v) not supported", len(data))
 	}
 
 	if err := d.queryFunctionality(I2C_FUNC_SMBUS_WRITE_I2C_BLOCK, "write i2c block"); err != nil {
@@ -283,7 +283,7 @@ func (d *i2cDevice) writeBytes(address int, data []byte) error {
 		return err
 	}
 	if n != len(data) {
-		return fmt.Errorf("Write %v bytes to device by sysfs, expected %v", n, len(data))
+		return fmt.Errorf("write %v bytes to device by sysfs, expected %v", n, len(data))
 	}
 	return nil
 }
@@ -304,7 +304,7 @@ func (d *i2cDevice) readAndCheckCount(address int, data []byte) error {
 		return err
 	}
 	if n != len(data) {
-		return fmt.Errorf("Read %v bytes from device by sysfs, expected %v", n, len(data))
+		return fmt.Errorf("read %v bytes from device by sysfs, expected %v", n, len(data))
 	}
 	return nil
 }

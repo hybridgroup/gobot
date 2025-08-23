@@ -89,6 +89,7 @@ type bmp280CalibrationCoefficients struct {
 // BMP280Driver is a driver for the BMP280 temperature/pressure sensor
 type BMP280Driver struct {
 	*Driver
+
 	calCoeffs         *bmp280CalibrationCoefficients
 	ctrlPwrMode       uint8
 	ctrlPressOversamp BMP280PressureOversampling

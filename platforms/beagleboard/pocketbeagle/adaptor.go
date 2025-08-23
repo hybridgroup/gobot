@@ -18,6 +18,7 @@ const pwmPeriodDefault = 500000 // 0.5 ms = 2 kHz
 //	http://beagleboard.org/pocket
 type PocketBeagleAdaptor struct {
 	*beaglebone.Adaptor
+
 	sys *system.Accesser
 }
 

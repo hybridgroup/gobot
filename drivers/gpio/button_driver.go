@@ -27,10 +27,11 @@ type buttonDefaultStateOption int
 // ButtonDriver Represents a digital Button
 type ButtonDriver struct {
 	*driver
-	buttonCfg *buttonConfiguration
 	gobot.Eventer
-	active bool
-	halt   chan struct{}
+
+	buttonCfg *buttonConfiguration
+	active    bool
+	halt      chan struct{}
 }
 
 // NewButtonDriver returns a driver for a button with a polling interval for changed state of 10 milliseconds,

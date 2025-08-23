@@ -55,9 +55,7 @@ func TestDriverHandleEventDS3(t *testing.T) {
 	tj.axisCount = 6
 	tj.buttonCount = 17
 
-	if err := d.initConfig(); err != nil {
-		require.Fail(t, "initConfig() error: %v", err)
-	}
+	require.NoError(t, d.initConfig())
 
 	d.initEvents()
 
@@ -111,9 +109,7 @@ func TestDriverHandleEventJSONDS3(t *testing.T) {
 	tj.axisCount = 6
 	tj.buttonCount = 17
 
-	if err := d.initConfig(); err != nil {
-		require.Fail(t, "initConfig() error: %v", err)
-	}
+	require.NoError(t, d.initConfig())
 
 	d.initEvents()
 
@@ -167,9 +163,7 @@ func TestDriverHandleEventDS4(t *testing.T) {
 	tj.axisCount = 6
 	tj.buttonCount = 17
 
-	if err := d.initConfig(); err != nil {
-		require.Fail(t, "initConfig() error: %v", err)
-	}
+	require.NoError(t, d.initConfig())
 
 	d.initEvents()
 

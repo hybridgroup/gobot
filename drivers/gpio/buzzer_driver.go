@@ -131,6 +131,7 @@ const (
 // BuzzerDriver represents a digital buzzer
 type BuzzerDriver struct {
 	*driver
+
 	high bool
 	bpm  float64
 }

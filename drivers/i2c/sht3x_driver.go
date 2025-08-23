@@ -47,14 +47,15 @@ var (
 	crc8Params = crc8.Params{
 		Poly: 0x31, Init: 0xff, RefIn: false, RefOut: false, XorOut: 0x00, Check: 0xf7, Name: "CRC-8/SENSIRON",
 	}
-	ErrInvalidAccuracy = errors.New("Invalid accuracy")
-	ErrInvalidCrc      = errors.New("Invalid crc")
-	ErrInvalidTemp     = errors.New("Invalid temperature units")
+	ErrInvalidAccuracy = errors.New("invalid accuracy")
+	ErrInvalidCrc      = errors.New("invalid crc")
+	ErrInvalidTemp     = errors.New("invalid temperature units")
 )
 
 // SHT3xDriver is a Driver for a SHT3x humidity and temperature sensor
 type SHT3xDriver struct {
 	*Driver
+
 	Units    string
 	accuracy byte
 	delay    time.Duration
@@ -127,7 +128,7 @@ func (s *SHT3xDriver) Heater() (bool, error) {
 		return false, err
 	}
 
-	if (1 << 13) == (sr & (1 << 13)) {
+	if sr&(1<<13) == 1<<13 {
 		return true, nil
 	}
 

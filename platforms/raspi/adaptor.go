@@ -25,15 +25,16 @@ const (
 
 // Adaptor is the Gobot Adaptor for the Raspberry Pi
 type Adaptor struct {
-	name     string
-	mutex    sync.Mutex
-	sys      *system.Accesser
-	revision string
 	*adaptors.AnalogPinsAdaptor
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.PWMPinsAdaptor
 	*adaptors.I2cBusAdaptor
 	*adaptors.SpiBusAdaptor
+
+	name     string
+	mutex    sync.Mutex
+	sys      *system.Accesser
+	revision string
 }
 
 // NewAdaptor creates a Raspi Adaptor

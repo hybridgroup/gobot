@@ -21,6 +21,7 @@ const (
 
 type Tinkerboard2Adaptor struct {
 	*tinkerboard.Adaptor
+
 	sys *system.Accesser // used for unit tests only
 }
 

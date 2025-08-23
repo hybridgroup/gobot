@@ -101,7 +101,7 @@ func (d *Adaptor) ServoWrite(pin string, angle uint8) error {
 // Only supports bus number 0
 func (d *Adaptor) GetI2cConnection(address int, bus int) (i2c.Connection, error) {
 	if bus != 0 {
-		return nil, fmt.Errorf("Invalid bus number %d, only 0 is supported", bus)
+		return nil, fmt.Errorf("invalid bus number %d, only 0 is supported", bus)
 	}
 	//nolint:gosec // TODO: fix later
 	c := NewDigisparkI2cConnection(d, uint8(address))

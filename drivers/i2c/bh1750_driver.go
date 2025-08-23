@@ -22,6 +22,7 @@ const (
 // BH1750Driver is a driver for the BH1750 digital Ambient Light Sensor IC for I²C bus interface.
 type BH1750Driver struct {
 	*Driver
+
 	mode byte
 }
 

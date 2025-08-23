@@ -43,6 +43,7 @@ type bmeHumidityCalibrationCoefficients struct {
 //	https://godoc.org/gobot.io/x/gobot/v2/drivers/i2c#BMP280Driver
 type BME280Driver struct {
 	*BMP280Driver
+
 	humCalCoeffs    *bmeHumidityCalibrationCoefficients
 	ctrlHumOversamp BME280HumidityOversampling
 }

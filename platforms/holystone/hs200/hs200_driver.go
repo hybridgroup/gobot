@@ -62,11 +62,12 @@ func (d *Driver) Connection() gobot.Connection { return nil }
 
 // Start starts the driver.
 func (d *Driver) Start() error {
-	tc, terr := net.Dial("tcp", d.tcpaddress)
+	dialer := net.Dialer{}
+	tc, terr := dialer.Dial("tcp", d.tcpaddress)
 	if terr != nil {
 		return terr
 	}
-	uc, uerr := net.Dial("udp4", d.udpaddress)
+	uc, uerr := dialer.Dial("udp4", d.udpaddress)
 	if uerr != nil {
 		return uerr
 	}

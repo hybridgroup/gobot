@@ -100,6 +100,7 @@ var pcf8591ModeMap = map[string]pcf8591ModeChan{
 // This driver was tested with Tinkerboard and the YL-40 driver.
 type PCF8591Driver struct {
 	*Driver
+
 	lastCtrlByte        byte
 	lastAnaOut          byte
 	additionalReadWrite uint8
@@ -290,7 +291,7 @@ func PCF8591ParseModeChan(description string) (*pcf8591ModeChan, error) {
 			descriptions = append(descriptions, k)
 		}
 		ds := strings.Join(descriptions, ", ")
-		return nil, fmt.Errorf("Unknown description '%s' for read analog value, accepted values: %s", description, ds)
+		return nil, fmt.Errorf("unknown description '%s' for read analog value, accepted values: %s", description, ds)
 	}
 
 	return &mc, nil
@@ -315,7 +316,7 @@ func (p *PCF8591Driver) readBuf(nr uint8, cntBytes uint8) error {
 		return err
 	}
 	if cntRead != len(buf) {
-		return fmt.Errorf("Not enough bytes (%d of %d) read", cntRead, len(buf))
+		return fmt.Errorf("not enough bytes (%d of %d) read", cntRead, len(buf))
 	}
 	if pcf8591Debug {
 		p.LastRead[nr-1] = buf

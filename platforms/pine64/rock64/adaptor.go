@@ -23,13 +23,14 @@ const (
 
 // Adaptor represents a Gobot Adaptor for the PINE64 ROCK64
 type Adaptor struct {
-	name  string
-	sys   *system.Accesser // used for unit tests only
-	mutex *sync.Mutex
 	*adaptors.AnalogPinsAdaptor
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.I2cBusAdaptor
 	*adaptors.SpiBusAdaptor
+
+	name  string
+	sys   *system.Accesser // used for unit tests only
+	mutex *sync.Mutex
 }
 
 // NewAdaptor creates a ROCK64 Adaptor

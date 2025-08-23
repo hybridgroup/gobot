@@ -90,7 +90,7 @@ func TestAnalogActuatorWriteRaw_AnalogWriteNotSupported(t *testing.T) {
 	d := NewAnalogActuatorDriver(newAioTestAdaptor(), "1")
 	d.connection = &aioTestBareAdaptor{}
 	// act & assert
-	require.EqualError(t, d.WriteRaw(3), "AnalogWrite is not supported by the platform 'bare'")
+	require.EqualError(t, d.WriteRaw(3), "'AnalogWrite' is not supported by the platform 'bare'")
 }
 
 func TestAnalogActuatorWrite_SetScaler(t *testing.T) {

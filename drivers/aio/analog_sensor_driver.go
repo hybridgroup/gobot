@@ -29,10 +29,11 @@ type sensorScaleOption struct {
 // AnalogSensorDriver represents an analog sensor
 type AnalogSensorDriver struct {
 	*driver
-	sensorCfg *sensorConfiguration
-	pin       string
-	halt      chan struct{}
 	gobot.Eventer
+
+	sensorCfg    *sensorConfiguration
+	pin          string
+	halt         chan struct{}
 	lastRawValue int
 	lastValue    float64
 	analogRead   func() (int, float64, error)
@@ -217,7 +218,7 @@ func (a *AnalogSensorDriver) analogSensorRead() (int, float64, error) {
 
 	reader, ok := a.connection.(AnalogReader)
 	if !ok {
-		return 0, 0, fmt.Errorf("AnalogRead is not supported by the platform '%s'", a.Connection().Name())
+		return 0, 0, fmt.Errorf("'AnalogRead' is not supported by the platform '%s'", a.Connection().Name())
 	}
 
 	rawValue, err := reader.AnalogRead(a.Pin())

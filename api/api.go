@@ -413,7 +413,7 @@ func (a *API) jsonRobotFor(name string) (*gobot.JSONRobot, error) {
 	if robot := a.manager.Robot(name); robot != nil {
 		return gobot.NewJSONRobot(robot), nil
 	}
-	return nil, fmt.Errorf("No Robot found with the name %s", name)
+	return nil, fmt.Errorf("no Robot found with the name %s", name)
 }
 
 func (a *API) jsonDeviceFor(robot string, name string) (*gobot.JSONDevice, error) {
@@ -421,7 +421,7 @@ func (a *API) jsonDeviceFor(robot string, name string) (*gobot.JSONDevice, error
 		return gobot.NewJSONDevice(device), nil
 	}
 
-	return nil, fmt.Errorf("No Device found with the name %s", name)
+	return nil, fmt.Errorf("no Device found with the name %s", name)
 }
 
 func (a *API) jsonConnectionFor(robot string, name string) (*gobot.JSONConnection, error) {
@@ -429,5 +429,5 @@ func (a *API) jsonConnectionFor(robot string, name string) (*gobot.JSONConnectio
 		return gobot.NewJSONConnection(connection), nil
 	}
 
-	return nil, fmt.Errorf("No Connection found with the name %s", name)
+	return nil, fmt.Errorf("no Connection found with the name %s", name)
 }

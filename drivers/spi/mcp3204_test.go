@@ -48,7 +48,7 @@ func TestMCP3204Read(t *testing.T) {
 	}{
 		"number_negative_error": {
 			chanNum: -1,
-			wantErr: fmt.Errorf("Invalid channel '-1' for read"),
+			wantErr: fmt.Errorf("invalid channel '-1' for read"),
 		},
 		"number_0_ok": {
 			chanNum:     0,
@@ -70,7 +70,7 @@ func TestMCP3204Read(t *testing.T) {
 		},
 		"number_4_error": {
 			chanNum: 4,
-			wantErr: fmt.Errorf("Invalid channel '4' for read"),
+			wantErr: fmt.Errorf("invalid channel '4' for read"),
 		},
 	}
 	for name, tc := range tests {

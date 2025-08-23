@@ -92,6 +92,7 @@ type MPU6050ThreeDData struct {
 // * https://github.com/ElectronicCats/mpu6050
 type MPU6050Driver struct {
 	*Driver
+
 	Accelerometer MPU6050ThreeDData
 	Gyroscope     MPU6050ThreeDData
 	Temperature   float64
