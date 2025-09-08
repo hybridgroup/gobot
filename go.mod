@@ -4,6 +4,11 @@ go 1.24.0
 
 toolchain go1.24.6
 
+// for testing on already prepared fork
+replace tinygo.org/x/drivers => github.com/gen2thomas/tinygo-drivers v0.0.0-20260223112616-e043c0ba54e7
+
+//replace tinygo.org/x/drivers => ../../../tinygo.org/drivers
+
 require (
 	github.com/0xcafed00d/joystick v1.0.1
 	github.com/bmizerany/pat v0.0.0-20210406213842-e4b6760bdd6f
@@ -25,6 +30,7 @@ require (
 	periph.io/x/conn/v3 v3.7.2
 	periph.io/x/host/v3 v3.8.5
 	tinygo.org/x/bluetooth v0.13.0
+	tinygo.org/x/drivers v0.33.0
 )
 
 require (
@@ -32,6 +38,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
+	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/klauspost/compress v1.18.0 // indirect
