@@ -8,7 +8,7 @@ require (
 	github.com/0xcafed00d/joystick v1.0.1
 	github.com/bmizerany/pat v0.0.0-20210406213842-e4b6760bdd6f
 	github.com/donovanhide/eventsource v0.0.0-20210830082556-c59027999da0
-	github.com/eclipse/paho.mqtt.golang v1.5.0
+	github.com/eclipse/paho.mqtt.golang v1.5.1
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/hybridgroup/go-ardrone v0.0.0-20140402002621-b9750d8d7b78
@@ -20,8 +20,8 @@ require (
 	github.com/warthog618/go-gpiocdev v0.9.1
 	go.bug.st/serial v1.6.4
 	gocv.io/x/gocv v0.42.0
-	golang.org/x/net v0.43.0
-	golang.org/x/sys v0.35.0
+	golang.org/x/net v0.44.0
+	golang.org/x/sys v0.36.0
 	periph.io/x/conn/v3 v3.7.2
 	periph.io/x/host/v3 v3.8.5
 	tinygo.org/x/bluetooth v0.13.0
@@ -46,9 +46,9 @@ require (
 	github.com/soypat/seqs v0.0.0-20250630134107-01c3f05666ba // indirect
 	github.com/tinygo-org/cbgo v0.0.4 // indirect
 	github.com/tinygo-org/pio v0.2.0 // indirect
-	golang.org/x/crypto v0.41.0 // indirect
+	golang.org/x/crypto v0.42.0 // indirect
 	golang.org/x/exp v0.0.0-20250819193227-8b4c13bb791b // indirect
-	golang.org/x/sync v0.16.0 // indirect
+	golang.org/x/sync v0.17.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
