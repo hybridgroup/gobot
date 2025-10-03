@@ -72,46 +72,46 @@ type SHT3xDriver struct {
 //	i2c.WithBus(int):	bus to use with this driver
 //	i2c.WithAddress(int):	address to use with this driver
 func NewSHT3xDriver(c Connector, options ...func(Config)) *SHT3xDriver {
-	s := &SHT3xDriver{
+	d := &SHT3xDriver{
 		Driver:   NewDriver(c, "SHT3x", SHT3xAddressA),
 		Units:    "C",
 		crcTable: crc8.MakeTable(crc8Params),
 	}
-	if err := s.SetAccuracy(SHT3xAccuracyHigh); err != nil {
+	if err := d.SetAccuracy(SHT3xAccuracyHigh); err != nil {
 		panic(err)
 	}
 
 	for _, option := range options {
-		option(s)
+		option(d)
 	}
 
-	return s
+	return d
 }
 
 // Accuracy returns the accuracy of the sampling
-func (s *SHT3xDriver) Accuracy() byte { return s.accuracy }
+func (d *SHT3xDriver) Accuracy() byte { return d.accuracy }
 
 // SetAccuracy sets the accuracy of the sampling
-func (s *SHT3xDriver) SetAccuracy(a byte) error {
+func (d *SHT3xDriver) SetAccuracy(a byte) error {
 	switch a {
 	case SHT3xAccuracyLow:
-		s.delay = 5 * time.Millisecond // Actual max is 4, wait 1 ms longer
+		d.delay = 5 * time.Millisecond // Actual max is 4, wait 1 ms longer
 	case SHT3xAccuracyMedium:
-		s.delay = 7 * time.Millisecond // Actual max is 6, wait 1 ms longer
+		d.delay = 7 * time.Millisecond // Actual max is 6, wait 1 ms longer
 	case SHT3xAccuracyHigh:
-		s.delay = 16 * time.Millisecond // Actual max is 15, wait 1 ms longer
+		d.delay = 16 * time.Millisecond // Actual max is 15, wait 1 ms longer
 	default:
 		return ErrInvalidAccuracy
 	}
 
-	s.accuracy = a
+	d.accuracy = a
 
 	return nil
 }
 
 // SerialNumber returns the serial number of the chip
-func (s *SHT3xDriver) SerialNumber() (uint32, error) {
-	ret, err := s.sendCommandDelayGetResponse([]byte{0x37, 0x80}, nil, 2)
+func (d *SHT3xDriver) SerialNumber() (uint32, error) {
+	ret, err := d.sendCommandDelayGetResponse([]byte{0x37, 0x80}, nil, 2)
 	if err != nil {
 		return 0, err
 	}
@@ -122,8 +122,8 @@ func (s *SHT3xDriver) SerialNumber() (uint32, error) {
 }
 
 // Heater returns true if the heater is enabled
-func (s *SHT3xDriver) Heater() (bool, error) {
-	sr, err := s.getStatusRegister()
+func (d *SHT3xDriver) Heater() (bool, error) {
+	sr, err := d.getStatusRegister()
 	if err != nil {
 		return false, err
 	}
@@ -136,20 +136,20 @@ func (s *SHT3xDriver) Heater() (bool, error) {
 }
 
 // SetHeater enables or disables the heater on the device
-func (s *SHT3xDriver) SetHeater(enabled bool) error {
+func (d *SHT3xDriver) SetHeater(enabled bool) error {
 	out := []byte{0x30, 0x66}
 	if enabled {
 		out[1] = 0x6d
 	}
-	_, err := s.connection.Write(out)
+	_, err := d.write(out)
 	return err
 }
 
 // Sample returns the temperature in celsius and relative humidity for one sample
 //
 //nolint:nonamedreturns // is sufficient here
-func (s *SHT3xDriver) Sample() (temp float32, rh float32, err error) {
-	ret, err := s.sendCommandDelayGetResponse([]byte{0x24, s.accuracy}, &s.delay, 2)
+func (d *SHT3xDriver) Sample() (temp float32, rh float32, err error) {
+	ret, err := d.sendCommandDelayGetResponse([]byte{0x24, d.accuracy}, &d.delay, 2)
 	if nil != err {
 		return
 	}
@@ -160,7 +160,7 @@ func (s *SHT3xDriver) Sample() (temp float32, rh float32, err error) {
 	rh = float32((uint64(1000000)*rhSample)/uint64(0xffff)) / 10000.0
 
 	tempSample := uint64(ret[0])
-	switch s.Units {
+	switch d.Units {
 	case "C":
 		// From the datasheet:
 		// T[C] = -45 + 175 * (St / (2^16 - 1))
@@ -177,8 +177,8 @@ func (s *SHT3xDriver) Sample() (temp float32, rh float32, err error) {
 }
 
 // getStatusRegister returns the device status register
-func (s *SHT3xDriver) getStatusRegister() (uint16, error) {
-	ret, err := s.sendCommandDelayGetResponse([]byte{0xf3, 0x2d}, nil, 1)
+func (d *SHT3xDriver) getStatusRegister() (uint16, error) {
+	ret, err := d.sendCommandDelayGetResponse([]byte{0xf3, 0x2d}, nil, 1)
 	if err != nil {
 		return 0, err
 	}
@@ -187,8 +187,8 @@ func (s *SHT3xDriver) getStatusRegister() (uint16, error) {
 }
 
 // sendCommandDelayGetResponse is a helper function to reduce duplicated code
-func (s *SHT3xDriver) sendCommandDelayGetResponse(send []byte, delay *time.Duration, expect int) ([]uint16, error) {
-	if _, err := s.connection.Write(send); err != nil {
+func (d *SHT3xDriver) sendCommandDelayGetResponse(send []byte, delay *time.Duration, expect int) ([]uint16, error) {
+	if _, err := d.write(send); err != nil {
 		return nil, err
 	}
 
@@ -197,7 +197,7 @@ func (s *SHT3xDriver) sendCommandDelayGetResponse(send []byte, delay *time.Durat
 	}
 
 	buf := make([]byte, 3*expect)
-	got, err := s.connection.Read(buf)
+	got, err := d.read(buf)
 	if err != nil {
 		return nil, err
 	}
@@ -207,7 +207,7 @@ func (s *SHT3xDriver) sendCommandDelayGetResponse(send []byte, delay *time.Durat
 
 	read := make([]uint16, expect)
 	for i := 0; i < expect; i++ {
-		crc := crc8.Checksum(buf[i*3:i*3+2], s.crcTable)
+		crc := crc8.Checksum(buf[i*3:i*3+2], d.crcTable)
 		if buf[i*3+2] != crc {
 			return nil, ErrInvalidCrc
 		}

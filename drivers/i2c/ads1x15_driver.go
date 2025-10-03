@@ -476,11 +476,11 @@ func (d *ADS1x15Driver) waitForConversionFinished(delay time.Duration) error {
 }
 
 func (d *ADS1x15Driver) writeWordBigEndian(reg uint8, val uint16) error {
-	return d.connection.WriteWordData(reg, swapBytes(val))
+	return d.writeWordData(reg, swapBytes(val))
 }
 
 func (d *ADS1x15Driver) readWordBigEndian(reg uint8) (uint16, error) {
-	data, err := d.connection.ReadWordData(reg)
+	data, err := d.readWordData(reg)
 	if err != nil {
 		return 0, err
 	}

@@ -79,6 +79,8 @@ func TestHalt(t *testing.T) {
 	// arrange
 	d := initTestDriver()
 	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
 	require.NoError(t, d.Halt())
 }
 

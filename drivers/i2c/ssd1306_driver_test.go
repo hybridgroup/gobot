@@ -98,8 +98,13 @@ func TestSSD1306StartSizeError(t *testing.T) {
 }
 
 func TestSSD1306Halt(t *testing.T) {
-	s, _ := initTestSSD1306DriverWithStubbedAdaptor(128, 64, false)
-	require.NoError(t, s.Halt())
+	// arrange
+	d := NewSSD1306Driver(newI2cTestAdaptor(), WithSSD1306DisplayWidth(128), WithSSD1306DisplayHeight(64),
+		WithSSD1306ExternalVCC(false))
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
 }
 
 func TestSSD1306Options(t *testing.T) {

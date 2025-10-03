@@ -48,7 +48,11 @@ func TestSHT3xStart(t *testing.T) {
 }
 
 func TestSHT3xHalt(t *testing.T) {
-	d, _ := initTestSHT3xDriverWithStubbedAdaptor()
+	// arrange
+	d := NewSHT3xDriver(newI2cTestAdaptor())
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
 	require.NoError(t, d.Halt())
 }
 

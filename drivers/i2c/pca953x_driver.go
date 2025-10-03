@@ -252,13 +252,13 @@ func (d *PCA953xDriver) writeRegister(regAddress pca953xRegister, val uint8) err
 	// ensure AI bit is not set
 	regAddress = regAddress &^ pca953xAiMask
 	// write content of requested register
-	return d.connection.WriteByteData(uint8(regAddress), val)
+	return d.writeByteData(uint8(regAddress), val)
 }
 
 func (d *PCA953xDriver) readRegister(regAddress pca953xRegister) (uint8, error) {
 	// ensure AI bit is not set
 	regAddress = regAddress &^ pca953xAiMask
-	return d.connection.ReadByteData(uint8(regAddress))
+	return d.readByteData(uint8(regAddress))
 }
 
 func pca953xCalcPsc(valSec float32) (uint8, error) {

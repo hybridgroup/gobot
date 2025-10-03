@@ -35,6 +35,15 @@ func TestNewHMC5883LDriver(t *testing.T) {
 	assert.InDelta(t, 390.0, d.gain, 0.0)
 }
 
+func TestHMC5883LHalt(t *testing.T) {
+	// arrange
+	d := NewHMC5883LDriver(newI2cTestAdaptor())
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
+}
+
 func TestHMC5883LOptions(t *testing.T) {
 	// This is a general test, that options are applied in constructor by using the common WithBus() option and
 	// least one of this driver. Further tests for options can also be done by call of "WithOption(val)(d)".

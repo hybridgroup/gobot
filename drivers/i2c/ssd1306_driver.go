@@ -202,54 +202,54 @@ type SSD1306Driver struct {
 //	WithSSD1306DisplayHeight(int): 	height of display (defaults to 64)
 //	WithSSD1306ExternalVCC:          set true when using an external OLED supply (defaults to false)
 func NewSSD1306Driver(c Connector, options ...func(Config)) *SSD1306Driver {
-	s := &SSD1306Driver{
+	d := &SSD1306Driver{
 		Driver:        NewDriver(c, "SSD1306", ssd1306DefaultAddress),
 		displayHeight: ssd1306Height,
 		displayWidth:  ssd1306Width,
 		externalVCC:   ssd1306ExternalVCC,
 	}
-	s.afterStart = s.initialize
+	d.afterStart = d.initialize
 
 	// set options
 	for _, option := range options {
-		option(s)
+		option(d)
 	}
 	// set page size
-	s.pageSize = 8
+	d.pageSize = 8
 	// set display buffer
-	s.buffer = NewDisplayBuffer(s.displayWidth, s.displayHeight, s.pageSize)
+	d.buffer = NewDisplayBuffer(d.displayWidth, d.displayHeight, d.pageSize)
 	// add commands
-	s.AddCommand("Display", func(_ map[string]interface{}) interface{} {
-		err := s.Display()
+	d.AddCommand("Display", func(_ map[string]interface{}) interface{} {
+		err := d.Display()
 		return map[string]interface{}{"err": err}
 	})
-	s.AddCommand("On", func(_ map[string]interface{}) interface{} {
-		err := s.On()
+	d.AddCommand("On", func(_ map[string]interface{}) interface{} {
+		err := d.On()
 		return map[string]interface{}{"err": err}
 	})
-	s.AddCommand("Off", func(_ map[string]interface{}) interface{} {
-		err := s.Off()
+	d.AddCommand("Off", func(_ map[string]interface{}) interface{} {
+		err := d.Off()
 		return map[string]interface{}{"err": err}
 	})
-	s.AddCommand("Clear", func(_ map[string]interface{}) interface{} {
-		s.Clear()
+	d.AddCommand("Clear", func(_ map[string]interface{}) interface{} {
+		d.Clear()
 		return map[string]interface{}{}
 	})
 	//nolint:forcetypeassert // ok here
-	s.AddCommand("SetContrast", func(params map[string]interface{}) interface{} {
+	d.AddCommand("SetContrast", func(params map[string]interface{}) interface{} {
 		contrast := params["contrast"].(byte)
-		err := s.SetContrast(contrast)
+		err := d.SetContrast(contrast)
 		return map[string]interface{}{"err": err}
 	})
 	//nolint:forcetypeassert // ok here
-	s.AddCommand("Set", func(params map[string]interface{}) interface{} {
+	d.AddCommand("Set", func(params map[string]interface{}) interface{} {
 		x := params["x"].(int)
 		y := params["y"].(int)
 		c := params["c"].(int)
-		s.Set(x, y, c)
+		d.Set(x, y, c)
 		return nil
 	})
-	return s
+	return d
 }
 
 // WithSSD1306DisplayWidth option sets the SSD1306Driver DisplayWidth option.
@@ -283,118 +283,118 @@ func WithSSD1306ExternalVCC(val bool) func(Config) {
 }
 
 // Init initializes the ssd1306 display.
-func (s *SSD1306Driver) Init() error {
+func (d *SSD1306Driver) Init() error {
 	// turn off screen
-	if err := s.Off(); err != nil {
+	if err := d.Off(); err != nil {
 		return err
 	}
 	// run through initialization commands
-	if err := s.commands(s.initSequence.GetSequence()); err != nil {
+	if err := d.commands(d.initSequence.GetSequence()); err != nil {
 		return err
 	}
-	if err := s.commands([]byte{ssd1306ColumnAddr, 0, byte(s.buffer.width) - 1}); err != nil {
+	if err := d.commands([]byte{ssd1306ColumnAddr, 0, byte(d.buffer.width) - 1}); err != nil {
 		return err
 	}
 
-	return s.commands([]byte{ssd1306PageAddr, 0, (byte(s.buffer.height / s.pageSize)) - 1})
+	return d.commands([]byte{ssd1306PageAddr, 0, (byte(d.buffer.height / d.pageSize)) - 1})
 }
 
 // On turns on the display.
-func (s *SSD1306Driver) On() error {
-	return s.command(ssd1306SetDisplayOn)
+func (d *SSD1306Driver) On() error {
+	return d.command(ssd1306SetDisplayOn)
 }
 
 // Off turns off the display.
-func (s *SSD1306Driver) Off() error {
-	return s.command(ssd1306SetDisplayOff)
+func (d *SSD1306Driver) Off() error {
+	return d.command(ssd1306SetDisplayOff)
 }
 
 // Clear clears the display buffer.
-func (s *SSD1306Driver) Clear() {
-	s.buffer.Clear()
+func (d *SSD1306Driver) Clear() {
+	d.buffer.Clear()
 }
 
 // Set sets a pixel in the buffer.
-func (s *SSD1306Driver) Set(x, y, c int) {
-	s.buffer.SetPixel(x, y, c)
+func (d *SSD1306Driver) Set(x, y, c int) {
+	d.buffer.SetPixel(x, y, c)
 }
 
 // Reset clears display.
-func (s *SSD1306Driver) Reset() error {
-	if err := s.Off(); err != nil {
+func (d *SSD1306Driver) Reset() error {
+	if err := d.Off(); err != nil {
 		return err
 	}
-	s.Clear()
+	d.Clear()
 
-	return s.On()
+	return d.On()
 }
 
 // SetContrast sets the display contrast.
-func (s *SSD1306Driver) SetContrast(contrast byte) error {
-	return s.commands([]byte{ssd1306SetContrast, contrast})
+func (d *SSD1306Driver) SetContrast(contrast byte) error {
+	return d.commands([]byte{ssd1306SetContrast, contrast})
 }
 
 // Display sends the memory buffer to the display.
-func (s *SSD1306Driver) Display() error {
-	_, err := s.connection.Write(append([]byte{0x40}, s.buffer.buffer...))
+func (d *SSD1306Driver) Display() error {
+	_, err := d.write(append([]byte{0x40}, d.buffer.buffer...))
 	return err
 }
 
 // ShowImage takes a standard Go image and displays it in monochrome.
-func (s *SSD1306Driver) ShowImage(img image.Image) error {
-	if img.Bounds().Dx() != s.displayWidth || img.Bounds().Dy() != s.displayHeight {
-		return fmt.Errorf("image must match display width and height: %dx%d", s.displayWidth, s.displayHeight)
+func (d *SSD1306Driver) ShowImage(img image.Image) error {
+	if img.Bounds().Dx() != d.displayWidth || img.Bounds().Dy() != d.displayHeight {
+		return fmt.Errorf("image must match display width and height: %dx%d", d.displayWidth, d.displayHeight)
 	}
-	s.Clear()
+	d.Clear()
 	for y, w, h := 0, img.Bounds().Dx(), img.Bounds().Dy(); y < h; y++ {
 		for x := 0; x < w; x++ {
 			c := img.At(x, y)
 			if r, g, b, _ := c.RGBA(); r > 0 || g > 0 || b > 0 {
-				s.Set(x, y, 1)
+				d.Set(x, y, 1)
 			}
 		}
 	}
-	return s.Display()
+	return d.Display()
 }
 
 // command sends a command to the ssd1306
-func (s *SSD1306Driver) command(b byte) error {
-	_, err := s.connection.Write([]byte{0x80, b})
+func (d *SSD1306Driver) command(b byte) error {
+	_, err := d.write([]byte{0x80, b})
 	return err
 }
 
 // commands sends a command sequence to the ssd1306
-func (s *SSD1306Driver) commands(commands []byte) error {
+func (d *SSD1306Driver) commands(commands []byte) error {
 	var command []byte
 	for _, d := range commands {
 		command = append(command, []byte{0x80, d}...)
 	}
-	_, err := s.connection.Write(command)
+	_, err := d.write(command)
 	return err
 }
 
-func (s *SSD1306Driver) initialize() error {
+func (d *SSD1306Driver) initialize() error {
 	// check device size for supported resolutions
 	switch {
-	case s.displayWidth == 128 && s.displayHeight == 64:
-		s.initSequence = ssd1306Init128x64
-	case s.displayWidth == 128 && s.displayHeight == 32:
-		s.initSequence = ssd1306Init128x32
-	case s.displayWidth == 96 && s.displayHeight == 16:
-		s.initSequence = ssd1306Init96x16
+	case d.displayWidth == 128 && d.displayHeight == 64:
+		d.initSequence = ssd1306Init128x64
+	case d.displayWidth == 128 && d.displayHeight == 32:
+		d.initSequence = ssd1306Init128x32
+	case d.displayWidth == 96 && d.displayHeight == 16:
+		d.initSequence = ssd1306Init96x16
 	default:
 		return fmt.Errorf("%dx%d resolution is unsupported, supported resolutions: 128x64, 128x32, 96x16",
-			s.displayWidth, s.displayHeight)
+			d.displayWidth, d.displayHeight)
 	}
 	// check for external vcc
-	if s.externalVCC {
-		s.initSequence.chargePumpSetting = 0x10
-		s.initSequence.contrast = 0x9F
-		s.initSequence.prechargePeriod = 0x22
+	if d.externalVCC {
+		d.initSequence.chargePumpSetting = 0x10
+		d.initSequence.contrast = 0x9F
+		d.initSequence.prechargePeriod = 0x22
 	}
-	if err := s.Init(); err != nil {
+	if err := d.Init(); err != nil {
 		return err
 	}
 
-	return s.On()
+	return d.On()
 }

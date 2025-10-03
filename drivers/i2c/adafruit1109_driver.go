@@ -26,22 +26,23 @@ type Adafruit1109Driver struct {
 	*MCP23017Driver
 	*gpio.HD44780Driver
 
-	name      string
-	redPin    adafruit1109PortPin
-	greenPin  adafruit1109PortPin
-	bluePin   adafruit1109PortPin
-	selectPin adafruit1109PortPin
-	upPin     adafruit1109PortPin
-	downPin   adafruit1109PortPin
-	leftPin   adafruit1109PortPin
-	rightPin  adafruit1109PortPin
-	rwPin     adafruit1109PortPin
-	rsPin     adafruit1109PortPin
-	enPin     adafruit1109PortPin
-	dataPinD4 adafruit1109PortPin
-	dataPinD5 adafruit1109PortPin
-	dataPinD6 adafruit1109PortPin
-	dataPinD7 adafruit1109PortPin
+	name       string
+	redPin     adafruit1109PortPin
+	greenPin   adafruit1109PortPin
+	bluePin    adafruit1109PortPin
+	selectPin  adafruit1109PortPin
+	upPin      adafruit1109PortPin
+	downPin    adafruit1109PortPin
+	leftPin    adafruit1109PortPin
+	rightPin   adafruit1109PortPin
+	rwPin      adafruit1109PortPin
+	rsPin      adafruit1109PortPin
+	enPin      adafruit1109PortPin
+	dataPinD4  adafruit1109PortPin
+	dataPinD5  adafruit1109PortPin
+	dataPinD6  adafruit1109PortPin
+	dataPinD7  adafruit1109PortPin
+	mcpStarted bool
 }
 
 // NewAdafruit1109Driver creates is a new driver for the 2x16 LCD display with RGB backlit and 5 keys.
@@ -120,6 +121,8 @@ func (d *Adafruit1109Driver) Start() error {
 		return err
 	}
 
+	d.mcpStarted = true
+
 	// set all to output (inputs will be set by initButton)
 	for pin := uint8(0); pin <= 7; pin++ {
 		if err := d.SetPinMode(pin, "A", 0); err != nil {
@@ -169,14 +172,19 @@ func (d *Adafruit1109Driver) Halt() error {
 	if err := d.HD44780Driver.Halt(); err != nil {
 		errors = append(errors, err.Error())
 	}
-	// switch off the background light
-	if err := d.SetRGB(false, false, false); err != nil {
-		errors = append(errors, err.Error())
+
+	if d.mcpStarted {
+		// switch off the background light
+		if err := d.SetRGB(false, false, false); err != nil {
+			errors = append(errors, err.Error())
+		}
+		// must be after HD44780Driver
+		if err := d.MCP23017Driver.Halt(); err != nil {
+			errors = append(errors, err.Error())
+		}
 	}
-	// must be after HD44780Driver
-	if err := d.MCP23017Driver.Halt(); err != nil {
-		errors = append(errors, err.Error())
-	}
+
+	d.mcpStarted = false
 
 	if len(errors) > 0 {
 		return fmt.Errorf("'Halt' the driver %s", strings.Join(errors, ", "))

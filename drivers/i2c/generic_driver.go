@@ -20,7 +20,7 @@ func (d *GenericDriver) WriteByte(val byte) error {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	return d.connection.WriteByte(val)
+	return d.writeByte(val)
 }
 
 // WriteByteData writes the given byte value to the given register of an i2c device.
@@ -28,7 +28,7 @@ func (d *GenericDriver) WriteByteData(reg uint8, val byte) error {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	return d.connection.WriteByteData(reg, val)
+	return d.writeByteData(reg, val)
 }
 
 // WriteWordData writes the given 16 bit value to the given register of an i2c device.
@@ -36,7 +36,7 @@ func (d *GenericDriver) WriteWordData(reg uint8, val uint16) error {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	return d.connection.WriteWordData(reg, val)
+	return d.writeWordData(reg, val)
 }
 
 // WriteBlockData writes the given buffer to the given register of an i2c device.
@@ -44,7 +44,7 @@ func (d *GenericDriver) WriteBlockData(reg uint8, data []byte) error {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	return d.connection.WriteBlockData(reg, data)
+	return d.writeBlockData(reg, data)
 }
 
 // WriteData writes the given buffer to the given register of an i2c device.
@@ -73,7 +73,7 @@ func (d *GenericDriver) ReadByte() (byte, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	return d.connection.ReadByte()
+	return d.readByte()
 }
 
 // ReadByteData reads a byte from the given register of an i2c device.
@@ -81,7 +81,7 @@ func (d *GenericDriver) ReadByteData(reg uint8) (byte, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	return d.connection.ReadByteData(reg)
+	return d.readByteData(reg)
 }
 
 // ReadWordData reads a 16 bit value starting from the given register of an i2c device.
@@ -89,7 +89,7 @@ func (d *GenericDriver) ReadWordData(reg uint8) (uint16, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	return d.connection.ReadWordData(reg)
+	return d.readWordData(reg)
 }
 
 // ReadBlockData fills the given buffer with reads starting from the given register of an i2c device.
@@ -97,7 +97,7 @@ func (d *GenericDriver) ReadBlockData(reg uint8, data []byte) error {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	return d.connection.ReadBlockData(reg, data)
+	return d.readBlockData(reg, data)
 }
 
 // ReadData fills the given buffer with reads from the given register of an i2c device.
@@ -106,7 +106,7 @@ func (d *GenericDriver) ReadData(reg uint8, data []byte) error {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	if err := d.connection.WriteByte(reg); err != nil {
+	if err := d.writeByte(reg); err != nil {
 		return err
 	}
 
@@ -126,7 +126,7 @@ func (d *GenericDriver) Read(data []byte) error {
 }
 
 func (d *GenericDriver) writeAndCheckCount(data []byte) error {
-	n, err := d.connection.Write(data)
+	n, err := d.write(data)
 	if err != nil {
 		return err
 	}
@@ -137,7 +137,7 @@ func (d *GenericDriver) writeAndCheckCount(data []byte) error {
 }
 
 func (d *GenericDriver) readAndCheckCount(data []byte) error {
-	n, err := d.connection.Read(data)
+	n, err := d.read(data)
 	if err != nil {
 		return err
 	}

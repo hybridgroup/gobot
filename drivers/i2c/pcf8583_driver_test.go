@@ -37,6 +37,15 @@ func TestNewPCF8583Driver(t *testing.T) {
 	assert.Equal(t, uint8(0x10), d.ramOffset)
 }
 
+func TestPCF8583Halt(t *testing.T) {
+	// arrange
+	d := NewPCF8583Driver(newI2cTestAdaptor())
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
+}
+
 func TestPCF8583Options(t *testing.T) {
 	// This is a general test, that options are applied in constructor by using the common WithBus() option and
 	// least one of this driver. Further tests for options can also be done by call of "WithOption(val)(d)".

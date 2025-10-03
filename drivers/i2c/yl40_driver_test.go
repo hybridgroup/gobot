@@ -17,7 +17,7 @@ func initTestYL40DriverWithStubbedAdaptor() (*YL40Driver, *i2cTestAdaptor) {
 	return yl, adaptor
 }
 
-func TestYL40Driver(t *testing.T) {
+func TestNewYL40Driver(t *testing.T) {
 	// arrange, act
 	yl := NewYL40Driver(newI2cTestAdaptor())
 	// assert
@@ -252,6 +252,8 @@ func TestYL40DriverStart(t *testing.T) {
 
 func TestYL40DriverHalt(t *testing.T) {
 	yl := NewYL40Driver(newI2cTestAdaptor())
+	require.NoError(t, yl.Halt()) // must be idempotent
+	require.NoError(t, yl.Start())
 	require.NoError(t, yl.Halt())
 }
 
