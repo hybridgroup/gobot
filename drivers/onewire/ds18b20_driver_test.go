@@ -129,6 +129,18 @@ func TestDS18B20Halt(t *testing.T) {
 	}
 }
 
+func TestDS18B20HaltIdempotent(t *testing.T) {
+	// arrange
+	d := NewDS18B20Driver(newOneWireTestAdaptor(), 2345)
+	// to trigger write calls:
+	d.ds18b20Cfg.resolution = ds18b20DefaultResolution + 1
+	d.ds18b20Cfg.conversionTime = ds18b20DefaultConversionTime + 2
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
+}
+
 func TestDS18B20Temperature(t *testing.T) {
 	const readValue = 24500
 	tests := map[string]struct {

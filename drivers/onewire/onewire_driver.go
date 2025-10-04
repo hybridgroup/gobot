@@ -87,8 +87,12 @@ func (d *driver) SetName(name string) {
 	d.driverCfg.name = name
 }
 
-// Connection returns the connection of the device.
+// Connection returns the gobot connection of the device.
 func (d *driver) Connection() gobot.Connection {
+	if d.connection == nil {
+		log.Printf("1-wire driver not started for %s\n", d.driverCfg.name)
+	}
+
 	if conn, ok := d.connection.(gobot.Connection); ok {
 		return conn
 	}
@@ -116,10 +120,52 @@ func (d *driver) Halt() error {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	// currently there is nothing to do here for the driver, the connection is cached on adaptor side
-	// and will be closed on adaptor Finalize()
+	if err := d.beforeHalt(); err != nil {
+		return err
+	}
 
-	return d.beforeHalt()
+	// the connection is also cached on adaptor side and will be closed on adaptor Finalize()
+	d.connection = nil
+
+	return nil
+}
+
+func (d *driver) id() (string, error) {
+	if d.connection == nil {
+		return "", fmt.Errorf("1-wire driver not started for %s", d.driverCfg.name)
+	}
+
+	return d.connection.ID(), nil
+}
+
+//nolint:unused // ok for now
+func (d *driver) readData(command string, data []byte) error {
+	if d.connection == nil {
+		return fmt.Errorf("1-wire driver not started for %s", d.driverCfg.name)
+	}
+	return d.connection.ReadData(command, data)
+}
+
+//nolint:unused // ok for now
+func (d *driver) writeData(command string, data []byte) error {
+	if d.connection == nil {
+		return fmt.Errorf("1-wire driver not started for %s", d.driverCfg.name)
+	}
+	return d.connection.WriteData(command, data)
+}
+
+func (d *driver) readInteger(command string) (int, error) {
+	if d.connection == nil {
+		return 0, fmt.Errorf("1-wire driver not started for %s", d.driverCfg.name)
+	}
+	return d.connection.ReadInteger(command)
+}
+
+func (d *driver) writeInteger(command string, val int) error {
+	if d.connection == nil {
+		return fmt.Errorf("1-wire driver not started for %s", d.driverCfg.name)
+	}
+	return d.connection.WriteInteger(command, val)
 }
 
 func (o nameOption) String() string {
