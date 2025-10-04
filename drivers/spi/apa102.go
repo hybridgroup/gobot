@@ -86,5 +86,5 @@ func (d *APA102Driver) Draw() error {
 		tx[i] = 0xff
 	}
 
-	return d.connection.WriteBytes(tx)
+	return d.writeBytes(tx)
 }

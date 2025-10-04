@@ -48,7 +48,7 @@ func (d *MCP3002Driver) Read(channel int) (int, error) {
 
 	rx := make([]byte, 2)
 
-	if err := d.connection.ReadCommandData(tx, rx); err != nil {
+	if err := d.readCommandData(tx, rx); err != nil {
 		return 0, err
 	}
 

@@ -24,8 +24,11 @@ func TestDriverSSDStart(t *testing.T) {
 }
 
 func TestDriverSSDHalt(t *testing.T) {
+	// arrange
 	d := initTestSSDDriver()
-	_ = d.Start()
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
 	require.NoError(t, d.Halt())
 }
 

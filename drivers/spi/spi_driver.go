@@ -1,6 +1,7 @@
 package spi
 
 import (
+	"fmt"
 	"log"
 	"sync"
 
@@ -103,13 +104,13 @@ func NewDriver(a Connector, name string, options ...func(Config)) *Driver {
 	return d
 }
 
-// Name returns the name of the device.
+// Name returns the name of the SPI device.
 func (d *Driver) Name() string { return d.name }
 
-// SetName sets the name of the device.
+// SetName sets the name of the SPI device.
 func (d *Driver) SetName(n string) { d.name = n }
 
-// Connection returns the Connection of the device.
+// Connection returns the gobot connection of the SPI device.
 func (d *Driver) Connection() gobot.Connection {
 	if conn, ok := d.connector.(gobot.Connection); ok {
 		return conn
@@ -147,7 +148,68 @@ func (d *Driver) Halt() error {
 		return err
 	}
 
+	d.connection = nil
+
 	// currently there is nothing to do here for the driver, the connection is cached on adaptor side
 	// and will be closed on adaptor Finalize()
 	return nil
+}
+
+func (d *Driver) readCommandData(command []byte, data []byte) error {
+	if d.connection == nil {
+		return fmt.Errorf("spi driver not started")
+	}
+
+	return d.connection.ReadCommandData(command, data)
+}
+
+//nolint:unused // ok for now
+func (d *Driver) readByteData(reg uint8) (uint8, error) {
+	if d.connection == nil {
+		return 0, fmt.Errorf("spi driver not started")
+	}
+
+	return d.connection.ReadByteData(reg)
+}
+
+//nolint:unused // ok for now
+func (d *Driver) readBlockData(reg uint8, data []byte) error {
+	if d.connection == nil {
+		return fmt.Errorf("spi driver not started")
+	}
+
+	return d.connection.ReadBlockData(reg, data)
+}
+
+func (d *Driver) writeByte(val byte) error {
+	if d.connection == nil {
+		return fmt.Errorf("spi driver not started")
+	}
+
+	return d.connection.WriteByte(val)
+}
+
+//nolint:unused // ok for now
+func (d *Driver) writeByteData(reg byte, data byte) error {
+	if d.connection == nil {
+		return fmt.Errorf("spi driver not started")
+	}
+
+	return d.connection.WriteByteData(reg, data)
+}
+
+func (d *Driver) writeBlockData(reg byte, data []byte) error {
+	if d.connection == nil {
+		return fmt.Errorf("spi driver not started")
+	}
+
+	return d.connection.WriteBlockData(reg, data)
+}
+
+func (d *Driver) writeBytes(data []byte) error {
+	if d.connection == nil {
+		return fmt.Errorf("spi driver not started")
+	}
+
+	return d.connection.WriteBytes(data)
 }

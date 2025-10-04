@@ -38,6 +38,15 @@ func TestNewMCP3204Driver(t *testing.T) {
 	assert.True(t, strings.HasPrefix(d.Name(), "MCP3204"))
 }
 
+func TestMCP3204Halt(t *testing.T) {
+	// arrange
+	d := NewMCP3204Driver(newSpiTestAdaptor())
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
+}
+
 func TestMCP3204Read(t *testing.T) {
 	tests := map[string]struct {
 		chanNum     int

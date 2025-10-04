@@ -35,6 +35,15 @@ func TestNewMFRC522Driver(t *testing.T) {
 	assert.True(t, strings.HasPrefix(d.Name(), "MFRC522"))
 }
 
+func TestMFRC522Halt(t *testing.T) {
+	// arrange
+	d := NewMFRC522Driver(newSpiTestAdaptor())
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
+}
+
 func TestMFRC522WriteByteData(t *testing.T) {
 	// arrange
 	d, a := initTestMFRC522DriverWithStubbedAdaptor()
