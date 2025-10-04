@@ -51,7 +51,7 @@ func (d *MCP3202Driver) Read(channel int) (int, error) {
 
 	rx := make([]byte, 3)
 
-	if err := d.connection.ReadCommandData(tx, rx); err != nil || len(rx) != 3 {
+	if err := d.readCommandData(tx, rx); err != nil || len(rx) != 3 {
 		return 0, err
 	}
 

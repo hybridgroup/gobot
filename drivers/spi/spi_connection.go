@@ -24,6 +24,14 @@ func NewConnection(spiSystem gobot.SpiSystemDevicer) *spiConnection {
 	return &spiConnection{spiSystem: spiSystem}
 }
 
+// Close connection to underlying SPI device.
+func (c *spiConnection) Close() error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	return c.spiSystem.Close()
+}
+
 // ReadCommandData uses the SPI device TX to send/receive data. Implements gobot.SpiOperations
 // On write command, the first byte normally contains the address and mode.
 // On read data, the return value is most likely one byte behind the command.
@@ -33,14 +41,6 @@ func (c *spiConnection) ReadCommandData(command []byte, data []byte) error {
 	defer c.mutex.Unlock()
 
 	return c.txRxAndCheckReadLength(command, data)
-}
-
-// Close connection to underlying SPI device.
-func (c *spiConnection) Close() error {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	return c.spiSystem.Close()
 }
 
 // ReadByteData reads a byte from the given register of SPI device. Implements gobot.BusOperations.
