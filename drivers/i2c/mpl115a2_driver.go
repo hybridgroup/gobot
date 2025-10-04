@@ -92,7 +92,7 @@ func (d *MPL115A2Driver) Temperature() (float32, error) {
 
 func (d *MPL115A2Driver) initialization() error {
 	data := make([]byte, 8)
-	if err := d.connection.ReadBlockData(mpl115A2Reg_A0_MSB, data); err != nil {
+	if err := d.readBlockData(mpl115A2Reg_A0_MSB, data); err != nil {
 		return err
 	}
 
@@ -133,13 +133,13 @@ func (d *MPL115A2Driver) getData() (p, t float32, err error) {
 	var pressure uint16
 	var pressureComp float32
 
-	if err = d.connection.WriteByteData(mpl115A2Reg_StartConversion, 0); err != nil {
+	if err = d.writeByteData(mpl115A2Reg_StartConversion, 0); err != nil {
 		return 0, 0, err
 	}
 	time.Sleep(5 * time.Millisecond)
 
 	data := []byte{0, 0, 0, 0}
-	if err = d.connection.ReadBlockData(mpl115A2Reg_PressureMSB, data); err != nil {
+	if err = d.readBlockData(mpl115A2Reg_PressureMSB, data); err != nil {
 		return 0, 0, err
 	}
 

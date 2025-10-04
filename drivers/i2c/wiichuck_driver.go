@@ -178,18 +178,18 @@ func (d *WiichuckDriver) initialize() error {
 				}
 				return
 			default:
-				if _, err := d.connection.Write([]byte{0x40, 0x00}); err != nil {
+				if _, err := d.write([]byte{0x40, 0x00}); err != nil {
 					d.Publish(d.Event(Error), err)
 					continue
 				}
 				time.Sleep(d.pauseTime)
-				if _, err := d.connection.Write([]byte{0x00}); err != nil {
+				if _, err := d.write([]byte{0x00}); err != nil {
 					d.Publish(d.Event(Error), err)
 					continue
 				}
 				time.Sleep(d.pauseTime)
 				newValue := make([]byte, 6)
-				bytesRead, err := d.connection.Read(newValue)
+				bytesRead, err := d.read(newValue)
 				if err != nil {
 					d.Publish(d.Event(Error), err)
 					continue

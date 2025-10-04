@@ -49,7 +49,9 @@ func TestBlinkMStart(t *testing.T) {
 }
 
 func TestBlinkMHalt(t *testing.T) {
-	d, _ := initTestBlinkMDriverWithStubbedAdaptor()
+	d := NewBlinkMDriver(newI2cTestAdaptor())
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
 	require.NoError(t, d.Halt())
 }
 

@@ -22,31 +22,31 @@ type LIDARLiteDriver struct {
 //	i2c.WithBus(int):	bus to use with this driver
 //	i2c.WithAddress(int):	address to use with this driver
 func NewLIDARLiteDriver(c Connector, options ...func(Config)) *LIDARLiteDriver {
-	l := &LIDARLiteDriver{
+	d := &LIDARLiteDriver{
 		Driver: NewDriver(c, "LIDARLite", lidarliteDefaultAddress),
 	}
 
 	for _, option := range options {
-		option(l)
+		option(d)
 	}
 
 	// TODO: add commands to API
-	return l
+	return d
 }
 
 // Distance returns the current distance in cm
-func (h *LIDARLiteDriver) Distance() (int, error) {
-	if _, err := h.connection.Write([]byte{0x00, 0x04}); err != nil {
+func (d *LIDARLiteDriver) Distance() (int, error) {
+	if _, err := d.write([]byte{0x00, 0x04}); err != nil {
 		return 0, err
 	}
 	time.Sleep(20 * time.Millisecond)
 
-	if _, err := h.connection.Write([]byte{0x0F}); err != nil {
+	if _, err := d.write([]byte{0x0F}); err != nil {
 		return 0, err
 	}
 
 	upper := []byte{0}
-	bytesRead, err := h.connection.Read(upper)
+	bytesRead, err := d.read(upper)
 	if err != nil {
 		return 0, err
 	}
@@ -55,12 +55,12 @@ func (h *LIDARLiteDriver) Distance() (int, error) {
 		return 0, ErrNotEnoughBytes
 	}
 
-	if _, err := h.connection.Write([]byte{0x10}); err != nil {
+	if _, err := d.write([]byte{0x10}); err != nil {
 		return 0, err
 	}
 
 	lower := []byte{0}
-	bytesRead, err = h.connection.Read(lower)
+	bytesRead, err = d.read(lower)
 	if err != nil {
 		return 0, err
 	}

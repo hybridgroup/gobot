@@ -49,7 +49,11 @@ func TestMMA7660Start(t *testing.T) {
 }
 
 func TestMMA7660Halt(t *testing.T) {
-	d, _ := initTestMMA7660DriverWithStubbedAdaptor()
+	// arrange
+	d := NewMMA7660Driver(newI2cTestAdaptor())
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
 	require.NoError(t, d.Halt())
 }
 

@@ -17,25 +17,25 @@ type HMC6352Driver struct {
 //	i2c.WithBus(int):	bus to use with this driver
 //	i2c.WithAddress(int):	address to use with this driver
 func NewHMC6352Driver(c Connector, options ...func(Config)) *HMC6352Driver {
-	h := &HMC6352Driver{
+	d := &HMC6352Driver{
 		Driver: NewDriver(c, "HMC6352", hmc6352DefaultAddress),
 	}
-	h.afterStart = h.initialize
+	d.afterStart = d.initialize
 
 	for _, option := range options {
-		option(h)
+		option(d)
 	}
 
-	return h
+	return d
 }
 
 // Heading returns the current heading
-func (h *HMC6352Driver) Heading() (uint16, error) {
-	if _, err := h.connection.Write([]byte("A")); err != nil {
+func (d *HMC6352Driver) Heading() (uint16, error) {
+	if _, err := d.write([]byte("A")); err != nil {
 		return 0, err
 	}
 	buf := []byte{0, 0}
-	bytesRead, err := h.connection.Read(buf)
+	bytesRead, err := d.read(buf)
 	if err != nil {
 		return 0, err
 	}
@@ -47,8 +47,8 @@ func (h *HMC6352Driver) Heading() (uint16, error) {
 	return 0, ErrNotEnoughBytes
 }
 
-func (h *HMC6352Driver) initialize() error {
-	if _, err := h.connection.Write([]byte("A")); err != nil {
+func (d *HMC6352Driver) initialize() error {
+	if _, err := d.write([]byte("A")); err != nil {
 		return err
 	}
 	return nil

@@ -36,24 +36,24 @@ type BH1750Driver struct {
 //	i2c.WithBus(int):	bus to use with this driver
 //	i2c.WithAddress(int):	address to use with this driver
 func NewBH1750Driver(c Connector, options ...func(Config)) *BH1750Driver {
-	h := &BH1750Driver{
+	d := &BH1750Driver{
 		Driver: NewDriver(c, "BH1750", bh1750DefaultAddress),
 		mode:   BH1750_CONTINUOUS_HIGH_RES_MODE,
 	}
-	h.afterStart = h.initialize
+	d.afterStart = d.initialize
 
 	for _, option := range options {
-		option(h)
+		option(d)
 	}
 
 	// TODO: add commands for API
-	return h
+	return d
 }
 
 // RawSensorData returns the raw value from the bh1750
-func (h *BH1750Driver) RawSensorData() (int, error) {
+func (d *BH1750Driver) RawSensorData() (int, error) {
 	buf := []byte{0, 0}
-	bytesRead, err := h.connection.Read(buf)
+	bytesRead, err := d.read(buf)
 	if err != nil {
 		return 0, err
 	}
@@ -67,15 +67,15 @@ func (h *BH1750Driver) RawSensorData() (int, error) {
 }
 
 // Lux returns the adjusted value from the bh1750
-func (h *BH1750Driver) Lux() (int, error) {
-	rawLux, err := h.RawSensorData()
+func (d *BH1750Driver) Lux() (int, error) {
+	rawLux, err := d.RawSensorData()
 	lux := int(float64(rawLux) / 1.2)
 
 	return lux, err
 }
 
-func (h *BH1750Driver) initialize() error {
-	err := h.connection.WriteByte(h.mode)
+func (d *BH1750Driver) initialize() error {
+	err := d.writeByte(d.mode)
 	time.Sleep(10 * time.Microsecond)
 	if err != nil {
 		return err

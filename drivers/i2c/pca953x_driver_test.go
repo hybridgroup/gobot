@@ -36,6 +36,15 @@ func TestNewPCA953xDriver(t *testing.T) {
 	assert.Equal(t, 0x63, d.defaultAddress)
 }
 
+func TestPCA953xHalt(t *testing.T) {
+	// arrange
+	d := NewPCA953xDriver(newI2cTestAdaptor())
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
+}
+
 func TestPCA953xWriteGPIO(t *testing.T) {
 	// sequence to write:
 	// * choose LED select register according to the given GPIO index (0x05 for 0..3, 0x06 for 4..7)

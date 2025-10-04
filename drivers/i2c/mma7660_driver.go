@@ -65,7 +65,7 @@ func (d *MMA7660Driver) Acceleration(x, y, z float64) (ax, ay, az float64) {
 //nolint:nonamedreturns // is sufficient here
 func (d *MMA7660Driver) XYZ() (x float64, y float64, z float64, err error) {
 	buf := []byte{0, 0, 0}
-	bytesRead, err := d.connection.Read(buf)
+	bytesRead, err := d.read(buf)
 	if err != nil {
 		return
 	}
@@ -90,15 +90,15 @@ func (d *MMA7660Driver) XYZ() (x float64, y float64, z float64, err error) {
 }
 
 func (d *MMA7660Driver) initialize() error {
-	if _, err := d.connection.Write([]byte{MMA7660_MODE, MMA7660_STAND_BY}); err != nil {
+	if _, err := d.write([]byte{MMA7660_MODE, MMA7660_STAND_BY}); err != nil {
 		return err
 	}
 
-	if _, err := d.connection.Write([]byte{MMA7660_SR, MMA7660_AUTO_SLEEP_32}); err != nil {
+	if _, err := d.write([]byte{MMA7660_SR, MMA7660_AUTO_SLEEP_32}); err != nil {
 		return err
 	}
 
-	if _, err := d.connection.Write([]byte{MMA7660_MODE, MMA7660_ACTIVE}); err != nil {
+	if _, err := d.write([]byte{MMA7660_MODE, MMA7660_ACTIVE}); err != nil {
 		return err
 	}
 

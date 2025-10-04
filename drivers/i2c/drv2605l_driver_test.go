@@ -56,7 +56,17 @@ func TestDRV2605LStart(t *testing.T) {
 	require.NoError(t, d.Start())
 }
 
+func TestDRV2605LHaltIdempotent(t *testing.T) {
+	// arrange
+	d := NewDRV2605LDriver(newI2cTestAdaptor())
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
+}
+
 func TestDRV2605LHalt(t *testing.T) {
+	// arrange
 	writeStopPlaybackData := []byte{drv2605RegGo, 0}
 	// single-byte-read starts with a write operation to set the register for reading
 	// see section 8.5.3.5 of data sheet
@@ -64,7 +74,9 @@ func TestDRV2605LHalt(t *testing.T) {
 	writeNewStandbyModeData := []byte{drv2605RegMode, 42 | drv2605Standby}
 	d, a := initTestDRV2605LDriverWithStubbedAdaptor()
 	a.written = []byte{}
+	// act
 	require.NoError(t, d.Halt())
+	// assert
 	assert.Equal(t, append(append(writeStopPlaybackData, readCurrentStandbyModeData), writeNewStandbyModeData...),
 		a.written)
 }

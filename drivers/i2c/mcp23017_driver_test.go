@@ -38,7 +38,9 @@ func initTestMCP23017WithStubbedAdaptor(b uint8) (*MCP23017Driver, *i2cTestAdapt
 	// create the driver, ready to use for tests
 	a := newI2cTestAdaptor()
 	d := NewMCP23017Driver(a, WithMCP23017Bank(b))
-	_ = d.Start()
+	if err := d.Start(); err != nil {
+		panic(err)
+	}
 	return d, a
 }
 
@@ -53,6 +55,13 @@ func TestNewMCP23017Driver(t *testing.T) {
 	assert.Equal(t, 0x20, d.defaultAddress)
 	assert.NotNil(t, d.mcpConf)
 	assert.NotNil(t, d.mcpBehav)
+}
+
+func TestMCP23017Halt(t *testing.T) {
+	d := NewMCP23017Driver(newI2cTestAdaptor())
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
 }
 
 func TestWithMCP23017Bank(t *testing.T) {

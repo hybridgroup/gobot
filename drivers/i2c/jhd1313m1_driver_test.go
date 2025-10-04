@@ -74,8 +74,11 @@ func TestJHD1313MDriverStartWriteError(t *testing.T) {
 }
 
 func TestJHD1313MDriverHalt(t *testing.T) {
+	// arrange
 	d := initTestJHD1313M1Driver()
-	_ = d.Start()
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
 	require.NoError(t, d.Halt())
 }
 

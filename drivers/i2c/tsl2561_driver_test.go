@@ -17,20 +17,23 @@ import (
 // and tests all implementations, so no further tests needed here for gobot.Driver interface
 var _ gobot.Driver = (*TSL2561Driver)(nil)
 
-func testIDReader(b []byte) (int, error) {
-	buf := new(bytes.Buffer)
-	// Mock device responding 0xA
-	_ = binary.Write(buf, binary.LittleEndian, uint8(0x0A))
-	copy(b, buf.Bytes())
-	return buf.Len(), nil
+func initTestTSL2561DriverStarted() (*TSL2561Driver, *i2cTestAdaptor) {
+	d, a := initTestTSL2561Driver()
+	if err := d.Start(); err != nil {
+		panic(err)
+	}
+	return d, a
 }
 
 func initTestTSL2561Driver() (*TSL2561Driver, *i2cTestAdaptor) {
 	a := newI2cTestAdaptor()
-	d := NewTSL2561Driver(a)
-	a.i2cReadImpl = testIDReader
-	if err := d.Start(); err != nil {
-		panic(err)
+	d := NewTSL2561Driver(a, WithTSL2561IntegrationTime13MS) // to reduce sleep time to minimum
+	a.i2cReadImpl = func(b []byte) (int, error) {
+		buf := new(bytes.Buffer)
+		// Mock device responding 0xA
+		_ = binary.Write(buf, binary.LittleEndian, uint8(0x0A))
+		copy(b, buf.Bytes())
+		return buf.Len(), nil
 	}
 	return d, a
 }
@@ -58,16 +61,14 @@ func TestTSL2561DriverOptions(t *testing.T) {
 }
 
 func TestTSL2561DriverStart(t *testing.T) {
-	a := newI2cTestAdaptor()
-	d := NewTSL2561Driver(a)
-	a.i2cReadImpl = testIDReader
-
+	// arrange
+	d, _ := initTestTSL2561Driver()
+	// act, assert
 	require.NoError(t, d.Start())
 }
 
 func TestTSL2561DriverStartNotFound(t *testing.T) {
-	a := newI2cTestAdaptor()
-	d := NewTSL2561Driver(a)
+	d, a := initTestTSL2561Driver()
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
 		buf.Write([]byte{1})
@@ -78,25 +79,12 @@ func TestTSL2561DriverStartNotFound(t *testing.T) {
 }
 
 func TestTSL2561DriverHalt(t *testing.T) {
+	// arrange
 	d, _ := initTestTSL2561Driver()
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
 	require.NoError(t, d.Halt())
-}
-
-func TestTSL2561DriverRead16(t *testing.T) {
-	d, a := initTestTSL2561Driver()
-	a.i2cReadImpl = testIDReader
-	a.i2cReadImpl = func(b []byte) (int, error) {
-		buf := new(bytes.Buffer)
-		// send low
-		_ = binary.Write(buf, binary.LittleEndian, uint8(0xEA))
-		// send high
-		_ = binary.Write(buf, binary.LittleEndian, uint8(0xAE))
-		copy(b, buf.Bytes())
-		return buf.Len(), nil
-	}
-	val, err := d.connection.ReadWordData(1)
-	require.NoError(t, err)
-	assert.Equal(t, uint16(0xAEEA), val)
 }
 
 func TestTSL2561DriverValidOptions(t *testing.T) {
@@ -153,7 +141,7 @@ func TestTSL2561DriverYetEvenMoreOptions(t *testing.T) {
 }
 
 func TestTSL2561DriverGetDataWriteError(t *testing.T) {
-	d, a := initTestTSL2561Driver()
+	d, a := initTestTSL2561DriverStarted()
 	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}
@@ -163,7 +151,7 @@ func TestTSL2561DriverGetDataWriteError(t *testing.T) {
 }
 
 func TestTSL2561DriverGetDataReadError(t *testing.T) {
-	d, a := initTestTSL2561Driver()
+	d, a := initTestTSL2561DriverStarted()
 	a.i2cReadImpl = func([]byte) (int, error) {
 		return 0, errors.New("read error")
 	}
@@ -173,7 +161,7 @@ func TestTSL2561DriverGetDataReadError(t *testing.T) {
 }
 
 func TestTSL2561DriverGetLuminocity(t *testing.T) {
-	d, a := initTestTSL2561Driver()
+	d, a := initTestTSL2561DriverStarted()
 	// TODO: obtain real sensor data here for testing
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
@@ -185,13 +173,14 @@ func TestTSL2561DriverGetLuminocity(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, uint16(12365), bb)
 	assert.Equal(t, uint16(12365), ir)
+	d.integrationTime = TSL2561IntegrationTime402MS
 	assert.Equal(t, uint32(72), d.CalculateLux(bb, ir))
 }
 
 func TestTSL2561DriverGetLuminocityAutoGain(t *testing.T) {
 	a := newI2cTestAdaptor()
 	d := NewTSL2561Driver(a,
-		WithTSL2561IntegrationTime402MS,
+		WithTSL2561IntegrationTime13MS, // to reduce sleep time to minimum
 		WithAddress(TSL2561AddressLow),
 		WithTSL2561AutoGain)
 	// TODO: obtain real sensor data here for testing
@@ -201,17 +190,17 @@ func TestTSL2561DriverGetLuminocityAutoGain(t *testing.T) {
 		copy(b, buf.Bytes())
 		return buf.Len(), nil
 	}
-
-	_ = d.Start()
+	_ = d.Start() // because we override start procedure
 	bb, ir, err := d.GetLuminocity()
 	require.NoError(t, err)
 	assert.Equal(t, uint16(12365), bb)
 	assert.Equal(t, uint16(12365), ir)
+	d.integrationTime = TSL2561IntegrationTime402MS
 	assert.Equal(t, uint32(72), d.CalculateLux(bb, ir))
 }
 
 func TestTSL2561SetIntegrationTimeError(t *testing.T) {
-	d, a := initTestTSL2561Driver()
+	d, a := initTestTSL2561DriverStarted()
 	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}
@@ -219,7 +208,7 @@ func TestTSL2561SetIntegrationTimeError(t *testing.T) {
 }
 
 func TestTSL2561SetGainError(t *testing.T) {
-	d, a := initTestTSL2561Driver()
+	d, a := initTestTSL2561DriverStarted()
 	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}

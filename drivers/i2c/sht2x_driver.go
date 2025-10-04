@@ -123,7 +123,7 @@ func (d *SHT2xDriver) SetAccuracy(acc byte) error {
 
 // Reset does a software reset of the device
 func (d *SHT2xDriver) Reset() error {
-	if err := d.connection.WriteByte(SHT2xSoftReset); err != nil {
+	if err := d.writeByte(SHT2xSoftReset); err != nil {
 		return err
 	}
 
@@ -162,7 +162,7 @@ func (d *SHT2xDriver) Humidity() (float32, error) {
 
 // sendCommandDelayGetResponse is a helper function to reduce duplicated code
 func (d *SHT2xDriver) readSensor(cmd byte) (uint16, error) {
-	if err := d.connection.WriteByte(cmd); err != nil {
+	if err := d.writeByte(cmd); err != nil {
 		return 0, err
 	}
 
@@ -173,7 +173,7 @@ func (d *SHT2xDriver) readSensor(cmd byte) (uint16, error) {
 	buf := make([]byte, 3)
 	counter := 0
 	for {
-		got, err := d.connection.Read(buf)
+		got, err := d.read(buf)
 		counter++
 		if counter > 50 {
 			return 0, err
@@ -207,10 +207,10 @@ func (d *SHT2xDriver) initialize() error {
 }
 
 func (d *SHT2xDriver) sendAccuracy() error {
-	if err := d.connection.WriteByte(SHT2xReadUserReg); err != nil {
+	if err := d.writeByte(SHT2xReadUserReg); err != nil {
 		return err
 	}
-	userRegister, err := d.connection.ReadByte()
+	userRegister, err := d.readByte()
 	if err != nil {
 		return err
 	}
@@ -221,10 +221,10 @@ func (d *SHT2xDriver) sendAccuracy() error {
 	userRegister |= acc // Mask in the requested resolution bits
 
 	// Request a write to user register
-	if _, err := d.connection.Write([]byte{SHT2xWriteUserReg, userRegister}); err != nil {
+	if _, err := d.write([]byte{SHT2xWriteUserReg, userRegister}); err != nil {
 		return err
 	}
 
-	_, err = d.connection.ReadByte()
+	_, err = d.readByte()
 	return err
 }

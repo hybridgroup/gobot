@@ -17,6 +17,11 @@ var _ gobot.Driver = (*CCS811Driver)(nil)
 
 func initTestCCS811WithStubbedAdaptor() (*CCS811Driver, *i2cTestAdaptor) {
 	a := newI2cTestAdaptor()
+	// mandatory for a successful start
+	a.i2cReadImpl = func(b []byte) (int, error) {
+		b[0] = ccs811HwIDCode
+		return len(b), nil
+	}
 	return NewCCS811Driver(a), a
 }
 
@@ -31,6 +36,15 @@ func TestNewCCS811Driver(t *testing.T) {
 	assert.Equal(t, 0x5A, d.defaultAddress)
 	assert.NotNil(t, d.measMode)
 	assert.Equal(t, uint32(100000), d.ntcResistanceValue)
+}
+
+func TestCCS811Halt(t *testing.T) {
+	// arrange
+	d, _ := initTestCCS811WithStubbedAdaptor()
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
 }
 
 func TestCCS811Options(t *testing.T) {
@@ -88,7 +102,7 @@ func TestCCS811GetGasData(t *testing.T) {
 			d, a := initTestCCS811WithStubbedAdaptor()
 			// Create stub function as it is needed by read submethod in driver code
 			a.i2cWriteImpl = func([]byte) (int, error) { return 0, nil }
-			_ = d.Start()
+			require.NoError(t, d.Start())
 			a.i2cReadImpl = tc.readReturn
 			// act
 			eco2, tvoc, err := d.GetGasData()
@@ -145,7 +159,7 @@ func TestCCS811GetTemperature(t *testing.T) {
 			d, a := initTestCCS811WithStubbedAdaptor()
 			// Create stub function as it is needed by read submethod in driver code
 			a.i2cWriteImpl = func([]byte) (int, error) { return 0, nil }
-			_ = d.Start()
+			require.NoError(t, d.Start())
 			a.i2cReadImpl = tc.readReturn
 			// act
 			temp, err := d.GetTemperature()
@@ -209,7 +223,7 @@ func TestCCS811HasData(t *testing.T) {
 			d, a := initTestCCS811WithStubbedAdaptor()
 			// Create stub function as it is needed by read submethod in driver code
 			a.i2cWriteImpl = func([]byte) (int, error) { return 0, nil }
-			_ = d.Start()
+			require.NoError(t, d.Start())
 			a.i2cReadImpl = tc.readReturn
 			// act
 			result, err := d.HasData()

@@ -32,6 +32,15 @@ func TestNewADS1115Driver(t *testing.T) {
 	}
 }
 
+func TestADS1115Halt(t *testing.T) {
+	// arrange
+	d := NewADS1115Driver(newI2cTestAdaptor())
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
+}
+
 func TestADS1115Options(t *testing.T) {
 	// This is a general test, that options are applied in constructor by using the common WithBus() option and
 	// least one of this driver. Further tests for options can also be done by call of "WithOption(val)(d)".

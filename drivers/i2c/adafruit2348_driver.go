@@ -125,32 +125,32 @@ func NewAdafruit2348Driver(c Connector, options ...func(Config)) *Adafruit2348Dr
 }
 
 // SetDCMotorSpeed will set the appropriate pins to run the specified DC motor for the given speed.
-func (a *Adafruit2348Driver) SetDCMotorSpeed(dcMotor int, speed int32) error {
-	return a.SetPWM(int(a.dcMotors[dcMotor].pwmPin), 0, uint16(speed*16)) //nolint:gosec // TODO: fix later
+func (d *Adafruit2348Driver) SetDCMotorSpeed(dcMotor int, speed int32) error {
+	return d.SetPWM(int(d.dcMotors[dcMotor].pwmPin), 0, uint16(speed*16)) //nolint:gosec // TODO: fix later
 }
 
 // RunDCMotor will set the appropriate pins to run the specified DC motor for the given direction.
-func (a *Adafruit2348Driver) RunDCMotor(dcMotor int, dir Adafruit2348Direction) error {
+func (d *Adafruit2348Driver) RunDCMotor(dcMotor int, dir Adafruit2348Direction) error {
 	switch dir {
 	case Adafruit2348Forward:
-		if err := a.setPin(a.dcMotors[dcMotor].in2Pin, 0); err != nil {
+		if err := d.setPin(d.dcMotors[dcMotor].in2Pin, 0); err != nil {
 			return err
 		}
-		if err := a.setPin(a.dcMotors[dcMotor].in1Pin, 1); err != nil {
+		if err := d.setPin(d.dcMotors[dcMotor].in1Pin, 1); err != nil {
 			return err
 		}
 	case Adafruit2348Backward:
-		if err := a.setPin(a.dcMotors[dcMotor].in1Pin, 0); err != nil {
+		if err := d.setPin(d.dcMotors[dcMotor].in1Pin, 0); err != nil {
 			return err
 		}
-		if err := a.setPin(a.dcMotors[dcMotor].in2Pin, 1); err != nil {
+		if err := d.setPin(d.dcMotors[dcMotor].in2Pin, 1); err != nil {
 			return err
 		}
 	case Adafruit2348Release:
-		if err := a.setPin(a.dcMotors[dcMotor].in1Pin, 0); err != nil {
+		if err := d.setPin(d.dcMotors[dcMotor].in1Pin, 0); err != nil {
 			return err
 		}
-		if err := a.setPin(a.dcMotors[dcMotor].in2Pin, 0); err != nil {
+		if err := d.setPin(d.dcMotors[dcMotor].in2Pin, 0); err != nil {
 			return err
 		}
 	}
@@ -158,21 +158,21 @@ func (a *Adafruit2348Driver) RunDCMotor(dcMotor int, dir Adafruit2348Direction) 
 }
 
 // SetStepperMotorSpeed sets the seconds-per-step for the given stepper motor. It is applied in the next cycle.
-func (a *Adafruit2348Driver) SetStepperMotorSpeed(stepperMotor int, rpm int) error {
-	a.stepperSpeedMutex.Lock()
-	defer a.stepperSpeedMutex.Unlock()
+func (d *Adafruit2348Driver) SetStepperMotorSpeed(stepperMotor int, rpm int) error {
+	d.stepperSpeedMutex.Lock()
+	defer d.stepperSpeedMutex.Unlock()
 
-	revSteps := a.stepperMotors[stepperMotor].revSteps
-	a.stepperMotors[stepperMotor].secPerStep = 60.0 / float64(revSteps*rpm)
+	revSteps := d.stepperMotors[stepperMotor].revSteps
+	d.stepperMotors[stepperMotor].secPerStep = 60.0 / float64(revSteps*rpm)
 	return nil
 }
 
 // Step will rotate the stepper motor the given number of steps, in the given direction and step style.
-func (a *Adafruit2348Driver) Step(motor, steps int, dir Adafruit2348Direction, style Adafruit2348StepStyle) error {
-	a.stepperSpeedMutex.Lock()
-	defer a.stepperSpeedMutex.Unlock()
+func (d *Adafruit2348Driver) Step(motor, steps int, dir Adafruit2348Direction, style Adafruit2348StepStyle) error {
+	d.stepperSpeedMutex.Lock()
+	defer d.stepperSpeedMutex.Unlock()
 
-	secPerStep := a.stepperMotors[motor].secPerStep
+	secPerStep := d.stepperMotors[motor].secPerStep
 	var latestStep int
 	var err error
 	if style == Adafruit2348Interleave {
@@ -186,7 +186,7 @@ func (a *Adafruit2348Driver) Step(motor, steps int, dir Adafruit2348Direction, s
 		log.Printf("[adafruit2348_driver] %f seconds per step", secPerStep)
 	}
 	for i := 0; i < steps; i++ {
-		if latestStep, err = a.oneStep(motor, dir, style); err != nil {
+		if latestStep, err = d.oneStep(motor, dir, style); err != nil {
 			return err
 		}
 		time.Sleep(time.Duration(secPerStep) * time.Second)
@@ -195,7 +195,7 @@ func (a *Adafruit2348Driver) Step(motor, steps int, dir Adafruit2348Direction, s
 	// This is an edge case, if we are in between full steps, keep going to end on a full step
 	if style == Adafruit2348Microstep {
 		for latestStep != 0 && latestStep != adafruit2348StepperMicrosteps {
-			if latestStep, err = a.oneStep(motor, dir, style); err != nil {
+			if latestStep, err = d.oneStep(motor, dir, style); err != nil {
 				return err
 			}
 			time.Sleep(time.Duration(secPerStep) * time.Second)
@@ -204,94 +204,94 @@ func (a *Adafruit2348Driver) Step(motor, steps int, dir Adafruit2348Direction, s
 	return nil
 }
 
-func (a *Adafruit2348Driver) oneStep(motor int, dir Adafruit2348Direction, style Adafruit2348StepStyle) (int, error) {
+func (d *Adafruit2348Driver) oneStep(motor int, dir Adafruit2348Direction, style Adafruit2348StepStyle) (int, error) {
 	pwmA := 255
 	pwmB := 255
 
 	// Determine the stepping procedure
 	switch style {
 	case Adafruit2348Single:
-		if (a.stepperMotors[motor].currentStep / (adafruit2348StepperMicrosteps / 2) % 2) != 0 {
+		if (d.stepperMotors[motor].currentStep / (adafruit2348StepperMicrosteps / 2) % 2) != 0 {
 			// we're at an odd step
 			if dir == Adafruit2348Forward {
-				a.stepperMotors[motor].currentStep += adafruit2348StepperMicrosteps / 2
+				d.stepperMotors[motor].currentStep += adafruit2348StepperMicrosteps / 2
 			} else {
-				a.stepperMotors[motor].currentStep -= adafruit2348StepperMicrosteps / 2
+				d.stepperMotors[motor].currentStep -= adafruit2348StepperMicrosteps / 2
 			}
 		} else {
 			// go to next even step
 			if dir == Adafruit2348Forward {
-				a.stepperMotors[motor].currentStep += adafruit2348StepperMicrosteps
+				d.stepperMotors[motor].currentStep += adafruit2348StepperMicrosteps
 			} else {
-				a.stepperMotors[motor].currentStep -= adafruit2348StepperMicrosteps
+				d.stepperMotors[motor].currentStep -= adafruit2348StepperMicrosteps
 			}
 		}
 	case Adafruit2348Double:
-		if (a.stepperMotors[motor].currentStep / (adafruit2348StepperMicrosteps / 2) % 2) == 0 {
+		if (d.stepperMotors[motor].currentStep / (adafruit2348StepperMicrosteps / 2) % 2) == 0 {
 			// we're at an even step, weird
 			if dir == Adafruit2348Forward {
-				a.stepperMotors[motor].currentStep += adafruit2348StepperMicrosteps / 2
+				d.stepperMotors[motor].currentStep += adafruit2348StepperMicrosteps / 2
 			} else {
-				a.stepperMotors[motor].currentStep -= adafruit2348StepperMicrosteps / 2
+				d.stepperMotors[motor].currentStep -= adafruit2348StepperMicrosteps / 2
 			}
 		} else {
 			// go to next odd step
 			if dir == Adafruit2348Forward {
-				a.stepperMotors[motor].currentStep += adafruit2348StepperMicrosteps
+				d.stepperMotors[motor].currentStep += adafruit2348StepperMicrosteps
 			} else {
-				a.stepperMotors[motor].currentStep -= adafruit2348StepperMicrosteps
+				d.stepperMotors[motor].currentStep -= adafruit2348StepperMicrosteps
 			}
 		}
 	case Adafruit2348Interleave:
 		if dir == Adafruit2348Forward {
-			a.stepperMotors[motor].currentStep += adafruit2348StepperMicrosteps / 2
+			d.stepperMotors[motor].currentStep += adafruit2348StepperMicrosteps / 2
 		} else {
-			a.stepperMotors[motor].currentStep -= adafruit2348StepperMicrosteps / 2
+			d.stepperMotors[motor].currentStep -= adafruit2348StepperMicrosteps / 2
 		}
 	case Adafruit2348Microstep:
 		if dir == Adafruit2348Forward {
-			a.stepperMotors[motor].currentStep++
+			d.stepperMotors[motor].currentStep++
 		} else {
-			a.stepperMotors[motor].currentStep--
+			d.stepperMotors[motor].currentStep--
 		}
 		// go to next step and wrap around
-		a.stepperMotors[motor].currentStep += adafruit2348StepperMicrosteps * 4
-		a.stepperMotors[motor].currentStep %= adafruit2348StepperMicrosteps * 4
+		d.stepperMotors[motor].currentStep += adafruit2348StepperMicrosteps * 4
+		d.stepperMotors[motor].currentStep %= adafruit2348StepperMicrosteps * 4
 
 		pwmA = 0
 		pwmB = 0
-		currStep := a.stepperMotors[motor].currentStep
+		currStep := d.stepperMotors[motor].currentStep
 		switch {
 		case currStep >= 0 && currStep < adafruit2348StepperMicrosteps:
-			pwmA = a.stepperMicrostepCurve[adafruit2348StepperMicrosteps-currStep]
-			pwmB = a.stepperMicrostepCurve[currStep]
+			pwmA = d.stepperMicrostepCurve[adafruit2348StepperMicrosteps-currStep]
+			pwmB = d.stepperMicrostepCurve[currStep]
 		case currStep >= adafruit2348StepperMicrosteps && currStep < adafruit2348StepperMicrosteps*2:
-			pwmA = a.stepperMicrostepCurve[currStep-adafruit2348StepperMicrosteps]
-			pwmB = a.stepperMicrostepCurve[adafruit2348StepperMicrosteps*2-currStep]
+			pwmA = d.stepperMicrostepCurve[currStep-adafruit2348StepperMicrosteps]
+			pwmB = d.stepperMicrostepCurve[adafruit2348StepperMicrosteps*2-currStep]
 		case currStep >= adafruit2348StepperMicrosteps*2 && currStep < adafruit2348StepperMicrosteps*3:
-			pwmA = a.stepperMicrostepCurve[adafruit2348StepperMicrosteps*3-currStep]
-			pwmB = a.stepperMicrostepCurve[currStep-adafruit2348StepperMicrosteps*2]
+			pwmA = d.stepperMicrostepCurve[adafruit2348StepperMicrosteps*3-currStep]
+			pwmB = d.stepperMicrostepCurve[currStep-adafruit2348StepperMicrosteps*2]
 		case currStep >= adafruit2348StepperMicrosteps*3 && currStep < adafruit2348StepperMicrosteps*4:
-			pwmA = a.stepperMicrostepCurve[currStep-adafruit2348StepperMicrosteps*3]
-			pwmB = a.stepperMicrostepCurve[adafruit2348StepperMicrosteps*4-currStep]
+			pwmA = d.stepperMicrostepCurve[currStep-adafruit2348StepperMicrosteps*3]
+			pwmB = d.stepperMicrostepCurve[adafruit2348StepperMicrosteps*4-currStep]
 		}
 	} // switch
 
 	// go to next 'step' and wrap around
-	a.stepperMotors[motor].currentStep += adafruit2348StepperMicrosteps * 4
-	a.stepperMotors[motor].currentStep %= adafruit2348StepperMicrosteps * 4
+	d.stepperMotors[motor].currentStep += adafruit2348StepperMicrosteps * 4
+	d.stepperMotors[motor].currentStep %= adafruit2348StepperMicrosteps * 4
 
 	// only really used for microstepping, otherwise always on!
 	//nolint:gosec // TODO: fix later
-	if err := a.SetPWM(int(a.stepperMotors[motor].pwmPinA), 0, uint16(pwmA*16)); err != nil {
+	if err := d.SetPWM(int(d.stepperMotors[motor].pwmPinA), 0, uint16(pwmA*16)); err != nil {
 		return 0, err
 	}
 	//nolint:gosec // TODO: fix later
-	if err := a.SetPWM(int(a.stepperMotors[motor].pwmPinB), 0, uint16(pwmB*16)); err != nil {
+	if err := d.SetPWM(int(d.stepperMotors[motor].pwmPinB), 0, uint16(pwmB*16)); err != nil {
 		return 0, err
 	}
 	var coils []int32
-	currStep := a.stepperMotors[motor].currentStep
+	currStep := d.stepperMotors[motor].currentStep
 	if style == Adafruit2348Microstep {
 		switch {
 		case currStep >= 0 && currStep < adafruit2348StepperMicrosteps:
@@ -305,34 +305,34 @@ func (a *Adafruit2348Driver) oneStep(motor int, dir Adafruit2348Direction, style
 		}
 	} else {
 		// step-2-coils is initialized in init()
-		coils = a.step2coils[(currStep / (adafruit2348StepperMicrosteps / 2))]
+		coils = d.step2coils[(currStep / (adafruit2348StepperMicrosteps / 2))]
 	}
 	if adafruit2348Debug {
 		log.Printf("[adafruit2348_driver] currStep: %d, index into step2coils: %d\n",
 			currStep, (currStep / (adafruit2348StepperMicrosteps / 2)))
 		log.Printf("[adafruit2348_driver] coils state = %v", coils)
 	}
-	if err := a.setPin(a.stepperMotors[motor].ain2, coils[0]); err != nil {
+	if err := d.setPin(d.stepperMotors[motor].ain2, coils[0]); err != nil {
 		return 0, err
 	}
-	if err := a.setPin(a.stepperMotors[motor].bin1, coils[1]); err != nil {
+	if err := d.setPin(d.stepperMotors[motor].bin1, coils[1]); err != nil {
 		return 0, err
 	}
-	if err := a.setPin(a.stepperMotors[motor].ain1, coils[2]); err != nil {
+	if err := d.setPin(d.stepperMotors[motor].ain1, coils[2]); err != nil {
 		return 0, err
 	}
-	if err := a.setPin(a.stepperMotors[motor].bin2, coils[3]); err != nil {
+	if err := d.setPin(d.stepperMotors[motor].bin2, coils[3]); err != nil {
 		return 0, err
 	}
-	return a.stepperMotors[motor].currentStep, nil
+	return d.stepperMotors[motor].currentStep, nil
 }
 
-func (a *Adafruit2348Driver) setPin(pin byte, value int32) error {
+func (d *Adafruit2348Driver) setPin(pin byte, value int32) error {
 	if value == 0 {
-		return a.SetPWM(int(pin), 0, 4096)
+		return d.SetPWM(int(pin), 0, 4096)
 	}
 	if value == 1 {
-		return a.SetPWM(int(pin), 4096, 0)
+		return d.SetPWM(int(pin), 4096, 0)
 	}
 	return errors.New("invalid pin")
 }

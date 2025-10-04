@@ -131,7 +131,7 @@ var mpu6050GyroGain = map[MPU6050GyroFsConfig]float64{
 //	i2c.WithBus(int):	bus to use with this driver
 //	i2c.WithAddress(int):	address to use with this driver
 func NewMPU6050Driver(a Connector, options ...func(Config)) *MPU6050Driver {
-	m := &MPU6050Driver{
+	d := &MPU6050Driver{
 		Driver:    NewDriver(a, "MPU6050", mpu6050DefaultAddress),
 		dlpf:      MPU6050General_Dlpf260Hz,
 		frameSync: MPU6050General_FrameSyncDisabled,
@@ -140,14 +140,14 @@ func NewMPU6050Driver(a Connector, options ...func(Config)) *MPU6050Driver {
 		clock:     MPU6050Pwr1_ClockPllXGyro,
 		gravity:   mpu6050EarthStandardGravity,
 	}
-	m.afterStart = m.initialize
+	d.afterStart = d.initialize
 
 	for _, option := range options {
-		option(m)
+		option(d)
 	}
 
 	// TODO: add commands to API
-	return m
+	return d
 }
 
 // WithMPU6050DigitalFilter option sets the digital low pass filter bandwidth frequency.
@@ -223,12 +223,12 @@ func WithMPU6050Gravity(val float64) func(Config) {
 }
 
 // GetData fetches the latest data from the MPU6050
-func (m *MPU6050Driver) GetData() error {
-	m.mutex.Lock()
-	defer m.mutex.Unlock()
+func (d *MPU6050Driver) GetData() error {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
 
 	data := make([]byte, 14)
-	if err := m.connection.ReadBlockData(mpu6050Reg_AccelXoutH, data); err != nil {
+	if err := d.readBlockData(mpu6050Reg_AccelXoutH, data); err != nil {
 		return err
 	}
 
@@ -255,69 +255,69 @@ func (m *MPU6050Driver) GetData() error {
 		return err
 	}
 
-	ag := float64(mpu6050AccelGain[m.accelFs]) / m.gravity
-	m.Accelerometer.X = float64(accel.X) / ag
-	m.Accelerometer.Y = float64(accel.Y) / ag
-	m.Accelerometer.Z = float64(accel.Z) / ag
+	ag := float64(mpu6050AccelGain[d.accelFs]) / d.gravity
+	d.Accelerometer.X = float64(accel.X) / ag
+	d.Accelerometer.Y = float64(accel.Y) / ag
+	d.Accelerometer.Z = float64(accel.Z) / ag
 
-	m.Temperature = float64(temp)/340 + 36.53
+	d.Temperature = float64(temp)/340 + 36.53
 
-	gg := mpu6050GyroGain[m.gyroFs]
-	m.Gyroscope.X = float64(gyro.X) / gg
-	m.Gyroscope.Y = float64(gyro.Y) / gg
-	m.Gyroscope.Z = float64(gyro.Z) / gg
+	gg := mpu6050GyroGain[d.gyroFs]
+	d.Gyroscope.X = float64(gyro.X) / gg
+	d.Gyroscope.Y = float64(gyro.Y) / gg
+	d.Gyroscope.Z = float64(gyro.Z) / gg
 
 	return nil
 }
 
-func (m *MPU6050Driver) waitForReset() error {
+func (d *MPU6050Driver) waitForReset() error {
 	wait := 100 * time.Millisecond
 	start := time.Now()
 	for {
 		if time.Since(start) > wait {
 			return fmt.Errorf("timeout on wait for reset is done")
 		}
-		if val, err := m.connection.ReadByteData(mpu6050Reg_PwrMgmt1); (val&mpu6050Pwr1_DeviceResetBit == 0) && (err == nil) {
+		if val, err := d.readByteData(mpu6050Reg_PwrMgmt1); (val&mpu6050Pwr1_DeviceResetBit == 0) && (err == nil) {
 			return nil
 		}
 		time.Sleep(wait / 10)
 	}
 }
 
-func (m *MPU6050Driver) initialize() error {
+func (d *MPU6050Driver) initialize() error {
 	// reset device and wait for reset is finished
-	if err := m.connection.WriteByteData(mpu6050Reg_PwrMgmt1, mpu6050Pwr1_DeviceResetBit); err != nil {
+	if err := d.writeByteData(mpu6050Reg_PwrMgmt1, mpu6050Pwr1_DeviceResetBit); err != nil {
 		return err
 	}
-	if err := m.waitForReset(); err != nil {
+	if err := d.waitForReset(); err != nil {
 		return err
 	}
 
 	// reset signal path register
 	reset := uint8(mpu6050SignalReset_TempBit | mpu6050SignalReset_AccelBit | mpu6050SignalReset_GyroBit)
-	if err := m.connection.WriteByteData(mpu6050Reg_SignalPathReset, reset); err != nil {
+	if err := d.writeByteData(mpu6050Reg_SignalPathReset, reset); err != nil {
 		return err
 	}
 	time.Sleep(100 * time.Millisecond)
 
 	// configure digital filter bandwidth and external frame synchronization (bits 3...5 are used)
-	generalConf := uint8(m.dlpf) | uint8(m.frameSync)<<3
-	if err := m.connection.WriteByteData(mpu6050Reg_GeneralConfig, generalConf); err != nil {
+	generalConf := uint8(d.dlpf) | uint8(d.frameSync)<<3
+	if err := d.writeByteData(mpu6050Reg_GeneralConfig, generalConf); err != nil {
 		return err
 	}
 
 	// set full scale range of gyroscope (bits 3 and 4 are used)
-	if err := m.connection.WriteByteData(mpu6050Reg_GyroConfig, uint8(m.gyroFs)<<3); err != nil {
+	if err := d.writeByteData(mpu6050Reg_GyroConfig, uint8(d.gyroFs)<<3); err != nil {
 		return err
 	}
 
 	// set full scale range of accelerometer (bits 3 and 4 are used)
-	if err := m.connection.WriteByteData(mpu6050Reg_AccelConfig, uint8(m.accelFs)<<3); err != nil {
+	if err := d.writeByteData(mpu6050Reg_AccelConfig, uint8(d.accelFs)<<3); err != nil {
 		return err
 	}
 
 	// set clock source and reset sleep
-	pwr1 := uint8(m.clock) & ^uint8(mpu6050Pwr1_SleepOnBit)
+	pwr1 := uint8(d.clock) & ^uint8(mpu6050Pwr1_SleepOnBit)
 
-	return m.connection.WriteByteData(mpu6050Reg_PwrMgmt1, pwr1)
+	return d.writeByteData(mpu6050Reg_PwrMgmt1, pwr1)
 }

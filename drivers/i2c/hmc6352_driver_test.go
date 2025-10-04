@@ -48,7 +48,11 @@ func TestHMC6352Start(t *testing.T) {
 }
 
 func TestHMC6352Halt(t *testing.T) {
-	d, _ := initTestHMC6352DriverWithStubbedAdaptor()
+	// arrange
+	d := NewHMC6352Driver(newI2cTestAdaptor())
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
 	require.NoError(t, d.Halt())
 }
 

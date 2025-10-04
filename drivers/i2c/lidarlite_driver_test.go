@@ -16,11 +16,6 @@ import (
 // and tests all implementations, so no further tests needed here for gobot.Driver interface
 var _ gobot.Driver = (*LIDARLiteDriver)(nil)
 
-func initTestLIDARLiteDriver() *LIDARLiteDriver {
-	d, _ := initTestLIDARLiteDriverWithStubbedAdaptor()
-	return d
-}
-
 func initTestLIDARLiteDriverWithStubbedAdaptor() (*LIDARLiteDriver, *i2cTestAdaptor) {
 	a := newI2cTestAdaptor()
 	d := NewLIDARLiteDriver(a)
@@ -54,7 +49,11 @@ func TestLIDARLiteDriverStart(t *testing.T) {
 }
 
 func TestLIDARLiteDriverHalt(t *testing.T) {
-	d := initTestLIDARLiteDriver()
+	// arrange
+	d := NewLIDARLiteDriver(newI2cTestAdaptor())
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
 	require.NoError(t, d.Halt())
 }
 

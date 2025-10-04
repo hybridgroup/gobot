@@ -3,7 +3,7 @@ package i2c
 // INA3221Driver is a driver for the Texas Instruments INA3221 device. The INA3221 is a three-channel
 // current and bus voltage monitor with an I2C and SMBUS compatible interface.
 //
-// INA3221 data sheet and specifications can be found at http://www.ti.com/product/INA3221
+// INA3221 data sheet and specifications can be found at http://www.td.com/product/INA3221
 //
 // This module was tested with SwitchDoc Labs INA3221 breakout board found at http://www.switchdoc.com/
 
@@ -54,21 +54,21 @@ type INA3221Driver struct {
 //	i2c.WithBus(int):		bus to use with this driver
 //	i2c.WithAddress(int):		address to use with this driver
 func NewINA3221Driver(c Connector, options ...func(Config)) *INA3221Driver {
-	i := &INA3221Driver{
+	d := &INA3221Driver{
 		Driver: NewDriver(c, "INA3221", ina3221DefaultAddress),
 	}
-	i.afterStart = i.initialize
+	d.afterStart = d.initialize
 
 	for _, option := range options {
-		option(i)
+		option(d)
 	}
 
-	return i
+	return d
 }
 
 // GetBusVoltage gets the bus voltage in Volts
-func (i *INA3221Driver) GetBusVoltage(channel INA3221Channel) (float64, error) {
-	value, err := i.getBusVoltageRaw(channel)
+func (d *INA3221Driver) GetBusVoltage(channel INA3221Channel) (float64, error) {
+	value, err := d.getBusVoltageRaw(channel)
 	if err != nil {
 		return 0, err
 	}
@@ -77,8 +77,8 @@ func (i *INA3221Driver) GetBusVoltage(channel INA3221Channel) (float64, error) {
 }
 
 // GetShuntVoltage Gets the shunt voltage in mV
-func (i *INA3221Driver) GetShuntVoltage(channel INA3221Channel) (float64, error) {
-	value, err := i.getShuntVoltageRaw(channel)
+func (d *INA3221Driver) GetShuntVoltage(channel INA3221Channel) (float64, error) {
+	value, err := d.getShuntVoltageRaw(channel)
 	if err != nil {
 		return 0, err
 	}
@@ -87,8 +87,8 @@ func (i *INA3221Driver) GetShuntVoltage(channel INA3221Channel) (float64, error)
 }
 
 // GetCurrent gets the current value in mA, taking into account the config settings and current LSB
-func (i *INA3221Driver) GetCurrent(channel INA3221Channel) (float64, error) {
-	value, err := i.GetShuntVoltage(channel)
+func (d *INA3221Driver) GetCurrent(channel INA3221Channel) (float64, error) {
+	value, err := d.GetShuntVoltage(channel)
 	if err != nil {
 		return 0, err
 	}
@@ -98,13 +98,13 @@ func (i *INA3221Driver) GetCurrent(channel INA3221Channel) (float64, error) {
 }
 
 // GetLoadVoltage gets the load voltage in mV
-func (i *INA3221Driver) GetLoadVoltage(channel INA3221Channel) (float64, error) {
-	bv, err := i.GetBusVoltage(channel)
+func (d *INA3221Driver) GetLoadVoltage(channel INA3221Channel) (float64, error) {
+	bv, err := d.GetBusVoltage(channel)
 	if err != nil {
 		return 0, err
 	}
 
-	sv, err := i.GetShuntVoltage(channel)
+	sv, err := d.GetShuntVoltage(channel)
 	if err != nil {
 		return 0, err
 	}
@@ -113,8 +113,8 @@ func (i *INA3221Driver) GetLoadVoltage(channel INA3221Channel) (float64, error) 
 }
 
 // getBusVoltageRaw gets the raw bus voltage (16-bit signed integer, so +-32767)
-func (i *INA3221Driver) getBusVoltageRaw(channel INA3221Channel) (int16, error) {
-	val, err := i.readWordFromRegister(ina3221RegBusVoltage1 + (uint8(channel)-1)*2)
+func (d *INA3221Driver) getBusVoltageRaw(channel INA3221Channel) (int16, error) {
+	val, err := d.readWordFromRegister(ina3221RegBusVoltage1 + (uint8(channel)-1)*2)
 	if err != nil {
 		return 0, err
 	}
@@ -128,8 +128,8 @@ func (i *INA3221Driver) getBusVoltageRaw(channel INA3221Channel) (int16, error) 
 }
 
 // getShuntVoltageRaw gets the raw shunt voltage (16-bit signed integer, so +-32767)
-func (i *INA3221Driver) getShuntVoltageRaw(channel INA3221Channel) (int16, error) {
-	val, err := i.readWordFromRegister(ina3221RegShuntVoltage1 + (uint8(channel)-1)*2)
+func (d *INA3221Driver) getShuntVoltageRaw(channel INA3221Channel) (int16, error) {
+	val, err := d.readWordFromRegister(ina3221RegShuntVoltage1 + (uint8(channel)-1)*2)
 	if err != nil {
 		return 0, err
 	}
@@ -143,8 +143,8 @@ func (i *INA3221Driver) getShuntVoltageRaw(channel INA3221Channel) (int16, error
 }
 
 // reads word from supplied register address
-func (i *INA3221Driver) readWordFromRegister(reg uint8) (uint16, error) {
-	val, err := i.connection.ReadWordData(reg)
+func (d *INA3221Driver) readWordFromRegister(reg uint8) (uint16, error) {
+	val, err := d.readWordData(reg)
 	if err != nil {
 		return 0, err
 	}
@@ -153,7 +153,7 @@ func (i *INA3221Driver) readWordFromRegister(reg uint8) (uint16, error) {
 }
 
 // initialize initializes the INA3221 device
-func (i *INA3221Driver) initialize() error {
+func (d *INA3221Driver) initialize() error {
 	config := ina3221ConfigEnableChan1 |
 		ina3221ConfigEnableChan2 |
 		ina3221ConfigEnableChan3 |
@@ -164,5 +164,5 @@ func (i *INA3221Driver) initialize() error {
 		ina3221ConfigMode1 |
 		ina3221ConfigMode0
 
-	return i.connection.WriteBlockData(ina3221RegConfig, []byte{byte(config >> 8), byte(config & 0x00FF)})
+	return d.writeBlockData(ina3221RegConfig, []byte{byte(config >> 8), byte(config & 0x00FF)})
 }

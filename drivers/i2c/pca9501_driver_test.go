@@ -62,6 +62,15 @@ func TestPCA9501Options(t *testing.T) {
 	assert.Equal(t, 2, d.GetBusOrDefault(1))
 }
 
+func TestPCA9501Halt(t *testing.T) {
+	// arrange
+	d := NewPCA9501Driver(newI2cTestAdaptor())
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
+}
+
 func TestPCA9501CommandsWriteGPIO(t *testing.T) {
 	// arrange
 	d, a := initPCA9501WithStubbedAdaptor()

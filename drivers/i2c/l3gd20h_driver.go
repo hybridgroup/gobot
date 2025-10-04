@@ -67,14 +67,14 @@ type L3GD20HDriver struct {
 //	i2c.WithBus(int):	bus to use with this driver
 //	i2c.WithAddress(int):	address to use with this driver
 func NewL3GD20HDriver(c Connector, options ...func(Config)) *L3GD20HDriver {
-	l := &L3GD20HDriver{
+	d := &L3GD20HDriver{
 		Driver: NewDriver(c, "L3GD20H", l3gd20hDefaultAddress, options...),
 		scale:  L3GD20HScale250dps,
 	}
-	l.afterStart = l.initialize
+	d.afterStart = d.initialize
 
 	// TODO: add commands to API
-	return l
+	return d
 }
 
 // WithL3GD20HFullScaleRange option sets the full scale range for the gyroscope.
@@ -105,7 +105,7 @@ func (d *L3GD20HDriver) FullScaleRange() (uint8, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	val, err := d.connection.ReadByteData(l3gd20hReg_Ctl4)
+	val, err := d.readByteData(l3gd20hReg_Ctl4)
 	if err != nil {
 		return 0, err
 	}
@@ -121,7 +121,7 @@ func (d *L3GD20HDriver) XYZ() (x float32, y float32, z float32, err error) {
 
 	measurements := make([]byte, 6)
 	reg := l3gd20hReg_OutXLSB | 0x80 // set auto-increment bit
-	if err := d.connection.ReadBlockData(uint8(reg), measurements); err != nil {
+	if err := d.readBlockData(uint8(reg), measurements); err != nil {
 		return 0, 0, 0, err
 	}
 
@@ -146,16 +146,16 @@ func (d *L3GD20HDriver) XYZ() (x float32, y float32, z float32, err error) {
 
 func (d *L3GD20HDriver) initialize() error {
 	// reset the gyroscope.
-	if err := d.connection.WriteByteData(l3gd20hReg_Ctl1, 0x00); err != nil {
+	if err := d.writeByteData(l3gd20hReg_Ctl1, 0x00); err != nil {
 		return err
 	}
 	// Enable Z, Y and X axis.
 	ctl1 := l3gd20hCtl1_NormalModeBit | l3gd20hCtl1_EnableZBit | l3gd20hCtl1_EnableYBit | l3gd20hCtl1_EnableXBit
-	if err := d.connection.WriteByteData(l3gd20hReg_Ctl1, uint8(ctl1)); err != nil {
+	if err := d.writeByteData(l3gd20hReg_Ctl1, uint8(ctl1)); err != nil {
 		return err
 	}
 	// Set the sensitivity scale.
-	if err := d.connection.WriteByteData(l3gd20hReg_Ctl4, byte(d.scale)); err != nil {
+	if err := d.writeByteData(l3gd20hReg_Ctl4, byte(d.scale)); err != nil {
 		return err
 	}
 	return nil

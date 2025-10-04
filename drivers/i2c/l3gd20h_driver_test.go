@@ -41,6 +41,15 @@ func TestNewL3GD20HDriver(t *testing.T) {
 	assert.Equal(t, L3GD20HScale250dps, d.Scale())
 }
 
+func TestL3GD20HHalt(t *testing.T) {
+	// arrange
+	d := NewL3GD20HDriver(newI2cTestAdaptor())
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
+}
+
 func TestL3GD20HOptions(t *testing.T) {
 	// This is a general test, that options are applied in constructor by using the common WithBus() option.
 	// Further tests for options can also be done by call of "WithOption(val)(d)".
