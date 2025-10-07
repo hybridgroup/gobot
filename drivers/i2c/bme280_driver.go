@@ -5,6 +5,8 @@ import (
 	"encoding/binary"
 	"errors"
 	"log"
+
+	"gobot.io/x/gobot/v2"
 )
 
 const bme280Debug = true
@@ -63,6 +65,7 @@ func NewBME280Driver(c Connector, options ...func(Config)) *BME280Driver {
 		humCalCoeffs:    &bmeHumidityCalibrationCoefficients{},
 		ctrlHumOversamp: BME280CtrlHumidityOversampling16,
 	}
+	d.name = gobot.DefaultName("BME280")
 	d.afterStart = d.initializationBME280
 
 	// this loop is for options of this class, all options of base class BMP280Driver
