@@ -1,6 +1,7 @@
 package gobot
 
 import (
+	"fmt"
 	"log"
 	"reflect"
 
@@ -54,7 +55,7 @@ func (d *Devices) Each(f func(Device)) {
 
 // Start calls Start on each Device in d
 func (d *Devices) Start() error {
-	log.Println("Starting devices...")
+	log.Printf("Starting %d devices...", d.Len())
 	var err error
 	for _, device := range *d {
 		info := "Starting device " + device.Name()
@@ -65,7 +66,7 @@ func (d *Devices) Start() error {
 
 		log.Println(info + "...")
 		if derr := device.Start(); derr != nil {
-			err = multierror.Append(err, derr)
+			err = multierror.Append(err, fmt.Errorf("'%s' start error: %w", device.Name(), derr))
 		}
 	}
 	return err
@@ -73,10 +74,11 @@ func (d *Devices) Start() error {
 
 // Halt calls Halt on each Device in d
 func (d *Devices) Halt() error {
+	log.Printf("Halt %d devices...", d.Len())
 	var err error
 	for _, device := range *d {
 		if derr := device.Halt(); derr != nil {
-			err = multierror.Append(err, derr)
+			err = multierror.Append(err, fmt.Errorf("'%s' halt error: %w", device.Name(), derr))
 		}
 	}
 	return err

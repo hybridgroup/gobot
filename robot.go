@@ -218,6 +218,11 @@ func (r *Robot) Stop() error {
 		err = multierror.Append(err, e)
 	}
 
+	if !r.Running() {
+		// start was not successful, a full channel would block
+		return err
+	}
+
 	r.done <- true
 	r.running.Store(false)
 	return err
