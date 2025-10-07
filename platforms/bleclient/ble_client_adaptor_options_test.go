@@ -34,3 +34,13 @@ func TestWithScanTimeout(t *testing.T) {
 	// assert
 	assert.Equal(t, newTimeout, cfg.scanTimeout)
 }
+
+func TestWithSleepAfterDisconnect(t *testing.T) {
+	// arrange
+	newSleep := 3 * time.Second
+	cfg := &configuration{sleepAfterDisconnect: 10 * time.Second}
+	// act
+	WithSleepAfterDisconnect(newSleep).apply(cfg)
+	// assert
+	assert.Equal(t, newSleep, cfg.sleepAfterDisconnect)
+}

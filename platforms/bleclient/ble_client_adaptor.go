@@ -81,6 +81,11 @@ func WithScanTimeout(timeout time.Duration) scanTimeoutOption {
 	return scanTimeoutOption(timeout)
 }
 
+// WithSleepAfterDisconnect substitute the default sleep of 500 ms.
+func WithSleepAfterDisconnect(sleep time.Duration) sleepAfterDisconnectOption {
+	return sleepAfterDisconnectOption(sleep)
+}
+
 // Name returns the name for the adaptor and after the connection is done, the name of the device
 func (a *Adaptor) Name() string {
 	if a.btDevice != nil {
@@ -127,7 +132,7 @@ func (a *Adaptor) Connect() error {
 	if a.btAdpt == nil {
 		a.btAdpt = a.btAdptCreator(bluetooth.DefaultAdapter, a.cfg.debug)
 		if err := a.btAdpt.enable(); err != nil {
-			return fmt.Errorf("can't get adapter default: %w", err)
+			return fmt.Errorf("BT can't get adapter default: %v", err)
 		}
 	}
 
@@ -137,7 +142,7 @@ func (a *Adaptor) Connect() error {
 
 	result, err := a.btAdpt.scan(a.identifier, a.cfg.scanTimeout)
 	if err != nil {
-		return err
+		return fmt.Errorf("BT scan error: %v", err)
 	}
 
 	if a.cfg.debug {
@@ -146,7 +151,7 @@ func (a *Adaptor) Connect() error {
 
 	dev, err := a.btAdpt.connect(result.Address, result.LocalName())
 	if err != nil {
-		return err
+		return fmt.Errorf("BT connect error: %v", err)
 	}
 
 	a.rssi = int(result.RSSI)
@@ -158,7 +163,7 @@ func (a *Adaptor) Connect() error {
 		}
 		services, err := a.btDevice.discoverServices(nil)
 		if err != nil {
-			return err
+			return fmt.Errorf("BT discover services/characteristics error: %v", err)
 		}
 		for _, service := range services {
 			if a.cfg.debug {
@@ -225,10 +230,15 @@ func (a *Adaptor) Disconnect() error {
 	err := a.btDevice.disconnect()
 	time.Sleep(a.cfg.sleepAfterDisconnect)
 	a.connected = false
+	if err != nil {
+		return fmt.Errorf("BT disconnect error: %v", err)
+	}
+
 	if a.cfg.debug {
 		fmt.Println("[Disconnect]: disconnected")
 	}
-	return err
+
+	return nil
 }
 
 // Finalize finalizes the BLEAdaptor
