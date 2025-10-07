@@ -147,8 +147,13 @@ func (d *JHD1313M1Driver) Name() string { return d.name }
 // SetName sets the name for the JHD1313M1 Driver.
 func (d *JHD1313M1Driver) SetName(n string) { d.name = n }
 
-// Connection returns the driver connection to the device.
+// Connection returns the gobot connection to the device.
 func (d *JHD1313M1Driver) Connection() gobot.Connection {
+	if d.connector == nil {
+		log.Printf("%s has no connector\n", d.name)
+		return nil
+	}
+
 	if conn, ok := d.connector.(gobot.Connection); ok {
 		return conn
 	}
@@ -159,6 +164,10 @@ func (d *JHD1313M1Driver) Connection() gobot.Connection {
 
 // Start starts the backlit and the screen and initializes the states.
 func (d *JHD1313M1Driver) Start() error {
+	if d.connector == nil {
+		return fmt.Errorf("%s has no connector", d.name)
+	}
+
 	bus := d.GetBusOrDefault(d.connector.DefaultI2cBus())
 
 	var err error

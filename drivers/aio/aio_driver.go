@@ -84,8 +84,13 @@ func (d *driver) SetName(name string) {
 	WithName(name).apply(d.driverCfg)
 }
 
-// Connection returns the connection of the driver.
+// Connection returns the gobot connection of the driver.
 func (d *driver) Connection() gobot.Connection {
+	if d.connection == nil {
+		log.Printf("%s has no connection\n", d.driverCfg.name)
+		return nil
+	}
+
 	if conn, ok := d.connection.(gobot.Connection); ok {
 		return conn
 	}

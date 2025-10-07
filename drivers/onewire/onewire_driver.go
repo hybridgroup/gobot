@@ -90,7 +90,8 @@ func (d *driver) SetName(name string) {
 // Connection returns the gobot connection of the device.
 func (d *driver) Connection() gobot.Connection {
 	if d.connection == nil {
-		log.Printf("1-wire driver not started for %s\n", d.driverCfg.name)
+		log.Printf("1-wire driver not started for '%s'\n", d.driverCfg.name)
+		return nil
 	}
 
 	if conn, ok := d.connection.(gobot.Connection); ok {
@@ -105,6 +106,10 @@ func (d *driver) Connection() gobot.Connection {
 func (d *driver) Start() error {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
+
+	if d.connector == nil {
+		return fmt.Errorf("%s has no connector", d.driverCfg.name)
+	}
 
 	var err error
 	d.connection, err = d.connector.GetOneWireConnection(d.driverCfg.familyCode, d.driverCfg.serialNumber)
@@ -132,7 +137,7 @@ func (d *driver) Halt() error {
 
 func (d *driver) id() (string, error) {
 	if d.connection == nil {
-		return "", fmt.Errorf("1-wire driver not started for %s", d.driverCfg.name)
+		return "", fmt.Errorf("1-wire driver not started for '%s'", d.driverCfg.name)
 	}
 
 	return d.connection.ID(), nil
@@ -141,7 +146,7 @@ func (d *driver) id() (string, error) {
 //nolint:unused // ok for now
 func (d *driver) readData(command string, data []byte) error {
 	if d.connection == nil {
-		return fmt.Errorf("1-wire driver not started for %s", d.driverCfg.name)
+		return fmt.Errorf("1-wire driver not started for '%s'", d.driverCfg.name)
 	}
 	return d.connection.ReadData(command, data)
 }
@@ -149,21 +154,21 @@ func (d *driver) readData(command string, data []byte) error {
 //nolint:unused // ok for now
 func (d *driver) writeData(command string, data []byte) error {
 	if d.connection == nil {
-		return fmt.Errorf("1-wire driver not started for %s", d.driverCfg.name)
+		return fmt.Errorf("1-wire driver not started for '%s'", d.driverCfg.name)
 	}
 	return d.connection.WriteData(command, data)
 }
 
 func (d *driver) readInteger(command string) (int, error) {
 	if d.connection == nil {
-		return 0, fmt.Errorf("1-wire driver not started for %s", d.driverCfg.name)
+		return 0, fmt.Errorf("1-wire driver not started for '%s'", d.driverCfg.name)
 	}
 	return d.connection.ReadInteger(command)
 }
 
 func (d *driver) writeInteger(command string, val int) error {
 	if d.connection == nil {
-		return fmt.Errorf("1-wire driver not started for %s", d.driverCfg.name)
+		return fmt.Errorf("1-wire driver not started for '%s'", d.driverCfg.name)
 	}
 	return d.connection.WriteInteger(command, val)
 }
