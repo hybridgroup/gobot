@@ -34,12 +34,12 @@ func NewAdafruit2327Driver(c Connector, options ...func(Config)) *Adafruit2327Dr
 }
 
 // SetServoMotorFreq sets the frequency for the currently addressed PWM Servo HAT.
-func (a *Adafruit2327Driver) SetServoMotorFreq(freq float64) error {
-	return a.SetPWMFreq(float32(freq))
+func (d *Adafruit2327Driver) SetServoMotorFreq(freq float64) error {
+	return d.SetPWMFreq(float32(freq))
 }
 
 // SetServoMotorPulse is a convenience function to specify the 'tick' value,
 // between 0-4095, when the signal will turn on, and when it will turn off.
-func (a *Adafruit2327Driver) SetServoMotorPulse(channel byte, on, off int32) error {
-	return a.SetPWM(int(channel), uint16(on), uint16(off)) //nolint:gosec // TODO: fix later
+func (d *Adafruit2327Driver) SetServoMotorPulse(channel byte, on, off int32) error {
+	return d.SetPWM(int(channel), uint16(on), uint16(off)) //nolint:gosec // TODO: fix later
 }
