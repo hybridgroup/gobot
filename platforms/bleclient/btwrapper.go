@@ -96,7 +96,7 @@ func (bta *btAdapter) scan(identifier string, scanTimeout time.Duration) (*bluet
 	select {
 	case result := <-resultChan:
 		if err := bta.stopScan(); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("stop scan: %v", err)
 		}
 
 		return &result, nil
