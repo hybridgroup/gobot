@@ -2,7 +2,6 @@ package i2c
 
 import (
 	"fmt"
-	"log"
 	"strconv"
 	"strings"
 
@@ -114,9 +113,8 @@ func (d *Adafruit1109Driver) Connection() gobot.Connection { return d.MCP23017Dr
 
 // Start implements the gobot.Device interface.
 func (d *Adafruit1109Driver) Start() error {
-	if adafruit1109Debug {
-		log.Printf("## MCP.Start ##")
-	}
+	d.debuglnf("## MCP.Start ##")
+
 	if err := d.MCP23017Driver.Start(); err != nil {
 		return err
 	}
@@ -158,9 +156,9 @@ func (d *Adafruit1109Driver) Start() error {
 	if err := d.writePin(d.rwPin, 0x00); err != nil {
 		return err
 	}
-	if adafruit1109Debug {
-		log.Printf("## HD.Start ##")
-	}
+
+	d.debuglnf("## HD.Start ##")
+
 	return d.HD44780Driver.Start()
 }
 
@@ -169,15 +167,22 @@ func (d *Adafruit1109Driver) Halt() error {
 	// we try halt on each device, not stopping on the first error
 	var errors []string
 
+	d.debuglnf("## HD.Halt ##")
+
 	if err := d.HD44780Driver.Halt(); err != nil {
 		errors = append(errors, err.Error())
 	}
 
+	d.debuglnf("## HD.Halt done ##: %v", errors)
+
 	if d.mcpStarted {
+		d.debuglnf("## MCP.Halt ##")
+
 		// switch off the background light
 		if err := d.SetRGB(false, false, false); err != nil {
 			errors = append(errors, err.Error())
 		}
+
 		// must be after HD44780Driver
 		if err := d.MCP23017Driver.Halt(); err != nil {
 			errors = append(errors, err.Error())
@@ -189,6 +194,8 @@ func (d *Adafruit1109Driver) Halt() error {
 	if len(errors) > 0 {
 		return fmt.Errorf("'Halt' the driver %s", strings.Join(errors, ", "))
 	}
+
+	d.debuglnf("## AD.Halt done without errors ##")
 
 	return nil
 }
@@ -216,9 +223,8 @@ func (d *Adafruit1109Driver) DigitalRead(id string) (int, error) {
 // SetRGB sets the Red Green Blue value of backlit.
 // The MCP23017 variant don't support PWM and have inverted logic
 func (d *Adafruit1109Driver) SetRGB(r, g, b bool) error {
-	if adafruit1109Debug {
-		log.Printf("## SetRGB %t, %t, %t ##", r, g, b)
-	}
+	d.debuglnf("## SetRGB %t, %t, %t ##", r, g, b)
+
 	rio := d.redPin
 	gio := d.greenPin
 	bio := d.bluePin
@@ -309,4 +315,8 @@ func (d *Adafruit1109Driver) adafruit1109InitButton(p adafruit1109PortPin) error
 		return err
 	}
 	return nil
+}
+
+func (d *Adafruit1109Driver) debuglnf(format string, p ...interface{}) {
+	gobot.Debuglnf(adafruit1109Debug, format, p...)
 }
