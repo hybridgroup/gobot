@@ -112,6 +112,11 @@ func (d *Driver) SetName(n string) { d.name = n }
 
 // Connection returns the gobot connection of the SPI device.
 func (d *Driver) Connection() gobot.Connection {
+	if d.connector == nil {
+		log.Printf("%s has no connector\n", d.name)
+		return nil
+	}
+
 	if conn, ok := d.connector.(gobot.Connection); ok {
 		return conn
 	}
@@ -124,6 +129,10 @@ func (d *Driver) Connection() gobot.Connection {
 func (d *Driver) Start() error {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
+
+	if d.connector == nil {
+		return fmt.Errorf("%s has no connector", d.name)
+	}
 
 	bus := d.GetBusNumberOrDefault(d.connector.SpiDefaultBusNumber())
 	chip := d.GetChipNumberOrDefault(d.connector.SpiDefaultChipNumber())
@@ -157,7 +166,7 @@ func (d *Driver) Halt() error {
 
 func (d *Driver) readCommandData(command []byte, data []byte) error {
 	if d.connection == nil {
-		return fmt.Errorf("spi driver not started")
+		return fmt.Errorf("spi driver not started for '%s'", d.name)
 	}
 
 	return d.connection.ReadCommandData(command, data)
@@ -166,7 +175,7 @@ func (d *Driver) readCommandData(command []byte, data []byte) error {
 //nolint:unused // ok for now
 func (d *Driver) readByteData(reg uint8) (uint8, error) {
 	if d.connection == nil {
-		return 0, fmt.Errorf("spi driver not started")
+		return 0, fmt.Errorf("spi driver not started for '%s'", d.name)
 	}
 
 	return d.connection.ReadByteData(reg)
@@ -175,7 +184,7 @@ func (d *Driver) readByteData(reg uint8) (uint8, error) {
 //nolint:unused // ok for now
 func (d *Driver) readBlockData(reg uint8, data []byte) error {
 	if d.connection == nil {
-		return fmt.Errorf("spi driver not started")
+		return fmt.Errorf("spi driver not started for '%s'", d.name)
 	}
 
 	return d.connection.ReadBlockData(reg, data)
@@ -183,7 +192,7 @@ func (d *Driver) readBlockData(reg uint8, data []byte) error {
 
 func (d *Driver) writeByte(val byte) error {
 	if d.connection == nil {
-		return fmt.Errorf("spi driver not started")
+		return fmt.Errorf("spi driver not started for '%s'", d.name)
 	}
 
 	return d.connection.WriteByte(val)
@@ -192,7 +201,7 @@ func (d *Driver) writeByte(val byte) error {
 //nolint:unused // ok for now
 func (d *Driver) writeByteData(reg byte, data byte) error {
 	if d.connection == nil {
-		return fmt.Errorf("spi driver not started")
+		return fmt.Errorf("spi driver not started for '%s'", d.name)
 	}
 
 	return d.connection.WriteByteData(reg, data)
@@ -200,7 +209,7 @@ func (d *Driver) writeByteData(reg byte, data byte) error {
 
 func (d *Driver) writeBlockData(reg byte, data []byte) error {
 	if d.connection == nil {
-		return fmt.Errorf("spi driver not started")
+		return fmt.Errorf("spi driver not started for '%s'", d.name)
 	}
 
 	return d.connection.WriteBlockData(reg, data)
@@ -208,7 +217,7 @@ func (d *Driver) writeBlockData(reg byte, data []byte) error {
 
 func (d *Driver) writeBytes(data []byte) error {
 	if d.connection == nil {
-		return fmt.Errorf("spi driver not started")
+		return fmt.Errorf("spi driver not started for '%s'", d.name)
 	}
 
 	return d.connection.WriteBytes(data)
