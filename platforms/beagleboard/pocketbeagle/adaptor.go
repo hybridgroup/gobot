@@ -32,7 +32,11 @@ type PocketBeagleAdaptor struct {
 //	adaptors.WithGpiosPullUp(pins): will be silently ignored (for some pins)
 //	adaptors.WithGpioDebounce(inPinNum, debounceTime): is only supported for debounceTime < 8ms
 //
-//	Optional parameters for PWM, see [adaptors.NewPWMPinsAdaptor]
+// Further optional parameters for:
+//
+//	AIO, see [adaptors.NewAnalogPinsAdaptor]
+//	GPIO, see [adaptors.NewDigitalPinsAdaptor]
+//	PWM, see [adaptors.NewPWMPinsAdaptor]
 func NewAdaptor(opts ...interface{}) *PocketBeagleAdaptor {
 	sys := system.NewAccesser()
 	a := PocketBeagleAdaptor{
@@ -42,10 +46,13 @@ func NewAdaptor(opts ...interface{}) *PocketBeagleAdaptor {
 
 	a.SetName(gobot.DefaultName("PocketBeagle"))
 
+	var analogPinsOpts []adaptors.AnalogPinsOptionApplier
 	var digitalPinsOpts []adaptors.DigitalPinsOptionApplier
 	pwmPinsOpts := []adaptors.PwmPinsOptionApplier{adaptors.WithPWMDefaultPeriod(pwmPeriodDefault)}
 	for _, opt := range opts {
 		switch o := opt.(type) {
+		case adaptors.AnalogPinsOptionApplier:
+			analogPinsOpts = append(analogPinsOpts, o)
 		case adaptors.DigitalPinsOptionApplier:
 			digitalPinsOpts = append(digitalPinsOpts, o)
 		case adaptors.PwmPinsOptionApplier:
@@ -59,7 +66,7 @@ func NewAdaptor(opts ...interface{}) *PocketBeagleAdaptor {
 	digitalPinTranslator := adaptors.NewDigitalPinTranslator(sys, gpioPinDefinitions)
 	pwmPinTranslator := adaptors.NewPWMPinTranslator(sys, pwmPinMap)
 
-	a.AnalogPinsAdaptor = adaptors.NewAnalogPinsAdaptor(sys, analogPinTranslator.Translate)
+	a.AnalogPinsAdaptor = adaptors.NewAnalogPinsAdaptor(sys, analogPinTranslator.Translate, analogPinsOpts...)
 	a.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys,
 		a.getTranslateAndMuxDigitalPinFunc(digitalPinTranslator.Translate), digitalPinsOpts...)
 	a.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, a.getTranslateAndMuxPWMPinFunc(pwmPinTranslator.Translate),

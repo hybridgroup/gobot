@@ -76,7 +76,7 @@ There are mapped to `/dev/i2c-[bus]`, just like the Gobot raspi implementation.
 - The I2C buses 2, 6, 7 work
 - SPI buses 1, 2 work
 
-PWM interaction is currently not yet supported. 
+PWM interaction is currently not yet supported.
 
 Please see the [official Radxa Rock Pi documentation](https://wiki.radxa.com/Rockpi4/dev/libmraa) on how `librmaa` can be utilized in combination with this module, and how these work.
 
@@ -89,4 +89,3 @@ $ GOARCH=arm64 GOOS=linux go build examples/rockpi_blink.go
 ```
 
 Rock Pi 4s are ARM64 machines.
-

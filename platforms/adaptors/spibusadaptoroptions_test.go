@@ -36,3 +36,12 @@ func TestNewSpiBusAdaptorWithSpiGpioAccess(t *testing.T) {
 	assert.Equal(t, 1, dpa.AppliedOptions("", sdoPinTranslated))
 	assert.Equal(t, 0, dpa.AppliedOptions("", sdiPinTranslated)) // already input, so no option applied
 }
+
+func TestWithSpiDebug(t *testing.T) {
+	// arrange
+	cfg := &spiBusConfiguration{debug: false}
+	// act
+	WithSpiDebug().apply(cfg)
+	// assert
+	assert.True(t, cfg.debug)
+}

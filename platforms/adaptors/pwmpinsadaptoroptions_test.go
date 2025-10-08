@@ -25,6 +25,15 @@ func TestWithPWMPinInitializer(t *testing.T) {
 	assert.Equal(t, wantErr, err)
 }
 
+func TestWithPWMPinDebug(t *testing.T) {
+	// arrange
+	cfg := &pwmPinsConfiguration{debug: false}
+	// act
+	WithPWMPinDebug().apply(cfg)
+	// assert
+	assert.True(t, cfg.debug)
+}
+
 func TestWithPWMUsePiBlaster(t *testing.T) {
 	// arrange
 	cfg := &pwmPinsConfiguration{usePiBlasterPin: false}
