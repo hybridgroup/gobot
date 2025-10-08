@@ -550,13 +550,13 @@ func TestMCP23017_write(t *testing.T) {
 	// clear bit
 	d, _ := initTestMCP23017WithStubbedAdaptor(0)
 	port := d.getPort("A")
-	err := d.write(port.IODIR, uint8(7), 0)
+	err := d.writePin(port.IODIR, uint8(7), 0)
 	require.NoError(t, err)
 
 	// set bit
 	d, _ = initTestMCP23017WithStubbedAdaptor(0)
 	port = d.getPort("B")
-	err = d.write(port.IODIR, uint8(7), 1)
+	err = d.writePin(port.IODIR, uint8(7), 1)
 	require.NoError(t, err)
 
 	// write error
@@ -564,7 +564,7 @@ func TestMCP23017_write(t *testing.T) {
 	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}
-	err = d.write(port.IODIR, uint8(7), 0)
+	err = d.writePin(port.IODIR, uint8(7), 0)
 	require.ErrorContains(t, err, "MCP write-read: MCP write-ReadByteData(reg=1): write error")
 
 	// read error
@@ -572,12 +572,12 @@ func TestMCP23017_write(t *testing.T) {
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		return len(b), errors.New("read error")
 	}
-	err = d.write(port.IODIR, uint8(7), 0)
+	err = d.writePin(port.IODIR, uint8(7), 0)
 	require.ErrorContains(t, err, "MCP write-read: MCP write-ReadByteData(reg=1): read error")
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		return len(b), nil
 	}
-	err = d.write(port.IODIR, uint8(7), 1)
+	err = d.writePin(port.IODIR, uint8(7), 1)
 	require.NoError(t, err)
 }
 
@@ -589,7 +589,7 @@ func TestMCP23017_read(t *testing.T) {
 		copy(b, []byte{255})
 		return 1, nil
 	}
-	val, _ := d.read(port.IODIR)
+	val, _ := d.readReg(port.IODIR)
 	assert.Equal(t, uint8(255), val)
 
 	// read error
@@ -598,7 +598,7 @@ func TestMCP23017_read(t *testing.T) {
 		return len(b), errors.New("read error")
 	}
 
-	val, err := d.read(port.IODIR)
+	val, err := d.readReg(port.IODIR)
 	assert.Equal(t, uint8(0), val)
 	require.ErrorContains(t, err, "MCP write-ReadByteData(reg=0): read error")
 
@@ -609,7 +609,7 @@ func TestMCP23017_read(t *testing.T) {
 		copy(b, []byte{255})
 		return 1, nil
 	}
-	val, _ = d.read(port.IODIR)
+	val, _ = d.readReg(port.IODIR)
 	assert.Equal(t, uint8(255), val)
 }
 
