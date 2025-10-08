@@ -88,64 +88,91 @@ func TestManagerStartAutoRun(t *testing.T) {
 }
 
 func TestManagerStartDriverErrors(t *testing.T) {
+	// arrange
 	g := initTestManager1Robot()
-	e := errors.New("driver start error 1")
-	testDriverStart = func() error {
-		return e
+	var ec int
+	es := [4]error{
+		nil,
+		errors.New("driver start error 1"),
+		errors.New("driver start error 2"),
+		errors.New("driver start error 3"),
 	}
+	testDriverStart = func() error {
+		ec++
+		return es[ec]
+	}
+	defer func() { testDriverStart = func() error { return nil } }()
 
 	var want error
-	want = multierror.Append(want, e)
-	want = multierror.Append(want, e)
-	want = multierror.Append(want, e)
+	want = multierror.Append(want, fmt.Errorf("'Device1' start error: %w", es[1]))
+	want = multierror.Append(want, fmt.Errorf("'Device2' start error: %w", es[2]))
+	want = multierror.Append(want, fmt.Errorf("'' start error: %w", es[3]))
 
+	// act & assert
 	assert.Equal(t, want, g.Start())
 	require.NoError(t, g.Stop())
-
-	testDriverStart = func() error { return nil }
 }
 
 func TestManagerHaltFromRobotDriverErrors(t *testing.T) {
+	// arrange
 	g := initTestManager1Robot()
+	es := [4]error{
+		nil,
+		errors.New("driver halt error 1"),
+		errors.New("driver halt error 2"),
+		errors.New("driver halt error 3"),
+	}
 	var ec int
 	testDriverHalt = func() error {
 		ec++
-		return fmt.Errorf("driver halt error %d", ec)
+		return es[ec]
 	}
 	defer func() { testDriverHalt = func() error { return nil } }()
 
 	var want error
-	for i := 1; i <= 3; i++ {
-		e := fmt.Errorf("driver halt error %d", i)
-		want = multierror.Append(want, e)
-	}
+	want = multierror.Append(want, fmt.Errorf("'Device1' halt error: %w", es[1]))
+	want = multierror.Append(want, fmt.Errorf("'Device2' halt error: %w", es[2]))
+	want = multierror.Append(want, fmt.Errorf("'' halt error: %w", es[3]))
 
+	// act & assert
 	assert.Equal(t, want, g.Start())
 }
 
 func TestManagerStartRobotAdaptorErrors(t *testing.T) {
+	// arrange
 	g := initTestManager1Robot()
+	es := [4]error{
+		nil,
+		errors.New("adaptor start error 1"),
+		errors.New("adaptor start error 2"),
+		errors.New("adaptor start error 3"),
+	}
 	var ec int
 	testAdaptorConnect = func() error {
 		ec++
-		return fmt.Errorf("adaptor start error %d", ec)
+		return es[ec]
 	}
 	defer func() { testAdaptorConnect = func() error { return nil } }()
 
 	var want error
-	for i := 1; i <= 3; i++ {
-		e := fmt.Errorf("adaptor start error %d", i)
-		want = multierror.Append(want, e)
-	}
+	want = multierror.Append(want, fmt.Errorf("'Connection1' connect error: %w", es[1]))
+	want = multierror.Append(want, fmt.Errorf("'Connection2' connect error: %w", es[2]))
+	want = multierror.Append(want, fmt.Errorf("'' connect error: %w", es[3]))
 
+	// act & assert
 	assert.Equal(t, want, g.Start())
 	require.NoError(t, g.Stop())
-
-	testAdaptorConnect = func() error { return nil }
 }
 
 func TestManagerFinalizeErrors(t *testing.T) {
+	// arrange
 	g := initTestManager1Robot()
+	es := [4]error{
+		nil,
+		errors.New("adaptor finalize error 1"),
+		errors.New("adaptor finalize error 2"),
+		errors.New("adaptor finalize error 3"),
+	}
 	var ec int
 	testAdaptorFinalize = func() error {
 		ec++
@@ -154,10 +181,10 @@ func TestManagerFinalizeErrors(t *testing.T) {
 	defer func() { testAdaptorFinalize = func() error { return nil } }()
 
 	var want error
-	for i := 1; i <= 3; i++ {
-		e := fmt.Errorf("adaptor finalize error %d", i)
-		want = multierror.Append(want, e)
-	}
+	want = multierror.Append(want, fmt.Errorf("'Connection1' finalize error: %w", es[1]))
+	want = multierror.Append(want, fmt.Errorf("'Connection2' finalize error: %w", es[2]))
+	want = multierror.Append(want, fmt.Errorf("'' finalize error: %w", es[3]))
 
+	// act & assert
 	assert.Equal(t, want, g.Start())
 }
