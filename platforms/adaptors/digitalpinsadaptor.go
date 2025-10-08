@@ -61,7 +61,7 @@ func NewDigitalPinsAdaptor(
 	return &a
 }
 
-// WithDigitalPinDebug can be used to switch on debugging for SPI implementation.
+// WithDigitalPinDebug can be used to switch on debugging for digital pins implementation.
 func WithDigitalPinDebug() digitalPinsDebugOption {
 	return digitalPinsDebugOption(true)
 }
@@ -163,15 +163,12 @@ func (a *DigitalPinsAdaptor) Connect() error {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
-	if a.digitalPinsCfg.debug {
-		fmt.Println("connect the digital pins adaptor")
-	}
-
 	if a.pins != nil {
 		return fmt.Errorf("digital pin adaptor already connected, please call Finalize() for re-connect")
 	}
 
 	a.pins = make(map[string]gobot.DigitalPinner)
+	a.debuglnf("connect the digital pins adaptor done")
 
 	return nil
 }
@@ -181,19 +178,20 @@ func (a *DigitalPinsAdaptor) Finalize() error {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
-	if a.digitalPinsCfg.debug {
-		fmt.Println("finalize the digital pins adaptor")
-	}
+	a.debuglnf("finalize the digital pins adaptor with %d pins...", len(a.pins))
 
 	var err error
-	for _, pin := range a.pins {
+	for id, pin := range a.pins {
 		if pin != nil {
-			if e := pin.Unexport(); e != nil {
+			e := pin.Unexport()
+			if e != nil {
 				err = multierror.Append(err, e)
 			}
+			a.debuglnf("finalize the digital pin '%s' done with error: %v", id, e)
 		}
 	}
 	a.pins = nil
+	a.debuglnf("finalize the digital pins adaptor done with error: %v", err)
 
 	return err
 }
@@ -259,4 +257,8 @@ func (a *DigitalPinsAdaptor) digitalPin(
 	}
 
 	return pin, nil
+}
+
+func (a *DigitalPinsAdaptor) debuglnf(format string, p ...interface{}) {
+	gobot.Debuglnf(a.digitalPinsCfg.debug, format, p...)
 }

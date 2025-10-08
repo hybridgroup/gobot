@@ -50,7 +50,11 @@ type Adaptor struct {
 // NewAdaptor returns a new Edison Adaptor of the given type.
 // Supported types are: "arduino", "miniboard", "sparkfun", an empty string defaults to "arduino"
 //
-//	Optional parameters for PWM, see [adaptors.NewPWMPinsAdaptor]
+// Further optional parameters for:
+//
+//	AIO, see [adaptors.NewAnalogPinsAdaptor]
+//	I2C, see [adaptors.NewI2cBusAdaptor]
+//	PWM, see [adaptors.NewPWMPinsAdaptor]
 func NewAdaptor(opts ...interface{}) *Adaptor {
 	sys := system.NewAccesser(system.WithDigitalPinSysfsAccess())
 	sys.AddDigitalPinSupport()
@@ -61,27 +65,33 @@ func NewAdaptor(opts ...interface{}) *Adaptor {
 		pinMap: arduinoPinMap,
 	}
 
+	var analogPinsOpts []adaptors.AnalogPinsOptionApplier
 	pwmPinsOpts := []adaptors.PwmPinsOptionApplier{adaptors.WithPWMPinInitializer(pwmPinInitializer)}
+	var i2cBusOpts []adaptors.I2CBusOptionApplier
 	for _, opt := range opts {
 		switch o := opt.(type) {
 		case string:
 			if o != "" {
 				a.board = o
 			}
+		case adaptors.AnalogPinsOptionApplier:
+			analogPinsOpts = append(analogPinsOpts, o)
 		case adaptors.PwmPinsOptionApplier:
 			pwmPinsOpts = append(pwmPinsOpts, o)
+		case adaptors.I2CBusOptionApplier:
+			i2cBusOpts = append(i2cBusOpts, o)
 		default:
 			panic(fmt.Sprintf("'%s' can not be applied on adaptor '%s'", opt, a.name))
 		}
 	}
 
-	a.AnalogPinsAdaptor = adaptors.NewAnalogPinsAdaptor(sys, a.translateAnalogPin)
+	a.AnalogPinsAdaptor = adaptors.NewAnalogPinsAdaptor(sys, a.translateAnalogPin, analogPinsOpts...)
 	a.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, a.translateAndMuxPWMPin, pwmPinsOpts...)
 	defI2cBusNr := defaultI2cBusNumber
 	if a.board != "arduino" {
 		defI2cBusNr = defaultI2cBusNumberOther
 	}
-	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, a.validateAndSetupI2cBusNumber, defI2cBusNr)
+	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, a.validateAndSetupI2cBusNumber, defI2cBusNr, i2cBusOpts...)
 	return a
 }
 
