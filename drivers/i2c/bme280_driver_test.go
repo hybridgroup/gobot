@@ -28,7 +28,7 @@ func TestNewBME280Driver(t *testing.T) {
 		require.Fail(t, "NewBME280Driver() should have returned a *BME280Driver")
 	}
 	assert.NotNil(t, d.Driver)
-	assert.True(t, strings.HasPrefix(d.Name(), "BMP280"))
+	assert.True(t, strings.HasPrefix(d.Name(), "BME280"))
 	assert.Equal(t, 0x77, d.defaultAddress)
 	assert.Equal(t, uint8(0x03), d.ctrlPwrMode)
 	assert.Equal(t, BMP280PressureOversampling(0x05), d.ctrlPressOversamp)
