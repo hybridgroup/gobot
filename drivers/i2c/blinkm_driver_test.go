@@ -49,7 +49,9 @@ func TestBlinkMStart(t *testing.T) {
 }
 
 func TestBlinkMHalt(t *testing.T) {
-	d, _ := initTestBlinkMDriverWithStubbedAdaptor()
+	d := NewBlinkMDriver(newI2cTestAdaptor())
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
 	require.NoError(t, d.Halt())
 }
 
@@ -121,7 +123,7 @@ func TestBlinkMFirmwareVersion(t *testing.T) {
 	}
 
 	version, _ = d.FirmwareVersion()
-	assert.Equal(t, "", version)
+	assert.Empty(t, version)
 
 	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")

@@ -48,7 +48,11 @@ func TestINA3221Start(t *testing.T) {
 }
 
 func TestINA3221Halt(t *testing.T) {
-	d, _ := initTestINA3221DriverWithStubbedAdaptor()
+	// arrange
+	d := NewINA3221Driver(newI2cTestAdaptor())
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
 	require.NoError(t, d.Halt())
 }
 

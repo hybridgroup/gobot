@@ -88,7 +88,8 @@ func TestAdafruit1109StartReadErr(t *testing.T) {
 
 func TestAdafruit1109Halt(t *testing.T) {
 	d, _ := initTestAdafruit1109WithStubbedAdaptor()
-	_ = d.Start()
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
 	require.NoError(t, d.Halt())
 }
 

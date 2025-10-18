@@ -21,6 +21,7 @@ const (
 
 type Tinkerboard2Adaptor struct {
 	*tinkerboard.Adaptor
+
 	sys *system.Accesser // used for unit tests only
 }
 
@@ -33,7 +34,12 @@ type Tinkerboard2Adaptor struct {
 //	adaptors.WithGpiosActiveLow(pin's): invert the pin behavior
 //	adaptors.WithGpiosPullUp/Down(pin's): sets the internal pull resistor
 //
-//	Optional parameters for PWM, see [adaptors.NewPWMPinsAdaptor]
+// Further optional parameters for:
+//
+//	GPIO, see [adaptors.NewDigitalPinsAdaptor]
+//	I2C, see [adaptors.NewI2cBusAdaptor]
+//	PWM, see [adaptors.NewPWMPinsAdaptor]
+//	SPI, see [adaptors.NewSpiBusAdaptor]
 func NewAdaptor(opts ...interface{}) *Tinkerboard2Adaptor {
 	sys := system.NewAccesser()
 	a := Tinkerboard2Adaptor{
@@ -44,6 +50,7 @@ func NewAdaptor(opts ...interface{}) *Tinkerboard2Adaptor {
 
 	var digitalPinsOpts []adaptors.DigitalPinsOptionApplier
 	var pwmPinsOpts []adaptors.PwmPinsOptionApplier
+	var i2cBusOpts []adaptors.I2CBusOptionApplier
 	var spiBusOpts []adaptors.SpiBusOptionApplier
 	for _, opt := range opts {
 		switch o := opt.(type) {
@@ -51,6 +58,8 @@ func NewAdaptor(opts ...interface{}) *Tinkerboard2Adaptor {
 			digitalPinsOpts = append(digitalPinsOpts, o)
 		case adaptors.PwmPinsOptionApplier:
 			pwmPinsOpts = append(pwmPinsOpts, o)
+		case adaptors.I2CBusOptionApplier:
+			i2cBusOpts = append(i2cBusOpts, o)
 		case adaptors.SpiBusOptionApplier:
 			spiBusOpts = append(spiBusOpts, o)
 		default:
@@ -68,7 +77,7 @@ func NewAdaptor(opts ...interface{}) *Tinkerboard2Adaptor {
 
 	a.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, digitalPinTranslator.Translate, digitalPinsOpts...)
 	a.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, pwmPinTranslator.Translate, pwmPinsOpts...)
-	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, i2cBusNumberValidator.Validate, defaultI2cBusNumber)
+	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, i2cBusNumberValidator.Validate, defaultI2cBusNumber, i2cBusOpts...)
 	a.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, spiBusNumberValidator.Validate, defaultSpiBusNumber,
 		defaultSpiChipNumber, defaultSpiMode, defaultSpiBitsNumber, defaultSpiMaxSpeed, a.DigitalPinsAdaptor, spiBusOpts...)
 

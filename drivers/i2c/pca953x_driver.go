@@ -37,10 +37,10 @@ const (
 )
 
 var (
-	errToSmallPeriod    = fmt.Errorf("Given Period to small, must be at least 1/152s (~6.58ms) or 152Hz")
-	errToBigPeriod      = fmt.Errorf("Given Period to high, must be max. 256/152s (~1.68s) or 152/256Hz (~0.6Hz)")
-	errToSmallDutyCycle = fmt.Errorf("Given Duty Cycle to small, must be at least 0%%")
-	errToBigDutyCycle   = fmt.Errorf("Given Duty Cycle to high, must be max. 100%%")
+	errToSmallPeriod    = fmt.Errorf("given Period to small, must be at least 1/152s (~6.58ms) or 152Hz")
+	errToBigPeriod      = fmt.Errorf("given Period to high, must be max. 256/152s (~1.68s) or 152/256Hz (~0.6Hz)")
+	errToSmallDutyCycle = fmt.Errorf("given Duty Cycle to small, must be at least 0%%")
+	errToBigDutyCycle   = fmt.Errorf("given Duty Cycle to high, must be max. 100%%")
 )
 
 // PCA953xDriver is a Gobot Driver for LED Dimmer PCA9530 (2-bit), PCA9533 (4-bit), PCA9531 (8-bit), PCA9532 (16-bit)
@@ -137,7 +137,7 @@ func (d *PCA953xDriver) WritePeriod(idx uint8, valSec float32) error {
 	if err != nil && pca953xDebug {
 		fmt.Println(err, "value limited!")
 	}
-	var regPsc pca953xRegister = pca953xRegPsc0
+	regPsc := pca953xRegPsc0
 	if idx > 0 {
 		regPsc = pca953xRegPsc1
 	}
@@ -252,13 +252,13 @@ func (d *PCA953xDriver) writeRegister(regAddress pca953xRegister, val uint8) err
 	// ensure AI bit is not set
 	regAddress = regAddress &^ pca953xAiMask
 	// write content of requested register
-	return d.connection.WriteByteData(uint8(regAddress), val)
+	return d.writeByteData(uint8(regAddress), val)
 }
 
 func (d *PCA953xDriver) readRegister(regAddress pca953xRegister) (uint8, error) {
 	// ensure AI bit is not set
 	regAddress = regAddress &^ pca953xAiMask
-	return d.connection.ReadByteData(uint8(regAddress))
+	return d.readByteData(uint8(regAddress))
 }
 
 func pca953xCalcPsc(valSec float32) (uint8, error) {

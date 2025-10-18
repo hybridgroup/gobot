@@ -39,7 +39,7 @@ func TestDriver(t *testing.T) {
 	assert.Equal(t, "Hello", d.Messages[0])
 	assert.Equal(t, "Hello", d.PendingMessage())
 	assert.Equal(t, "World", d.PendingMessage())
-	assert.Equal(t, "", d.PendingMessage())
+	assert.Empty(t, d.PendingMessage())
 
 	_ = d.On(d.Event("button"), func(data interface{}) {
 		sem <- true

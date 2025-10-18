@@ -76,12 +76,13 @@ type pinOption string
 
 // Driver implements the interface gobot.Driver.
 type driver struct {
+	gobot.Commander
+
 	driverCfg  *configuration
 	connection gobot.Adaptor
 	afterStart func() error
 	beforeHalt func() error
-	gobot.Commander
-	mutex *sync.Mutex // mutex often needed to ensure that write-read sequences are not interrupted
+	mutex      *sync.Mutex // mutex often needed to ensure that write-read sequences are not interrupted
 }
 
 // newDriver creates a new generic and basic gpio gobot driver.
@@ -139,8 +140,13 @@ func (d *driver) Pin() string {
 	return d.driverCfg.pin
 }
 
-// Connection returns the connection of the gpio device.
+// Connection returns the gobot connection of the gpio device.
 func (d *driver) Connection() gobot.Connection {
+	if d.connection == nil {
+		log.Printf("%s has no connection\n", d.driverCfg.name)
+		return nil
+	}
+
 	if conn, ok := d.connection.(gobot.Connection); ok {
 		return conn
 	}
@@ -171,6 +177,10 @@ func (d *driver) Halt() error {
 
 // digitalRead is a helper function with check that the connection implements DigitalReader
 func (d *driver) digitalRead(pin string) (int, error) {
+	if d.connection == nil {
+		return 0, fmt.Errorf("%s has no connection", d.driverCfg.name)
+	}
+
 	if reader, ok := d.connection.(DigitalReader); ok {
 		return reader.DigitalRead(pin)
 	}
@@ -180,6 +190,10 @@ func (d *driver) digitalRead(pin string) (int, error) {
 
 // digitalWrite is a helper function with check that the connection implements DigitalWriter
 func (d *driver) digitalWrite(pin string, val byte) error {
+	if d.connection == nil {
+		return fmt.Errorf("%s has no connection", d.driverCfg.name)
+	}
+
 	if writer, ok := d.connection.(DigitalWriter); ok {
 		return writer.DigitalWrite(pin, val)
 	}
@@ -189,6 +203,10 @@ func (d *driver) digitalWrite(pin string, val byte) error {
 
 // pwmWrite is a helper function with check that the connection implements PwmWriter
 func (d *driver) pwmWrite(pin string, level byte) error {
+	if d.connection == nil {
+		return fmt.Errorf("%s has no connection", d.driverCfg.name)
+	}
+
 	if writer, ok := d.connection.(PwmWriter); ok {
 		return writer.PwmWrite(pin, level)
 	}
@@ -198,6 +216,10 @@ func (d *driver) pwmWrite(pin string, level byte) error {
 
 // servoWrite is a helper function with check that the connection implements ServoWriter
 func (d *driver) servoWrite(pin string, level byte) error {
+	if d.connection == nil {
+		return fmt.Errorf("%s has no connection", d.driverCfg.name)
+	}
+
 	if writer, ok := d.connection.(ServoWriter); ok {
 		return writer.ServoWrite(pin, level)
 	}

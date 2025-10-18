@@ -62,6 +62,8 @@ var (
 
 // Client represents a client connection to a firmata board
 type Client struct {
+	gobot.Eventer
+
 	pins            []Pin
 	FirmwareName    string
 	ProtocolVersion string
@@ -70,7 +72,6 @@ type Client struct {
 	connection      io.ReadWriteCloser
 	analogPins      []int
 	ConnectTimeout  time.Duration
-	gobot.Eventer
 }
 
 // Pin represents a pin on the firmata board
@@ -237,11 +238,7 @@ func (b *Client) Connect(conn io.ReadWriteCloser) error {
 	}
 
 	go func() {
-		for {
-			if !b.Connected() {
-				break
-			}
-
+		for b.Connected() {
 			if err := b.process(); err != nil {
 				b.Publish(b.Event("Error"), err)
 			}

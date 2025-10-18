@@ -62,7 +62,7 @@ func TestJHD1313MDriverStart(t *testing.T) {
 func TestJHD1313MStartConnectError(t *testing.T) {
 	d, adaptor := initTestJHD1313M1DriverWithStubbedAdaptor()
 	adaptor.Testi2cConnectErr(true)
-	require.ErrorContains(t, d.Start(), "Invalid i2c connection")
+	require.ErrorContains(t, d.Start(), "invalid i2c connection")
 }
 
 func TestJHD1313MDriverStartWriteError(t *testing.T) {
@@ -74,8 +74,11 @@ func TestJHD1313MDriverStartWriteError(t *testing.T) {
 }
 
 func TestJHD1313MDriverHalt(t *testing.T) {
+	// arrange
 	d := initTestJHD1313M1Driver()
-	_ = d.Start()
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
 	require.NoError(t, d.Halt())
 }
 

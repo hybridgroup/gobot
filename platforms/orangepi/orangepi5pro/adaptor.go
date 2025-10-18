@@ -23,14 +23,15 @@ const (
 
 // Adaptor represents a Gobot Adaptor for the OrangePi 5 Pro
 type Adaptor struct {
-	name  string
-	sys   *system.Accesser // used for unit tests only
-	mutex *sync.Mutex
 	*adaptors.AnalogPinsAdaptor
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.PWMPinsAdaptor
 	*adaptors.I2cBusAdaptor
 	*adaptors.SpiBusAdaptor
+
+	name  string
+	sys   *system.Accesser // used for unit tests only
+	mutex *sync.Mutex
 }
 
 // NewAdaptor creates a OrangePi 5 Pro Adaptor
@@ -44,7 +45,13 @@ type Adaptor struct {
 //	adaptors.WithGpiosOpenDrain/Source(pin's): sets the output behavior
 //	adaptors.WithGpioEventOnFallingEdge/RaisingEdge/BothEdges(pin, handler): activate edge detection
 //
-//	Optional parameters for PWM, see [adaptors.NewPWMPinsAdaptor]
+// Further optional parameters for:
+//
+//	AIO, see [adaptors.NewAnalogPinsAdaptor]
+//	GPIO, see [adaptors.NewDigitalPinsAdaptor]
+//	I2C, see [adaptors.NewI2cBusAdaptor]
+//	PWM, see [adaptors.NewPWMPinsAdaptor]
+//	SPI, see [adaptors.NewSpiBusAdaptor]
 func NewAdaptor(opts ...interface{}) *Adaptor {
 	sys := system.NewAccesser()
 	a := &Adaptor{
@@ -53,15 +60,21 @@ func NewAdaptor(opts ...interface{}) *Adaptor {
 		mutex: &sync.Mutex{},
 	}
 
+	var analogPinsOpts []adaptors.AnalogPinsOptionApplier
 	var digitalPinsOpts []adaptors.DigitalPinsOptionApplier
 	var pwmPinsOpts []adaptors.PwmPinsOptionApplier
+	var i2cBusOpts []adaptors.I2CBusOptionApplier
 	var spiBusOpts []adaptors.SpiBusOptionApplier
 	for _, opt := range opts {
 		switch o := opt.(type) {
+		case adaptors.AnalogPinsOptionApplier:
+			analogPinsOpts = append(analogPinsOpts, o)
 		case adaptors.DigitalPinsOptionApplier:
 			digitalPinsOpts = append(digitalPinsOpts, o)
 		case adaptors.PwmPinsOptionApplier:
 			pwmPinsOpts = append(pwmPinsOpts, o)
+		case adaptors.I2CBusOptionApplier:
+			i2cBusOpts = append(i2cBusOpts, o)
 		case adaptors.SpiBusOptionApplier:
 			spiBusOpts = append(spiBusOpts, o)
 		default:
@@ -80,10 +93,10 @@ func NewAdaptor(opts ...interface{}) *Adaptor {
 	// x is the chip number <255
 	spiBusNumberValidator := adaptors.NewBusNumberValidator([]int{0, 4})
 
-	a.AnalogPinsAdaptor = adaptors.NewAnalogPinsAdaptor(sys, analogPinTranslator.Translate)
+	a.AnalogPinsAdaptor = adaptors.NewAnalogPinsAdaptor(sys, analogPinTranslator.Translate, analogPinsOpts...)
 	a.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, digitalPinTranslator.Translate, digitalPinsOpts...)
 	a.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, pwmPinTranslator.Translate, pwmPinsOpts...)
-	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, i2cBusNumberValidator.Validate, defaultI2cBusNumber)
+	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, i2cBusNumberValidator.Validate, defaultI2cBusNumber, i2cBusOpts...)
 	a.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, spiBusNumberValidator.Validate, defaultSpiBusNumber,
 		defaultSpiChipNumber, defaultSpiMode, defaultSpiBitsNumber, defaultSpiMaxSpeed, a.DigitalPinsAdaptor, spiBusOpts...)
 

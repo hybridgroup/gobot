@@ -16,6 +16,15 @@ func TestWithDebug(t *testing.T) {
 	assert.True(t, a.cfg.debug)
 }
 
+func TestWithDropCharacteristicsOnDisconnect(t *testing.T) {
+	// arrange
+	cfg := &configuration{dropCharacteristicsOnDisconnect: false}
+	// act
+	WithDropCharacteristicsOnDisconnect().apply(cfg)
+	// assert
+	assert.True(t, cfg.dropCharacteristicsOnDisconnect)
+}
+
 func TestWithScanTimeout(t *testing.T) {
 	// arrange
 	newTimeout := 2 * time.Second
@@ -24,4 +33,14 @@ func TestWithScanTimeout(t *testing.T) {
 	WithScanTimeout(newTimeout).apply(cfg)
 	// assert
 	assert.Equal(t, newTimeout, cfg.scanTimeout)
+}
+
+func TestWithSleepAfterDisconnect(t *testing.T) {
+	// arrange
+	newSleep := 3 * time.Second
+	cfg := &configuration{sleepAfterDisconnect: 10 * time.Second}
+	// act
+	WithSleepAfterDisconnect(newSleep).apply(cfg)
+	// assert
+	assert.Equal(t, newSleep, cfg.sleepAfterDisconnect)
 }

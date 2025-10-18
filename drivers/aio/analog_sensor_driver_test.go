@@ -109,7 +109,7 @@ func TestAnalogSensorDriverReadRaw_AnalogWriteNotSupported(t *testing.T) {
 	d.connection = &aioTestBareAdaptor{}
 	// act & assert
 	got, err := d.ReadRaw()
-	require.EqualError(t, err, "AnalogRead is not supported by the platform 'bare'")
+	require.EqualError(t, err, "'AnalogRead' is not supported by the platform 'bare'")
 	assert.Equal(t, 0, got)
 }
 
@@ -246,7 +246,7 @@ func TestAnalogSensorHalt_WithSensorCyclicRead(t *testing.T) {
 		select {
 		case <-d.halt: // wait until halt is broadcasted by close the channel
 		case <-time.After(timeout): // otherwise run into the timeout
-			assert.Fail(t, "halt was not received within %s", timeout)
+			assert.Fail(t, fmt.Sprintf("halt was not received within %s", timeout))
 		}
 	}()
 	// act & assert

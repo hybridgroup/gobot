@@ -1,4 +1,5 @@
 # note: GolangCI-Lint also searches for config files in all directories from the directory of the first analyzed path up to the root.
+version: "2"
 run:
   build-tags:
     - utils
@@ -22,22 +23,12 @@ run:
   # By default, it isn't set.
   modules-download-mode: readonly
 
-issues:
-  # Enables skipping of directories:
-  # - vendor$, third_party$, testdata$, examples$, Godeps$, builtin$
-  # Default: true
-  exclude-dirs-use-default: false
-
-  # note: folders/files can not be excluded from "typecheck" anymore since v1.61.0
-
-linters:
-  enable-all: true
-
   # https://golangci-lint.run/usage/linters/#enabled-by-default
   # note: typecheck can not be disabled, it is used to check code compilation
+linters:
+  default: all
   disable:
-    # deprecated:
-    - tenv # replaced by usetesting
+    # deprecated: none
     # not used for this go version: none
     # not used for any reason
     - err113 # not used (we allow error creation at return statement)
@@ -51,6 +42,7 @@ linters:
     - importas # not needed (there is no alias rule at the moment)
     - ireturn # not used (we allow return interfaces)
     - loggercheck # not needed (relates to kitlog, klog, logr, zap)
+    - noinlineerr # this violates best practices in other style guides
     - paralleltest # not used
     - promlinter # not needed (prometheus metrics naming)
     - rowserrcheck # not needed (sql related)
@@ -63,6 +55,7 @@ linters:
     - dupl # useful with some tweeks (reduce bugs and lines of code)
     - errname # useful for common style
     - exhaustruct # useful with some exclusions for existing code (e.g. mavlink/common/common.go)
+    - funcorder # common style, but too many findings
     - funlen # useful with some tweeks (reduce bugs, simplify code, better understandable code)
     - gocognit # useful with some tweeks (better understandable code)
     - goconst # useful (reduce bugs)
@@ -74,95 +67,115 @@ linters:
     - mnd # useful with some exclusions for existing code (e.g. mavlink.go)
     - nestif # useful (reduce bugs, simplify code, better understandable code)
     - nlreturn # more common style, but could become annoying
-    - stylecheck # useful with some tweaking (e.g. underscores in names should be allowed - we use it for constants retrieved from C/C++)
     - tagliatelle # maybe useful with some tweaking or excluding
     - varnamelen # maybe useful with some tweaking, but many findings
     - whitespace # more common style, but could become annoying
     - wsl # more common style, but could become annoying
+    - wsl_v5 # same as above
 
-linters-settings:
-  depguard:
-    # Rules to apply.
-    #
-    # Variables:
-    # - File Variables
-    #   you can still use and exclamation mark ! in front of a variable to say not to use it.
-    #   Example !$test will match any file that is not a go test file.
-    #
-    #   `$all` - matches all go files
-    #   `$test` - matches all go test files
-    #
-    # - Package Variables
-    #
-    #  `$gostd` - matches all of go's standard library (Pulled from `GOROOT`)
-    #
-    # Default: Only allow $gostd in all files.
-    rules:
-      main:
-        # Packages that are not allowed where the value is a suggestion.
-        deny:
-          - pkg: "github.com/pkg/errors"
-            desc: Should be replaced by standard lib errors package
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
 
-  dupword:
-    # Keywords for detecting duplicate words.
-    # If this list is not empty, only the words defined in this list will be detected.
-    # Default: []
-    keywords:
-      - "the"
-      - "and"
-      - "a"
+  settings:
+    depguard:
+      # Rules to apply.
+      #
+      # Variables:
+      # - File Variables
+      #   you can still use and exclamation mark ! in front of a variable to say not to use it.
+      #   Example !$test will match any file that is not a go test file.
+      #
+      #   `$all` - matches all go files
+      #   `$test` - matches all go test files
+      #
+      # - Package Variables
+      #
+      #  `$gostd` - matches all of go's standard library (Pulled from `GOROOT`)
+      #
+      # Default: Only allow $gostd in all files.
+      rules:
+        main:
+          # Packages that are not allowed where the value is a suggestion.
+          deny:
+            - pkg: github.com/pkg/errors
+              desc: Should be replaced by standard lib errors package
 
-  errorlint:
-    # Default: true
-    # %v should be used by default over %w, see https://github.com/uber-go/guide/blob/master/style.md#error-wrapping
-    errorf: false
-    # Permit more than 1 %w verb, valid per Go 1.20 (Requires errorf:true)
-    # Default: true
-    errorf-multi: false
+    dupword:
+      # Keywords for detecting duplicate words.
+      # If this list is not empty, only the words defined in this list will be detected.
+      # Default: []
+      keywords:
+        - the
+        - and
+        - a
 
-  gci:
-    # Section configuration to compare against.
-    # Section names are case-insensitive and may contain parameters in ().
-    # The default order of sections is `standard > default > custom > blank > dot`,
-    # If `custom-order` is `true`, it follows the order of `sections` option.
-    # Default: ["standard", "default"]
-    sections:
-      - standard # Standard section: captures all standard packages.
-      - default # Default section: contains all imports that could not be matched to another section type.
-      - prefix(gobot.io/x/gobot/) # Custom section: groups all imports with the specified Prefix.
-      #- blank # Blank section: contains all blank imports. This section is not present unless explicitly enabled.
-      #- dot # Dot section: contains all dot imports. This section is not present unless explicitly enabled.
-    # Enable custom order of sections.
-    # If `true`, make the section order the same as the order of `sections`.
-    # Default: false
-    custom-order: true
+    errorlint:
+      # Default: true
+      # %v should be used by default over %w, see https://github.com/uber-go/guide/blob/master/style.md#error-wrapping
+      errorf: false
+      # Permit more than 1 %w verb, valid per Go 1.20 (Requires errorf:true)
+      # Default: true
+      errorf-multi: false
 
-  gocritic:
-    disabled-checks:
-      - assignOp # very opinionated
-      - appendAssign # mostly used by intention
+    gocritic:
+      disabled-checks:
+        - assignOp # very opinionated
+        - appendAssign # mostly used by intention
 
-  nolintlint:
-    # Enable to require an explanation of nonzero length after each nolint directive.
-    # Default: false
-    require-explanation: true
-    # Enable to require nolint directives to mention the specific linter being suppressed.
-    # Default: false
-    require-specific: true
+    nolintlint:
+      # Enable to require an explanation of nonzero length after each nolint directive.
+      # Default: false
+      require-explanation: true
+      # Enable to require nolint directives to mention the specific linter being suppressed.
+      # Default: false
+      require-specific: true
 
-  perfsprint:
-    # Optimizes `fmt.Errorf`.
-    # Default: true
-    errorf: false
-    # Optimizes `fmt.Sprintf` with only one argument
-    # Default: true
-    sprintf1: false
+    perfsprint:
+      # Optimizes `fmt.Errorf`.
+      # Default: true
+      errorf: false
+      # Optimizes `fmt.Sprintf` with only one argument
+      # Default: true
+      sprintf1: false
 
-  revive:
-    rules:
-      # https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md#unexported-return
-      # disable this rule, because sometimes it has its justification
-      - name: unexported-return
-        severity: warning
-        disabled: true
+    revive:
+      rules:
+        # https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md#unexported-return
+        # disable this rule, because sometimes it has its justification
+        - name: unexported-return
+          severity: warning
+          disabled: true
+
+
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports
+
+  exclusions:
+    generated: lax
+
+  settings:
+    gci:
+      # Section configuration to compare against.
+      # Section names are case-insensitive and may contain parameters in ().
+      # The default order of sections is `standard > default > custom > blank > dot`,
+      # If `custom-order` is `true`, it follows the order of `sections` option.
+      # Default: ["standard", "default"]
+      sections:
+        - standard # Standard section: captures all standard packages.
+        - default # Default section: contains all imports that could not be matched to another section type.
+        - prefix(gobot.io/x/gobot/) # Custom section: groups all imports with the specified Prefix.
+        #- blank # Blank section: contains all blank imports. This section is not present unless explicitly enabled.
+        #- dot # Dot section: contains all dot imports. This section is not present unless explicitly enabled.
+      # Enable custom order of sections.
+      # If `true`, make the section order the same as the order of `sections`.
+      # Default: false
+      custom-order: true

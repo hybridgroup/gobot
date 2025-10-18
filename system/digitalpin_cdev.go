@@ -22,10 +22,11 @@ type cdevLine interface {
 }
 
 type digitalPinCdev struct {
+	*digitalPinConfig
+
 	chipName string
 	pin      int
-	*digitalPinConfig
-	line cdevLine
+	line     cdevLine
 }
 
 var digitalPinCdevReconfigure = digitalPinCdevReconfigureLine // to allow unit testing

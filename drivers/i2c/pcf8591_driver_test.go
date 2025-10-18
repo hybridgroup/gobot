@@ -41,7 +41,11 @@ func TestPCF8591Start(t *testing.T) {
 }
 
 func TestPCF8591Halt(t *testing.T) {
+	// arrange
 	d := NewPCF8591Driver(newI2cTestAdaptor())
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
 	require.NoError(t, d.Halt())
 }
 

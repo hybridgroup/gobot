@@ -23,6 +23,7 @@ const (
 // Library ported from: https://github.com/wemos/WEMOS_Matrix_LED_Shield_Arduino_Library
 type AIP1640Driver struct {
 	*driver
+
 	pinClock  *DirectPinDriver
 	pinData   *DirectPinDriver
 	intensity byte

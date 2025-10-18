@@ -26,13 +26,14 @@ const (
 
 // Adaptor is the Gobot Adaptor for Radxa's Rock Pi.
 type Adaptor struct {
+	*adaptors.DigitalPinsAdaptor
+	*adaptors.I2cBusAdaptor
+	*adaptors.SpiBusAdaptor
+
 	name     string
 	mutex    sync.Mutex
 	sys      *system.Accesser
 	revision string
-	*adaptors.DigitalPinsAdaptor
-	*adaptors.I2cBusAdaptor
-	*adaptors.SpiBusAdaptor
 }
 
 // NewAdaptor creates a RockPi Adaptor
@@ -44,6 +45,12 @@ type Adaptor struct {
 //	adaptors.WithGpioCdevAccess():	use character device driver instead of the default sysfs (NOT work on RockPi4C+!)
 //	adaptors.WithSpiGpioAccess(sclk, ncs, sdo, sdi):	use GPIO's instead of /dev/spidev#.#
 //	adaptors.WithGpiosActiveLow(pin's): invert the pin behavior
+//
+// Further optional parameters for:
+//
+//	GPIO, see [adaptors.NewDigitalPinsAdaptor]
+//	I2C, see [adaptors.NewI2cBusAdaptor]
+//	SPI, see [adaptors.NewSpiBusAdaptor]
 func NewAdaptor(opts ...interface{}) *Adaptor {
 	sys := system.NewAccesser(system.WithDigitalPinSysfsAccess())
 	a := &Adaptor{
@@ -52,11 +59,14 @@ func NewAdaptor(opts ...interface{}) *Adaptor {
 	}
 
 	var digitalPinsOpts []adaptors.DigitalPinsOptionApplier
+	var i2cBusOpts []adaptors.I2CBusOptionApplier
 	var spiBusOpts []adaptors.SpiBusOptionApplier
 	for _, opt := range opts {
 		switch o := opt.(type) {
 		case adaptors.DigitalPinsOptionApplier:
 			digitalPinsOpts = append(digitalPinsOpts, o)
+		case adaptors.I2CBusOptionApplier:
+			i2cBusOpts = append(i2cBusOpts, o)
 		case adaptors.SpiBusOptionApplier:
 			spiBusOpts = append(spiBusOpts, o)
 		default:
@@ -72,7 +82,7 @@ func NewAdaptor(opts ...interface{}) *Adaptor {
 	spiBusNumberValidator := adaptors.NewBusNumberValidator([]int{1, 2})
 
 	a.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, a.getPinTranslatorFunction(), digitalPinsOpts...)
-	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, i2cBusNumberValidator.Validate, defaultI2cBusNumber)
+	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, i2cBusNumberValidator.Validate, defaultI2cBusNumber, i2cBusOpts...)
 	a.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, spiBusNumberValidator.Validate, defaultSpiBusNumber,
 		defaultSpiChipNumber, defaultSpiMode, defaultSpiBitsNumber, defaultSpiMaxSpeed, a.DigitalPinsAdaptor, spiBusOpts...)
 
@@ -136,7 +146,7 @@ func (a *Adaptor) getPinTranslatorFunction() func(string) (string, int, error) {
 		} else if val, ok := pins[pin]["*"]; ok {
 			line = val
 		} else {
-			return "", 0, errors.New("Not a valid pin")
+			return "", 0, errors.New("not a valid pin")
 		}
 		return "", line, nil
 	}

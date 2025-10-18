@@ -36,12 +36,13 @@ func TestConnect(t *testing.T) {
 		rssi          = 56
 	)
 	tests := map[string]struct {
-		identifier  string
-		extAdapter  *btTestAdapter
-		extDevice   btTestDevice
-		wantAddress string
-		wantName    string
-		wantErr     string
+		identifier                  string
+		extAdapter                  *btTestAdapter
+		simulateConnected           bool
+		simulateDiscoverServicesErr bool
+		wantAddress                 string
+		wantName                    string
+		wantErr                     string
 	}{
 		"connect_by_address": {
 			identifier: deviceAddress,
@@ -50,7 +51,6 @@ func TestConnect(t *testing.T) {
 				rssi:          rssi,
 				payload:       &btTestPayload{name: deviceName},
 			},
-			extDevice:   btTestDevice{},
 			wantAddress: deviceAddress,
 			wantName:    deviceName,
 		},
@@ -61,9 +61,14 @@ func TestConnect(t *testing.T) {
 				rssi:          rssi,
 				payload:       &btTestPayload{name: deviceName},
 			},
-			extDevice:   btTestDevice{},
 			wantAddress: deviceAddress,
 			wantName:    deviceName,
+		},
+		"error_already_connected": {
+			extAdapter:        &btTestAdapter{},
+			simulateConnected: true,
+			wantName:          "BLEClient",
+			wantErr:           "is already connected",
 		},
 		"error_enable": {
 			extAdapter: &btTestAdapter{
@@ -122,26 +127,26 @@ func TestConnect(t *testing.T) {
 				deviceAddress: deviceAddress,
 				payload:       &btTestPayload{name: "disco_err"},
 			},
-			extDevice: btTestDevice{
-				simulateDiscoverServicesErr: true,
-			},
-			wantAddress: deviceAddress,
-			wantName:    "disco_err",
-			wantErr:     "device discover services error",
+			simulateDiscoverServicesErr: true,
+			wantAddress:                 deviceAddress,
+			wantName:                    "disco_err",
+			wantErr:                     "device discover services error",
 		},
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
 			a := NewAdaptor(tc.identifier)
+			extDevice := btTestDevice{simulateDiscoverServicesErr: tc.simulateDiscoverServicesErr}
 			btdc := func(_ bluetoothExtDevicer, address, name string) *btDevice {
-				return &btDevice{extDevice: tc.extDevice, devAddress: address, devName: name}
+				return &btDevice{extDevice: extDevice, devAddress: address, devName: name}
 			}
 			btac := func(bluetoothExtAdapterer, bool) *btAdapter {
 				return &btAdapter{extAdapter: tc.extAdapter, btDeviceCreator: btdc}
 			}
 			a.btAdptCreator = btac
 			a.cfg.scanTimeout = scanTimeout // to speed up test
+			a.connected = tc.simulateConnected
 			// act
 			err := a.Connect()
 			// assert
@@ -155,8 +160,76 @@ func TestConnect(t *testing.T) {
 				require.ErrorContains(t, err, tc.wantErr)
 				assert.Contains(t, a.Name(), tc.wantName)
 				assert.Equal(t, tc.wantAddress, a.Address())
-				assert.False(t, a.connected)
+				assert.Equal(t, tc.simulateConnected, a.connected)
 			}
+		})
+	}
+}
+
+func TestDisconnect(t *testing.T) {
+	const (
+		scanTimeout   = 5 * time.Millisecond
+		deviceName    = "hello"
+		deviceAddress = "11:22:44:AA:BB:CC"
+	)
+	tests := map[string]struct {
+		connectBefore         bool
+		dropCharacteristics   bool
+		simulateDisconnectErr bool
+		wantErr               string
+	}{
+		"disconnect_not_connectected": {},
+		"disconnect_connectected_before": {
+			connectBefore: true,
+		},
+		"disconnect_drop_charas": {
+			connectBefore:       true,
+			dropCharacteristics: true,
+		},
+		"error_disconnect": {
+			simulateDisconnectErr: true,
+			connectBefore:         true,
+			wantErr:               "device disconnect error",
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			a := NewAdaptor(deviceName)
+			a.cfg.sleepAfterDisconnect = 0 // to speed up test
+			a.cfg.dropCharacteristicsOnDisconnect = tc.dropCharacteristics
+			var wantCharaLen int
+			if tc.connectBefore {
+				extDevice := btTestDevice{simulateDisconnectErr: tc.simulateDisconnectErr}
+				btdc := func(_ bluetoothExtDevicer, address, name string) *btDevice {
+					return &btDevice{extDevice: extDevice, devAddress: address, devName: name}
+				}
+				extAdapter := &btTestAdapter{
+					deviceAddress: deviceAddress,
+					payload:       &btTestPayload{name: deviceName},
+				}
+				btac := func(bluetoothExtAdapterer, bool) *btAdapter {
+					return &btAdapter{extAdapter: extAdapter, btDeviceCreator: btdc}
+				}
+				a.btAdptCreator = btac
+				a.cfg.scanTimeout = scanTimeout // to speed up test
+				require.NoError(t, a.Connect())
+				a.characteristics["charauuid"] = &btTestChara{}
+				if !tc.dropCharacteristics {
+					wantCharaLen = 1
+				}
+			}
+			// act
+			err := a.Disconnect()
+			// assert
+			if tc.wantErr == "" {
+				require.NoError(t, err)
+			} else {
+				require.ErrorContains(t, err, tc.wantErr)
+			}
+			assert.False(t, a.connected)
+			require.NotNil(t, a.characteristics)
+			assert.Len(t, a.characteristics, wantCharaLen)
 		})
 	}
 }
@@ -169,42 +242,57 @@ func TestReconnect(t *testing.T) {
 		rssi          = 56
 	)
 	tests := map[string]struct {
-		extAdapter   *btTestAdapter
-		extDevice    *btTestDevice
-		wasConnected bool
-		wantErr      string
+		wasConnected          bool
+		dropCharacteristics   bool
+		simulateDisconnectErr bool
+		simulateConnectErr    bool
+		wantErr               string
 	}{
-		"reconnect_not_connected": {
-			extAdapter: &btTestAdapter{
-				deviceAddress: deviceAddress,
-				rssi:          rssi,
-				payload:       &btTestPayload{name: deviceName},
-			},
-			extDevice: &btTestDevice{},
-		},
+		"reconnect_not_connected": {},
 		"reconnect_was_connected": {
-			extAdapter: &btTestAdapter{
-				deviceAddress: deviceAddress,
-				rssi:          rssi,
-				payload:       &btTestPayload{name: deviceName},
-			},
-			extDevice:    &btTestDevice{},
 			wasConnected: true,
+		},
+		"reconnect_drop_charas": {
+			wasConnected:        true,
+			dropCharacteristics: true,
+		},
+		"error_disconnect": {
+			simulateDisconnectErr: true,
+			wasConnected:          true,
+			wantErr:               "device disconnect error",
+		},
+		"error_connect": {
+			simulateConnectErr: true,
+			wasConnected:       true,
+			wantErr:            "adapter connect error",
 		},
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
 			a := NewAdaptor(deviceAddress)
+			extDevice := btTestDevice{simulateDisconnectErr: tc.simulateDisconnectErr}
 			btdc := func(_ bluetoothExtDevicer, address, name string) *btDevice {
-				return &btDevice{extDevice: tc.extDevice, devAddress: address, devName: name}
+				return &btDevice{extDevice: extDevice, devAddress: address, devName: name}
 			}
-			a.btAdpt = &btAdapter{extAdapter: tc.extAdapter, btDeviceCreator: btdc}
+			extAdapter := &btTestAdapter{
+				simulateConnectErr: tc.simulateConnectErr,
+				deviceAddress:      deviceAddress,
+				rssi:               rssi,
+				payload:            &btTestPayload{name: deviceName},
+			}
+			a.btAdpt = &btAdapter{extAdapter: extAdapter, btDeviceCreator: btdc}
 			a.cfg.scanTimeout = scanTimeout // to speed up test in case of errors
 			a.cfg.sleepAfterDisconnect = 0  // to speed up test
+			a.cfg.dropCharacteristicsOnDisconnect = tc.dropCharacteristics
+			var wantCharaLen int
 			if tc.wasConnected {
 				a.btDevice = btdc(nil, "", "")
 				a.connected = tc.wasConnected
+				a.characteristics["charauuid"] = &btTestChara{}
+				if !tc.dropCharacteristics {
+					wantCharaLen = 1
+				}
 			}
 			// act
 			err := a.Reconnect()
@@ -212,10 +300,11 @@ func TestReconnect(t *testing.T) {
 			if tc.wantErr == "" {
 				require.NoError(t, err)
 				assert.Equal(t, rssi, a.RSSI())
+				assert.Len(t, a.characteristics, wantCharaLen)
+				assert.True(t, a.connected)
 			} else {
 				require.ErrorContains(t, err, tc.wantErr)
 			}
-			assert.True(t, a.connected)
 		})
 	}
 }
@@ -223,17 +312,13 @@ func TestReconnect(t *testing.T) {
 func TestFinalize(t *testing.T) {
 	// this also tests Disconnect()
 	tests := map[string]struct {
-		extDevice *btTestDevice
-		wantErr   string
+		simulateDisconnectErr bool
+		wantErr               string
 	}{
-		"disconnect": {
-			extDevice: &btTestDevice{},
-		},
+		"disconnect": {},
 		"error_disconnect": {
-			extDevice: &btTestDevice{
-				simulateDisconnectErr: true,
-			},
-			wantErr: "device disconnect error",
+			simulateDisconnectErr: true,
+			wantErr:               "device disconnect error",
 		},
 	}
 	for name, tc := range tests {
@@ -241,7 +326,8 @@ func TestFinalize(t *testing.T) {
 			// arrange
 			a := NewAdaptor("")
 			a.cfg.sleepAfterDisconnect = 0 // to speed up test
-			a.btDevice = &btDevice{extDevice: tc.extDevice}
+			extDevice := btTestDevice{simulateDisconnectErr: tc.simulateDisconnectErr}
+			a.btDevice = &btDevice{extDevice: extDevice}
 			// act
 			err := a.Finalize()
 			// assert
@@ -402,6 +488,54 @@ func TestSubscribe(t *testing.T) {
 				require.ErrorContains(t, err, tc.wantErr)
 			}
 			assert.Equal(t, tc.want, got)
+		})
+	}
+}
+
+func TestUnsubscribe(t *testing.T) {
+	const uuid = "00004321-0000-1000-8000-00805f9b34fb"
+	tests := map[string]struct {
+		inUUID       string
+		notConnected bool
+		chara        *btTestChara
+		wantErr      string
+	}{
+		"unsubscribe_ok": {
+			inUUID: uuid,
+			chara:  &btTestChara{notificationFunc: func([]byte) {}},
+		},
+		"error_not_connected": {
+			notConnected: true,
+			wantErr:      "cannot unsubscribe from BLE device until connected",
+		},
+		"error_bad_chara": {
+			inUUID:  "gag2",
+			wantErr: "'gag2' is not a valid 16-bit Bluetooth UUID",
+		},
+		"error_unknown_chara": {
+			inUUID:  uuid,
+			wantErr: "unknown characteristic: 00004321-0000-1000-8000-00805f9b34fb",
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			a := NewAdaptor("")
+			if tc.chara != nil {
+				a.characteristics[uuid] = tc.chara
+			}
+			a.connected = !tc.notConnected
+			// act
+			err := a.Unsubscribe(tc.inUUID)
+			// assert
+			if tc.wantErr == "" {
+				require.NoError(t, err)
+				require.NotNil(t, a.characteristics)
+				require.NotNil(t, a.characteristics[uuid])
+				assert.Nil(t, tc.chara.notificationFunc)
+			} else {
+				require.ErrorContains(t, err, tc.wantErr)
+			}
 		})
 	}
 }

@@ -40,17 +40,17 @@ func (pt *PWMPinTranslator) Translate(id string) (string, int, error) {
 func (p PWMPinDefinition) FindPWMDir(sys *system.Accesser) (string, error) {
 	items, _ := sys.Find(p.Dir, p.DirRegexp)
 	if len(items) == 0 {
-		return "", fmt.Errorf("No path found for PWM directory pattern, '%s' in path '%s'. See README.md for activation",
+		return "", fmt.Errorf("no path found for PWM directory pattern, '%s' in path '%s'. See README.md for activation",
 			p.DirRegexp, p.Dir)
 	}
 
 	dir := items[0]
 	info, err := sys.Stat(dir)
 	if err != nil {
-		return "", fmt.Errorf("Error (%v) on access '%s'", err, dir)
+		return "", fmt.Errorf("error (%v) on access '%s'", err, dir)
 	}
 	if !info.IsDir() {
-		return "", fmt.Errorf("The item '%s' is not a directory, which is not expected", dir)
+		return "", fmt.Errorf("the item '%s' is not a directory, which is not expected", dir)
 	}
 
 	return dir, nil

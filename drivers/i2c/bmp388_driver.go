@@ -88,6 +88,7 @@ type bmp388CalibrationCoefficients struct {
 // BMP388Driver is a driver for the BMP388 temperature/pressure sensor
 type BMP388Driver struct {
 	*Driver
+
 	calCoeffs   *bmp388CalibrationCoefficients
 	ctrlPwrMode uint8
 	confFilter  BMP388IIRFilter
@@ -137,12 +138,12 @@ func (d *BMP388Driver) Temperature(accuracy BMP388Accuracy) (float32, error) {
 	defer d.mutex.Unlock()
 
 	mode := d.ctrlPwrMode<<4 | bmp388PWRCTRLPressEnableBit | bmp388PWRCTRLTempEnableBit
-	if err := d.connection.WriteByteData(bmp388RegPWRCTRL, mode); err != nil {
+	if err := d.writeByteData(bmp388RegPWRCTRL, mode); err != nil {
 		return 0, err
 	}
 
 	// Set Accuracy for temperature
-	if err := d.connection.WriteByteData(bmp388RegOSR, uint8(accuracy<<3)); err != nil {
+	if err := d.writeByteData(bmp388RegOSR, uint8(accuracy<<3)); err != nil {
 		return 0, err
 	}
 
@@ -162,12 +163,12 @@ func (d *BMP388Driver) Pressure(accuracy BMP388Accuracy) (float32, error) {
 	defer d.mutex.Unlock()
 
 	mode := d.ctrlPwrMode<<4 | bmp388PWRCTRLPressEnableBit | bmp388PWRCTRLTempEnableBit
-	if err := d.connection.WriteByteData(bmp388RegPWRCTRL, mode); err != nil {
+	if err := d.writeByteData(bmp388RegPWRCTRL, mode); err != nil {
 		return 0, err
 	}
 
 	// Set Standard Accuracy for pressure
-	if err := d.connection.WriteByteData(bmp388RegOSR, uint8(accuracy)); err != nil {
+	if err := d.writeByteData(bmp388RegOSR, uint8(accuracy)); err != nil {
 		return 0, err
 	}
 
@@ -201,13 +202,13 @@ func (d *BMP388Driver) Altitude(accuracy BMP388Accuracy) (float32, error) {
 
 // initialization reads the calibration coefficients.
 func (d *BMP388Driver) initialization() error {
-	chipID, err := d.connection.ReadByteData(bmp388RegChipID)
+	chipID, err := d.readByteData(bmp388RegChipID)
 	if err != nil {
 		return err
 	}
 
 	if bmp388ChipID != chipID {
-		return fmt.Errorf("Incorrect BMP388 chip ID '0%x' Expected 0x%x", chipID, bmp388ChipID)
+		return fmt.Errorf("incorrect BMP388 chip ID '0%x' Expected 0x%x", chipID, bmp388ChipID)
 	}
 
 	var (
@@ -228,7 +229,7 @@ func (d *BMP388Driver) initialization() error {
 	)
 
 	coefficients := make([]byte, 24)
-	if err = d.connection.ReadBlockData(bmp388RegCalib00, coefficients); err != nil {
+	if err = d.readBlockData(bmp388RegCalib00, coefficients); err != nil {
 		return err
 	}
 	buf := bytes.NewBuffer(coefficients)
@@ -291,18 +292,18 @@ func (d *BMP388Driver) initialization() error {
 	d.calCoeffs.p10 = float32(float64(p10) / math.Pow(2, 48))
 	d.calCoeffs.p11 = float32(float64(p11) / math.Pow(2, 65))
 
-	if err := d.connection.WriteByteData(bmp388RegCMD, bmp388CMDSoftReset); err != nil {
+	if err := d.writeByteData(bmp388RegCMD, bmp388CMDSoftReset); err != nil {
 		return err
 	}
 
-	return d.connection.WriteByteData(bmp388RegConf, uint8(d.confFilter)<<1)
+	return d.writeByteData(bmp388RegConf, uint8(d.confFilter)<<1)
 }
 
 func (d *BMP388Driver) rawTemp() (int32, error) {
 	var tp0, tp1, tp2 byte
 
 	data := make([]byte, 3)
-	if err := d.connection.ReadBlockData(bmp388RegTempData, data); err != nil {
+	if err := d.readBlockData(bmp388RegTempData, data); err != nil {
 		return 0, err
 	}
 	buf := bytes.NewBuffer(data)
@@ -326,7 +327,7 @@ func (d *BMP388Driver) rawPressure() (int32, error) {
 	var tp0, tp1, tp2 byte
 
 	data := make([]byte, 3)
-	if err := d.connection.ReadBlockData(bmp388RegPressureData, data); err != nil {
+	if err := d.readBlockData(bmp388RegPressureData, data); err != nil {
 		return 0, err
 	}
 	buf := bytes.NewBuffer(data)
@@ -358,13 +359,13 @@ func (d *BMP388Driver) calculateTemp(rawTemp int32) float32 {
 
 func (d *BMP388Driver) calculatePress(rawPress int32, tLin float64) float32 {
 	pd1 := float64(d.calCoeffs.p6) * tLin
-	pd2 := float64(d.calCoeffs.p7) * math.Pow(tLin, 2)
-	pd3 := float64(d.calCoeffs.p8) * math.Pow(tLin, 3)
+	pd2 := float64(d.calCoeffs.p7) * tLin * tLin
+	pd3 := float64(d.calCoeffs.p8) * tLin * tLin * tLin
 	po1 := float64(d.calCoeffs.p5) + pd1 + pd2 + pd3
 
 	pd1 = float64(d.calCoeffs.p2) * tLin
-	pd2 = float64(d.calCoeffs.p3) * math.Pow(tLin, 2)
-	pd3 = float64(d.calCoeffs.p4) * math.Pow(tLin, 3)
+	pd2 = float64(d.calCoeffs.p3) * tLin * tLin
+	pd3 = float64(d.calCoeffs.p4) * tLin * tLin * tLin
 	po2 := float64(rawPress) * (float64(d.calCoeffs.p1) + pd1 + pd2 + pd3)
 
 	pd1 = math.Pow(float64(rawPress), 2)

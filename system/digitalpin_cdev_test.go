@@ -95,19 +95,19 @@ func TestApplyOptions(t *testing.T) {
 			}
 			d := &digitalPinCdev{digitalPinConfig: &digitalPinConfig{direction: "in"}}
 			optionFunction1 := func(gobot.DigitalPinOptioner) bool {
-				d.digitalPinConfig.direction = "test"
+				d.direction = "test"
 				return tc.changed[0]
 			}
 			optionFunction2 := func(gobot.DigitalPinOptioner) bool {
-				d.digitalPinConfig.drive = 15
+				d.drive = 15
 				return tc.changed[1]
 			}
 			// act
 			err := d.ApplyOptions(optionFunction1, optionFunction2)
 			// assert
 			assert.Equal(t, tc.wantErr, err)
-			assert.Equal(t, "test", d.digitalPinConfig.direction)
-			assert.Equal(t, 15, d.digitalPinConfig.drive)
+			assert.Equal(t, "test", d.direction)
+			assert.Equal(t, 15, d.drive)
 			assert.Equal(t, tc.wantReconfigured, reconfigured)
 			if reconfigured > 0 {
 				assert.False(t, inputForced)

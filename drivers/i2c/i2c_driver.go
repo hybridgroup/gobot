@@ -39,15 +39,16 @@ type Connector interface {
 
 // Driver implements the interface gobot.Driver.
 type Driver struct {
+	Config
+	gobot.Commander
+
 	name           string
 	defaultAddress int
 	connector      Connector
 	connection     Connection
 	afterStart     func() error
 	beforeHalt     func() error
-	Config
-	gobot.Commander
-	mutex *sync.Mutex // mutex often needed to ensure that write-read sequences are not interrupted
+	mutex          *sync.Mutex // mutex often needed to ensure that write-read sequences are not interrupted
 }
 
 // NewDriver creates a new generic and basic i2c gobot driver.
@@ -80,8 +81,13 @@ func (d *Driver) SetName(name string) {
 	d.name = name
 }
 
-// Connection returns the connection of the i2c device.
+// Connection returns the gobot connection of the i2c device.
 func (d *Driver) Connection() gobot.Connection {
+	if d.connector == nil {
+		log.Printf("%s has no connector\n", d.name)
+		return nil
+	}
+
 	if conn, ok := d.connector.(gobot.Connection); ok {
 		return conn
 	}
@@ -94,6 +100,10 @@ func (d *Driver) Connection() gobot.Connection {
 func (d *Driver) Start() error {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
+
+	if d.connector == nil {
+		return fmt.Errorf("%s has no connector", d.name)
+	}
 
 	var err error
 	bus := d.GetBusOrDefault(d.connector.DefaultI2cBus())
@@ -115,7 +125,8 @@ func (d *Driver) Halt() error {
 		return err
 	}
 
-	// currently there is nothing to do here for the driver
+	d.connection = nil
+
 	return nil
 }
 
@@ -123,6 +134,10 @@ func (d *Driver) Halt() error {
 func (d *Driver) Write(pin string, val int) error {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
+
+	if d.connection == nil {
+		return fmt.Errorf("i2c driver not started for '%s'", d.name)
+	}
 
 	register, err := driverParseRegister(pin)
 	if err != nil {
@@ -145,6 +160,10 @@ func (d *Driver) Read(pin string) (int, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
+	if d.connection == nil {
+		return 0, fmt.Errorf("i2c driver not started for '%s'", d.name)
+	}
+
 	register, err := driverParseRegister(pin)
 	if err != nil {
 		return 0, err
@@ -158,10 +177,90 @@ func (d *Driver) Read(pin string) (int, error) {
 	return int(val), nil
 }
 
+func (d *Driver) write(data []byte) (int, error) {
+	if d.connection == nil {
+		return 0, fmt.Errorf("i2c driver not started for '%s'", d.name)
+	}
+
+	return d.connection.Write(data)
+}
+
+func (d *Driver) writeByte(val byte) error {
+	if d.connection == nil {
+		return fmt.Errorf("i2c driver not started for '%s'", d.name)
+	}
+
+	return d.connection.WriteByte(val)
+}
+
+func (d *Driver) writeByteData(reg uint8, val byte) error {
+	if d.connection == nil {
+		return fmt.Errorf("i2c driver not started for '%s'", d.name)
+	}
+
+	return d.connection.WriteByteData(reg, val)
+}
+
+func (d *Driver) writeWordData(reg uint8, val uint16) error {
+	if d.connection == nil {
+		return fmt.Errorf("i2c driver not started for '%s'", d.name)
+	}
+
+	return d.connection.WriteWordData(reg, val)
+}
+
+func (d *Driver) writeBlockData(reg uint8, data []byte) error {
+	if d.connection == nil {
+		return fmt.Errorf("i2c driver not started for '%s'", d.name)
+	}
+
+	return d.connection.WriteBlockData(reg, data)
+}
+
+func (d *Driver) read(data []byte) (int, error) {
+	if d.connection == nil {
+		return 0, fmt.Errorf("i2c driver not started for '%s'", d.name)
+	}
+
+	return d.connection.Read(data)
+}
+
+func (d *Driver) readByte() (byte, error) {
+	if d.connection == nil {
+		return 0, fmt.Errorf("i2c driver not started for '%s'", d.name)
+	}
+
+	return d.connection.ReadByte()
+}
+
+func (d *Driver) readByteData(reg uint8) (byte, error) {
+	if d.connection == nil {
+		return 0, fmt.Errorf("i2c driver not started for '%s'", d.name)
+	}
+
+	return d.connection.ReadByteData(reg)
+}
+
+func (d *Driver) readWordData(reg uint8) (uint16, error) {
+	if d.connection == nil {
+		return 0, fmt.Errorf("i2c driver not started for '%s'", d.name)
+	}
+
+	return d.connection.ReadWordData(reg)
+}
+
+func (d *Driver) readBlockData(reg uint8, data []byte) error {
+	if d.connection == nil {
+		return fmt.Errorf("i2c driver not started for '%s'", d.name)
+	}
+
+	return d.connection.ReadBlockData(reg, data)
+}
+
 func driverParseRegister(pin string) (uint8, error) {
 	register, err := strconv.ParseUint(pin, 10, 8)
 	if err != nil {
-		return 0, fmt.Errorf("Could not parse the register from given pin '%s'", pin)
+		return 0, fmt.Errorf("could not parse the register from given pin '%s'", pin)
 	}
 	return uint8(register), nil
 }

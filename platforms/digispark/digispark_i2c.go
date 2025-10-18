@@ -198,7 +198,7 @@ func (c *digisparkI2cConnection) readAndCheckCount(buf []byte) error {
 	}
 	expectedCount := len(buf)
 	if countRead != expectedCount {
-		return fmt.Errorf("Digispark i2c read %d bytes, expected %d bytes", countRead, expectedCount)
+		return fmt.Errorf("digispark i2c read %d bytes, expected %d bytes", countRead, expectedCount)
 	}
 	return nil
 }
@@ -210,14 +210,14 @@ func (c *digisparkI2cConnection) writeAndCheckCount(buf []byte, finalStop bool) 
 	}
 	expectedCount := len(buf)
 	if countWritten != expectedCount {
-		return fmt.Errorf("Digispark i2c write %d bytes, expected %d bytes", countWritten, expectedCount)
+		return fmt.Errorf("digispark i2c write %d bytes, expected %d bytes", countWritten, expectedCount)
 	}
 	return nil
 }
 
 func (c *digisparkI2cConnection) readInternal(b []byte) (int, error) {
 	if !c.adaptor.i2c {
-		err := errors.New("Digispark i2c not initialized")
+		err := errors.New("digispark i2c not initialized")
 		return 0, err
 	}
 	if err := c.adaptor.littleWire.i2cStart(c.address, 1); err != nil {
@@ -242,7 +242,7 @@ func (c *digisparkI2cConnection) readInternal(b []byte) (int, error) {
 
 func (c *digisparkI2cConnection) writeInternal(data []byte, finalStop bool) (int, error) {
 	if !c.adaptor.i2c {
-		return 0, errors.New("Digispark i2c not initialized")
+		return 0, errors.New("digispark i2c not initialized")
 	}
 	if err := c.adaptor.littleWire.i2cStart(c.address, 0); err != nil {
 		return 0, err

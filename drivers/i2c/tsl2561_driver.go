@@ -113,6 +113,7 @@ const (
 // K. Townsend
 type TSL2561Driver struct {
 	*Driver
+
 	autoGain        bool
 	gain            TSL2561Gain
 	integrationTime TSL2561IntegrationTime
@@ -216,7 +217,7 @@ func (d *TSL2561Driver) SetIntegrationTime(time TSL2561IntegrationTime) error {
 	}
 
 	timeGainVal := uint8(time) | uint8(d.gain) //nolint:gosec // TODO: fix later
-	if err := d.connection.WriteByteData(tsl2561CommandBit|tsl2561RegisterTiming, timeGainVal); err != nil {
+	if err := d.writeByteData(tsl2561CommandBit|tsl2561RegisterTiming, timeGainVal); err != nil {
 		return err
 	}
 	d.integrationTime = time
@@ -231,7 +232,7 @@ func (d *TSL2561Driver) SetGain(gain TSL2561Gain) error {
 	}
 
 	timeGainVal := uint8(d.integrationTime) | uint8(gain) //nolint:gosec // TODO: fix later
-	if err := d.connection.WriteByteData(tsl2561CommandBit|tsl2561RegisterTiming, timeGainVal); err != nil {
+	if err := d.writeByteData(tsl2561CommandBit|tsl2561RegisterTiming, timeGainVal); err != nil {
 		return err
 	}
 	d.gain = gain
@@ -345,11 +346,11 @@ func (d *TSL2561Driver) CalculateLux(broadband uint16, ir uint16) uint32 {
 }
 
 func (d *TSL2561Driver) enable() error {
-	return d.connection.WriteByteData(uint8(tsl2561CommandBit|tsl2561RegisterControl), tsl2561ControlPowerOn)
+	return d.writeByteData(uint8(tsl2561CommandBit|tsl2561RegisterControl), tsl2561ControlPowerOn)
 }
 
 func (d *TSL2561Driver) disable() error {
-	return d.connection.WriteByteData(uint8(tsl2561CommandBit|tsl2561RegisterControl), tsl2561ControlPowerOff)
+	return d.writeByteData(uint8(tsl2561CommandBit|tsl2561RegisterControl), tsl2561ControlPowerOff)
 }
 
 func (d *TSL2561Driver) getData() (uint16, uint16, error) {
@@ -360,13 +361,13 @@ func (d *TSL2561Driver) getData() (uint16, uint16, error) {
 	d.waitForADC()
 
 	// Reads a two byte value from channel 0 (visible + infrared)
-	broadband, err := d.connection.ReadWordData(tsl2561CommandBit | tsl2561WordBit | tsl2561RegisterChan0Low)
+	broadband, err := d.readWordData(tsl2561CommandBit | tsl2561WordBit | tsl2561RegisterChan0Low)
 	if err != nil {
 		return 0, 0, err
 	}
 
 	// Reads a two byte value from channel 1 (infrared)
-	ir, err := d.connection.ReadWordData(tsl2561CommandBit | tsl2561WordBit | tsl2561RegisterChan1Low)
+	ir, err := d.readWordData(tsl2561CommandBit | tsl2561WordBit | tsl2561RegisterChan1Low)
 	if err != nil {
 		return 0, 0, err
 	}
@@ -455,7 +456,7 @@ func (d *TSL2561Driver) initialize() error {
 		return err
 	}
 
-	if initialized, err := d.connection.ReadByteData(tsl2561RegisterID); err != nil {
+	if initialized, err := d.readByteData(tsl2561RegisterID); err != nil {
 		return err
 	} else if (initialized & 0x0A) == 0 {
 		return fmt.Errorf("TSL2561 device not found (0x%X)", initialized)

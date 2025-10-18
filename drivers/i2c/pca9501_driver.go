@@ -19,8 +19,9 @@ const pca9501DefaultAddress = 0x3F // this applies, if all 6 address pins left o
 //
 // PCA9501 is the replacement for PCF8574, so this driver should also work for PCF8574 except EEPROM calls
 type PCA9501Driver struct {
-	connectionMem Connection
 	*Driver
+
+	connectionMem Connection
 }
 
 // NewPCA9501Driver creates a new driver with specified i2c interface
@@ -33,63 +34,64 @@ type PCA9501Driver struct {
 //	i2c.WithBus(int):	bus to use with this driver
 //	i2c.WithAddress(int):	address to use with this driver
 func NewPCA9501Driver(a Connector, options ...func(Config)) *PCA9501Driver {
-	p := &PCA9501Driver{
+	d := &PCA9501Driver{
 		Driver: NewDriver(a, "PCA9501", pca9501DefaultAddress, options...),
 	}
-	p.afterStart = p.initialize
+	d.afterStart = d.initialize
 
 	// API commands
 	//nolint:forcetypeassert // ok here
-	p.AddCommand("WriteGPIO", func(params map[string]interface{}) interface{} {
+	d.AddCommand("WriteGPIO", func(params map[string]interface{}) interface{} {
 		pin := params["pin"].(uint8)
 		val := params["val"].(uint8)
-		err := p.WriteGPIO(pin, val)
+		err := d.WriteGPIO(pin, val)
 		return map[string]interface{}{"err": err}
 	})
 
 	//nolint:forcetypeassert // ok here
-	p.AddCommand("ReadGPIO", func(params map[string]interface{}) interface{} {
+	d.AddCommand("ReadGPIO", func(params map[string]interface{}) interface{} {
 		pin := params["pin"].(uint8)
-		val, err := p.ReadGPIO(pin)
+		val, err := d.ReadGPIO(pin)
 		return map[string]interface{}{"val": val, "err": err}
 	})
 
 	//nolint:forcetypeassert // ok here
-	p.AddCommand("WriteEEPROM", func(params map[string]interface{}) interface{} {
+	d.AddCommand("WriteEEPROM", func(params map[string]interface{}) interface{} {
 		address := params["address"].(uint8)
 		val := params["val"].(uint8)
-		err := p.WriteEEPROM(address, val)
+		err := d.WriteEEPROM(address, val)
 		return map[string]interface{}{"err": err}
 	})
 
 	//nolint:forcetypeassert // ok here
-	p.AddCommand("ReadEEPROM", func(params map[string]interface{}) interface{} {
+	d.AddCommand("ReadEEPROM", func(params map[string]interface{}) interface{} {
 		address := params["address"].(uint8)
-		val, err := p.ReadEEPROM(address)
+		val, err := d.ReadEEPROM(address)
 		return map[string]interface{}{"val": val, "err": err}
 	})
-	return p
+
+	return d
 }
 
 // WriteGPIO writes a value to a gpio pin (0-7)
-func (p *PCA9501Driver) WriteGPIO(pin uint8, val uint8) error {
-	p.mutex.Lock()
-	defer p.mutex.Unlock()
+func (d *PCA9501Driver) WriteGPIO(pin uint8, val uint8) error {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
 
 	// read current value of CTRL register, 0 is output, 1 is no output
-	iodir, err := p.connection.ReadByte()
+	iodir, err := d.readByte()
 	if err != nil {
 		return err
 	}
 	// set pin as output by clearing bit
 	iodirVal := bit.Clear(int(iodir), pin)
 	// write CTRL register
-	err = p.connection.WriteByte(uint8(iodirVal)) //nolint:gosec // TODO: fix later
+	err = d.writeByte(uint8(iodirVal)) //nolint:gosec // TODO: fix later
 	if err != nil {
 		return err
 	}
 	// read current value of port
-	cVal, err := p.connection.ReadByte()
+	cVal, err := d.readByte()
 	if err != nil {
 		return err
 	}
@@ -101,7 +103,7 @@ func (p *PCA9501Driver) WriteGPIO(pin uint8, val uint8) error {
 		nVal = bit.Set(int(cVal), pin)
 	}
 	// write new value to port
-	err = p.connection.WriteByte(uint8(nVal)) //nolint:gosec // TODO: fix later
+	err = d.writeByte(uint8(nVal)) //nolint:gosec // TODO: fix later
 	if err != nil {
 		return err
 	}
@@ -109,24 +111,24 @@ func (p *PCA9501Driver) WriteGPIO(pin uint8, val uint8) error {
 }
 
 // ReadGPIO reads a value from a given gpio pin (0-7)
-func (p *PCA9501Driver) ReadGPIO(pin uint8) (uint8, error) {
-	p.mutex.Lock()
-	defer p.mutex.Unlock()
+func (d *PCA9501Driver) ReadGPIO(pin uint8) (uint8, error) {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
 
 	// read current value of CTRL register, 0 is no input, 1 is an input
-	iodir, err := p.connection.ReadByte()
+	iodir, err := d.readByte()
 	if err != nil {
 		return 0, err
 	}
 	// set pin as input by setting bit
 	iodirVal := bit.Set(int(iodir), pin)
 	// write CTRL register
-	err = p.connection.WriteByte(uint8(iodirVal)) //nolint:gosec // TODO: fix later
+	err = d.writeByte(uint8(iodirVal)) //nolint:gosec // TODO: fix later
 	if err != nil {
 		return 0, err
 	}
 	// read port and create return bit
-	val, err := p.connection.ReadByte()
+	val, err := d.readByte()
 	if err != nil {
 		return val, err
 	}
@@ -140,26 +142,26 @@ func (p *PCA9501Driver) ReadGPIO(pin uint8) (uint8, error) {
 // ReadEEPROM reads a value from a given address (0x00-0xFF)
 // Note: only this sequence for memory read is supported: "STARTW-DATA1-STARTR-DATA2-STOP"
 // DATA1: EEPROM address, DATA2: read value
-func (p *PCA9501Driver) ReadEEPROM(address uint8) (uint8, error) {
-	p.mutex.Lock()
-	defer p.mutex.Unlock()
+func (d *PCA9501Driver) ReadEEPROM(address uint8) (uint8, error) {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
 
-	return p.connectionMem.ReadByteData(address)
+	return d.connectionMem.ReadByteData(address)
 }
 
 // WriteEEPROM writes a value to a given address in memory (0x00-0xFF)
-func (p *PCA9501Driver) WriteEEPROM(address uint8, val uint8) error {
-	p.mutex.Lock()
-	defer p.mutex.Unlock()
+func (d *PCA9501Driver) WriteEEPROM(address uint8, val uint8) error {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
 
-	return p.connectionMem.WriteByteData(address, val)
+	return d.connectionMem.WriteByteData(address, val)
 }
 
-func (p *PCA9501Driver) initialize() error {
+func (d *PCA9501Driver) initialize() error {
 	// initialize the EEPROM connection
-	bus := p.GetBusOrDefault(p.connector.DefaultI2cBus())
-	addressMem := p.GetAddressOrDefault(pca9501DefaultAddress) | 0x40
+	bus := d.GetBusOrDefault(d.connector.DefaultI2cBus())
+	addressMem := d.GetAddressOrDefault(pca9501DefaultAddress) | 0x40
 	var err error
-	p.connectionMem, err = p.connector.GetI2cConnection(addressMem, bus)
+	d.connectionMem, err = d.connector.GetI2cConnection(addressMem, bus)
 	return err
 }

@@ -16,12 +16,13 @@ import (
 
 // Adaptor is the Gobot Adaptor for Particle
 type Adaptor struct {
+	gobot.Eventer
+
 	name        string
 	DeviceID    string
 	AccessToken string
 	APIServer   string
 	servoPins   map[string]bool
-	gobot.Eventer
 }
 
 // Event is an event emitted by the Particle cloud
@@ -250,9 +251,10 @@ func (s *Adaptor) pinLevel(level byte) string {
 func (s *Adaptor) request(method string, url string, params url.Values) (map[string]interface{}, error) {
 	var resp *http.Response
 	var err error
-	if method == "POST" {
+	switch method {
+	case "POST":
 		resp, err = http.PostForm(url, params) //nolint:gosec // accepted, because local function and no exposed routing
-	} else if method == "GET" {
+	case "GET":
 		resp, err = http.Get(url) //nolint:gosec // accepted, because local function and no exposed routing
 	}
 

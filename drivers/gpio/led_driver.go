@@ -7,6 +7,7 @@ import (
 // LedDriver represents a digital Led
 type LedDriver struct {
 	*driver
+
 	high bool
 }
 

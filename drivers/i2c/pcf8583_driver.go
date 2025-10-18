@@ -54,6 +54,7 @@ const (
 // This driver was tested with Tinkerboard.
 type PCF8583Driver struct {
 	*Driver
+
 	mode       PCF8583Control // clock 32.768kHz (default), clock 50Hz, event counter
 	yearOffset int
 	ramOffset  byte
@@ -140,7 +141,7 @@ func (d *PCF8583Driver) WriteTime(val time.Time) error {
 
 	// according to chapter 7.11 of the product data sheet, the stop counting flag of the control/status register
 	// must be set before, so we read the control byte before and only set/reset the stop
-	ctrlRegVal, err := d.connection.ReadByteData(uint8(pcf8583Reg_CTRL))
+	ctrlRegVal, err := d.readByteData(uint8(pcf8583Reg_CTRL))
 	if err != nil {
 		return err
 	}
@@ -148,7 +149,7 @@ func (d *PCF8583Driver) WriteTime(val time.Time) error {
 		return fmt.Errorf("%s: can't write time because the device is in wrong mode 0x%02x", d.name, ctrlRegVal)
 	}
 	year, month, day := val.Date()
-	err = d.connection.WriteBlockData(uint8(pcf8583Reg_CTRL),
+	err = d.writeBlockData(uint8(pcf8583Reg_CTRL),
 		[]byte{
 			ctrlRegVal | uint8(pcf8583CtrlStopCounting),
 			// sub seconds in 1/10th seconds
@@ -175,7 +176,7 @@ func (d *PCF8583Driver) ReadTime() (time.Time, error) {
 
 	// according to chapter 7.1 of the product data sheet, the setting of "hold last count" flag
 	// is not needed when reading with auto increment
-	ctrlRegVal, err := d.connection.ReadByteData(uint8(pcf8583Reg_CTRL))
+	ctrlRegVal, err := d.readByteData(uint8(pcf8583Reg_CTRL))
 	if err != nil {
 		return time.Time{}, err
 	}
@@ -185,7 +186,7 @@ func (d *PCF8583Driver) ReadTime() (time.Time, error) {
 	// auto increment feature is used
 	clockDataSize := 6
 	data := make([]byte, clockDataSize)
-	read, err := d.connection.Read(data)
+	read, err := d.read(data)
 	if err != nil {
 		return time.Time{}, err
 	}
@@ -212,14 +213,14 @@ func (d *PCF8583Driver) WriteCounter(val int32) error {
 	// we don't care of negative values here
 	// according to chapter 7.11 of the product data sheet, the stop counting flag of the control/status register
 	// must be set before, so we read the control byte before and only set/reset the stop
-	ctrlRegVal, err := d.connection.ReadByteData(uint8(pcf8583Reg_CTRL))
+	ctrlRegVal, err := d.readByteData(uint8(pcf8583Reg_CTRL))
 	if err != nil {
 		return err
 	}
 	if !PCF8583Control(ctrlRegVal).isCounterMode() {
 		return fmt.Errorf("%s: can't write counter because the device is in wrong mode 0x%02x", d.name, ctrlRegVal)
 	}
-	err = d.connection.WriteBlockData(uint8(pcf8583Reg_CTRL),
+	err = d.writeBlockData(uint8(pcf8583Reg_CTRL),
 		[]byte{
 			ctrlRegVal | uint8(pcf8583CtrlStopCounting), // stop
 			//nolint:gosec // TODO: fix later
@@ -242,7 +243,7 @@ func (d *PCF8583Driver) ReadCounter() (int32, error) {
 
 	// according to chapter 7.1 of the product data sheet, the setting of "hold last count" flag
 	// is not needed when reading with auto increment
-	ctrlRegVal, err := d.connection.ReadByteData(uint8(pcf8583Reg_CTRL))
+	ctrlRegVal, err := d.readByteData(uint8(pcf8583Reg_CTRL))
 	if err != nil {
 		return 0, err
 	}
@@ -252,7 +253,7 @@ func (d *PCF8583Driver) ReadCounter() (int32, error) {
 	// auto increment feature is used
 	counterDataSize := 3
 	data := make([]byte, counterDataSize)
-	read, err := d.connection.Read(data)
+	read, err := d.read(data)
 	if err != nil {
 		return 0, err
 	}
@@ -273,7 +274,7 @@ func (d *PCF8583Driver) WriteRAM(address uint8, val uint8) error {
 	if realAddress > 0xFF {
 		return fmt.Errorf("%s: RAM address overflow %d", d.name, realAddress)
 	}
-	return d.connection.WriteByteData(uint8(realAddress), val)
+	return d.writeByteData(uint8(realAddress), val)
 }
 
 // ReadRAM reads a value from a given address (0x00-0xFF)
@@ -285,23 +286,23 @@ func (d *PCF8583Driver) ReadRAM(address uint8) (uint8, error) {
 	if realAddress > 0xFF {
 		return 0, fmt.Errorf("%s: RAM address overflow %d", d.name, realAddress)
 	}
-	return d.connection.ReadByteData(uint8(realAddress))
+	return d.readByteData(uint8(realAddress))
 }
 
 func (d *PCF8583Driver) run(ctrlRegVal uint8) error {
 	ctrlRegVal = ctrlRegVal & ^uint8(pcf8583CtrlStopCounting) // reset stop bit
-	return d.connection.WriteByteData(uint8(pcf8583Reg_CTRL), ctrlRegVal)
+	return d.writeByteData(uint8(pcf8583Reg_CTRL), ctrlRegVal)
 }
 
 func (d *PCF8583Driver) initialize() error {
 	// switch to configured mode
-	ctrlRegVal, err := d.connection.ReadByteData(uint8(pcf8583Reg_CTRL))
+	ctrlRegVal, err := d.readByteData(uint8(pcf8583Reg_CTRL))
 	if err != nil {
 		return err
 	}
 	if d.mode.isModeDiffer(PCF8583Control(ctrlRegVal)) {
 		ctrlRegVal = ctrlRegVal&^uint8(PCF8583CtrlModeTest) | uint8(d.mode)
-		if err = d.connection.WriteByteData(uint8(pcf8583Reg_CTRL), ctrlRegVal); err != nil {
+		if err = d.writeByteData(uint8(pcf8583Reg_CTRL), ctrlRegVal); err != nil {
 			return err
 		}
 		if pcf8583Debug {

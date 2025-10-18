@@ -33,6 +33,7 @@ type pwmPinServoScale struct {
 
 // pwmPinsConfiguration contains all changeable attributes of the adaptor.
 type pwmPinsConfiguration struct {
+	debug                      bool
 	initialize                 pwmPinInitializer
 	usePiBlasterPin            bool
 	periodDefault              uint32
@@ -61,6 +62,7 @@ type PWMPinsAdaptor struct {
 //
 // Further options:
 //
+//	"WithPWMPinDebug"
 //	"WithPWMDefaultPeriod"
 //	"WithPWMPolarityInvertedIdentifier"
 //	"WithPWMNoDutyCycleAdjustment"
@@ -89,6 +91,11 @@ func NewPWMPinsAdaptor(sys *system.Accesser, t pwmPinTranslator, opts ...PwmPins
 	sys.AddPWMSupport()
 
 	return &a
+}
+
+// WithPWMPinDebug can be used to switch on debugging for PWM-pins implementation.
+func WithPWMPinDebug() pwmPinsDebugOption {
+	return pwmPinsDebugOption(true)
 }
 
 // WithPWMPinInitializer substitute the default initializer.
@@ -152,11 +159,17 @@ func (a *PWMPinsAdaptor) Connect() error {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
+	if a.pins != nil {
+		return fmt.Errorf("PWM pins adaptor already connected, please call Finalize() for re-connect")
+	}
+
 	a.pins = make(map[string]gobot.PWMPinner)
 
 	if a.pwmPinsCfg.dutyRateMinimum == 0 && a.pwmPinsCfg.periodDefault > 0 {
 		a.pwmPinsCfg.dutyRateMinimum = 1 / float64(a.pwmPinsCfg.periodDefault)
 	}
+
+	a.debuglnf("connect the PWM pins adaptor done")
 
 	return nil
 }
@@ -166,18 +179,24 @@ func (a *PWMPinsAdaptor) Finalize() error {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
+	a.debuglnf("finalize the pwm pins adaptor with %d pins...", len(a.pins))
+
 	var err error
-	for _, pin := range a.pins {
+	for id, pin := range a.pins {
 		if pin != nil {
-			if errs := pin.SetEnabled(false); errs != nil {
-				err = multierror.Append(err, errs)
+			if e := pin.SetEnabled(false); e != nil {
+				a.debuglnf("PWM pin '%s' disabled on finalize with error: %v", id, e)
+				err = multierror.Append(err, e)
 			}
-			if errs := pin.Unexport(); errs != nil {
-				err = multierror.Append(err, errs)
+			if e := pin.Unexport(); e != nil {
+				a.debuglnf("PWM pin '%s' unexport on finalize with error: %v", id, e)
+				err = multierror.Append(err, e)
 			}
 		}
 	}
 	a.pins = nil
+	a.debuglnf("finalize the PWM pins adaptor done with error: %v", err)
+
 	return err
 }
 
@@ -360,6 +379,10 @@ func (a *PWMPinsAdaptor) validateDutyCycle(id string, dutyNanos, periodNanos flo
 			rate, a.pwmPinsCfg.dutyRateMinimum, id)
 	}
 	return nil
+}
+
+func (a *PWMPinsAdaptor) debuglnf(format string, p ...interface{}) {
+	gobot.Debuglnf(a.pwmPinsCfg.debug, format, p...)
 }
 
 // setPeriod adjusts the PWM period of the given pin. If duty cycle is already set and this feature is not suppressed,

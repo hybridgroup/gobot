@@ -33,6 +33,7 @@ const (
 // https://github.com/DexterInd/GrovePi/tree/1.3.0/README.md
 type GrovePiDriver struct {
 	*Driver
+
 	pins map[int]string
 }
 
@@ -80,7 +81,7 @@ func (d *GrovePiDriver) AnalogRead(pin string) (int, error) {
 	}
 
 	buf := []byte{commandReadAnalog, byte(pinNum), 0, 0}
-	if _, err := d.connection.Write(buf); err != nil {
+	if _, err := d.write(buf); err != nil {
 		return 0, err
 	}
 
@@ -105,7 +106,7 @@ func (d *GrovePiDriver) DigitalRead(pin string) (int, error) {
 	}
 
 	buf := []byte{commandReadDigital, byte(pinNum), 0, 0}
-	if _, err := d.connection.Write(buf); err != nil {
+	if _, err := d.write(buf); err != nil {
 		return 0, err
 	}
 
@@ -134,7 +135,7 @@ func (d *GrovePiDriver) UltrasonicRead(pin string, duration int) (int, error) {
 	}
 
 	buf := []byte{commandReadUltrasonic, byte(pinNum), 0, 0}
-	if _, err = d.connection.Write(buf); err != nil {
+	if _, err = d.write(buf); err != nil {
 		return 0, err
 	}
 
@@ -154,7 +155,7 @@ func (d *GrovePiDriver) FirmwareVersionRead() (string, error) {
 	defer d.mutex.Unlock()
 
 	buf := []byte{commandReadFirmwareVersion, 0, 0, 0}
-	if _, err := d.connection.Write(buf); err != nil {
+	if _, err := d.write(buf); err != nil {
 		return "", err
 	}
 
@@ -187,7 +188,7 @@ func (d *GrovePiDriver) DHTRead(pin string, sensorType byte, duration int) (temp
 	}
 
 	buf := []byte{commandReadDHT, byte(pinNum), sensorType, 0}
-	if _, err = d.connection.Write(buf); err != nil {
+	if _, err = d.write(buf); err != nil {
 		return 0, 0, err
 	}
 	time.Sleep(time.Duration(duration) * time.Millisecond)
@@ -227,13 +228,13 @@ func (d *GrovePiDriver) DigitalWrite(pin string, val byte) error {
 	}
 
 	buf := []byte{commandWriteDigital, byte(pinNum), val, 0}
-	if _, err := d.connection.Write(buf); err != nil {
+	if _, err := d.write(buf); err != nil {
 		return err
 	}
 
 	time.Sleep(2 * time.Millisecond)
 
-	_, err = d.connection.ReadByte()
+	_, err = d.readByte()
 	return err
 }
 
@@ -248,13 +249,13 @@ func (d *GrovePiDriver) AnalogWrite(pin string, val int) error {
 	}
 
 	buf := []byte{commandWriteAnalog, byte(pinNum), byte(val), 0}
-	if _, err := d.connection.Write(buf); err != nil {
+	if _, err := d.write(buf); err != nil {
 		return err
 	}
 
 	time.Sleep(2 * time.Millisecond)
 
-	_, err = d.connection.ReadByte()
+	_, err = d.readByte()
 	return err
 }
 
@@ -283,13 +284,13 @@ func (d *GrovePiDriver) setPinMode(pin byte, mode string) error {
 	} else {
 		b = []byte{commandSetPinMode, pin, 0, 0}
 	}
-	if _, err := d.connection.Write(b); err != nil {
+	if _, err := d.write(b); err != nil {
 		return err
 	}
 
 	time.Sleep(2 * time.Millisecond)
 
-	_, err := d.connection.ReadByte()
+	_, err := d.readByte()
 	return err
 }
 
@@ -318,7 +319,7 @@ func (d *GrovePiDriver) preparePin(pin string, mode string) (int, error) {
 }
 
 func (d *GrovePiDriver) readForCommand(command byte, data []byte) error {
-	cnt, err := d.connection.Read(data)
+	cnt, err := d.read(data)
 	if err != nil {
 		return err
 	}

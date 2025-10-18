@@ -48,7 +48,11 @@ func TestSHT3xStart(t *testing.T) {
 }
 
 func TestSHT3xHalt(t *testing.T) {
-	d, _ := initTestSHT3xDriverWithStubbedAdaptor()
+	// arrange
+	d := NewSHT3xDriver(newI2cTestAdaptor())
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
 	require.NoError(t, d.Halt())
 }
 
@@ -118,8 +122,8 @@ func TestSHT3xSampleUnits(t *testing.T) {
 // Test internal sendCommandDelayGetResponse
 func TestSHT3xSCDGRIoFailures(t *testing.T) {
 	d, a := initTestSHT3xDriverWithStubbedAdaptor()
-	invalidRead := errors.New("Read error")
-	invalidWrite := errors.New("Write error")
+	invalidRead := errors.New("read error")
+	invalidWrite := errors.New("write error")
 
 	// Only send 5 bytes
 	a.i2cReadImpl = func(b []byte) (int, error) {

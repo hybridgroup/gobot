@@ -32,6 +32,15 @@ func TestNewADS1015Driver(t *testing.T) {
 	}
 }
 
+func TestADS1015Halt(t *testing.T) {
+	// arrange
+	d := NewADS1015Driver(newI2cTestAdaptor())
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
+}
+
 func TestADS1015Options(t *testing.T) {
 	// This is a general test, that options are applied in constructor by using the common WithBus() option and
 	// least one of this driver. Further tests for options can also be done by call of "WithOption(val)(d)".
@@ -123,7 +132,7 @@ func TestADS1x15AnalogReadInvalidPin(t *testing.T) {
 	d, _ := initTestADS1015DriverWithStubbedAdaptor()
 
 	_, err := d.AnalogRead("99")
-	require.ErrorContains(t, err, "Invalid channel (99), must be between 0 and 3")
+	require.ErrorContains(t, err, "invalid channel (99), must be between 0 and 3")
 }
 
 func TestADS1x15AnalogReadWriteError(t *testing.T) {
@@ -147,28 +156,28 @@ func TestADS1x15ReadInvalidChannel(t *testing.T) {
 	d, _ := initTestADS1015DriverWithStubbedAdaptor()
 
 	_, err := d.Read(9, 1, 1600)
-	require.ErrorContains(t, err, "Invalid channel (9), must be between 0 and 3")
+	require.ErrorContains(t, err, "invalid channel (9), must be between 0 and 3")
 }
 
 func TestADS1x15ReadInvalidGain(t *testing.T) {
 	d, _ := initTestADS1015DriverWithStubbedAdaptor()
 
 	_, err := d.Read(0, 8, 1600)
-	require.ErrorContains(t, err, "Gain (8) must be one of: [0 1 2 3 4 5 6 7]")
+	require.ErrorContains(t, err, "gain (8) must be one of: [0 1 2 3 4 5 6 7]")
 }
 
 func TestADS1x15ReadInvalidDataRate(t *testing.T) {
 	d, _ := initTestADS1015DriverWithStubbedAdaptor()
 
 	_, err := d.Read(0, 1, 321)
-	require.ErrorContains(t, err, "Invalid data rate (321). Accepted values: [128 250 490 920 1600 2400 3300]")
+	require.ErrorContains(t, err, "invalid data rate (321). Accepted values: [128 250 490 920 1600 2400 3300]")
 }
 
 func TestADS1x15ReadDifferenceInvalidChannel(t *testing.T) {
 	d, _ := initTestADS1015DriverWithStubbedAdaptor()
 
 	_, err := d.ReadDifference(9, 1, 1600)
-	require.ErrorContains(t, err, "Invalid channel (9), must be between 0 and 3")
+	require.ErrorContains(t, err, "invalid channel (9), must be between 0 and 3")
 }
 
 func TestADS1015_rawRead(t *testing.T) {

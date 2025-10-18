@@ -5,6 +5,8 @@ import (
 	"encoding/binary"
 	"errors"
 	"log"
+
+	"gobot.io/x/gobot/v2"
 )
 
 const bme280Debug = true
@@ -43,6 +45,7 @@ type bmeHumidityCalibrationCoefficients struct {
 //	https://godoc.org/gobot.io/x/gobot/v2/drivers/i2c#BMP280Driver
 type BME280Driver struct {
 	*BMP280Driver
+
 	humCalCoeffs    *bmeHumidityCalibrationCoefficients
 	ctrlHumOversamp BME280HumidityOversampling
 }
@@ -62,6 +65,7 @@ func NewBME280Driver(c Connector, options ...func(Config)) *BME280Driver {
 		humCalCoeffs:    &bmeHumidityCalibrationCoefficients{},
 		ctrlHumOversamp: BME280CtrlHumidityOversampling16,
 	}
+	d.name = gobot.DefaultName("BME280")
 	d.afterStart = d.initializationBME280
 
 	// this loop is for options of this class, all options of base class BMP280Driver
@@ -153,7 +157,7 @@ func (d *BME280Driver) initializationBME280() error {
 
 // read the humidity calibration coefficients.
 func (d *BME280Driver) initHumidity() error {
-	hch1, err := d.connection.ReadByteData(bme280RegCalibDigH1)
+	hch1, err := d.readByteData(bme280RegCalibDigH1)
 	if err != nil {
 		return err
 	}
@@ -163,7 +167,7 @@ func (d *BME280Driver) initHumidity() error {
 	}
 
 	coefficients := make([]byte, 7)
-	if err = d.connection.ReadBlockData(bme280RegCalibDigH2LSB, coefficients); err != nil {
+	if err = d.readBlockData(bme280RegCalibDigH2LSB, coefficients); err != nil {
 		return err
 	}
 	buf = bytes.NewBuffer(coefficients)
@@ -203,21 +207,21 @@ func (d *BME280Driver) initHumidity() error {
 	// The 'ctrl_hum' register (0xF2) sets the humidity data acquisition options of
 	// the device. Changes to this register only become effective after a write
 	// operation to 'ctrl_meas' (0xF4). So we read the current value in, then write it back
-	if err := d.connection.WriteByteData(bme280RegControlHumidity, uint8(d.ctrlHumOversamp)); err != nil {
+	if err := d.writeByteData(bme280RegControlHumidity, uint8(d.ctrlHumOversamp)); err != nil {
 		return err
 	}
 
-	cmr, err := d.connection.ReadByteData(bmp280RegCtrl)
+	cmr, err := d.readByteData(bmp280RegCtrl)
 	if err != nil {
 		return err
 	}
 
-	return d.connection.WriteByteData(bmp280RegCtrl, cmr)
+	return d.writeByteData(bmp280RegCtrl, cmr)
 }
 
 func (d *BME280Driver) rawHumidity() (uint32, error) {
 	ret := make([]byte, 2)
-	if err := d.connection.ReadBlockData(bme280RegHumidityMSB, ret); err != nil {
+	if err := d.readBlockData(bme280RegHumidityMSB, ret); err != nil {
 		return 0, err
 	}
 	if ret[0] == 0x80 && ret[1] == 0x00 {

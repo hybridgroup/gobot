@@ -34,6 +34,15 @@ func TestNewAPA102Driver(t *testing.T) {
 	assert.True(t, strings.HasPrefix(d.Name(), "APA102"))
 }
 
+func TestAPA102Halt(t *testing.T) {
+	// arrange
+	d := NewAPA102Driver(newSpiTestAdaptor(), 10, 31)
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
+}
+
 func TestDriverLEDs(t *testing.T) {
 	d := initTestAPA102DriverWithStubbedAdaptor()
 

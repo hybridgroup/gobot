@@ -21,8 +21,9 @@ var errNotExported = errors.New("pin has not been exported")
 
 // digitalPin represents a digital pin
 type digitalPinSysfs struct {
-	pin string
 	*digitalPinConfig
+
+	pin string
 	sfa *sysfsFileAccess
 
 	dirFile       *sysfsFile
@@ -94,7 +95,7 @@ func (d *digitalPinSysfs) Unexport() error {
 	if err != nil {
 		// If EINVAL then the pin is reserved in the system and can't be unexported, we suppress the error
 		var pathError *os.PathError
-		if !(errors.As(err, &pathError) && errors.Is(err, Syscall_EINVAL)) {
+		if !errors.As(err, &pathError) || !errors.Is(err, Syscall_EINVAL) {
 			return err
 		}
 	}
@@ -134,7 +135,7 @@ func (d *digitalPinSysfs) reconfigure() error {
 	if err != nil {
 		// If EBUSY then the pin has already been exported, we suppress the error
 		var pathError *os.PathError
-		if !(errors.As(err, &pathError) && errors.Is(err, Syscall_EBUSY)) {
+		if !errors.As(err, &pathError) || !errors.Is(err, Syscall_EBUSY) {
 			return err
 		}
 	}

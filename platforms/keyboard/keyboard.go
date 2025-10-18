@@ -1,6 +1,7 @@
 package keyboard
 
 import (
+	"context"
 	"os"
 	"os/exec"
 )
@@ -175,7 +176,7 @@ func restore() error {
 }
 
 func stty(args ...string) (string, error) {
-	cmd := exec.Command("stty", args...)
+	cmd := exec.CommandContext(context.Background(), "stty", args...)
 	cmd.Stdin = os.Stdin
 
 	out, err := cmd.Output()

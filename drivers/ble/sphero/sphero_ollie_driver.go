@@ -63,6 +63,7 @@ type Point2D struct {
 type OllieDriver struct {
 	*ble.Driver
 	gobot.Eventer
+
 	defaultCollisionConfig spherocommon.CollisionConfig
 	seq                    uint8
 	collisionResponse      []uint8

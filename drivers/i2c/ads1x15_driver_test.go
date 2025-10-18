@@ -102,5 +102,5 @@ func TestADS1x15_ads1x15BestGainForVoltage(t *testing.T) {
 	assert.Equal(t, 2, g)
 
 	_, err := ads1x15BestGainForVoltage(20.0)
-	require.ErrorContains(t, err, "The maximum voltage which can be read is 6.144000")
+	require.ErrorContains(t, err, "the maximum voltage which can be read is 6.144000")
 }

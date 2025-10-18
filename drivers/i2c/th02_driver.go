@@ -57,6 +57,7 @@ const (
 // TH02Driver is a Driver for a TH02 humidity and temperature sensor
 type TH02Driver struct {
 	*Driver
+
 	Units    string
 	heating  bool
 	fastMode bool
@@ -76,7 +77,7 @@ type TH02Driver struct {
 //	i2c.WithBus(int):	bus to use with this driver
 //	i2c.WithAddress(int):	address to use with this driver
 func NewTH02Driver(a Connector, options ...func(Config)) *TH02Driver {
-	s := &TH02Driver{
+	d := &TH02Driver{
 		Driver:   NewDriver(a, "TH02", th02DefaultAddress, options...),
 		Units:    "C",
 		heating:  false,
@@ -84,10 +85,10 @@ func NewTH02Driver(a Connector, options ...func(Config)) *TH02Driver {
 	}
 
 	for _, option := range options {
-		option(s)
+		option(d)
 	}
 
-	return s
+	return d
 }
 
 // WithTH02FastMode option sets the fast mode (leads to lower accuracy).
@@ -104,8 +105,8 @@ func WithTH02FastMode(val int) func(Config) {
 }
 
 // Accuracy returns the accuracy of the sampling (deprecated, use FastMode() instead)
-func (s *TH02Driver) Accuracy() byte {
-	if s.fastMode {
+func (d *TH02Driver) Accuracy() byte {
+	if d.fastMode {
 		return TH02LowAccuracy
 	}
 	return TH02HighAccuracy
@@ -113,105 +114,105 @@ func (s *TH02Driver) Accuracy() byte {
 
 // SetAccuracy sets the accuracy of the sampling. (deprecated, use WithFastMode() instead)
 // It will only be used on the next measurement request.  Invalid value will use the default of High
-func (s *TH02Driver) SetAccuracy(a byte) {
-	s.fastMode = (a == TH02LowAccuracy)
+func (d *TH02Driver) SetAccuracy(a byte) {
+	d.fastMode = (a == TH02LowAccuracy)
 }
 
 // SerialNumber returns the serial number of the chip
-func (s *TH02Driver) SerialNumber() (uint8, error) {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
+func (d *TH02Driver) SerialNumber() (uint8, error) {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
 
-	ret, err := s.connection.ReadByteData(th02Reg_ID)
+	ret, err := d.readByteData(th02Reg_ID)
 	return ret >> 4, err
 }
 
 // FastMode returns true if the fast mode is enabled in the device
-func (s *TH02Driver) FastMode() (bool, error) {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
+func (d *TH02Driver) FastMode() (bool, error) {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
 
-	cfg, err := s.connection.ReadByteData(th02Reg_Config)
+	cfg, err := d.readByteData(th02Reg_Config)
 	return (th02Config_FastBit & cfg) == th02Config_FastBit, err
 }
 
 // SetHeater sets the heater of the device to the given state.
-func (s *TH02Driver) SetHeater(state bool) error {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
+func (d *TH02Driver) SetHeater(state bool) error {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
 
-	s.heating = state
-	return s.connection.WriteByteData(th02Reg_Config, s.createConfig(false, false))
+	d.heating = state
+	return d.writeByteData(th02Reg_Config, d.createConfig(false, false))
 }
 
 // Heater returns true if the heater is enabled in the device
-func (s *TH02Driver) Heater() (bool, error) {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
+func (d *TH02Driver) Heater() (bool, error) {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
 
-	cfg, err := s.connection.ReadByteData(th02Reg_Config)
+	cfg, err := d.readByteData(th02Reg_Config)
 	return (th02Config_HeatBit & cfg) == th02Config_HeatBit, err
 }
 
 // Sample returns the temperature in celsius and relative humidity for one sample
 //
 //nolint:nonamedreturns // is sufficient here
-func (s *TH02Driver) Sample() (temperature float32, relhumidity float32, _ error) {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
+func (d *TH02Driver) Sample() (temperature float32, relhumidity float32, _ error) {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
 
 	// read humidity
-	if err := s.connection.WriteByteData(th02Reg_Config, s.createConfig(true, false)); err != nil {
+	if err := d.writeByteData(th02Reg_Config, d.createConfig(true, false)); err != nil {
 		return 0, 0, err
 	}
 
-	rawrh, err := s.waitAndReadData()
+	rawrh, err := d.waitAndReadData()
 	if err != nil {
 		return 0, 0, err
 	}
 	relhumidity = float32(rawrh>>4)/16.0 - 24.0
 
 	// read temperature
-	if err := s.connection.WriteByteData(th02Reg_Config, s.createConfig(true, true)); err != nil {
+	if err := d.writeByteData(th02Reg_Config, d.createConfig(true, true)); err != nil {
 		return 0, relhumidity, err
 	}
-	rawt, err := s.waitAndReadData()
+	rawt, err := d.waitAndReadData()
 	if err != nil {
 		return 0, relhumidity, err
 	}
 	temperature = float32(rawt>>2)/32.0 - 50.0
 
-	if s.Units == "F" {
+	if d.Units == "F" {
 		temperature = 9.0/5.0*temperature + 32.0
 	}
 
 	return temperature, relhumidity, nil
 }
 
-func (s *TH02Driver) createConfig(measurement bool, readTemp bool) byte {
+func (d *TH02Driver) createConfig(measurement bool, readTemp bool) byte {
 	cfg := byte(0x00)
 	if measurement {
 		cfg = cfg | th02Config_StartBit
 		if readTemp {
 			cfg = cfg | th02Config_TempBit
 		}
-		if s.fastMode {
+		if d.fastMode {
 			cfg = cfg | th02Config_FastBit
 		}
 	}
-	if s.heating {
+	if d.heating {
 		cfg = cfg | th02Config_HeatBit
 	}
 	return cfg
 }
 
-func (s *TH02Driver) waitAndReadData() (uint16, error) {
-	if err := s.waitForReady(nil); err != nil {
+func (d *TH02Driver) waitAndReadData() (uint16, error) {
+	if err := d.waitForReady(nil); err != nil {
 		return 0, err
 	}
 
 	rcvd := make([]byte, 2)
-	err := s.connection.ReadBlockData(th02Reg_DataMSB, rcvd)
+	err := d.readBlockData(th02Reg_DataMSB, rcvd)
 	if err != nil {
 		return 0, err
 	}
@@ -220,7 +221,7 @@ func (s *TH02Driver) waitAndReadData() (uint16, error) {
 
 // waitForReady blocks for up to the passed duration (which defaults to 50mS if nil)
 // until the ~RDY bit is cleared, meaning a sample has been fully sampled and is ready for reading.
-func (s *TH02Driver) waitForReady(dur *time.Duration) error {
+func (d *TH02Driver) waitForReady(dur *time.Duration) error {
 	wait := 100 * time.Millisecond
 	if dur != nil {
 		wait = *dur
@@ -231,7 +232,7 @@ func (s *TH02Driver) waitForReady(dur *time.Duration) error {
 			return fmt.Errorf("timeout on \\RDY")
 		}
 
-		if reg, err := s.connection.ReadByteData(th02Reg_Status); (reg == 0) && (err == nil) {
+		if reg, err := d.readByteData(th02Reg_Status); (reg == 0) && (err == nil) {
 			return nil
 		}
 		time.Sleep(wait / 10)

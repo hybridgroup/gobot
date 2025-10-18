@@ -87,7 +87,7 @@ func TestIOPinDigitalReadInvalidPin(t *testing.T) {
 	require.Error(t, err)
 
 	_, err = d.DigitalRead("6")
-	require.ErrorContains(t, err, "Invalid pin.")
+	require.ErrorContains(t, err, "invalid pin")
 }
 
 func TestIOPinDigitalWrite(t *testing.T) {
@@ -103,7 +103,7 @@ func TestIOPinDigitalWriteInvalidPin(t *testing.T) {
 	d := NewIOPinDriver(a)
 
 	require.Error(t, d.DigitalWrite("A3", 1))
-	require.ErrorContains(t, d.DigitalWrite("6", 1), "Invalid pin.")
+	require.ErrorContains(t, d.DigitalWrite("6", 1), "invalid pin")
 }
 
 func TestIOPinAnalogRead(t *testing.T) {
@@ -130,7 +130,7 @@ func TestIOPinAnalogReadInvalidPin(t *testing.T) {
 	require.Error(t, err)
 
 	_, err = d.AnalogRead("6")
-	require.ErrorContains(t, err, "Invalid pin.")
+	require.ErrorContains(t, err, "invalid pin")
 }
 
 func TestIOPinDigitalAnalogRead(t *testing.T) {

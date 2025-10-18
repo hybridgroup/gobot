@@ -8,6 +8,7 @@ import (
 // APA102Driver is a driver for the APA102 programmable RGB LEDs.
 type APA102Driver struct {
 	*Driver
+
 	vals       []color.RGBA
 	brightness uint8
 }
@@ -85,5 +86,5 @@ func (d *APA102Driver) Draw() error {
 		tx[i] = 0xff
 	}
 
-	return d.connection.WriteBytes(tx)
+	return d.writeBytes(tx)
 }

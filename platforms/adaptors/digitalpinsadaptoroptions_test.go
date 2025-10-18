@@ -15,11 +15,19 @@ import (
 func TestDigitalPinsWithGpiosActiveLow(t *testing.T) {
 	// This is a general test, that options are applied in constructor. Further tests for options
 	// can also be done by call of "WithOption(val).apply(cfg)".
-	// arrange & act, connect is mandatory to set options to the system
+	// arrange & act
 	a := NewDigitalPinsAdaptor(system.NewAccesser(), nil, WithGpiosActiveLow("1", "12", "33"))
-	require.NoError(t, a.Connect())
 	// assert
 	assert.Len(t, a.digitalPinsCfg.pinOptions, 3)
+}
+
+func TestWithDigitalPinDebug(t *testing.T) {
+	// arrange
+	cfg := &digitalPinsConfiguration{debug: false}
+	// act
+	WithDigitalPinDebug().apply(cfg)
+	// assert
+	assert.True(t, cfg.debug)
 }
 
 func TestDigitalPinsWithDigitalPinInitializer(t *testing.T) {

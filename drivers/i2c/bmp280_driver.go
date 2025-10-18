@@ -89,6 +89,7 @@ type bmp280CalibrationCoefficients struct {
 // BMP280Driver is a driver for the BMP280 temperature/pressure sensor
 type BMP280Driver struct {
 	*Driver
+
 	calCoeffs         *bmp280CalibrationCoefficients
 	ctrlPwrMode       uint8
 	ctrlPressOversamp BMP280PressureOversampling
@@ -210,7 +211,7 @@ func (d *BMP280Driver) Altitude() (float32, error) {
 // initialization reads the calibration coefficients.
 func (d *BMP280Driver) initialization() error {
 	coefficients := make([]byte, 24)
-	if err := d.connection.ReadBlockData(bmp280RegCalib00, coefficients); err != nil {
+	if err := d.readBlockData(bmp280RegCalib00, coefficients); err != nil {
 		return err
 	}
 	buf := bytes.NewBuffer(coefficients)
@@ -252,19 +253,19 @@ func (d *BMP280Driver) initialization() error {
 	}
 
 	ctrlReg := d.ctrlPwrMode | uint8(d.ctrlPressOversamp)<<2 | uint8(d.ctrlTempOversamp)<<5
-	if err := d.connection.WriteByteData(bmp280RegCtrl, ctrlReg); err != nil {
+	if err := d.writeByteData(bmp280RegCtrl, ctrlReg); err != nil {
 		return err
 	}
 
 	confReg := uint8(bmp280ConfStandBy0005)<<2 | uint8(d.confFilter)<<5
-	return d.connection.WriteByteData(bmp280RegConf, confReg & ^uint8(bmp280ConfSPIBit))
+	return d.writeByteData(bmp280RegConf, confReg & ^uint8(bmp280ConfSPIBit))
 }
 
 func (d *BMP280Driver) rawTemp() (int32, error) {
 	var tp0, tp1, tp2 byte
 
 	data := make([]byte, 3)
-	if err := d.connection.ReadBlockData(bmp280RegTempData, data); err != nil {
+	if err := d.readBlockData(bmp280RegTempData, data); err != nil {
 		return 0, err
 	}
 	buf := bytes.NewBuffer(data)
@@ -285,7 +286,7 @@ func (d *BMP280Driver) rawPressure() (int32, error) {
 	var tp0, tp1, tp2 byte
 
 	data := make([]byte, 3)
-	if err := d.connection.ReadBlockData(bmp280RegPressureData, data); err != nil {
+	if err := d.readBlockData(bmp280RegPressureData, data); err != nil {
 		return 0, err
 	}
 	buf := bytes.NewBuffer(data)

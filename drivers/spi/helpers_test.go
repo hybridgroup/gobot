@@ -34,7 +34,7 @@ func newSpiTestAdaptor() *spiTestAdaptor {
 // spi.Connector interfaces
 func (a *spiTestAdaptor) GetSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (Connection, error) {
 	if a.spiConnectErr {
-		return nil, fmt.Errorf("Invalid SPI connection in helper")
+		return nil, fmt.Errorf("invalid SPI connection in helper")
 	}
 	// a.busNum = busNum
 	sysdev, err := a.sys.NewSpiDevice(busNum, chipNum, mode, bits, maxSpeed)

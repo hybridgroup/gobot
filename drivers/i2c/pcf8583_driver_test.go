@@ -37,6 +37,15 @@ func TestNewPCF8583Driver(t *testing.T) {
 	assert.Equal(t, uint8(0x10), d.ramOffset)
 }
 
+func TestPCF8583Halt(t *testing.T) {
+	// arrange
+	d := NewPCF8583Driver(newI2cTestAdaptor())
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
+}
+
 func TestPCF8583Options(t *testing.T) {
 	// This is a general test, that options are applied in constructor by using the common WithBus() option and
 	// least one of this driver. Further tests for options can also be done by call of "WithOption(val)(d)".
@@ -70,8 +79,8 @@ func TestPCF8583CommandsReadTime(t *testing.T) {
 	// arrange
 	d, a := initTestPCF8583WithStubbedAdaptor()
 	d.yearOffset = 2019
-	milliSec := 550 * time.Millisecond // 0.55 sec = 550 ms
-	want := time.Date(2021, time.December, 24, 18, 0, 0, int(milliSec), time.UTC)
+	const millis = 550 * time.Millisecond // 0.55 sec = 550 ms
+	want := time.Date(2021, time.December, 24, 18, 0, 0, int(millis), time.UTC)
 	reg0Val := uint8(0x00) // clock mode 32.768 kHz
 	reg1Val := uint8(0x55) // BCD: 1/10 and 1/100 sec (55)
 	reg2Val := uint8(0x00) // BCD: 10 and 1 sec (00)
@@ -187,10 +196,10 @@ func TestPCF8583WriteTime(t *testing.T) {
 	// * write the control register (start counting)
 	// arrange
 	d, a := initTestPCF8583WithStubbedAdaptor()
-	a.written = []byte{}               // reset writes of Start() and former test
-	readCtrlState := uint8(0x07)       // 32.768kHz clock mode
-	milliSec := 210 * time.Millisecond // 0.21 sec = 210 ms
-	initDate := time.Date(2022, time.December, 16, 15, 14, 13, int(milliSec), time.UTC)
+	a.written = []byte{}                  // reset writes of Start() and former test
+	readCtrlState := uint8(0x07)          // 32.768kHz clock mode
+	const millis = 210 * time.Millisecond // 0.21 sec = 210 ms
+	initDate := time.Date(2022, time.December, 16, 15, 14, 13, int(millis), time.UTC)
 	wantCtrlStop := uint8(0x87)  // stop counting bit is set
 	wantReg1Val := uint8(0x21)   // BCD: 1/10 and 1/100 sec (21)
 	wantReg2Val := uint8(0x13)   // BCD: 10 and 1 sec (13)
@@ -265,8 +274,8 @@ func TestPCF8583ReadTime(t *testing.T) {
 	d, a := initTestPCF8583WithStubbedAdaptor()
 	a.written = []byte{} // reset writes of Start() and former test
 	d.yearOffset = 2020
-	milliSec := 210 * time.Millisecond // 0.21 sec = 210 ms
-	want := time.Date(2022, time.December, 16, 15, 14, 13, int(milliSec), time.UTC)
+	const millis = 210 * time.Millisecond // 0.21 sec = 210 ms
+	want := time.Date(2022, time.December, 16, 15, 14, 13, int(millis), time.UTC)
 	reg0Val := uint8(0x10) // clock mode 50Hz
 	reg1Val := uint8(0x21) // BCD: 1/10 and 1/100 sec (21)
 	reg2Val := uint8(0x13) // BCD: 10 and 1 sec (13)

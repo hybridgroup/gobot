@@ -72,7 +72,7 @@ func TestNewHD44780Driver(t *testing.T) {
 	assert.NotNil(t, d.Commander)
 	assert.NotNil(t, d.mutex)
 	// assert: driver specific attributes
-	assert.Equal(t, "", d.hd44780Cfg.pinRW)
+	assert.Empty(t, d.hd44780Cfg.pinRW)
 	assert.Equal(t, 16, d.cols)
 	assert.Equal(t, 2, d.rows)
 	assert.Equal(t, HD44780_4BITMODE, d.busMode)
@@ -138,7 +138,7 @@ func TestHD44780StartError(t *testing.T) {
 		D7: "",
 	}
 	d = NewHD44780Driver(a, 2, 16, HD44780_4BITMODE, "13", "15", pins)
-	require.EqualError(t, d.Start(), "Initialization error")
+	require.EqualError(t, d.Start(), "initialization error")
 
 	pins = HD44780DataPin{
 		D0: "31",
@@ -151,7 +151,7 @@ func TestHD44780StartError(t *testing.T) {
 		D7: "",
 	}
 	d = NewHD44780Driver(a, 2, 16, HD44780_8BITMODE, "13", "15", pins)
-	require.EqualError(t, d.Start(), "Initialization error")
+	require.EqualError(t, d.Start(), "initialization error")
 }
 
 func TestHD44780Write(t *testing.T) {
@@ -203,10 +203,10 @@ func TestHD44780SetCursor(t *testing.T) {
 func TestHD44780SetCursorInvalid(t *testing.T) {
 	d := initTestHD44780Driver()
 
-	require.EqualError(t, d.SetCursor(-1, 3), "Invalid position value (-1, 3), range (1, 15)")
-	require.EqualError(t, d.SetCursor(2, 3), "Invalid position value (2, 3), range (1, 15)")
-	require.EqualError(t, d.SetCursor(0, -1), "Invalid position value (0, -1), range (1, 15)")
-	require.EqualError(t, d.SetCursor(0, 16), "Invalid position value (0, 16), range (1, 15)")
+	require.EqualError(t, d.SetCursor(-1, 3), "invalid position value (-1, 3), range (1, 15)")
+	require.EqualError(t, d.SetCursor(2, 3), "invalid position value (2, 3), range (1, 15)")
+	require.EqualError(t, d.SetCursor(0, -1), "invalid position value (0, -1), range (1, 15)")
+	require.EqualError(t, d.SetCursor(0, 16), "invalid position value (0, 16), range (1, 15)")
 }
 
 func TestHD44780DisplayOn(t *testing.T) {

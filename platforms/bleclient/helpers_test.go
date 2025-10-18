@@ -69,6 +69,8 @@ func (ptp *btTestPayload) LocalName() string { return ptp.name }
 
 func (*btTestPayload) HasServiceUUID(bluetooth.UUID) bool { return true }
 
+func (*btTestPayload) ServiceUUIDs() []bluetooth.UUID { return nil }
+
 func (*btTestPayload) Bytes() []byte { return nil }
 
 func (*btTestPayload) ManufacturerData() []bluetooth.ManufacturerDataElement { return nil }
@@ -97,6 +99,7 @@ func (btd btTestDevice) Disconnect() error {
 	return nil
 }
 
+// btTestChara implements bluetoothExtCharacteristicer
 type btTestChara struct {
 	readData         []byte
 	writtenData      []byte

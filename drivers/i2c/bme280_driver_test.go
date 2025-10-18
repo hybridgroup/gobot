@@ -28,7 +28,7 @@ func TestNewBME280Driver(t *testing.T) {
 		require.Fail(t, "NewBME280Driver() should have returned a *BME280Driver")
 	}
 	assert.NotNil(t, d.Driver)
-	assert.True(t, strings.HasPrefix(d.Name(), "BMP280"))
+	assert.True(t, strings.HasPrefix(d.Name(), "BME280"))
 	assert.Equal(t, 0x77, d.defaultAddress)
 	assert.Equal(t, uint8(0x03), d.ctrlPwrMode)
 	assert.Equal(t, BMP280PressureOversampling(0x05), d.ctrlPressOversamp)
@@ -36,6 +36,15 @@ func TestNewBME280Driver(t *testing.T) {
 	assert.Equal(t, BME280HumidityOversampling(0x05), d.ctrlHumOversamp)
 	assert.Equal(t, BMP280IIRFilter(0x00), d.confFilter)
 	assert.NotNil(t, d.calCoeffs)
+}
+
+func TestBME280Halt(t *testing.T) {
+	// arrange
+	d := NewBME280Driver(newI2cTestAdaptor())
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
 }
 
 func TestBME280Options(t *testing.T) {

@@ -62,13 +62,13 @@ type DisplayBuffer struct {
 
 // NewDisplayBuffer creates a new DisplayBuffer
 func NewDisplayBuffer(width, height, pageSize int) *DisplayBuffer {
-	s := &DisplayBuffer{
+	d := &DisplayBuffer{
 		width:    width,
 		height:   height,
 		pageSize: pageSize,
 	}
-	s.buffer = make([]byte, s.Size())
-	return s
+	d.buffer = make([]byte, d.Size())
+	return d
 }
 
 // Size returns the memory size of the display buffer
@@ -100,6 +100,7 @@ func (d *DisplayBuffer) Set(buf []byte) {
 // SSD1306Driver is a Gobot Driver for a SSD1306 Display
 type SSD1306Driver struct {
 	*Driver
+
 	dcDriver      *gpio.DirectPinDriver
 	rstDriver     *gpio.DirectPinDriver
 	pageSize      int
@@ -135,7 +136,7 @@ func NewSSD1306Driver(a gobot.Adaptor, options ...func(Config)) *SSD1306Driver {
 	if !ok {
 		panic("unable to get gobot connector for ssd1306")
 	}
-	s := &SSD1306Driver{
+	d := &SSD1306Driver{
 		Driver:        NewDriver(b, "SSD1306"),
 		DisplayWidth:  ssd1306Width,
 		DisplayHeight: ssd1306Height,
@@ -143,47 +144,47 @@ func NewSSD1306Driver(a gobot.Adaptor, options ...func(Config)) *SSD1306Driver {
 		RSTPin:        ssd1306RstPin,
 		ExternalVcc:   ssd1306ExternalVcc,
 	}
-	s.afterStart = s.initialize
-	s.beforeHalt = s.shutdown
+	d.afterStart = d.initialize
+	d.beforeHalt = d.shutdown
 
 	for _, option := range options {
-		option(s)
+		option(d)
 	}
-	s.dcDriver = gpio.NewDirectPinDriver(a, s.DCPin)
-	s.rstDriver = gpio.NewDirectPinDriver(a, s.RSTPin)
-	s.pageSize = s.DisplayHeight / 8
-	s.buffer = NewDisplayBuffer(s.DisplayWidth, s.DisplayHeight, s.pageSize)
-	s.AddCommand("Display", func(_ map[string]interface{}) interface{} {
-		err := s.Display()
+	d.dcDriver = gpio.NewDirectPinDriver(a, d.DCPin)
+	d.rstDriver = gpio.NewDirectPinDriver(a, d.RSTPin)
+	d.pageSize = d.DisplayHeight / 8
+	d.buffer = NewDisplayBuffer(d.DisplayWidth, d.DisplayHeight, d.pageSize)
+	d.AddCommand("Display", func(_ map[string]interface{}) interface{} {
+		err := d.Display()
 		return map[string]interface{}{"err": err}
 	})
-	s.AddCommand("On", func(_ map[string]interface{}) interface{} {
-		err := s.On()
+	d.AddCommand("On", func(_ map[string]interface{}) interface{} {
+		err := d.On()
 		return map[string]interface{}{"err": err}
 	})
-	s.AddCommand("Off", func(_ map[string]interface{}) interface{} {
-		err := s.Off()
+	d.AddCommand("Off", func(_ map[string]interface{}) interface{} {
+		err := d.Off()
 		return map[string]interface{}{"err": err}
 	})
-	s.AddCommand("Clear", func(_ map[string]interface{}) interface{} {
-		err := s.Clear()
+	d.AddCommand("Clear", func(_ map[string]interface{}) interface{} {
+		err := d.Clear()
 		return map[string]interface{}{"err": err}
 	})
 	//nolint:forcetypeassert // ok here
-	s.AddCommand("SetContrast", func(params map[string]interface{}) interface{} {
+	d.AddCommand("SetContrast", func(params map[string]interface{}) interface{} {
 		contrast := params["contrast"].(byte)
-		err := s.SetContrast(contrast)
+		err := d.SetContrast(contrast)
 		return map[string]interface{}{"err": err}
 	})
 	//nolint:forcetypeassert // ok here
-	s.AddCommand("Set", func(params map[string]interface{}) interface{} {
+	d.AddCommand("Set", func(params map[string]interface{}) interface{} {
 		x := params["x"].(int)
 		y := params["y"].(int)
 		c := params["c"].(int)
-		s.Set(x, y, c)
+		d.Set(x, y, c)
 		return nil
 	})
-	return s
+	return d
 }
 
 // WithDisplayWidth option sets the SSD1306Driver DisplayWidth option.
@@ -247,238 +248,243 @@ func WithExternalVCC(val bool) func(Config) {
 }
 
 // On turns on the display.
-func (s *SSD1306Driver) On() error {
-	return s.command(ssd1306SetDisplayOn)
+func (d *SSD1306Driver) On() error {
+	return d.command(ssd1306SetDisplayOn)
 }
 
 // Off turns off the display.
-func (s *SSD1306Driver) Off() error {
-	return s.command(ssd1306SetDisplayOff)
+func (d *SSD1306Driver) Off() error {
+	return d.command(ssd1306SetDisplayOff)
 }
 
 // Clear clears the display buffer.
-func (s *SSD1306Driver) Clear() error {
-	s.buffer.Clear()
+func (d *SSD1306Driver) Clear() error {
+	d.buffer.Clear()
 	return nil
 }
 
 // Set sets a pixel in the display buffer.
-func (s *SSD1306Driver) Set(x, y, c int) {
-	s.buffer.SetPixel(x, y, c)
+func (d *SSD1306Driver) Set(x, y, c int) {
+	d.buffer.SetPixel(x, y, c)
 }
 
 // Reset re-initializes the device to a clean state.
-func (s *SSD1306Driver) Reset() error {
-	if err := s.rstDriver.DigitalWrite(1); err != nil {
+func (d *SSD1306Driver) Reset() error {
+	if err := d.rstDriver.DigitalWrite(1); err != nil {
 		return err
 	}
 	time.Sleep(10 * time.Millisecond)
-	if err := s.rstDriver.DigitalWrite(0); err != nil {
+	if err := d.rstDriver.DigitalWrite(0); err != nil {
 		return err
 	}
 	time.Sleep(10 * time.Millisecond)
-	if err := s.rstDriver.DigitalWrite(1); err != nil {
+	if err := d.rstDriver.DigitalWrite(1); err != nil {
 		return err
 	}
 	return nil
 }
 
 // SetBufferAndDisplay sets the display buffer with the given buffer and displays the image.
-func (s *SSD1306Driver) SetBufferAndDisplay(buf []byte) error {
-	s.buffer.Set(buf)
-	return s.Display()
+func (d *SSD1306Driver) SetBufferAndDisplay(buf []byte) error {
+	d.buffer.Set(buf)
+	return d.Display()
 }
 
 // SetContrast sets the display contrast (0-255).
-func (s *SSD1306Driver) SetContrast(contrast byte) error {
-	if err := s.command(ssd1306SetContrast); err != nil {
+func (d *SSD1306Driver) SetContrast(contrast byte) error {
+	if err := d.command(ssd1306SetContrast); err != nil {
 		return err
 	}
-	return s.command(contrast)
+	return d.command(contrast)
 }
 
 // Display sends the memory buffer to the display.
-func (s *SSD1306Driver) Display() error {
-	if err := s.command(ssd1306ColumnAddr); err != nil {
+func (d *SSD1306Driver) Display() error {
+	if err := d.command(ssd1306ColumnAddr); err != nil {
 		return err
 	}
-	if err := s.command(0); err != nil {
-		return err
-	}
-	//nolint:gosec // TODO: fix later
-	if err := s.command(uint8(s.DisplayWidth) - 1); err != nil {
-		return err
-	}
-	if err := s.command(ssd1306PageAddr); err != nil {
-		return err
-	}
-	if err := s.command(0); err != nil {
+	if err := d.command(0); err != nil {
 		return err
 	}
 	//nolint:gosec // TODO: fix later
-	if err := s.command(uint8(s.pageSize) - 1); err != nil {
+	if err := d.command(uint8(d.DisplayWidth) - 1); err != nil {
 		return err
 	}
-	if err := s.dcDriver.DigitalWrite(1); err != nil {
+	if err := d.command(ssd1306PageAddr); err != nil {
 		return err
 	}
-	return s.connection.WriteBlockData(0x40, s.buffer.buffer)
+	if err := d.command(0); err != nil {
+		return err
+	}
+	//nolint:gosec // TODO: fix later
+	if err := d.command(uint8(d.pageSize) - 1); err != nil {
+		return err
+	}
+	if err := d.dcDriver.DigitalWrite(1); err != nil {
+		return err
+	}
+	return d.writeBlockData(0x40, d.buffer.buffer)
 }
 
 // ShowImage takes a standard Go image and shows it on the display in monochrome.
-func (s *SSD1306Driver) ShowImage(img image.Image) error {
-	if img.Bounds().Dx() != s.DisplayWidth || img.Bounds().Dy() != s.DisplayHeight {
-		return fmt.Errorf("Image must match the display width and height")
+func (d *SSD1306Driver) ShowImage(img image.Image) error {
+	if img.Bounds().Dx() != d.DisplayWidth || img.Bounds().Dy() != d.DisplayHeight {
+		return fmt.Errorf("image must match the display width and height")
 	}
 
-	if err := s.Clear(); err != nil {
+	if err := d.Clear(); err != nil {
 		return err
 	}
 	for y, w, h := 0, img.Bounds().Dx(), img.Bounds().Dy(); y < h; y++ {
 		for x := 0; x < w; x++ {
 			c := img.At(x, y)
 			if r, g, b, _ := c.RGBA(); r > 0 || g > 0 || b > 0 {
-				s.Set(x, y, 1)
+				d.Set(x, y, 1)
 			}
 		}
 	}
-	return s.Display()
+	return d.Display()
 }
 
 // command sends a unique command
-func (s *SSD1306Driver) command(b byte) error {
-	if err := s.dcDriver.DigitalWrite(0); err != nil {
+func (d *SSD1306Driver) command(b byte) error {
+	if err := d.dcDriver.DigitalWrite(0); err != nil {
 		return err
 	}
-	return s.connection.WriteByte(b)
+	return d.writeByte(b)
 }
 
 // initialize configures the ssd1306 based on the options passed in when the driver was created
-func (s *SSD1306Driver) initialize() error {
-	if err := s.command(ssd1306SetDisplayOff); err != nil {
+func (d *SSD1306Driver) initialize() error {
+	if err := d.command(ssd1306SetDisplayOff); err != nil {
 		return err
 	}
-	if err := s.command(ssd1306SetDisplayClock); err != nil {
+	if err := d.command(ssd1306SetDisplayClock); err != nil {
 		return err
 	}
-	if s.DisplayHeight == 16 {
-		if err := s.command(0x60); err != nil {
+	if d.DisplayHeight == 16 {
+		if err := d.command(0x60); err != nil {
 			return err
 		}
 	} else {
-		if err := s.command(0x80); err != nil {
+		if err := d.command(0x80); err != nil {
 			return err
 		}
 	}
-	if err := s.command(ssd1306SetMultiplexRatio); err != nil {
+	if err := d.command(ssd1306SetMultiplexRatio); err != nil {
 		return err
 	}
 	//nolint:gosec // TODO: fix later
-	if err := s.command(uint8(s.DisplayHeight) - 1); err != nil {
+	if err := d.command(uint8(d.DisplayHeight) - 1); err != nil {
 		return err
 	}
-	if err := s.command(ssd1306SetDisplayOffset); err != nil {
+	if err := d.command(ssd1306SetDisplayOffset); err != nil {
 		return err
 	}
-	if err := s.command(0x0); err != nil {
+	if err := d.command(0x0); err != nil {
 		return err
 	}
-	if err := s.command(ssd1306SetStartLine); err != nil {
+	if err := d.command(ssd1306SetStartLine); err != nil {
 		return err
 	}
-	if err := s.command(0x0); err != nil {
+	if err := d.command(0x0); err != nil {
 		return err
 	}
-	if err := s.command(ssd1306ChargePumpSetting); err != nil {
+	if err := d.command(ssd1306ChargePumpSetting); err != nil {
 		return err
 	}
-	if s.ExternalVcc {
-		if err := s.command(0x10); err != nil {
+	if d.ExternalVcc {
+		if err := d.command(0x10); err != nil {
 			return err
 		}
 	} else {
-		if err := s.command(0x14); err != nil {
+		if err := d.command(0x14); err != nil {
 			return err
 		}
 	}
-	if err := s.command(ssd1306SetMemoryAddressingMode); err != nil {
+	if err := d.command(ssd1306SetMemoryAddressingMode); err != nil {
 		return err
 	}
-	if err := s.command(0x00); err != nil {
+	if err := d.command(0x00); err != nil {
 		return err
 	}
-	if err := s.command(ssd1306SetSegmentRemap0); err != nil {
+	if err := d.command(ssd1306SetSegmentRemap0); err != nil {
 		return err
 	}
-	if err := s.command(0x01); err != nil {
+	if err := d.command(0x01); err != nil {
 		return err
 	}
-	if err := s.command(ssd1306ComScanInc); err != nil {
+	if err := d.command(ssd1306ComScanInc); err != nil {
 		return err
 	}
-	if err := s.command(ssd1306SetComPins); err != nil {
+	if err := d.command(ssd1306SetComPins); err != nil {
 		return err
 	}
-	if s.DisplayHeight == 64 {
-		if err := s.command(0x12); err != nil {
+	if d.DisplayHeight == 64 {
+		if err := d.command(0x12); err != nil {
 			return err
 		}
 	} else {
-		if err := s.command(0x02); err != nil {
+		if err := d.command(0x02); err != nil {
 			return err
 		}
 	}
-	if err := s.command(ssd1306SetContrast); err != nil {
+	if err := d.command(ssd1306SetContrast); err != nil {
 		return err
 	}
-	if s.DisplayHeight == 64 {
-		if s.ExternalVcc {
-			if err := s.command(0x9F); err != nil {
+	if d.DisplayHeight == 64 {
+		if d.ExternalVcc {
+			if err := d.command(0x9F); err != nil {
 				return err
 			}
 		} else {
-			if err := s.command(0xCF); err != nil {
+			if err := d.command(0xCF); err != nil {
 				return err
 			}
 		}
 	} else {
-		if err := s.command(0x8F); err != nil {
+		if err := d.command(0x8F); err != nil {
 			return err
 		}
 	}
-	if err := s.command(ssd1306SetPrechargePeriod); err != nil {
+	if err := d.command(ssd1306SetPrechargePeriod); err != nil {
 		return err
 	}
-	if s.ExternalVcc {
-		if err := s.command(0x22); err != nil {
+	if d.ExternalVcc {
+		if err := d.command(0x22); err != nil {
 			return err
 		}
 	} else {
-		if err := s.command(0xF1); err != nil {
+		if err := d.command(0xF1); err != nil {
 			return err
 		}
 	}
-	if err := s.command(ssd1306SetVComDeselectLevel); err != nil {
+	if err := d.command(ssd1306SetVComDeselectLevel); err != nil {
 		return err
 	}
-	if err := s.command(0x40); err != nil {
+	if err := d.command(0x40); err != nil {
 		return err
 	}
-	if err := s.command(ssd1306DisplayOnResumeToRAM); err != nil {
+	if err := d.command(ssd1306DisplayOnResumeToRAM); err != nil {
 		return err
 	}
-	if err := s.command(ssd1306SetDisplayNormal); err != nil {
+	if err := d.command(ssd1306SetDisplayNormal); err != nil {
 		return err
 	}
-	if err := s.command(ssd1306DeactivateScroll); err != nil {
+	if err := d.command(ssd1306DeactivateScroll); err != nil {
 		return err
 	}
-	return s.command(ssd1306SetDisplayOn)
+	return d.command(ssd1306SetDisplayOn)
 }
 
-func (s *SSD1306Driver) shutdown() error {
-	if err := s.Reset(); err != nil {
+func (d *SSD1306Driver) shutdown() error {
+	if d.connection == nil {
+		// not started yet
+		return nil
+	}
+
+	if err := d.Reset(); err != nil {
 		return err
 	}
-	return s.Off()
+	return d.Off()
 }

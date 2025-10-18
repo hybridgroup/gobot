@@ -29,6 +29,7 @@ const (
 // Datasheet: https://datasheets.maximintegrated.com/en/ds/MAX7219-MAX7221.pdf
 type MAX7219Driver struct {
 	*driver
+
 	pinClock *DirectPinDriver
 	pinData  *DirectPinDriver
 	pinCS    *DirectPinDriver

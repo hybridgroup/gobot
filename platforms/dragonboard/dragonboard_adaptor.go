@@ -19,13 +19,14 @@ const (
 
 // Adaptor represents a Gobot Adaptor for a DragonBoard 410c
 type Adaptor struct {
+	*adaptors.DigitalPinsAdaptor
+	*adaptors.I2cBusAdaptor
+	*adaptors.SpiBusAdaptor // for usage of "adaptors.WithSpiGpioAccess()"
+
 	name   string
 	sys    *system.Accesser // used for unit tests only
 	mutex  sync.Mutex
 	pinMap map[string]int
-	*adaptors.DigitalPinsAdaptor
-	*adaptors.I2cBusAdaptor
-	*adaptors.SpiBusAdaptor // for usage of "adaptors.WithSpiGpioAccess()"
 }
 
 // Valid pins are the GPIO_A through GPIO_L pins from the
@@ -55,6 +56,12 @@ var fixedPins = map[string]int{
 //
 //	adaptors.WithGpioCdevAccess():	use character device driver instead of sysfs
 //	adaptors.WithSpiGpioAccess(sclk, ncs, sdo, sdi):	use GPIO's instead of /dev/spidev#.#
+//
+// Further optional parameters for:
+//
+//	GPIO, see [adaptors.NewDigitalPinsAdaptor]
+//	I2C, see [adaptors.NewI2cBusAdaptor]
+//	SPI, see [adaptors.NewSpiBusAdaptor]
 func NewAdaptor(opts ...interface{}) *Adaptor {
 	sys := system.NewAccesser(system.WithDigitalPinSysfsAccess())
 	a := &Adaptor{
@@ -63,11 +70,14 @@ func NewAdaptor(opts ...interface{}) *Adaptor {
 	}
 
 	var digitalPinsOpts []adaptors.DigitalPinsOptionApplier
+	var i2cBusOpts []adaptors.I2CBusOptionApplier
 	var spiBusOpts []adaptors.SpiBusOptionApplier
 	for _, opt := range opts {
 		switch o := opt.(type) {
 		case adaptors.DigitalPinsOptionApplier:
 			digitalPinsOpts = append(digitalPinsOpts, o)
+		case adaptors.I2CBusOptionApplier:
+			i2cBusOpts = append(i2cBusOpts, o)
 		case adaptors.SpiBusOptionApplier:
 			spiBusOpts = append(spiBusOpts, o)
 		default:
@@ -79,7 +89,7 @@ func NewAdaptor(opts ...interface{}) *Adaptor {
 	i2cBusNumberValidator := adaptors.NewBusNumberValidator([]int{0, 1})
 
 	a.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, a.translateDigitalPin, digitalPinsOpts...)
-	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, i2cBusNumberValidator.Validate, defaultI2cBusNumber)
+	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, i2cBusNumberValidator.Validate, defaultI2cBusNumber, i2cBusOpts...)
 
 	// SPI is only supported when "adaptors.WithSpiGpioAccess()" is given
 	if len(spiBusOpts) > 0 {

@@ -96,6 +96,15 @@ func TestPCA9685HaltError(t *testing.T) {
 	require.ErrorContains(t, d.Halt(), "write error")
 }
 
+func TestPCA9685HaltIdempotent(t *testing.T) {
+	// arrange
+	d := NewPCA9685Driver(newI2cTestAdaptor())
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
+}
+
 func TestPCA9685SetPWM(t *testing.T) {
 	// sequence to set PWM for PCA9685:
 	// * set LEDn ON-time register (n=0: 0x06, 0x07, n=1: 0x0A, 0x0B ... n=14: 0x3E, 0x3F, n=15: 0x42, 0x43)

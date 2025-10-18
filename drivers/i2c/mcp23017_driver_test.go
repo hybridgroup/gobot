@@ -38,7 +38,9 @@ func initTestMCP23017WithStubbedAdaptor(b uint8) (*MCP23017Driver, *i2cTestAdapt
 	// create the driver, ready to use for tests
 	a := newI2cTestAdaptor()
 	d := NewMCP23017Driver(a, WithMCP23017Bank(b))
-	_ = d.Start()
+	if err := d.Start(); err != nil {
+		panic(err)
+	}
 	return d, a
 }
 
@@ -53,6 +55,13 @@ func TestNewMCP23017Driver(t *testing.T) {
 	assert.Equal(t, 0x20, d.defaultAddress)
 	assert.NotNil(t, d.mcpConf)
 	assert.NotNil(t, d.mcpBehav)
+}
+
+func TestMCP23017Halt(t *testing.T) {
+	d := NewMCP23017Driver(newI2cTestAdaptor())
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
 }
 
 func TestWithMCP23017Bank(t *testing.T) {
@@ -541,13 +550,13 @@ func TestMCP23017_write(t *testing.T) {
 	// clear bit
 	d, _ := initTestMCP23017WithStubbedAdaptor(0)
 	port := d.getPort("A")
-	err := d.write(port.IODIR, uint8(7), 0)
+	err := d.writePin(port.IODIR, uint8(7), 0)
 	require.NoError(t, err)
 
 	// set bit
 	d, _ = initTestMCP23017WithStubbedAdaptor(0)
 	port = d.getPort("B")
-	err = d.write(port.IODIR, uint8(7), 1)
+	err = d.writePin(port.IODIR, uint8(7), 1)
 	require.NoError(t, err)
 
 	// write error
@@ -555,7 +564,7 @@ func TestMCP23017_write(t *testing.T) {
 	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}
-	err = d.write(port.IODIR, uint8(7), 0)
+	err = d.writePin(port.IODIR, uint8(7), 0)
 	require.ErrorContains(t, err, "MCP write-read: MCP write-ReadByteData(reg=1): write error")
 
 	// read error
@@ -563,12 +572,12 @@ func TestMCP23017_write(t *testing.T) {
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		return len(b), errors.New("read error")
 	}
-	err = d.write(port.IODIR, uint8(7), 0)
+	err = d.writePin(port.IODIR, uint8(7), 0)
 	require.ErrorContains(t, err, "MCP write-read: MCP write-ReadByteData(reg=1): read error")
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		return len(b), nil
 	}
-	err = d.write(port.IODIR, uint8(7), 1)
+	err = d.writePin(port.IODIR, uint8(7), 1)
 	require.NoError(t, err)
 }
 
@@ -580,7 +589,7 @@ func TestMCP23017_read(t *testing.T) {
 		copy(b, []byte{255})
 		return 1, nil
 	}
-	val, _ := d.read(port.IODIR)
+	val, _ := d.readReg(port.IODIR)
 	assert.Equal(t, uint8(255), val)
 
 	// read error
@@ -589,7 +598,7 @@ func TestMCP23017_read(t *testing.T) {
 		return len(b), errors.New("read error")
 	}
 
-	val, err := d.read(port.IODIR)
+	val, err := d.readReg(port.IODIR)
 	assert.Equal(t, uint8(0), val)
 	require.ErrorContains(t, err, "MCP write-ReadByteData(reg=0): read error")
 
@@ -600,7 +609,7 @@ func TestMCP23017_read(t *testing.T) {
 		copy(b, []byte{255})
 		return 1, nil
 	}
-	val, _ = d.read(port.IODIR)
+	val, _ = d.readReg(port.IODIR)
 	assert.Equal(t, uint8(255), val)
 }
 

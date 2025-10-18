@@ -38,6 +38,15 @@ func TestNewMCP3004Driver(t *testing.T) {
 	assert.True(t, strings.HasPrefix(d.Name(), "MCP3004"))
 }
 
+func TestMCP3004Halt(t *testing.T) {
+	// arrange
+	d := NewMCP3004Driver(newSpiTestAdaptor())
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
+}
+
 func TestMCP3004Read(t *testing.T) {
 	tests := map[string]struct {
 		chanNum     int
@@ -48,7 +57,7 @@ func TestMCP3004Read(t *testing.T) {
 	}{
 		"number_negative_error": {
 			chanNum: -1,
-			wantErr: fmt.Errorf("Invalid channel '-1' for read"),
+			wantErr: fmt.Errorf("invalid channel '-1' for read"),
 		},
 		"number_0_ok": {
 			chanNum:     0,
@@ -70,7 +79,7 @@ func TestMCP3004Read(t *testing.T) {
 		},
 		"number_4_error": {
 			chanNum: 4,
-			wantErr: fmt.Errorf("Invalid channel '4' for read"),
+			wantErr: fmt.Errorf("invalid channel '4' for read"),
 		},
 	}
 	for name, tc := range tests {

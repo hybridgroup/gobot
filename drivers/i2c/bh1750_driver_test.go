@@ -49,7 +49,9 @@ func TestBH1750Start(t *testing.T) {
 }
 
 func TestBH1750Halt(t *testing.T) {
-	d, _ := initTestBH1750DriverWithStubbedAdaptor()
+	d := NewBH1750Driver(newI2cTestAdaptor())
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
 	require.NoError(t, d.Halt())
 }
 

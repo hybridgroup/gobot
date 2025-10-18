@@ -119,6 +119,7 @@ func (mm *CCS811MeasMode) GetMeasMode() byte {
 // CCS811Driver is the Gobot driver for the CCS811 (air quality sensor) Adafruit breakout board
 type CCS811Driver struct {
 	*Driver
+
 	measMode           *CCS811MeasMode
 	ntcResistanceValue uint32
 }
@@ -162,7 +163,7 @@ func (d *CCS811Driver) GetHardwareVersion() (uint8, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	v, err := d.connection.ReadByteData(ccs811RegHwVersion)
+	v, err := d.readByteData(ccs811RegHwVersion)
 	if err != nil {
 		return 0, err
 	}
@@ -175,7 +176,7 @@ func (d *CCS811Driver) GetFirmwareBootVersion() (uint16, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	v, err := d.connection.ReadWordData(ccs811RegFwBootVersion)
+	v, err := d.readWordData(ccs811RegFwBootVersion)
 	if err != nil {
 		return 0, err
 	}
@@ -188,7 +189,7 @@ func (d *CCS811Driver) GetFirmwareAppVersion() (uint16, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	v, err := d.connection.ReadWordData(ccs811RegFwAppVersion)
+	v, err := d.readWordData(ccs811RegFwAppVersion)
 	if err != nil {
 		return 0, err
 	}
@@ -201,7 +202,7 @@ func (d *CCS811Driver) GetStatus() (*CCS811Status, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	s, err := d.connection.ReadByteData(ccs811RegStatus)
+	s, err := d.readByteData(ccs811RegStatus)
 	if err != nil {
 		return nil, err
 	}
@@ -217,7 +218,7 @@ func (d *CCS811Driver) GetTemperature() (float32, error) {
 	defer d.mutex.Unlock()
 
 	buf := make([]byte, 4)
-	err := d.connection.ReadBlockData(ccs811RegNtc, buf)
+	err := d.readBlockData(ccs811RegNtc, buf)
 	if err != nil {
 		return 0, err
 	}
@@ -242,7 +243,7 @@ func (d *CCS811Driver) GetGasData() (uint16, uint16, error) {
 	defer d.mutex.Unlock()
 
 	data := make([]byte, 4)
-	err := d.connection.ReadBlockData(ccs811RegAlgResultData, data)
+	err := d.readBlockData(ccs811RegAlgResultData, data)
 	if err != nil {
 		return 0, 0, err
 	}
@@ -262,7 +263,7 @@ func (d *CCS811Driver) HasData() (bool, error) {
 		return false, err
 	}
 
-	if !(s.DataReady == 0x01) || (s.HasError == 0x01) {
+	if (s.DataReady != 0x01) || (s.HasError == 0x01) {
 		return false, nil
 	}
 
@@ -275,7 +276,7 @@ func (d *CCS811Driver) EnableExternalInterrupt() error {
 	defer d.mutex.Unlock()
 
 	d.measMode.intDataRdy = 1
-	return d.connection.WriteByteData(ccs811RegMeasMode, d.measMode.GetMeasMode())
+	return d.writeByteData(ccs811RegMeasMode, d.measMode.GetMeasMode())
 }
 
 // DisableExternalInterrupt disables the external output hardware interrupt pin 3.
@@ -284,33 +285,33 @@ func (d *CCS811Driver) DisableExternalInterrupt() error {
 	defer d.mutex.Unlock()
 
 	d.measMode.intDataRdy = 0
-	return d.connection.WriteByteData(ccs811RegMeasMode, d.measMode.GetMeasMode())
+	return d.writeByteData(ccs811RegMeasMode, d.measMode.GetMeasMode())
 }
 
 func (d *CCS811Driver) initialize() error {
-	deviceID, err := d.connection.ReadByteData(ccs811RegHwID)
+	deviceID, err := d.readByteData(ccs811RegHwID)
 	if err != nil {
-		return fmt.Errorf("Failed to get the device id from ccs811RegHwID with error: %s", err.Error())
+		return fmt.Errorf("failed to get the device id from ccs811RegHwID with error: %s", err.Error())
 	}
 
 	// Verify that the connected device is the CCS811 sensor
 	if deviceID != ccs811HwIDCode {
-		return fmt.Errorf("The fetched device id %d is not the known id %d with error", deviceID, ccs811HwIDCode)
+		return fmt.Errorf("the fetched device id %d is not the known id %d with error", deviceID, ccs811HwIDCode)
 	}
 
 	if err := d.resetDevice(); err != nil {
-		return fmt.Errorf("Was not able to reset the device with error: %s", err.Error())
+		return fmt.Errorf("was not able to reset the device with error: %s", err.Error())
 	}
 
 	// Required sleep to allow device to switch states
 	time.Sleep(100 * time.Millisecond)
 
 	if err := d.startApp(); err != nil {
-		return fmt.Errorf("Failed to start app code with error: %s", err.Error())
+		return fmt.Errorf("failed to start app code with error: %s", err.Error())
 	}
 
 	if err := d.updateMeasMode(); err != nil {
-		return fmt.Errorf("Failed to update the measMode register with error: %s", err.Error())
+		return fmt.Errorf("failed to update the measMode register with error: %s", err.Error())
 	}
 
 	return nil
@@ -319,18 +320,18 @@ func (d *CCS811Driver) initialize() error {
 // ResetDevice does a software reset of the device. After this operation is done,
 // the user must start the app code before the sensor can take any measurements
 func (d *CCS811Driver) resetDevice() error {
-	return d.connection.WriteBlockData(ccs811RegSwReset, ccs811SwResetSequence)
+	return d.writeBlockData(ccs811RegSwReset, ccs811SwResetSequence)
 }
 
 // startApp starts the app code in the device. This operation has to be done after a
 // software reset to start taking sensor measurements.
 func (d *CCS811Driver) startApp() error {
 	// Write without data is needed to start the app code
-	_, err := d.connection.Write([]byte{ccs811RegAppStart})
+	_, err := d.write([]byte{ccs811RegAppStart})
 	return err
 }
 
 // updateMeasMode writes the current value of measMode to the measurement mode register.
 func (d *CCS811Driver) updateMeasMode() error {
-	return d.connection.WriteByteData(ccs811RegMeasMode, d.measMode.GetMeasMode())
+	return d.writeByteData(ccs811RegMeasMode, d.measMode.GetMeasMode())
 }

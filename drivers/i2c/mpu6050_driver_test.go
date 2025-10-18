@@ -49,6 +49,15 @@ func TestMPU6050Options(t *testing.T) {
 	assert.Equal(t, MPU6050DlpfConfig(0x06), d.dlpf)
 }
 
+func TestMPU6050Halt(t *testing.T) {
+	// arrange
+	d := NewMPU6050Driver(newI2cTestAdaptor())
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
+}
+
 func TestWithMPU6050FrameSync(t *testing.T) {
 	d := NewMPU6050Driver(newI2cTestAdaptor(), WithMPU6050FrameSync(0x07))
 	assert.Equal(t, MPU6050FrameSyncConfig(0x07), d.frameSync)

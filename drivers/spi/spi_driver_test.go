@@ -36,7 +36,11 @@ func TestStart(t *testing.T) {
 }
 
 func TestHalt(t *testing.T) {
-	d, _ := initTestDriverWithStubbedAdaptor()
+	// arrange
+	d := NewDriver(newSpiTestAdaptor(), "SPI_BASIC")
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
 	require.NoError(t, d.Halt())
 }
 

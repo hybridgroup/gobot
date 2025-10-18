@@ -98,8 +98,13 @@ func TestSSD1306StartSizeError(t *testing.T) {
 }
 
 func TestSSD1306Halt(t *testing.T) {
-	s, _ := initTestSSD1306DriverWithStubbedAdaptor(128, 64, false)
-	require.NoError(t, s.Halt())
+	// arrange
+	d := NewSSD1306Driver(newI2cTestAdaptor(), WithSSD1306DisplayWidth(128), WithSSD1306DisplayHeight(64),
+		WithSSD1306ExternalVCC(false))
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
 }
 
 func TestSSD1306Options(t *testing.T) {
@@ -270,14 +275,8 @@ func TestDisplayBuffer(t *testing.T) {
 	size := 1024 // (width*height) / 8
 	display := NewDisplayBuffer(width, height, 8)
 
-	if display.Size() != size {
-		require.Fail(t, "invalid Size() (%d, expected %d)",
-			display.Size(), size)
-	}
-	if len(display.buffer) != size {
-		require.Fail(t, "allocated buffer size invalid (%d, expected %d)",
-			len(display.buffer), size)
-	}
+	require.Equal(t, size, display.Size())
+	require.Len(t, display.buffer, size)
 
 	assert.Equal(t, byte(0), display.buffer[0])
 	assert.Equal(t, byte(0), display.buffer[1])

@@ -53,6 +53,7 @@ type bmp180CalibrationCoefficients struct {
 // Device datasheet: https://cdn-shop.adafruit.com/datasheets/BST-BMP180-DS000-09.pdf
 type BMP180Driver struct {
 	*Driver
+
 	oversampling BMP180OversamplingMode
 	calCoeffs    *bmp180CalibrationCoefficients
 }
@@ -125,7 +126,7 @@ func (d *BMP180Driver) Pressure() (float32, error) {
 func (d *BMP180Driver) initialization() error {
 	// read the 11 calibration coefficients.
 	coefficients := make([]byte, 22)
-	if err := d.connection.ReadBlockData(bmp180RegisterAC1MSB, coefficients); err != nil {
+	if err := d.readBlockData(bmp180RegisterAC1MSB, coefficients); err != nil {
 		return err
 	}
 	buf := bytes.NewBuffer(coefficients)
@@ -163,12 +164,12 @@ func (d *BMP180Driver) initialization() error {
 }
 
 func (d *BMP180Driver) rawTemp() (int16, error) {
-	if _, err := d.connection.Write([]byte{bmp180RegisterCtl, bmp180CtlTemp}); err != nil {
+	if _, err := d.write([]byte{bmp180RegisterCtl, bmp180CtlTemp}); err != nil {
 		return 0, err
 	}
 	time.Sleep(5 * time.Millisecond)
 	ret := make([]byte, 2)
-	err := d.connection.ReadBlockData(bmp180RegisterDataMSB, ret)
+	err := d.readBlockData(bmp180RegisterDataMSB, ret)
 	if err != nil {
 		return 0, err
 	}
@@ -193,12 +194,12 @@ func (d *BMP180Driver) calculateB5(rawTemp int16) int32 {
 }
 
 func (d *BMP180Driver) rawPressure(oversampling BMP180OversamplingMode) (int32, error) {
-	if _, err := d.connection.Write([]byte{bmp180RegisterCtl, bmp180CtlPressure + byte(oversampling<<6)}); err != nil {
+	if _, err := d.write([]byte{bmp180RegisterCtl, bmp180CtlPressure + byte(oversampling<<6)}); err != nil {
 		return 0, err
 	}
 	time.Sleep(bmp180PauseForReading(oversampling))
 	ret := make([]byte, 3)
-	if err := d.connection.ReadBlockData(bmp180RegisterDataMSB, ret); err != nil {
+	if err := d.readBlockData(bmp180RegisterDataMSB, ret); err != nil {
 		return 0, err
 	}
 	rawPressure := (int32(ret[0])<<16 + int32(ret[1])<<8 + int32(ret[2])) >> (8 - uint(oversampling))

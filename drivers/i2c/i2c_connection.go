@@ -21,9 +21,9 @@ const (
 
 var (
 	// ErrNotEnoughBytes is used when the count of read bytes was too small
-	ErrNotEnoughBytes = fmt.Errorf("Not enough bytes read")
+	ErrNotEnoughBytes = fmt.Errorf("not enough bytes read")
 	// ErrNotReady is used when the device is not ready
-	ErrNotReady = fmt.Errorf("Device is not ready")
+	ErrNotReady = fmt.Errorf("device is not ready")
 )
 
 type bitState uint8

@@ -19,7 +19,7 @@ func TestRobotWork(t *testing.T) {
 	}
 
 	duration := time.Second * 1
-	ctx, cancelFunc := context.WithCancel(context.Background())
+	ctx, cancelFunc := context.WithCancel(t.Context())
 
 	rw.ctx = ctx
 	rw.cancelFunc = cancelFunc
@@ -41,7 +41,7 @@ func TestRobotWork(t *testing.T) {
 func TestRobotWorkRegistry(t *testing.T) {
 	robot := NewRobot("testbot")
 
-	rw := robot.Every(context.Background(), time.Millisecond*250, func() {
+	rw := robot.Every(t.Context(), time.Millisecond*250, func() {
 		_ = 1 + 1
 	})
 
@@ -61,7 +61,7 @@ func TestRobotAutomationFunctions(t *testing.T) {
 		robot := NewRobot("testbot")
 		counter := 0
 
-		rw := robot.Every(context.Background(), time.Millisecond*100, func() {
+		rw := robot.Every(t.Context(), time.Millisecond*100, func() {
 			counter++
 		})
 
@@ -78,7 +78,7 @@ func TestRobotAutomationFunctions(t *testing.T) {
 	t.Run("After with cancel", func(t *testing.T) {
 		robot := NewRobot("testbot")
 
-		rw := robot.After(context.Background(), time.Millisecond*10, func() {
+		rw := robot.After(t.Context(), time.Millisecond*10, func() {
 			_ = 1 + 1 // perform mindless computation!
 		})
 

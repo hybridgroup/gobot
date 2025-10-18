@@ -100,6 +100,7 @@ var pcf8591ModeMap = map[string]pcf8591ModeChan{
 // This driver was tested with Tinkerboard and the YL-40 driver.
 type PCF8591Driver struct {
 	*Driver
+
 	lastCtrlByte        byte
 	lastAnaOut          byte
 	additionalReadWrite uint8
@@ -119,23 +120,23 @@ type PCF8591Driver struct {
 //	i2c.WithAddress(int): address to use with this driver
 //	i2c.WithPCF8591With400kbitStabilization(uint8, uint8): stabilize read in 400 kbit mode
 func NewPCF8591Driver(c Connector, options ...func(Config)) *PCF8591Driver {
-	p := &PCF8591Driver{
+	d := &PCF8591Driver{
 		Driver: NewDriver(c, "PCF8591", pcf8591DefaultAddress),
 	}
-	p.afterStart = p.initialize
-	p.beforeHalt = p.shutdown
+	d.afterStart = d.initialize
+	d.beforeHalt = d.shutdown
 
 	for _, option := range options {
-		option(p)
+		option(d)
 	}
 
-	return p
+	return d
 }
 
 // WithPCF8591With400kbitStabilization option sets the PCF8591 additionalReadWrite and additionalRead value
 func WithPCF8591With400kbitStabilization(additionalReadWrite, additionalRead int) func(Config) {
 	return func(c Config) {
-		p, ok := c.(*PCF8591Driver)
+		d, ok := c.(*PCF8591Driver)
 		if ok {
 			if additionalReadWrite < 0 {
 				additionalReadWrite = 1 // works in most cases
@@ -143,10 +144,10 @@ func WithPCF8591With400kbitStabilization(additionalReadWrite, additionalRead int
 			if additionalRead < 0 {
 				additionalRead = 2 // works in most cases
 			}
-			p.additionalReadWrite = uint8(additionalReadWrite) //nolint:gosec // checked before
-			p.additionalRead = uint8(additionalRead)           //nolint:gosec // checked before
+			d.additionalReadWrite = uint8(additionalReadWrite) //nolint:gosec // checked before
+			d.additionalRead = uint8(additionalRead)           //nolint:gosec // checked before
 			if pcf8591Debug {
-				log.Printf("400 kbit stabilization for PCF8591Driver set rw: %d, r: %d", p.additionalReadWrite, p.additionalRead)
+				log.Printf("400 kbit stabilization for PCF8591Driver set rw: %d, r: %d", d.additionalReadWrite, d.additionalRead)
 			}
 		} else if pcf8591Debug {
 			log.Printf("trying to set 400 kbit stabilization for non-PCF8591Driver %v", c)
@@ -191,9 +192,9 @@ func WithPCF8591ForceRefresh(val uint8) func(Config) {
 //     because some missing integration steps in each conversion (each byte value is a little bit lower than expected)
 //
 // So, for default, we drop the first three bytes to get the right value.
-func (p *PCF8591Driver) AnalogRead(description string) (int, error) {
-	p.mutex.Lock()
-	defer p.mutex.Unlock()
+func (d *PCF8591Driver) AnalogRead(description string) (int, error) {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
 
 	mc, err := PCF8591ParseModeChan(description)
 	if err != nil {
@@ -201,20 +202,20 @@ func (p *PCF8591Driver) AnalogRead(description string) (int, error) {
 	}
 
 	// reset channel and mode
-	ctrlByte := p.lastCtrlByte & ^uint8(pcf8591_ADMASK)
+	ctrlByte := d.lastCtrlByte & ^uint8(pcf8591_ADMASK)
 	// set to current channel and mode, AI must be off, because we need reading twice
 	ctrlByte = ctrlByte | uint8(mc.mode) | uint8(mc.channel) & ^uint8(pcf8591_AION)
 
 	var uval byte
-	p.LastRead = make([][]byte, p.additionalReadWrite+1)
+	d.LastRead = make([][]byte, d.additionalReadWrite+1)
 	// repeated write and read cycle to stabilize value in 400 kbit mode
-	for writeReadCycle := uint8(1); writeReadCycle <= p.additionalReadWrite+1; writeReadCycle++ {
-		if err = p.writeCtrlByte(ctrlByte, p.forceRefresh || writeReadCycle > 1); err != nil {
+	for writeReadCycle := uint8(1); writeReadCycle <= d.additionalReadWrite+1; writeReadCycle++ {
+		if err = d.writeCtrlByte(ctrlByte, d.forceRefresh || writeReadCycle > 1); err != nil {
 			return 0, err
 		}
 
 		// initiate read but skip some bytes
-		if err := p.readBuf(writeReadCycle, 1+p.additionalRead); err != nil {
+		if err := d.readBuf(writeReadCycle, 1+d.additionalRead); err != nil {
 			return 0, err
 		}
 
@@ -222,12 +223,12 @@ func (p *PCF8591Driver) AnalogRead(description string) (int, error) {
 		time.Sleep(1 * time.Millisecond)
 
 		// real used read
-		if uval, err = p.connection.ReadByte(); err != nil {
+		if uval, err = d.readByte(); err != nil {
 			return 0, err
 		}
 
 		if pcf8591Debug {
-			p.LastRead[writeReadCycle-1] = append(p.LastRead[writeReadCycle-1], uval)
+			d.LastRead[writeReadCycle-1] = append(d.LastRead[writeReadCycle-1], uval)
 		}
 	}
 
@@ -246,26 +247,26 @@ func (p *PCF8591Driver) AnalogRead(description string) (int, error) {
 // AnalogWrite writes the given value to the analog output (DAC)
 // Vlsb = (Vref-Vagnd)/256, Vaout = Vagnd+Vlsb*value
 // implements the aio.AnalogWriter interface, pin is unused here
-func (p *PCF8591Driver) AnalogWrite(pin string, value int) error {
-	p.mutex.Lock()
-	defer p.mutex.Unlock()
+func (d *PCF8591Driver) AnalogWrite(pin string, value int) error {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
 
 	byteVal := byte(value)
 
-	if p.lastAnaOut == byteVal {
+	if d.lastAnaOut == byteVal {
 		if pcf8591Debug {
 			log.Printf("write skipped because value unchanged: 0x%X\n", byteVal)
 		}
 		return nil
 	}
 
-	ctrlByte := p.lastCtrlByte | byte(pcf8591_ANAON)
-	if err := p.connection.WriteByteData(ctrlByte, byteVal); err != nil {
+	ctrlByte := d.lastCtrlByte | byte(pcf8591_ANAON)
+	if err := d.writeByteData(ctrlByte, byteVal); err != nil {
 		return err
 	}
 
-	p.lastCtrlByte = ctrlByte
-	p.lastAnaOut = byteVal
+	d.lastCtrlByte = ctrlByte
+	d.lastAnaOut = byteVal
 	return nil
 }
 
@@ -273,11 +274,11 @@ func (p *PCF8591Driver) AnalogWrite(pin string, value int) error {
 // Please note that in case of using the internal oscillator
 // and the auto increment mode the output should not switched off.
 // Otherwise conversion errors could occur.
-func (p *PCF8591Driver) AnalogOutputState(state bool) error {
-	p.mutex.Lock()
-	defer p.mutex.Unlock()
+func (d *PCF8591Driver) AnalogOutputState(state bool) error {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
 
-	return p.analogOutputState(state)
+	return d.analogOutputState(state)
 }
 
 // PCF8591ParseModeChan is used to get a working combination between mode (single, mixed, 2 differential,
@@ -290,35 +291,35 @@ func PCF8591ParseModeChan(description string) (*pcf8591ModeChan, error) {
 			descriptions = append(descriptions, k)
 		}
 		ds := strings.Join(descriptions, ", ")
-		return nil, fmt.Errorf("Unknown description '%s' for read analog value, accepted values: %s", description, ds)
+		return nil, fmt.Errorf("unknown description '%s' for read analog value, accepted values: %s", description, ds)
 	}
 
 	return &mc, nil
 }
 
-func (p *PCF8591Driver) writeCtrlByte(ctrlByte uint8, forceRefresh bool) error {
-	if p.lastCtrlByte != ctrlByte || forceRefresh {
-		if err := p.connection.WriteByte(ctrlByte); err != nil {
+func (d *PCF8591Driver) writeCtrlByte(ctrlByte uint8, forceRefresh bool) error {
+	if d.lastCtrlByte != ctrlByte || forceRefresh {
+		if err := d.writeByte(ctrlByte); err != nil {
 			return err
 		}
-		p.lastCtrlByte = ctrlByte
+		d.lastCtrlByte = ctrlByte
 	} else if pcf8591Debug {
 		log.Printf("write skipped because control byte unchanged: 0x%X\n", ctrlByte)
 	}
 	return nil
 }
 
-func (p *PCF8591Driver) readBuf(nr uint8, cntBytes uint8) error {
+func (d *PCF8591Driver) readBuf(nr uint8, cntBytes uint8) error {
 	buf := make([]byte, cntBytes)
-	cntRead, err := p.connection.Read(buf)
+	cntRead, err := d.read(buf)
 	if err != nil {
 		return err
 	}
 	if cntRead != len(buf) {
-		return fmt.Errorf("Not enough bytes (%d of %d) read", cntRead, len(buf))
+		return fmt.Errorf("not enough bytes (%d of %d) read", cntRead, len(buf))
 	}
 	if pcf8591Debug {
-		p.LastRead[nr-1] = buf
+		d.LastRead[nr-1] = buf
 	}
 	return nil
 }
@@ -336,23 +337,23 @@ func (mc pcf8591ModeChan) pcf8591IsDiff() bool {
 	}
 }
 
-func (p *PCF8591Driver) initialize() error {
-	return p.analogOutputState(false)
+func (d *PCF8591Driver) initialize() error {
+	return d.analogOutputState(false)
 }
 
-func (p *PCF8591Driver) shutdown() error {
-	return p.analogOutputState(false)
+func (d *PCF8591Driver) shutdown() error {
+	return d.analogOutputState(false)
 }
 
-func (p *PCF8591Driver) analogOutputState(state bool) error {
+func (d *PCF8591Driver) analogOutputState(state bool) error {
 	var ctrlByte uint8
 	if state {
-		ctrlByte = p.lastCtrlByte | byte(pcf8591_ANAON)
+		ctrlByte = d.lastCtrlByte | byte(pcf8591_ANAON)
 	} else {
-		ctrlByte = p.lastCtrlByte & ^uint8(pcf8591_ANAON)
+		ctrlByte = d.lastCtrlByte & ^uint8(pcf8591_ANAON)
 	}
 
-	if err := p.writeCtrlByte(ctrlByte, p.forceRefresh); err != nil {
+	if err := d.writeCtrlByte(ctrlByte, d.forceRefresh); err != nil {
 		return err
 	}
 	return nil

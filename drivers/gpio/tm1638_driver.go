@@ -34,6 +34,7 @@ const (
 // Ported from the Arduino driver https://github.com/rjbatista/tm1638-library
 type TM1638Driver struct {
 	*driver
+
 	pinClock  *DirectPinDriver
 	pinData   *DirectPinDriver
 	pinStrobe *DirectPinDriver

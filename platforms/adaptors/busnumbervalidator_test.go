@@ -26,7 +26,7 @@ func TestBusNumberValidatorValidate(t *testing.T) {
 		"number_negative_error": {
 			validNumbers: []int{0, 1, 2, 3, 4},
 			busNr:        -1,
-			wantErr:      fmt.Errorf("Bus number -1 out of range [0 1 2 3 4]"),
+			wantErr:      fmt.Errorf("bus number -1 out of range [0 1 2 3 4]"),
 		},
 		"number_0_ok": {
 			validNumbers: []int{0, 1, 2, 3, 4},
@@ -51,12 +51,12 @@ func TestBusNumberValidatorValidate(t *testing.T) {
 		"number_5_error": {
 			validNumbers: []int{0, 1, 2, 3, 4},
 			busNr:        5,
-			wantErr:      fmt.Errorf("Bus number 5 out of range [0 1 2 3 4]"),
+			wantErr:      fmt.Errorf("bus number 5 out of range [0 1 2 3 4]"),
 		},
 		"number_negative_error_0_2": {
 			validNumbers: []int{0, 2},
 			busNr:        -1,
-			wantErr:      fmt.Errorf("Bus number -1 out of range [0 2]"),
+			wantErr:      fmt.Errorf("bus number -1 out of range [0 2]"),
 		},
 		"number_0_ok_0_2": {
 			validNumbers: []int{0, 2},
@@ -65,7 +65,7 @@ func TestBusNumberValidatorValidate(t *testing.T) {
 		"number_1_error_0_2": {
 			validNumbers: []int{0, 2},
 			busNr:        1,
-			wantErr:      fmt.Errorf("Bus number 1 out of range [0 2]"),
+			wantErr:      fmt.Errorf("bus number 1 out of range [0 2]"),
 		},
 		"number_2_ok_0_2": {
 			validNumbers: []int{0, 2},
@@ -74,7 +74,7 @@ func TestBusNumberValidatorValidate(t *testing.T) {
 		"number_3_error_0_2": {
 			validNumbers: []int{0, 2},
 			busNr:        3,
-			wantErr:      fmt.Errorf("Bus number 3 out of range [0 2]"),
+			wantErr:      fmt.Errorf("bus number 3 out of range [0 2]"),
 		},
 	}
 	for name, tc := range tests {

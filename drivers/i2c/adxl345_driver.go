@@ -2,7 +2,6 @@ package i2c
 
 import (
 	"encoding/binary"
-	"fmt"
 	"log"
 )
 
@@ -86,6 +85,7 @@ const (
 // Ported from the Arduino driver https://github.com/jakalada/Arduino-ADXL345
 type ADXL345Driver struct {
 	*Driver
+
 	powerCtl   adxl345PowerCtl
 	dataFormat adxl345DataFormat
 	bwRate     adxl345BwRate
@@ -191,7 +191,7 @@ func (d *ADXL345Driver) UseLowPower(lowPower bool) error {
 	defer d.mutex.Unlock()
 
 	d.bwRate.lowPower = lowPower
-	return d.connection.WriteByteData(adxl345Reg_BW_RATE, d.bwRate.toByte())
+	return d.writeByteData(adxl345Reg_BW_RATE, d.bwRate.toByte())
 }
 
 // SetRate change the current rate of the sensor immediately
@@ -200,7 +200,7 @@ func (d *ADXL345Driver) SetRate(rate ADXL345RateConfig) error {
 	defer d.mutex.Unlock()
 
 	d.bwRate.rate = rate
-	return d.connection.WriteByteData(adxl345Reg_BW_RATE, d.bwRate.toByte())
+	return d.writeByteData(adxl345Reg_BW_RATE, d.bwRate.toByte())
 }
 
 // SetRange change the current range of the sensor immediately
@@ -209,7 +209,7 @@ func (d *ADXL345Driver) SetRange(fullScaleRange ADXL345FsRangeConfig) error {
 	defer d.mutex.Unlock()
 
 	d.dataFormat.fullScaleRange = fullScaleRange
-	return d.connection.WriteByteData(adxl345Reg_DATA_FORMAT, d.dataFormat.toByte())
+	return d.writeByteData(adxl345Reg_DATA_FORMAT, d.dataFormat.toByte())
 }
 
 // XYZ returns the adjusted x, y and z axis, unit [g]
@@ -235,7 +235,7 @@ func (d *ADXL345Driver) RawXYZ() (int16, int16, int16, error) {
 
 func (d *ADXL345Driver) readRawData() (int16, int16, int16, error) {
 	buf := []byte{0, 0, 0, 0, 0, 0}
-	if err := d.connection.ReadBlockData(adxl345Reg_DATAX0, buf); err != nil {
+	if err := d.readBlockData(adxl345Reg_DATAX0, buf); err != nil {
 		return 0, 0, 0, err
 	}
 
@@ -246,13 +246,13 @@ func (d *ADXL345Driver) readRawData() (int16, int16, int16, error) {
 }
 
 func (d *ADXL345Driver) initialize() error {
-	if err := d.connection.WriteByteData(adxl345Reg_BW_RATE, d.bwRate.toByte()); err != nil {
+	if err := d.writeByteData(adxl345Reg_BW_RATE, d.bwRate.toByte()); err != nil {
 		return err
 	}
-	if err := d.connection.WriteByteData(adxl345Reg_POWER_CTL, d.powerCtl.toByte()); err != nil {
+	if err := d.writeByteData(adxl345Reg_POWER_CTL, d.powerCtl.toByte()); err != nil {
 		return err
 	}
-	if err := d.connection.WriteByteData(adxl345Reg_DATA_FORMAT, d.dataFormat.toByte()); err != nil {
+	if err := d.writeByteData(adxl345Reg_DATA_FORMAT, d.dataFormat.toByte()); err != nil {
 		return err
 	}
 
@@ -260,11 +260,12 @@ func (d *ADXL345Driver) initialize() error {
 }
 
 func (d *ADXL345Driver) shutdown() error {
-	d.powerCtl.measure = 0
 	if d.connection == nil {
-		return fmt.Errorf("connection not available")
+		return nil
 	}
-	return d.connection.WriteByteData(adxl345Reg_POWER_CTL, d.powerCtl.toByte())
+
+	d.powerCtl.measure = 0
+	return d.writeByteData(adxl345Reg_POWER_CTL, d.powerCtl.toByte())
 }
 
 // convertToG converts the given raw value by range configuration to the unit [g]

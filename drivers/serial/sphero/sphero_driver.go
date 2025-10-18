@@ -30,6 +30,7 @@ type packet struct {
 type SpheroDriver struct {
 	*serial.Driver
 	gobot.Eventer
+
 	seq              uint8
 	asyncResponse    [][]uint8
 	syncResponse     [][]uint8
@@ -315,9 +316,10 @@ func (d *SpheroDriver) initialize() error {
 			var evt []uint8
 			for len(d.asyncResponse) != 0 {
 				evt, d.asyncResponse = d.asyncResponse[len(d.asyncResponse)-1], d.asyncResponse[:len(d.asyncResponse)-1]
-				if evt[2] == 0x07 {
+				switch evt[2] {
+				case 0x07:
 					d.handleCollisionDetected(evt)
-				} else if evt[2] == 0x03 {
+				case 0x03:
 					d.handleDataStreaming(evt)
 				}
 			}
@@ -419,7 +421,7 @@ func (d *SpheroDriver) write(packet *packet) error {
 	}
 
 	if length != len(buf) {
-		return errors.New("Not enough bytes written")
+		return errors.New("not enough bytes written")
 	}
 	d.seq++
 	return nil

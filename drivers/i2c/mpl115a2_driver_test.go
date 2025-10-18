@@ -38,6 +38,15 @@ func TestMPL115A2Options(t *testing.T) {
 	assert.Equal(t, 2, d.GetBusOrDefault(1))
 }
 
+func TestMPL115A2Halt(t *testing.T) {
+	// arrange
+	d := NewMPL115A2Driver(newI2cTestAdaptor())
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
+}
+
 func TestMPL115A2ReadData(t *testing.T) {
 	// sequence for read data
 	// * retrieve the coefficients for temperature compensation of pressure - see test for Start()

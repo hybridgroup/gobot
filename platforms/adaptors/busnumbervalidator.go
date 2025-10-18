@@ -18,5 +18,5 @@ func (bnv *BusNumberValidator) Validate(busNr int) error {
 		}
 	}
 
-	return fmt.Errorf("Bus number %d out of range %v", busNr, bnv.validNumbers)
+	return fmt.Errorf("bus number %d out of range %v", busNr, bnv.validNumbers)
 }

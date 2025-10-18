@@ -36,6 +36,15 @@ func TestNewTH02Driver(t *testing.T) {
 	assert.Equal(t, 0x40, d.defaultAddress)
 }
 
+func TestTH02Halt(t *testing.T) {
+	// arrange
+	d := NewTH02Driver(newI2cTestAdaptor())
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
+	require.NoError(t, d.Halt())
+}
+
 func TestTH02Options(t *testing.T) {
 	// This is a general test, that options are applied in constructor by using the common options.
 	// Further tests for options can also be done by call of "WithOption(val)(d)".
@@ -383,9 +392,9 @@ func TestTH02_readData(t *testing.T) {
 					return len(b), nil
 				}
 				// data register
-				return len(b), fmt.Errorf("Nope")
+				return len(b), fmt.Errorf("nope")
 			},
-			wantErr: fmt.Errorf("Nope"),
+			wantErr: fmt.Errorf("nope"),
 			rtn:     0,
 		},
 		"unable to read doesn't provide enough data": {
@@ -399,7 +408,7 @@ func TestTH02_readData(t *testing.T) {
 				}
 				return len(b), nil
 			},
-			wantErr: fmt.Errorf("Read 1 bytes from device by i2c helpers, expected 2"),
+			wantErr: fmt.Errorf("read 1 bytes from device by i2c helpers, expected 2"),
 			rtn:     0,
 		},
 	}

@@ -62,12 +62,13 @@ const (
 // MinidroneDriver is the Gobot interface to the Parrot Minidrone
 type MinidroneDriver struct {
 	*ble.Driver
+	gobot.Eventer
+
 	stepsfa0a uint16
 	stepsfa0b uint16
 	pcmdMutex sync.Mutex
 	flying    bool
 	Pcmd      Pcmd
-	gobot.Eventer
 }
 
 // Pcmd is the Parrot Command structure for flight control

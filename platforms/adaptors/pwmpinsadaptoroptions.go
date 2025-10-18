@@ -7,6 +7,9 @@ type PwmPinsOptionApplier interface {
 	apply(cfg *pwmPinsConfiguration)
 }
 
+// pwmPinsDebugOption is the type to switch on PWM pins related debug messages.
+type pwmPinsDebugOption bool
+
 // pwmPinInitializeOption is the type for applying another than the default initializer.
 type pwmPinsInitializeOption pwmPinInitializer
 
@@ -55,6 +58,10 @@ type pwmPinsServoAngleScaleForPinOption struct {
 	maxDegree float64
 }
 
+func (o pwmPinsDebugOption) String() string {
+	return "switch on debugging for pwm pins option"
+}
+
 func (o pwmPinsInitializeOption) String() string {
 	return "pin initializer option for PWM's"
 }
@@ -93,6 +100,10 @@ func (o pwmPinsServoDutyScaleForPinOption) String() string {
 
 func (o pwmPinsServoAngleScaleForPinOption) String() string {
 	return "angle min-max range for a servo pin option for PWM's"
+}
+
+func (o pwmPinsDebugOption) apply(cfg *pwmPinsConfiguration) {
+	cfg.debug = bool(o)
 }
 
 func (o pwmPinsInitializeOption) apply(cfg *pwmPinsConfiguration) {

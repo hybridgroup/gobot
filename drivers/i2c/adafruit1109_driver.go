@@ -2,7 +2,6 @@ package i2c
 
 import (
 	"fmt"
-	"log"
 	"strconv"
 	"strings"
 
@@ -23,24 +22,26 @@ type adafruit1109PortPin struct {
 //
 // Have to implement DigitalWriter, DigitalReader interface
 type Adafruit1109Driver struct {
-	name string
 	*MCP23017Driver
-	redPin    adafruit1109PortPin
-	greenPin  adafruit1109PortPin
-	bluePin   adafruit1109PortPin
-	selectPin adafruit1109PortPin
-	upPin     adafruit1109PortPin
-	downPin   adafruit1109PortPin
-	leftPin   adafruit1109PortPin
-	rightPin  adafruit1109PortPin
-	rwPin     adafruit1109PortPin
-	rsPin     adafruit1109PortPin
-	enPin     adafruit1109PortPin
-	dataPinD4 adafruit1109PortPin
-	dataPinD5 adafruit1109PortPin
-	dataPinD6 adafruit1109PortPin
-	dataPinD7 adafruit1109PortPin
 	*gpio.HD44780Driver
+
+	name       string
+	redPin     adafruit1109PortPin
+	greenPin   adafruit1109PortPin
+	bluePin    adafruit1109PortPin
+	selectPin  adafruit1109PortPin
+	upPin      adafruit1109PortPin
+	downPin    adafruit1109PortPin
+	leftPin    adafruit1109PortPin
+	rightPin   adafruit1109PortPin
+	rwPin      adafruit1109PortPin
+	rsPin      adafruit1109PortPin
+	enPin      adafruit1109PortPin
+	dataPinD4  adafruit1109PortPin
+	dataPinD5  adafruit1109PortPin
+	dataPinD6  adafruit1109PortPin
+	dataPinD7  adafruit1109PortPin
+	mcpStarted bool
 }
 
 // NewAdafruit1109Driver creates is a new driver for the 2x16 LCD display with RGB backlit and 5 keys.
@@ -112,12 +113,13 @@ func (d *Adafruit1109Driver) Connection() gobot.Connection { return d.MCP23017Dr
 
 // Start implements the gobot.Device interface.
 func (d *Adafruit1109Driver) Start() error {
-	if adafruit1109Debug {
-		log.Printf("## MCP.Start ##")
-	}
+	d.debuglnf("## MCP.Start ##")
+
 	if err := d.MCP23017Driver.Start(); err != nil {
 		return err
 	}
+
+	d.mcpStarted = true
 
 	// set all to output (inputs will be set by initButton)
 	for pin := uint8(0); pin <= 7; pin++ {
@@ -154,9 +156,9 @@ func (d *Adafruit1109Driver) Start() error {
 	if err := d.writePin(d.rwPin, 0x00); err != nil {
 		return err
 	}
-	if adafruit1109Debug {
-		log.Printf("## HD.Start ##")
-	}
+
+	d.debuglnf("## HD.Start ##")
+
 	return d.HD44780Driver.Start()
 }
 
@@ -165,21 +167,35 @@ func (d *Adafruit1109Driver) Halt() error {
 	// we try halt on each device, not stopping on the first error
 	var errors []string
 
+	d.debuglnf("## HD.Halt ##")
+
 	if err := d.HD44780Driver.Halt(); err != nil {
 		errors = append(errors, err.Error())
 	}
-	// switch off the background light
-	if err := d.SetRGB(false, false, false); err != nil {
-		errors = append(errors, err.Error())
-	}
-	// must be after HD44780Driver
-	if err := d.MCP23017Driver.Halt(); err != nil {
-		errors = append(errors, err.Error())
+
+	d.debuglnf("## HD.Halt done ##: %v", errors)
+
+	if d.mcpStarted {
+		d.debuglnf("## MCP.Halt ##")
+
+		// switch off the background light
+		if err := d.SetRGB(false, false, false); err != nil {
+			errors = append(errors, err.Error())
+		}
+
+		// must be after HD44780Driver
+		if err := d.MCP23017Driver.Halt(); err != nil {
+			errors = append(errors, err.Error())
+		}
 	}
 
+	d.mcpStarted = false
+
 	if len(errors) > 0 {
-		return fmt.Errorf("Halt the driver %s", strings.Join(errors, ", "))
+		return fmt.Errorf("'Halt' the driver %s", strings.Join(errors, ", "))
 	}
+
+	d.debuglnf("## AD.Halt done without errors ##")
 
 	return nil
 }
@@ -207,9 +223,8 @@ func (d *Adafruit1109Driver) DigitalRead(id string) (int, error) {
 // SetRGB sets the Red Green Blue value of backlit.
 // The MCP23017 variant don't support PWM and have inverted logic
 func (d *Adafruit1109Driver) SetRGB(r, g, b bool) error {
-	if adafruit1109Debug {
-		log.Printf("## SetRGB %t, %t, %t ##", r, g, b)
-	}
+	d.debuglnf("## SetRGB %t, %t, %t ##", r, g, b)
+
 	rio := d.redPin
 	gio := d.greenPin
 	bio := d.bluePin
@@ -300,4 +315,8 @@ func (d *Adafruit1109Driver) adafruit1109InitButton(p adafruit1109PortPin) error
 		return err
 	}
 	return nil
+}
+
+func (d *Adafruit1109Driver) debuglnf(format string, p ...interface{}) {
+	gobot.Debuglnf(adafruit1109Debug, format, p...)
 }

@@ -183,18 +183,19 @@ type WifiData struct {
 
 // Driver represents the DJI Tello drone
 type Driver struct {
-	name           string
-	reqAddr        string
-	cmdConn        io.WriteCloser // UDP connection to send/receive drone commands
-	videoConn      *net.UDPConn   // UDP connection for drone video
-	respPort       string
-	videoPort      string
-	cmdMutex       sync.Mutex
-	seq            int16
-	rx, ry, lx, ly float32
-	throttle       int
-	bouncing       bool
 	gobot.Eventer
+
+	name              string
+	reqAddr           string
+	cmdConn           io.WriteCloser // UDP connection to send/receive drone commands
+	videoConn         *net.UDPConn   // UDP connection for drone video
+	respPort          string
+	videoPort         string
+	cmdMutex          sync.Mutex
+	seq               int16
+	rx, ry, lx, ly    float32
+	throttle          int
+	bouncing          bool
 	doneCh            chan struct{}
 	doneChReaderCount int32
 }
@@ -448,7 +449,7 @@ func (d *Driver) StartVideo() error {
 // SetExposure sets the drone camera exposure level. Valid levels are 0, 1, and 2.
 func (d *Driver) SetExposure(level int) error {
 	if level < 0 || level > 2 {
-		return errors.New("Invalid exposure level")
+		return errors.New("invalid exposure level")
 	}
 
 	buf, _ := d.createPacket(exposureCommand, 0x48, 1)
@@ -779,7 +780,7 @@ func (d *Driver) ParseFlightData(b []byte) (*FlightData, error) {
 	var data byte
 
 	if buf.Len() < 24 {
-		err := errors.New("Invalid buffer length for flight data packet")
+		err := errors.New("invalid buffer length for flight data packet")
 		fmt.Println(err)
 		return fd, err
 	}

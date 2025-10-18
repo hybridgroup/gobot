@@ -1,6 +1,7 @@
 package gobot
 
 import (
+	"fmt"
 	"log"
 	"reflect"
 
@@ -41,7 +42,7 @@ func (c *Connections) Each(f func(Connection)) {
 
 // Start calls Connect on each Connection in c
 func (c *Connections) Start() error {
-	log.Println("Starting connections...")
+	log.Printf("Starting %d connections...", len(*c))
 	var err error
 	for _, connection := range *c {
 		info := "Starting connection " + connection.Name()
@@ -53,7 +54,7 @@ func (c *Connections) Start() error {
 		log.Println(info + "...")
 
 		if cerr := connection.Connect(); cerr != nil {
-			err = multierror.Append(err, cerr)
+			err = multierror.Append(err, fmt.Errorf("'%s' connect error: %w", connection.Name(), cerr))
 		}
 	}
 	return err
@@ -61,10 +62,11 @@ func (c *Connections) Start() error {
 
 // Finalize calls Finalize on each Connection in c
 func (c *Connections) Finalize() error {
+	log.Printf("Finalize %d connections...", len(*c))
 	var err error
 	for _, connection := range *c {
 		if cerr := connection.Finalize(); cerr != nil {
-			err = multierror.Append(err, cerr)
+			err = multierror.Append(err, fmt.Errorf("'%s' finalize error: %w", connection.Name(), cerr))
 		}
 	}
 	return err

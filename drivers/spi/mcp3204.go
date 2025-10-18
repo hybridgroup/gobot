@@ -41,7 +41,7 @@ func NewMCP3204Driver(a Connector, options ...func(Config)) *MCP3204Driver {
 // Read reads the current analog data for the desired channel.
 func (d *MCP3204Driver) Read(channel int) (int, error) {
 	if channel < 0 || channel > MCP3204DriverMaxChannel-1 {
-		return 0, fmt.Errorf("Invalid channel '%d' for read", channel)
+		return 0, fmt.Errorf("invalid channel '%d' for read", channel)
 	}
 
 	tx := make([]byte, 3)
@@ -51,7 +51,7 @@ func (d *MCP3204Driver) Read(channel int) (int, error) {
 
 	rx := make([]byte, 3)
 
-	if err := d.connection.ReadCommandData(tx, rx); err != nil || len(rx) != 3 {
+	if err := d.readCommandData(tx, rx); err != nil || len(rx) != 3 {
 		return 0, err
 	}
 

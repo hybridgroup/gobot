@@ -44,6 +44,9 @@ func NewJSONRobot(robot *Robot) *JSONRobot {
 // It contains its own work routine and a collection of
 // custom commands to control a robot remotely via the Gobot api.
 type Robot struct {
+	Commander
+	Eventer
+
 	Name               string
 	Work               func()
 	connections        *Connections
@@ -55,8 +58,6 @@ type Robot struct {
 	workRegistry       *RobotWorkRegistry
 	WorkEveryWaitGroup *sync.WaitGroup
 	WorkAfterWaitGroup *sync.WaitGroup
-	Commander
-	Eventer
 }
 
 // Robots is a collection of Robot
@@ -215,6 +216,11 @@ func (r *Robot) Stop() error {
 	}
 	if e := r.Connections().Finalize(); e != nil {
 		err = multierror.Append(err, e)
+	}
+
+	if !r.Running() {
+		// start was not successful, a full channel would block
+		return err
 	}
 
 	r.done <- true

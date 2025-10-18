@@ -31,14 +31,15 @@ type sysfsPin struct {
 
 // Adaptor represents a Gobot Adaptor for a C.H.I.P.
 type Adaptor struct {
-	name   string
-	sys    *system.Accesser // used for unit tests only
-	mutex  sync.Mutex
-	pinMap map[string]sysfsPin
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.PWMPinsAdaptor
 	*adaptors.I2cBusAdaptor
 	*adaptors.SpiBusAdaptor // for usage of "adaptors.WithSpiGpioAccess()"
+
+	name   string
+	sys    *system.Accesser // used for unit tests only
+	mutex  sync.Mutex
+	pinMap map[string]sysfsPin
 }
 
 // NewAdaptor creates a C.H.I.P. Adaptor
@@ -48,7 +49,12 @@ type Adaptor struct {
 //	adaptors.WithGpioCdevAccess():	use character device driver instead of sysfs
 //	adaptors.WithSpiGpioAccess(sclk, ncs, sdo, sdi):	use GPIO's instead of /dev/spidev#.#
 //
-//	Optional parameters for PWM, see [adaptors.NewPWMPinsAdaptor]
+// Further optional parameters for:
+//
+//	GPIO, see [adaptors.NewDigitalPinsAdaptor]
+//	I2C, see [adaptors.NewI2cBusAdaptor]
+//	PWM, see [adaptors.NewPWMPinsAdaptor]
+//	SPI, see [adaptors.NewSpiBusAdaptor]
 func NewAdaptor(opts ...interface{}) *Adaptor {
 	sys := system.NewAccesser(system.WithDigitalPinSysfsAccess())
 	a := &Adaptor{
@@ -65,6 +71,7 @@ func NewAdaptor(opts ...interface{}) *Adaptor {
 
 	var digitalPinsOpts []adaptors.DigitalPinsOptionApplier
 	var pwmPinsOpts []adaptors.PwmPinsOptionApplier
+	var i2cBusOpts []adaptors.I2CBusOptionApplier
 	var spiBusOpts []adaptors.SpiBusOptionApplier
 	for _, opt := range opts {
 		switch o := opt.(type) {
@@ -72,6 +79,8 @@ func NewAdaptor(opts ...interface{}) *Adaptor {
 			digitalPinsOpts = append(digitalPinsOpts, o)
 		case adaptors.PwmPinsOptionApplier:
 			pwmPinsOpts = append(pwmPinsOpts, o)
+		case adaptors.I2CBusOptionApplier:
+			i2cBusOpts = append(i2cBusOpts, o)
 		case adaptors.SpiBusOptionApplier:
 			spiBusOpts = append(spiBusOpts, o)
 		default:
@@ -84,7 +93,7 @@ func NewAdaptor(opts ...interface{}) *Adaptor {
 
 	a.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, a.translateDigitalPin, digitalPinsOpts...)
 	a.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, a.translatePWMPin, pwmPinsOpts...)
-	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, i2cBusNumberValidator.Validate, defaultI2cBusNumber)
+	a.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, i2cBusNumberValidator.Validate, defaultI2cBusNumber, i2cBusOpts...)
 
 	// SPI is only supported when "adaptors.WithSpiGpioAccess()" is given
 	if len(spiBusOpts) > 0 {

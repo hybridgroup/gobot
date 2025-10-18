@@ -68,7 +68,11 @@ func TestWiichuckDriverStart(t *testing.T) {
 }
 
 func TestWiichuckDriverHalt(t *testing.T) {
-	d := initTestWiichuckDriverWithStubbedAdaptor()
+	// arrange
+	d := NewWiichuckDriver(newI2cTestAdaptor())
+	// act, assert
+	require.NoError(t, d.Halt()) // must be idempotent
+	require.NoError(t, d.Start())
 	require.NoError(t, d.Halt())
 }
 

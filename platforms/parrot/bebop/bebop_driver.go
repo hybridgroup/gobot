@@ -11,9 +11,10 @@ const (
 
 // Driver is gobot.Driver representation for the Bebop
 type Driver struct {
+	gobot.Eventer
+
 	name       string
 	connection gobot.Connection
-	gobot.Eventer
 }
 
 // NewDriver creates an Bebop Driver.

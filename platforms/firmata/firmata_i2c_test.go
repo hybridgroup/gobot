@@ -22,6 +22,7 @@ var _ i2c.Connector = (*Adaptor)(nil)
 
 type i2cMockFirmataBoard struct {
 	gobot.Eventer
+
 	i2cDataForRead []byte
 	numBytesToRead int
 	i2cWritten     []byte
@@ -249,5 +250,5 @@ func TestDefaultBus(t *testing.T) {
 func TestGetI2cConnectionInvalidBus(t *testing.T) {
 	a := NewAdaptor()
 	_, err := a.GetI2cConnection(0x01, 99)
-	require.ErrorContains(t, err, "Invalid bus number 99, only 0 is supported")
+	require.ErrorContains(t, err, "invalid bus number 99, only 0 is supported")
 }

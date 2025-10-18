@@ -36,6 +36,11 @@ type SpiBusAdaptor struct {
 
 // NewSpiBusAdaptor provides the access to SPI buses of the board. The validator is used to check the
 // bus number (given by user) to the abilities of the board.
+//
+// Options:
+//
+//	"WithSpiDebug"
+//	"WithSpiGpioAccess"
 func NewSpiBusAdaptor(
 	sys *system.Accesser,
 	v spiBusNumberValidator,
@@ -86,11 +91,13 @@ func (a *SpiBusAdaptor) Connect() error {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
-	if a.spiBusCfg.debug {
-		fmt.Println("connect the SPI bus adaptor")
+	if a.connections != nil {
+		return fmt.Errorf("SPI bus adaptor already connected, please call Finalize() for re-connect")
 	}
 
 	a.connections = make(map[string]spi.Connection)
+	a.debuglnf("connect the SPI bus adaptor done")
+
 	return nil
 }
 
@@ -99,19 +106,21 @@ func (a *SpiBusAdaptor) Finalize() error {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
-	if a.spiBusCfg.debug {
-		fmt.Println("finalize the SPI bus adaptor")
-	}
+	a.debuglnf("finalize the SPI bus adaptor for %d buses...", len(a.connections))
 
 	var err error
-	for _, con := range a.connections {
+	for id, con := range a.connections {
 		if con != nil {
-			if e := con.Close(); e != nil {
+			e := con.Close()
+			if e != nil {
 				err = multierror.Append(err, e)
 			}
+			a.debuglnf("SPI bus '%s' closed with error: %v", id, e)
 		}
 	}
 	a.connections = nil
+	a.debuglnf("finalize the SPI bus adaptor done with error: %v", err)
+
 	return err
 }
 
@@ -121,9 +130,7 @@ func (a *SpiBusAdaptor) GetSpiConnection(busNum, chipNum, mode, bits int, maxSpe
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
-	if a.spiBusCfg.debug {
-		fmt.Println("get SPI connection")
-	}
+	a.debuglnf("get SPI connection")
 
 	if a.connections == nil {
 		return nil, fmt.Errorf("not connected")
@@ -171,4 +178,8 @@ func (a *SpiBusAdaptor) SpiDefaultBitCount() int {
 // SpiDefaultMaxSpeed returns the default maximal speed for this platform.
 func (a *SpiBusAdaptor) SpiDefaultMaxSpeed() int64 {
 	return a.defaultMaxSpeed
+}
+
+func (a *SpiBusAdaptor) debuglnf(format string, p ...interface{}) {
+	gobot.Debuglnf(a.spiBusCfg.debug, format, p...)
 }

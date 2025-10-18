@@ -40,6 +40,7 @@ type ds18b20ConversionTimeOption uint16
 // DS18B20Driver is a driver for the DS18B20 1-wire temperature sensor.
 type DS18B20Driver struct {
 	*driver
+
 	ds18b20Cfg *ds18b20Configuration
 }
 
@@ -107,7 +108,7 @@ func (d *DS18B20Driver) Temperature() (float32, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	val, err := d.connection.ReadInteger(temperatureCommand)
+	val, err := d.readInteger(temperatureCommand)
 	if err != nil {
 		return 0, err
 	}
@@ -120,7 +121,7 @@ func (d *DS18B20Driver) Resolution() (uint8, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	val, err := d.connection.ReadInteger(resolutionCommand)
+	val, err := d.readInteger(resolutionCommand)
 	if err != nil {
 		return 0, err
 	}
@@ -137,7 +138,7 @@ func (d *DS18B20Driver) IsExternalPowered() (bool, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	val, err := d.connection.ReadInteger(extPowerCommand)
+	val, err := d.readInteger(extPowerCommand)
 	if err != nil {
 		return false, err
 	}
@@ -150,7 +151,7 @@ func (d *DS18B20Driver) ConversionTime() (uint16, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	val, err := d.connection.ReadInteger(convTimeCommand)
+	val, err := d.readInteger(convTimeCommand)
 	if err != nil {
 		return 0, err
 	}
@@ -165,13 +166,18 @@ func (d *DS18B20Driver) ConversionTime() (uint16, error) {
 // DebugConversionTime try to set the conversion time and compare with real time to read temperature.
 func (d *DS18B20Driver) DebugConversionTime(start, end uint16, stepwide uint16, skipInvalid bool) {
 	r, _ := d.Resolution()
+	id, err := d.id()
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
 	fmt.Printf("\n---- Conversion time check for '%s'@%dbit %d..%d +%d ----\n",
-		d.connection.ID(), r, start, end, stepwide)
+		id, r, start, end, stepwide)
 	fmt.Println("|r1(err)\t|w(err)\t\t|r2(err)\t|T(err)\t\t|real\t\t|diff\t\t|")
 	fmt.Println("--------------------------------------------------------------------------------")
 	for ct := start; ct < end; ct += stepwide {
 		r1, e1 := d.ConversionTime()
-		ew := d.connection.WriteInteger(convTimeCommand, int(ct))
+		ew := d.writeInteger(convTimeCommand, int(ct))
 		r2, e2 := d.ConversionTime()
 		time.Sleep(100 * time.Millisecond) // relax the system
 		start := time.Now()
@@ -188,27 +194,31 @@ func (d *DS18B20Driver) DebugConversionTime(start, end uint16, stepwide uint16, 
 
 func (d *DS18B20Driver) initialize() error {
 	if d.ds18b20Cfg.resolution != ds18b20DefaultResolution {
-		if err := d.connection.WriteInteger(resolutionCommand, int(d.ds18b20Cfg.resolution)); err != nil {
+		if err := d.writeInteger(resolutionCommand, int(d.ds18b20Cfg.resolution)); err != nil {
 			return err
 		}
 	}
 
 	if d.ds18b20Cfg.conversionTime != ds18b20DefaultConversionTime {
-		return d.connection.WriteInteger(convTimeCommand, int(d.ds18b20Cfg.conversionTime))
+		return d.writeInteger(convTimeCommand, int(d.ds18b20Cfg.conversionTime))
 	}
 
 	return nil
 }
 
 func (d *DS18B20Driver) shutdown() error {
+	if d.connection == nil {
+		return nil
+	}
+
 	if d.ds18b20Cfg.resolution != ds18b20DefaultResolution {
-		if err := d.connection.WriteInteger(resolutionCommand, ds18b20DefaultResolution); err != nil {
+		if err := d.writeInteger(resolutionCommand, ds18b20DefaultResolution); err != nil {
 			return err
 		}
 	}
 
 	if d.ds18b20Cfg.conversionTime != ds18b20DefaultConversionTime {
-		return d.connection.WriteInteger(convTimeCommand, int(ds18b20DefaultConversionTime))
+		return d.writeInteger(convTimeCommand, int(ds18b20DefaultConversionTime))
 	}
 
 	return nil

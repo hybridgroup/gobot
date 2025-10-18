@@ -45,12 +45,13 @@ type nameOption string
 
 // Driver implements the interface gobot.Driver.
 type driver struct {
+	gobot.Commander
+
 	driverCfg  *configuration
 	connection interface{}
 	afterStart func() error
 	beforeHalt func() error
-	gobot.Commander
-	mutex *sync.Mutex // e.g. used to prevent data race between cyclic and single shot write/read to values and scaler
+	mutex      *sync.Mutex // e.g. used to prevent data race between cyclic and single shot write/read to values and scaler
 }
 
 // newDriver creates a new basic analog gobot driver.
@@ -83,8 +84,13 @@ func (d *driver) SetName(name string) {
 	WithName(name).apply(d.driverCfg)
 }
 
-// Connection returns the connection of the driver.
+// Connection returns the gobot connection of the driver.
 func (d *driver) Connection() gobot.Connection {
+	if d.connection == nil {
+		log.Printf("%s has no connection\n", d.driverCfg.name)
+		return nil
+	}
+
 	if conn, ok := d.connection.(gobot.Connection); ok {
 		return conn
 	}

@@ -34,6 +34,7 @@ type motorBackwardPinOption string
 // MotorDriver Represents a Motor
 type MotorDriver struct {
 	*driver
+
 	motorCfg         *motorConfiguration
 	currentState     byte
 	currentSpeed     byte
