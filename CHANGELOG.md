@@ -1,8 +1,58 @@
 # CHANGELOG
 
-## [Unreleased](https://github.com/hybridgroup/gobot/compare/v2.5.0...HEAD)
+## [Unreleased](https://github.com/hybridgroup/gobot/compare/v2.6.0...HEAD)
 
-## [v2.5.0](https://github.com/hybridgroup/gobot/compare/v2.4.0...v2.5.0) (2025-02-15)
+## [v2.6.0](https://github.com/hybridgroup/gobot/compare/v2.5.0...v2.6.0) (2025-10-18)
+
+### Adaptors
+
+* **all:** add debug option ([#1181](https://github.com/hybridgroup/gobot/issues/1181))
+
+### Ble
+
+* fix some issues in connect and disconnect ([#1161](https://github.com/hybridgroup/gobot/issues/1161))
+
+### Build
+
+* **deps:** update modules ([#1186](https://github.com/hybridgroup/gobot/issues/1186))
+* **go, deps:** switch to Go 1.24 linter 2.4.0 and update modules ([#1162](https://github.com/hybridgroup/gobot/issues/1162))
+
+### Common
+
+* improve robot level errors ([#1180](https://github.com/hybridgroup/gobot/issues/1180))
+
+### Doc
+
+* **core:** prepare for release v2.6.0
+
+### Drivers
+
+* fix nil connector check ([#1178](https://github.com/hybridgroup/gobot/issues/1178))
+
+### I2c
+
+* **adafruit1109:** rework debug messages ([#1182](https://github.com/hybridgroup/gobot/issues/1182))
+* **all:** ensure halt is idempotent ([#1171](https://github.com/hybridgroup/gobot/issues/1171))
+* **bme280:** fix default name ([#1177](https://github.com/hybridgroup/gobot/issues/1177))
+* **mcp23017:** fix missing code for halt is idempotent ([#1175](https://github.com/hybridgroup/gobot/issues/1175))
+
+### Onewire
+
+* **all:** ensure halt is idempotent ([#1174](https://github.com/hybridgroup/gobot/issues/1174))
+
+### Platforms
+
+* **bleclient:** improve errors and add sleep option ([#1179](https://github.com/hybridgroup/gobot/issues/1179))
+
+### Spi
+
+* **all:** ensure halt is idempotent ([#1173](https://github.com/hybridgroup/gobot/issues/1173))
+
+### Wiichuck
+
+* fix go routine leaking and concurrency problem ([#1172](https://github.com/hybridgroup/gobot/issues/1172))
+
+## [v2.5.0](https://github.com/hybridgroup/gobot/compare/v2.4.0...v2.5.0) (2025-02-16)
 
 ### Build
 
