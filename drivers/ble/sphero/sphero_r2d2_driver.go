@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"log"
+	"sync"
 	"time"
 
 	"gobot.io/x/gobot/v2"
@@ -12,20 +14,30 @@ import (
 )
 
 const (
+	PlaybackImmediate         = 0x0
+	PlaybackIfNotPlaying      = 0x1
+	PlaybackAfterCurrentSound = 0x2
+
 	// spheroBLEService    = "22bb746f2bb075542d6f726568705327"
 	// robotControlService = "22bb746f2ba075542d6f726568705327"
 
-	r2WakeChara     = "22bb746f2bbf75542d6f726568705327"
-	r2TxPowerChara  = "22bb746f2bb275542d6f726568705327"
-	r2AntiDosChara  = "22bb746f2bbd75542d6f726568705327"
-	r2CommandsChara = "00010002574f4f2053706865726f2121"
+	//r2WakeChara    = "22bb746f2bbf75542d6f726568705327"
+	r2WakeChara    = "22bb746f2bbf75542d6f726568705327"
+	r2TxPowerChara = "22bb746f2bb275542d6f726568705327" // handshake 2nd transmission
+	//r2AntiDosChara  = "22bb746f2bbd75542d6f726568705327" // handshake 1st transmission
+	r2AntiDosChara  = "00020005574f4f2053706865726f2121" // handshake 1st transmission
+	r2CommandsChara = "00010002574f4f2053706865726f2121" // send uuid
 	r2ResponseChara = r2CommandsChara
+
+	// command safe interval
+	commandInterval = time.Duration(12) * time.Millisecond
 
 	// start of packet
 	sop = 0x8D
-
 	// end of packet
-	eop = 0xD8
+	eop        = 0xD8
+	escapeHex  = 0xAB
+	escapeMask = 0x88
 
 	// flags
 	isResponse                = 0b1
@@ -56,6 +68,7 @@ type R2D2Driver struct {
 	gobot.Eventer
 	defaultCollisionConfig spherocommon.CollisionConfig
 	seq                    uint8
+	seqMutex               sync.Mutex
 	collisionResponse      []uint8
 	packetChannel          chan *packet
 	asyncBuffer            []byte
@@ -77,6 +90,7 @@ func newR2D2BaseDriver(
 		defaultCollisionConfig: dcc,
 		Eventer:                gobot.NewEventer(),
 		packetChannel:          make(chan *packet, 1024),
+		seqMutex:               sync.Mutex{},
 	}
 	d.Driver = ble.NewDriver(a, name, d.initialize, d.shutdown, opts...)
 
@@ -86,31 +100,18 @@ func newR2D2BaseDriver(
 	return d
 }
 
-// SetTXPower sets transmit level
-func (d *R2D2Driver) SetTXPower(level int) error {
-	buf := []byte{byte(level)}
-
-	if err := d.Adaptor().WriteCharacteristic(r2TxPowerChara, buf); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 // Wake wakes R2D2 up so we can play
 func (d *R2D2Driver) Wake() error {
-	buf := []byte{0x01}
-
-	if err := d.Adaptor().WriteCharacteristic(r2WakeChara, buf); err != nil {
-		return err
-	}
+	// Power.wake did: 19 cid: 13
+	d.sendCraftPacket([]uint8{}, 0x13, 0x0D)
 
 	return nil
 }
 
 // ConfigureCollisionDetection configures the sensitivity of the detection.
 func (d *R2D2Driver) ConfigureCollisionDetection(cc spherocommon.CollisionConfig) {
-	d.sendCraftPacket([]uint8{cc.Method, cc.Xt, cc.Yt, cc.Xs, cc.Ys, cc.Dead}, 0x02, 0x12)
+	// did: 24, cid: 17
+	d.sendCraftPacket([]uint8{cc.Method, cc.Xt, cc.Yt, cc.Xs, cc.Ys, cc.Dead}, 0x18, 0x11)
 }
 
 // GetLocatorData calls the passed function with the data from the locator
@@ -122,30 +123,37 @@ func (d *R2D2Driver) GetLocatorData(f func(p Point2D)) {
 
 // GetPowerState calls the passed function with the Power State information from the sphero
 func (d *R2D2Driver) GetPowerState(f func(p spherocommon.PowerStatePacket)) {
-	// CID 0x20 is the code for the power state
-	d.sendCraftPacket([]uint8{}, 0x00, 0x20)
+	// did: 19, cid: 4
+	d.sendCraftPacket([]uint8{}, 0x13, 0x04)
+	//	CHARGED = 0
+	//	CHARGING = 1
+	//	NOT_CHARGING = 2
+	//	OK = 3
+	//	LOW = 4
+	//	CRITICAL = 5
+	//	UNKNOWN = 255
 	d.powerstateCallback = f
 }
 
 // SetRGB sets the R2D2 to the given r, g, and b values
 func (d *R2D2Driver) SetRGB(r uint8, g uint8, b uint8) {
-	d.sendCraftPacket([]uint8{r, g, b, 0x01}, 0x02, 0x20)
+	// did: 26, cid: 14
+	d.sendCraftPacket([]uint8{0, 119, r, g, b, r, g, b}, 0x1A, 0x0E)
 }
 
 // Roll tells the R2D2 to roll
 func (d *R2D2Driver) Roll(speed uint8, heading uint16) {
 	//nolint:gosec // TODO: fix later
-	d.sendCraftPacket([]uint8{speed, uint8(heading >> 8), uint8(heading & 0xFF), 0x01}, 0x02, 0x30)
-}
-
-// Boost executes the boost macro from within the SSB which takes a 1 byte parameter which is
-// either 01h to begin boosting or 00h to stop.
-func (d *R2D2Driver) Boost(state bool) {
-	s := uint8(0x01)
-	if !state {
-		s = 0x00
-	}
-	d.sendCraftPacket([]uint8{s}, 0x02, 0x31)
+	// did: 22, cid: 7
+	// last data packet is DriveFlags, may not be supported on the R2
+	//	FORWARD = 0x0  # 0b0
+	//	BACKWARD = 0x1  # 0b1
+	//	TURBO = 0x2  # 0b10
+	//	FAST_TURN = 0x4  # 0b100
+	//	LEFT_DIRECTION = 0x8  # 0b1000
+	//	RIGHT_DIRECTION = 0x10  # 0b10000
+	//	ENABLE_DRIFT = 0x20  # 0b100000
+	d.sendCraftPacket([]uint8{speed, uint8(heading >> 8), uint8(heading & 0xFF), 0x00}, 0x16, 0x07)
 }
 
 // SetStabilization enables or disables the built-in auto stabilizing features of the R2D2
@@ -154,25 +162,49 @@ func (d *R2D2Driver) SetStabilization(state bool) {
 	if !state {
 		s = 0x00
 	}
-	d.sendCraftPacket([]uint8{s}, 0x02, 0x02)
-}
-
-// SetRotationRate allows you to control the rotation rate that Sphero will use to meet new heading commands. A value
-// of 255 jumps to the maximum (currently 400 degrees/sec). A value of zero doesn't make much sense so it's interpreted
-// as 1, the minimum.
-func (d *R2D2Driver) SetRotationRate(speed uint8) {
-	d.sendCraftPacket([]uint8{speed}, 0x02, 0x03)
+	// did: 22, cid: 12
+	//	NO_CONTROL_SYSTEM = 0
+	//	FULL_CONTROL_SYSTEM = 1
+	//	PITCH_CONTROL_SYSTEM = 2
+	//	ROLL_CONTROL_SYSTEM = 3
+	//	YAW_CONTROL_SYSTEM = 4
+	//	SPEED_AND_YAW_CONTROL_SYSTEM = 5
+	d.sendCraftPacket([]uint8{s}, 0x16, 0x0C)
 }
 
 // SetRawMotorValues allows you to take over one or both of the motor output values, instead of having the stabilization
 // system control them. Each motor (left and right) requires a mode and a power value from 0-255.
+// MotorModes Brake and Ignore are not supported on the R2.
 func (d *R2D2Driver) SetRawMotorValues(lmode MotorModes, lpower uint8, rmode MotorModes, rpower uint8) {
-	d.sendCraftPacket([]uint8{uint8(lmode), lpower, uint8(rmode), rpower}, 0x02, 0x33)
+	// did: 22, cid: 1
+	d.sendCraftPacket([]uint8{uint8(lmode), lpower, uint8(rmode), rpower}, 0x16, 0x01)
 }
 
-// SetBackLEDBrightness allows you to control the brightness of the back(tail) LED.
-func (d *R2D2Driver) SetBackLEDBrightness(value uint8) {
-	d.sendCraftPacket([]uint8{value}, 0x02, 0x21)
+// SetBackRGB sets the back R2D2 dome LED to the given r, g, and b values
+func (d *R2D2Driver) SetBackRGB(r uint8, g uint8, b uint8) {
+	// did: 26, cid: 14
+	//	def set_leds(self, mapping: Dict[IntEnum, int]):
+	//	mask = 0
+	//	led_values = []
+	//	for e in self.__toy.LEDs:
+	//		if e in mapping:
+	//			mask |= 1 << e
+	//			led_values.append(mapping[e])
+	//	self.__toy.set_all_leds_with_16_bit_mask(mask, led_values)
+	// IO._encode(toy, 14, proc, [*to_bytes(mask, 2), *values])
+	d.sendCraftPacket([]uint8{0, 119, r, g, b, r, g, b}, 0x1A, 0x0E)
+}
+
+// SetDomePosition pos can be -160 to 180
+func (d *R2D2Driver) SetDomePosition(pos float32) {
+	// did: 23, cid: 15
+	d.sendCraftPacket(spherocommon.FloatToBytes(pos), 0x17, 0xf)
+}
+
+// PlaySound where playback is PlaybackImmediate, PlaybackIfNotPlaying or PlaybackAfterCurrentSound
+func (d *R2D2Driver) PlaySound(sound uint16, playback byte) {
+	// did: 26, cid: 7
+	d.sendCraftPacket(append(spherocommon.IntToBytes(sound), playback), 0x1A, 0x7)
 }
 
 // Stop tells the R2D2 to stop
@@ -182,7 +214,8 @@ func (d *R2D2Driver) Stop() {
 
 // Sleep says Go to sleep
 func (d *R2D2Driver) Sleep() {
-	d.sendCraftPacket([]uint8{0x00, 0x00, 0x00, 0x00, 0x00}, 0x00, 0x22)
+	// did: 19, cid: 1
+	d.sendCraftPacket([]uint8{}, 0x13, 0x1)
 }
 
 // SetDataStreamingConfig passes the config to the sphero to stream sensor data
@@ -200,13 +233,9 @@ func (d *R2D2Driver) initialize() error {
 	if err := d.antiDOSOff(); err != nil {
 		return err
 	}
-	if err := d.SetTXPower(7); err != nil {
-		return err
-	}
 	if err := d.Wake(); err != nil {
 		return err
 	}
-
 	// subscribe to Sphero response notifications
 	if err := d.Adaptor().Subscribe(r2ResponseChara, d.handleResponses); err != nil {
 		return err
@@ -223,14 +252,15 @@ func (d *R2D2Driver) initialize() error {
 	}()
 
 	d.ConfigureCollisionDetection(d.defaultCollisionConfig)
-	d.enableStopOnDisconnect()
+	// enableStopOnDisconnect is a temporary option, not supported by the R2
+	// d.enableStopOnDisconnect()
 
 	return nil
 }
 
 // antiDOSOff turns off Anti-DOS code so we can control R2D2
 func (d *R2D2Driver) antiDOSOff() error {
-	str := "011i3"
+	str := "usetheforce...band"
 	buf := &bytes.Buffer{}
 	buf.WriteString(str)
 
@@ -242,24 +272,22 @@ func (d *R2D2Driver) antiDOSOff() error {
 }
 
 func (d *R2D2Driver) writeCommand(packet *packet) error {
-	d.Mutex().Lock()
-	defer d.Mutex().Unlock()
+	log.Printf("request %X % X % X %X %X\n", sop, packet.header, packet.body, packet.checksum, eop)
 
-	buf := append([]uint8{sop}, packet.header...)
-	buf = append(buf, packet.body...)
-	buf = append(buf, packet.checksum, eop)
+	buf := append([]uint8{sop}, escapeBytes(packet.header)...)
+	buf = append(buf, escapeBytes(packet.body)...)
+	buf = append(buf, escapeByte(packet.checksum)...)
+	buf = append(buf, eop)
+
 	if err := d.Adaptor().WriteCharacteristic(r2CommandsChara, buf); err != nil {
 		fmt.Println("async send command error:", err)
 		return err
 	}
 
-	d.seq++
-	return nil
-}
+	// avoid ddos the r2
+	time.Sleep(commandInterval)
 
-// enableStopOnDisconnect auto-sends a Stop command after losing the connection
-func (d *R2D2Driver) enableStopOnDisconnect() {
-	d.sendCraftPacket([]uint8{0x00, 0x00, 0x00, 0x01}, 0x02, 0x37)
+	return nil
 }
 
 // shutdown stops R2D2 driver (void)
@@ -271,40 +299,41 @@ func (d *R2D2Driver) shutdown() error {
 
 // handleResponses handles responses returned from R2D2
 func (d *R2D2Driver) handleResponses(data []byte) {
-	// since packets can only be 20 bytes long, we have to puzzle them together
-	newMessage := false
+	log.Printf("handleResponse of %v bytes: %X\n", len(data), data)
+	// v2 packets can be arbitrary length, we have to puzzle them together
+	//newMessage := false
 
 	// append message parts to existing
-	if len(data) > 0 && data[0] != 0xFF {
+	if len(data) > 0 && data[0] != eop {
 		d.asyncBuffer = append(d.asyncBuffer, data...)
 	}
 
-	// clear message when new one begins (first byte is always 0xFF)
-	if len(data) > 0 && data[0] == 0xFF {
+	// clear message when new one begins (first byte is always 0x8D)
+	if len(data) > 0 && data[0] == sop {
 		d.asyncMessage = d.asyncBuffer
 		d.asyncBuffer = data
-		newMessage = true
+		//newMessage = true
 	}
 
-	parts := d.asyncMessage
-	// 3 is the id of data streaming, located at index 2 byte
-	if newMessage && len(parts) > 2 && parts[2] == 3 {
-		d.handleDataStreaming(parts)
-	}
-
-	// index 1 is the type of the message, 0xFF being a direct response, 0xFE an asynchronous message
-	if len(data) > 4 && data[1] == 0xFF && data[0] == 0xFF {
-		// locator request
-		if data[4] == 0x0B && len(data) == 16 {
-			d.handleLocatorDetected(data)
-		}
-
-		if data[4] == 0x09 {
-			d.handlePowerStateDetected(data)
-		}
-	}
-
-	d.handleCollisionDetected(data)
+	//parts := d.asyncMessage
+	//// 8 is the id of data streaming, located at index 7 byte
+	//if newMessage && len(parts) > 7 && parts[7] == 8 {
+	//	d.handleDataStreaming(parts)
+	//}
+	//
+	//// index 1 is the flag byte of the message, interpret response based on flags
+	//if len(data) > 4 && data[1] == 0xFF && data[0] == sop {
+	//	// locator request
+	//	if data[4] == 0x0B && len(data) == 16 {
+	//		d.handleLocatorDetected(data)
+	//	}
+	//
+	//	if data[4] == 0x09 {
+	//		d.handlePowerStateDetected(data)
+	//	}
+	//}
+	//
+	//d.handleCollisionDetected(data)
 }
 
 func (d *R2D2Driver) handleDataStreaming(data []byte) {
@@ -403,25 +432,34 @@ func (d *R2D2Driver) handleCollisionDetected(data []uint8) {
 }
 
 func (d *R2D2Driver) sendCraftPacket(body []uint8, did byte, cid byte) {
-	d.packetChannel <- d.craftPacket(body, nil, did, cid)
+	d.packetChannel <- d.craftPacket(body, did, cid)
 }
 
-func (d *R2D2Driver) craftPacket(body []uint8, tid *byte, did byte, cid byte) *packet {
-	//TODO handle flags, tid, sid, err better
+func (d *R2D2Driver) craftPacket(body []uint8, did byte, cid byte) *packet {
+	// packet protocol v2
+	// [SOP, FLAGS, TID (optional), SID (optional), DID, CID, SEQ, ERR (at response), DATA..., CHK, EOP]
+	// FLAGS to DATA... included in CHK
+	// FLAGS to CHK are encoded
+	d.seqMutex.Lock()
+	defer d.seqMutex.Unlock()
+
+	//TODO handle flags, tid, sid err better
 	flags := byte(requestsResponse | isActivity)
-	var sid byte
-	if tid != nil {
-		flags |= hasSourceId | hasTargetId
-		sid = 0x1
-	}
-	hdr := []uint8{flags, *tid, sid, did, cid, d.seq} //nolint:gosec // TODO: fix later
+	//var sid byte
+	//if tid != nil {
+	//	flags |= hasSourceId | hasTargetId
+	//	sid = 0x1
+	//}
+	hdr := []uint8{flags, did, cid, d.seq} //nolint:gosec // TODO: fix later
 	buf := append(hdr, body...)
 
 	packet := &packet{
 		body:     body,
 		header:   hdr,
-		checksum: spherocommon.CalculateChecksum(buf[2:]),
+		checksum: spherocommon.CalculateChecksum(buf),
 	}
+
+	d.seq++
 
 	return packet
 }
@@ -430,10 +468,43 @@ func (d *R2D2Driver) craftPacket(body []uint8, tid *byte, did byte, cid byte) *p
 func r2d2DefaultCollisionConfig() spherocommon.CollisionConfig {
 	return spherocommon.CollisionConfig{
 		Method: 0x01,
-		Xt:     0x20,
-		Yt:     0x20,
-		Xs:     0x20,
-		Ys:     0x20,
-		Dead:   0x60,
+		Xt:     0x5A,
+		Yt:     0x82,
+		Xs:     0x5A,
+		Ys:     0x82,
+		Dead:   0x01,
 	}
+}
+
+func escapeBytes(data []uint8) []uint8 {
+	var escaped []uint8
+	for _, b := range data {
+		escaped = append(escaped, escapeByte(b)...)
+	}
+	return escaped
+}
+
+func escapeByte(b uint8) []uint8 {
+	var escaped []uint8
+	if b == sop || b == eop || b == escapeHex {
+		return append(escaped, escapeHex, b^escapeMask)
+	}
+
+	return append(escaped, b)
+}
+
+func unescapeBytes(data []uint8) []uint8 {
+	var result []uint8
+	escaped := false
+	for _, b := range data {
+		if escaped {
+			result = append(result, b^escapeMask)
+			escaped = false
+		} else if b == escapeHex {
+			escaped = true
+		} else {
+			result = append(result, b)
+		}
+	}
+	return result
 }

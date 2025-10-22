@@ -1,5 +1,10 @@
 package spherocommon
 
+import (
+	"encoding/binary"
+	"math"
+)
+
 const (
 	// ErrorEvent event when error encountered
 	ErrorEvent = "error"
@@ -30,4 +35,17 @@ func CalculateChecksum(buf []byte) byte {
 		calculatedChecksum += uint16(buf[i])
 	}
 	return uint8(^(calculatedChecksum % 256)) //nolint:gosec // TODO: fix later
+}
+
+func FloatToBytes(flt float32) []byte {
+	u := math.Float32bits(flt)
+	buf := make([]uint8, 4)
+	binary.BigEndian.PutUint32(buf, u)
+	return buf
+}
+
+func IntToBytes(int uint16) []byte {
+	buf := make([]uint8, 2)
+	binary.BigEndian.PutUint16(buf, int)
+	return buf
 }
