@@ -13,10 +13,18 @@ import (
 	"gobot.io/x/gobot/v2/drivers/common/spherocommon"
 )
 
+type LegAction uint8
+type Playback uint8
+
 const (
-	PlaybackImmediate         = 0x0
-	PlaybackIfNotPlaying      = 0x1
-	PlaybackAfterCurrentSound = 0x2
+	Immediate         Playback = 0x0
+	IfNotPlaying      Playback = 0x1
+	AfterCurrentSound Playback = 0x2
+
+	Stop      LegAction = 0
+	ThreeLegs LegAction = 1
+	TwoLegs   LegAction = 2
+	Waddle    LegAction = 3
 
 	// spheroBLEService    = "22bb746f2bb075542d6f726568705327"
 	// robotControlService = "22bb746f2ba075542d6f726568705327"
@@ -108,6 +116,11 @@ func (d *R2D2Driver) Wake() error {
 	return nil
 }
 
+func (d *R2D2Driver) ResetLocatorData() {
+	// did: 24, cid: 19
+	d.sendCraftPacket([]uint8{}, 0x18, 0x13)
+}
+
 // ConfigureCollisionDetection configures the sensitivity of the detection.
 func (d *R2D2Driver) ConfigureCollisionDetection(cc spherocommon.CollisionConfig) {
 	// did: 24, cid: 17
@@ -195,16 +208,26 @@ func (d *R2D2Driver) SetBackRGB(r uint8, g uint8, b uint8) {
 	d.sendCraftPacket([]uint8{0, 119, r, g, b, r, g, b}, 0x1A, 0x0E)
 }
 
+func (d *R2D2Driver) PerformLegAction(action LegAction) {
+	// did: 23, cid: 13
+	d.sendCraftPacket([]uint8{uint8(action)}, 0x17, 0x0D)
+}
+
 // SetDomePosition pos can be -160 to 180
 func (d *R2D2Driver) SetDomePosition(pos float32) {
 	// did: 23, cid: 15
-	d.sendCraftPacket(spherocommon.FloatToBytes(pos), 0x17, 0xf)
+	d.sendCraftPacket(spherocommon.FloatToBytes(pos), 0x17, 0x0F)
 }
 
 // PlaySound where playback is PlaybackImmediate, PlaybackIfNotPlaying or PlaybackAfterCurrentSound
-func (d *R2D2Driver) PlaySound(sound uint16, playback byte) {
+func (d *R2D2Driver) PlaySound(sound uint16, playback Playback) {
 	// did: 26, cid: 7
-	d.sendCraftPacket(append(spherocommon.IntToBytes(sound), playback), 0x1A, 0x7)
+	d.sendCraftPacket(append(spherocommon.IntToBytes(sound), uint8(playback)), 0x1A, 0x07)
+}
+
+func (d *R2D2Driver) PlayAnimation(anima uint16) {
+	// did: 23, cid: 5
+	d.sendCraftPacket(spherocommon.IntToBytes(anima), 0x17, 0x05)
 }
 
 // Stop tells the R2D2 to stop
