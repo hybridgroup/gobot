@@ -46,6 +46,7 @@ Gobot has a extensible system for connecting to hardware devices. The following 
 - PCF8591 8-bit 4xA/D & 1xD/A converter
 - SHT2x Temperature/Humidity
 - SHT3x-D Temperature/Humidity
+- Si4713 FM Transmitter
 - SSD1306 OLED Display Controller
 - TSL2561 Digital Luminosity/Lux/Light Sensor
 - Wii Nunchuck Controller
