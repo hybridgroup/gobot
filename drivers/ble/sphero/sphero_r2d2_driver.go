@@ -13,8 +13,8 @@ import (
 	"gobot.io/x/gobot/v2/drivers/common/spherocommon"
 )
 
-type LegAction uint8
 type Playback uint8
+type LegAction uint8
 
 const (
 	Immediate         Playback = 0x0
@@ -26,13 +26,6 @@ const (
 	TwoLegs   LegAction = 2
 	Waddle    LegAction = 3
 
-	// spheroBLEService    = "22bb746f2bb075542d6f726568705327"
-	// robotControlService = "22bb746f2ba075542d6f726568705327"
-
-	//r2WakeChara    = "22bb746f2bbf75542d6f726568705327"
-	r2WakeChara    = "22bb746f2bbf75542d6f726568705327"
-	r2TxPowerChara = "22bb746f2bb275542d6f726568705327" // handshake 2nd transmission
-	//r2AntiDosChara  = "22bb746f2bbd75542d6f726568705327" // handshake 1st transmission
 	r2AntiDosChara  = "00020005574f4f2053706865726f2121" // handshake 1st transmission
 	r2CommandsChara = "00010002574f4f2053706865726f2121" // send uuid
 	r2ResponseChara = r2CommandsChara
@@ -56,18 +49,6 @@ const (
 	hasSourceId               = 0b100000
 	unused                    = 0b1000000
 	extendedFlags             = 0b10000000
-
-	// packet header size
-	r2PacketHeaderSize = 5
-
-	// Response packet max size
-	r2ResponsePacketMaxSize = 20
-
-	// Collision packet data size: The number of bytes following the DLEN field through the end of the packet
-	r2CollisionDataSize = 17
-
-	// Full size of the collision response
-	r2CollisionResponseSize = packetHeaderSize + collisionDataSize
 )
 
 // R2D2Driver is the Gobot driver for the Sphero R2D2 robot
@@ -220,14 +201,14 @@ func (d *R2D2Driver) SetDomePosition(pos float32) {
 }
 
 // PlaySound where playback is PlaybackImmediate, PlaybackIfNotPlaying or PlaybackAfterCurrentSound
-func (d *R2D2Driver) PlaySound(sound uint16, playback Playback) {
+func (d *R2D2Driver) PlaySound(sound Audio, playback Playback) {
 	// did: 26, cid: 7
-	d.sendCraftPacket(append(spherocommon.IntToBytes(sound), uint8(playback)), 0x1A, 0x07)
+	d.sendCraftPacket(append(spherocommon.IntToBytes(uint16(sound)), uint8(playback)), 0x1A, 0x07)
 }
 
-func (d *R2D2Driver) PlayAnimation(anima uint16) {
+func (d *R2D2Driver) PlayAnimation(anima Animation) {
 	// did: 23, cid: 5
-	d.sendCraftPacket(spherocommon.IntToBytes(anima), 0x17, 0x05)
+	d.sendCraftPacket(spherocommon.IntToBytes(uint16(anima)), 0x17, 0x05)
 }
 
 // Stop tells the R2D2 to stop
@@ -242,6 +223,7 @@ func (d *R2D2Driver) Sleep() {
 }
 
 // SetDataStreamingConfig passes the config to the sphero to stream sensor data
+// TODO get this working for R2
 func (d *R2D2Driver) SetDataStreamingConfig(dsc spherocommon.DataStreamingConfig) error {
 	buf := new(bytes.Buffer)
 	if err := binary.Write(buf, binary.BigEndian, dsc); err != nil {
@@ -322,97 +304,56 @@ func (d *R2D2Driver) shutdown() error {
 
 // handleResponses handles responses returned from R2D2
 func (d *R2D2Driver) handleResponses(data []byte) {
-	log.Printf("handleResponse of %v bytes: %X\n", len(data), data)
+	log.Printf("handleResponse of %v bytes: %X", len(data), data)
+
 	// v2 packets can be arbitrary length, we have to puzzle them together
-	//newMessage := false
+	// they also are sent in 1 byte chunks and can be out of order
+
+	// ignore end of packet and wait till we see another packet
+	if len(data) > 0 && data[0] == eop {
+		return
+	}
 
 	// append message parts to existing
-	if len(data) > 0 && data[0] != eop {
+	if len(data) > 0 && data[0] != sop {
 		d.asyncBuffer = append(d.asyncBuffer, data...)
+		return
 	}
 
 	// clear message when new one begins (first byte is always 0x8D)
-	if len(data) > 0 && data[0] == sop {
-		d.asyncMessage = d.asyncBuffer
+	if len(data) > 0 {
+		// append end of packet to complete message
+		d.asyncMessage = append(d.asyncBuffer, eop)
 		d.asyncBuffer = data
-		//newMessage = true
 	}
 
-	//parts := d.asyncMessage
-	//// 8 is the id of data streaming, located at index 7 byte
-	//if newMessage && len(parts) > 7 && parts[7] == 8 {
-	//	d.handleDataStreaming(parts)
-	//}
-	//
-	//// index 1 is the flag byte of the message, interpret response based on flags
-	//if len(data) > 4 && data[1] == 0xFF && data[0] == sop {
-	//	// locator request
-	//	if data[4] == 0x0B && len(data) == 16 {
-	//		d.handleLocatorDetected(data)
-	//	}
-	//
-	//	if data[4] == 0x09 {
-	//		d.handlePowerStateDetected(data)
-	//	}
-	//}
-	//
-	//d.handleCollisionDetected(data)
+	log.Printf("processing asyncMessage: % X", d.asyncMessage)
+
+	//TODO get sensor data from a packet starting with 0x8d 0x0 0x18 0x2 0xff
 }
 
+// TODO get this working for R2
 func (d *R2D2Driver) handleDataStreaming(data []byte) {
-	// ensure data is the right length:
-	if len(data) != 88 {
-		return
-	}
-
-	// data packet is the same as for the normal sphero, since the same communication api is used
-	// only difference in communication is that the "newer" spheros use BLE for communications
-	var dataPacket spherocommon.DataStreamingPacket
-	buffer := bytes.NewBuffer(data[5:]) // skip header
-	if err := binary.Read(buffer, binary.BigEndian, &dataPacket); err != nil {
-		panic(err)
-	}
-
-	d.Publish(spherocommon.SensorDataEvent, dataPacket)
+	// d.Publish(spherocommon.SensorDataEvent, dataPacket)
 }
 
+// TODO get this working for R2
 func (d *R2D2Driver) handleLocatorDetected(data []uint8) {
-	if d.locatorCallback == nil {
-		return
-	}
-
-	// read the unsigned raw values
-	ux := binary.BigEndian.Uint16(data[5:7])
-	uy := binary.BigEndian.Uint16(data[7:9])
-
-	// convert to signed values
-	var x, y int16
-
-	if ux > 32255 {
-		x = int16(ux - 65535) //nolint:gosec // ok here
-	} else {
-		x = int16(ux)
-	}
-
-	if uy > 32255 {
-		y = int16(uy - 65535) //nolint:gosec // ok here
-	} else {
-		y = int16(uy)
-	}
-
-	d.locatorCallback(Point2D{X: x, Y: y})
+	// d.locatorCallback(Point2D{X: x, Y: y})
 }
 
+// TODO get this working for R2
 func (d *R2D2Driver) handlePowerStateDetected(data []uint8) {
-	var dataPacket spherocommon.PowerStatePacket
-	buffer := bytes.NewBuffer(data[5:]) // skip header
-	if err := binary.Read(buffer, binary.BigEndian, &dataPacket); err != nil {
-		panic(err)
-	}
-
-	d.powerstateCallback(dataPacket)
+	//var dataPacket spherocommon.PowerStatePacket
+	//buffer := bytes.NewBuffer(data[5:]) // skip header
+	//if err := binary.Read(buffer, binary.BigEndian, &dataPacket); err != nil {
+	//	panic(err)
+	//}
+	//
+	//d.powerstateCallback(dataPacket)
 }
 
+// TODO get this working for R2
 func (d *R2D2Driver) handleCollisionDetected(data []uint8) {
 	switch len(data) {
 	case responsePacketMaxSize:
