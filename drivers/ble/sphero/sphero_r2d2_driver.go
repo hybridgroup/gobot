@@ -197,18 +197,18 @@ func (d *R2D2Driver) PerformLegAction(action LegAction) {
 // SetDomePosition pos can be -160 to 180
 func (d *R2D2Driver) SetDomePosition(pos float32) {
 	// did: 23, cid: 15
-	d.sendCraftPacket(spherocommon.FloatToBytes(pos), 0x17, 0x0F)
+	d.sendCraftPacket(spherocommon.Float32ToBytes(pos), 0x17, 0x0F)
 }
 
 // PlaySound where playback is PlaybackImmediate, PlaybackIfNotPlaying or PlaybackAfterCurrentSound
 func (d *R2D2Driver) PlaySound(sound Audio, playback Playback) {
 	// did: 26, cid: 7
-	d.sendCraftPacket(append(spherocommon.IntToBytes(uint16(sound)), uint8(playback)), 0x1A, 0x07)
+	d.sendCraftPacket(append(spherocommon.Int16ToBytes(uint16(sound)), uint8(playback)), 0x1A, 0x07)
 }
 
 func (d *R2D2Driver) PlayAnimation(anima Animation) {
 	// did: 23, cid: 5
-	d.sendCraftPacket(spherocommon.IntToBytes(uint16(anima)), 0x17, 0x05)
+	d.sendCraftPacket(spherocommon.Int16ToBytes(uint16(anima)), 0x17, 0x05)
 }
 
 // Stop tells the R2D2 to stop
@@ -304,7 +304,7 @@ func (d *R2D2Driver) shutdown() error {
 
 // handleResponses handles responses returned from R2D2
 func (d *R2D2Driver) handleResponses(data []byte) {
-	log.Printf("handleResponse of %v bytes: %X", len(data), data)
+	//log.Printf("handleResponse of %v bytes: % X", len(data), data)
 
 	// v2 packets can be arbitrary length, we have to puzzle them together
 	// they also are sent in 1 byte chunks and can be out of order

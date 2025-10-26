@@ -37,14 +37,14 @@ func CalculateChecksum(buf []byte) byte {
 	return uint8(^(calculatedChecksum % 256)) //nolint:gosec // TODO: fix later
 }
 
-func FloatToBytes(flt float32) []byte {
+func Float32ToBytes(flt float32) []byte {
 	u := math.Float32bits(flt)
 	buf := make([]uint8, 4)
 	binary.BigEndian.PutUint32(buf, u)
 	return buf
 }
 
-func IntToBytes(int uint16) []byte {
+func Int16ToBytes(int uint16) []byte {
 	buf := make([]uint8, 2)
 	binary.BigEndian.PutUint16(buf, int)
 	return buf

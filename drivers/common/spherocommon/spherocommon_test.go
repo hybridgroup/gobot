@@ -35,7 +35,7 @@ func TestFloatToBytes(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		actual := FloatToBytes(tt.data)
+		actual := Float32ToBytes(tt.data)
 		if !bytes.Equal(actual, tt.bytes) {
 			require.Fail(t, fmt.Sprintf("Expected %x, got %x for data %v.", tt.bytes, actual, tt.data))
 		}
@@ -52,7 +52,7 @@ func TestIntToBytes(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		actual := IntToBytes(tt.data)
+		actual := Int16ToBytes(tt.data)
 		if !bytes.Equal(actual, tt.bytes) {
 			require.Fail(t, fmt.Sprintf("Expected %x, got %x for data %v.", tt.bytes, actual, tt.data))
 		}
