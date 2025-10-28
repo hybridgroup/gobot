@@ -1,6 +1,7 @@
 package sphero
 
 type Audio uint16
+
 type Animation uint16
 
 const (

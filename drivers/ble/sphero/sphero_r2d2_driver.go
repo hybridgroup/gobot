@@ -14,18 +14,10 @@ import (
 )
 
 type Playback uint8
+
 type LegAction uint8
 
 const (
-	Immediate         Playback = 0x0
-	IfNotPlaying      Playback = 0x1
-	AfterCurrentSound Playback = 0x2
-
-	Stop      LegAction = 0
-	ThreeLegs LegAction = 1
-	TwoLegs   LegAction = 2
-	Waddle    LegAction = 3
-
 	r2AntiDosChara  = "00020005574f4f2053706865726f2121" // handshake 1st transmission
 	r2CommandsChara = "00010002574f4f2053706865726f2121" // send uuid
 	r2ResponseChara = r2CommandsChara
@@ -49,12 +41,22 @@ const (
 	hasSourceId               = 0b100000
 	unused                    = 0b1000000
 	extendedFlags             = 0b10000000
+
+	Immediate         Playback = 0x0
+	IfNotPlaying      Playback = 0x1
+	AfterCurrentSound Playback = 0x2
+
+	Stop      LegAction = 0
+	ThreeLegs LegAction = 1
+	TwoLegs   LegAction = 2
+	Waddle    LegAction = 3
 )
 
 // R2D2Driver is the Gobot driver for the Sphero R2D2 robot
 type R2D2Driver struct {
 	*ble.Driver
 	gobot.Eventer
+
 	defaultCollisionConfig spherocommon.CollisionConfig
 	seq                    uint8
 	seqMutex               sync.Mutex
@@ -304,7 +306,7 @@ func (d *R2D2Driver) shutdown() error {
 
 // handleResponses handles responses returned from R2D2
 func (d *R2D2Driver) handleResponses(data []byte) {
-	//log.Printf("handleResponse of %v bytes: % X", len(data), data)
+	// log.Printf("handleResponse of %v bytes: % X", len(data), data)
 
 	// v2 packets can be arbitrary length, we have to puzzle them together
 	// they also are sent in 1 byte chunks and can be out of order
@@ -329,7 +331,7 @@ func (d *R2D2Driver) handleResponses(data []byte) {
 
 	log.Printf("processing asyncMessage: % X", d.asyncMessage)
 
-	//TODO get sensor data from a packet starting with 0x8d 0x0 0x18 0x2 0xff
+	// TODO get sensor data from a packet starting with 0x8d 0x0 0x18 0x2 0xff
 }
 
 // TODO get this working for R2
@@ -344,13 +346,13 @@ func (d *R2D2Driver) handleLocatorDetected(data []uint8) {
 
 // TODO get this working for R2
 func (d *R2D2Driver) handlePowerStateDetected(data []uint8) {
-	//var dataPacket spherocommon.PowerStatePacket
-	//buffer := bytes.NewBuffer(data[5:]) // skip header
-	//if err := binary.Read(buffer, binary.BigEndian, &dataPacket); err != nil {
-	//	panic(err)
-	//}
+	// var dataPacket spherocommon.PowerStatePacket
+	// buffer := bytes.NewBuffer(data[5:]) // skip header
+	// if err := binary.Read(buffer, binary.BigEndian, &dataPacket); err != nil {
+	// 	panic(err)
+	// }
 	//
-	//d.powerstateCallback(dataPacket)
+	// d.powerstateCallback(dataPacket)
 }
 
 // TODO get this working for R2
@@ -407,14 +409,14 @@ func (d *R2D2Driver) craftPacket(body []uint8, did byte, cid byte) *packet {
 	d.seqMutex.Lock()
 	defer d.seqMutex.Unlock()
 
-	//TODO handle flags, tid, sid err better
+	// TODO handle flags, tid, sid err better
 	flags := byte(requestsResponse | isActivity)
-	//var sid byte
-	//if tid != nil {
-	//	flags |= hasSourceId | hasTargetId
-	//	sid = 0x1
-	//}
-	hdr := []uint8{flags, did, cid, d.seq} //nolint:gosec // TODO: fix later
+	// var sid byte
+	// if tid != nil {
+	// 	flags |= hasSourceId | hasTargetId
+	// 	sid = 0x1
+	// }
+	hdr := []uint8{flags, did, cid, d.seq}
 	buf := append(hdr, body...)
 
 	packet := &packet{
@@ -461,12 +463,13 @@ func unescapeBytes(data []uint8) []uint8 {
 	var result []uint8
 	escaped := false
 	for _, b := range data {
-		if escaped {
+		switch {
+		case escaped:
 			result = append(result, b^escapeMask)
 			escaped = false
-		} else if b == escapeHex {
+		case b == escapeHex:
 			escaped = true
-		} else {
+		default:
 			result = append(result, b)
 		}
 	}
