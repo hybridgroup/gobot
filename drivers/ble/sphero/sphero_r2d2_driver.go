@@ -60,7 +60,6 @@ type R2D2Driver struct {
 	defaultCollisionConfig spherocommon.CollisionConfig
 	seq                    uint8
 	seqMutex               sync.Mutex
-	collisionResponse      []uint8
 	packetChannel          chan *packet
 	asyncBuffer            []byte
 	asyncMessage           []byte
@@ -334,69 +333,6 @@ func (d *R2D2Driver) handleResponses(data []byte) {
 	// TODO get sensor data from a packet starting with 0x8d 0x0 0x18 0x2 0xff
 }
 
-// TODO get this working for R2
-func (d *R2D2Driver) handleDataStreaming(data []byte) {
-	// d.Publish(spherocommon.SensorDataEvent, dataPacket)
-}
-
-// TODO get this working for R2
-func (d *R2D2Driver) handleLocatorDetected(data []uint8) {
-	// d.locatorCallback(Point2D{X: x, Y: y})
-}
-
-// TODO get this working for R2
-func (d *R2D2Driver) handlePowerStateDetected(data []uint8) {
-	// var dataPacket spherocommon.PowerStatePacket
-	// buffer := bytes.NewBuffer(data[5:]) // skip header
-	// if err := binary.Read(buffer, binary.BigEndian, &dataPacket); err != nil {
-	// 	panic(err)
-	// }
-	//
-	// d.powerstateCallback(dataPacket)
-}
-
-// TODO get this working for R2
-func (d *R2D2Driver) handleCollisionDetected(data []uint8) {
-	switch len(data) {
-	case responsePacketMaxSize:
-		// Check if this is the header of collision response. (i.e. first part of data)
-		// Collision response is 22 bytes long. (individual packet size is maxed at 20)
-		if data[1] == 0xFE && data[2] == 0x07 && len(d.collisionResponse) == 0 {
-			// response code 7 is for a detected collision
-			d.collisionResponse = append(d.collisionResponse, data...)
-		}
-	case collisionResponseSize - responsePacketMaxSize:
-		// if this is the remaining part of the collision response,
-		// then make sure the header and first part of data is already received
-		if len(d.collisionResponse) == responsePacketMaxSize {
-			d.collisionResponse = append(d.collisionResponse, data...)
-		}
-	default:
-		return // not collision event
-	}
-
-	// check expected sizes
-	if len(d.collisionResponse) != collisionResponseSize || d.collisionResponse[4] != collisionDataSize {
-		return
-	}
-
-	// confirm checksum
-	size := len(d.collisionResponse)
-	chk := d.collisionResponse[size-1] // last byte is checksum
-	if chk != spherocommon.CalculateChecksum(d.collisionResponse[2:size-1]) {
-		return
-	}
-
-	var collision spherocommon.CollisionPacket
-	buffer := bytes.NewBuffer(d.collisionResponse[5:]) // skip header
-	if err := binary.Read(buffer, binary.BigEndian, &collision); err != nil {
-		panic(err)
-	}
-	d.collisionResponse = nil // clear the current response
-
-	d.Publish(spherocommon.CollisionEvent, collision)
-}
-
 func (d *R2D2Driver) sendCraftPacket(body []uint8, did byte, cid byte) {
 	d.packetChannel <- d.craftPacket(body, did, cid)
 }
@@ -457,21 +393,4 @@ func escapeByte(b uint8) []uint8 {
 	}
 
 	return append(escaped, b)
-}
-
-func unescapeBytes(data []uint8) []uint8 {
-	var result []uint8
-	escaped := false
-	for _, b := range data {
-		switch {
-		case escaped:
-			result = append(result, b^escapeMask)
-			escaped = false
-		case b == escapeHex:
-			escaped = true
-		default:
-			result = append(result, b)
-		}
-	}
-	return result
 }

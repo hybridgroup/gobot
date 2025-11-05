@@ -44,8 +44,8 @@ func Float32ToBytes(flt float32) []byte {
 	return buf
 }
 
-func Int16ToBytes(int uint16) []byte {
+func Int16ToBytes(nt uint16) []byte {
 	buf := make([]uint8, 2)
-	binary.BigEndian.PutUint16(buf, int)
+	binary.BigEndian.PutUint16(buf, nt)
 	return buf
 }
