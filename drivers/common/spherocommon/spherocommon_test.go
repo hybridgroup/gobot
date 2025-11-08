@@ -52,7 +52,7 @@ func TestIntToBytes(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		actual := Int16ToBytes(tt.data)
+		actual := Uint16ToBytes(tt.data)
 		if !bytes.Equal(actual, tt.bytes) {
 			require.Fail(t, fmt.Sprintf("Expected %x, got %x for data %v.", tt.bytes, actual, tt.data))
 		}

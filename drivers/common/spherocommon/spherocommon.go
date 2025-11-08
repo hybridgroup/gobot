@@ -37,15 +37,17 @@ func CalculateChecksum(buf []byte) byte {
 	return uint8(^(calculatedChecksum % 256)) //nolint:gosec // TODO: fix later
 }
 
-func Float32ToBytes(flt float32) []byte {
-	u := math.Float32bits(flt)
+// Float32ToBytes splits the given 32 bit value in 4 bytes in big endian format without any further conversion of the IEEE 754 binary representation.
+func Float32ToBytes(val float32) []byte {
+	valBits := math.Float32bits(val)
 	buf := make([]uint8, 4)
-	binary.BigEndian.PutUint32(buf, u)
+	binary.BigEndian.PutUint32(buf, valBits)
 	return buf
 }
 
-func Int16ToBytes(nt uint16) []byte {
+// Uint16ToBytes splits the given 16 bit value in 2 bytes in big endian format.
+func Uint16ToBytes(val uint16) []byte {
 	buf := make([]uint8, 2)
-	binary.BigEndian.PutUint16(buf, nt)
+	binary.BigEndian.PutUint16(buf, val)
 	return buf
 }
