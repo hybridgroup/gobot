@@ -21,7 +21,7 @@ require (
 	go.bug.st/serial v1.6.4
 	gocv.io/x/gocv v0.42.0
 	golang.org/x/net v0.46.0
-	golang.org/x/sys v0.37.0
+	golang.org/x/sys v0.38.0
 	periph.io/x/conn/v3 v3.7.2
 	periph.io/x/host/v3 v3.8.5
 	tinygo.org/x/bluetooth v0.13.0
