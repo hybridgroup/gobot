@@ -37,7 +37,8 @@ func CalculateChecksum(buf []byte) byte {
 	return uint8(^(calculatedChecksum % 256)) //nolint:gosec // TODO: fix later
 }
 
-// Float32ToBytes splits the given 32 bit value in 4 bytes in big endian format without any further conversion of the IEEE 754 binary representation.
+// Float32ToBytes splits the given 32 bit value in 4 bytes in big endian format without any further conversion of the
+// IEEE 754 binary representation.
 func Float32ToBytes(val float32) []byte {
 	valBits := math.Float32bits(val)
 	buf := make([]uint8, 4)
