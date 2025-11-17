@@ -20,8 +20,8 @@ require (
 	github.com/warthog618/go-gpiocdev v0.9.1
 	go.bug.st/serial v1.6.4
 	gocv.io/x/gocv v0.42.0
-	golang.org/x/net v0.46.0
-	golang.org/x/sys v0.37.0
+	golang.org/x/net v0.47.0
+	golang.org/x/sys v0.38.0
 	periph.io/x/conn/v3 v3.7.2
 	periph.io/x/host/v3 v3.8.5
 	tinygo.org/x/bluetooth v0.13.0
@@ -46,7 +46,7 @@ require (
 	github.com/soypat/seqs v0.0.0-20250630134107-01c3f05666ba // indirect
 	github.com/tinygo-org/cbgo v0.0.4 // indirect
 	github.com/tinygo-org/pio v0.2.0 // indirect
-	golang.org/x/crypto v0.43.0 // indirect
+	golang.org/x/crypto v0.44.0 // indirect
 	golang.org/x/exp v0.0.0-20251017212417-90e834f514db // indirect
 	golang.org/x/sync v0.17.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
