@@ -23,7 +23,7 @@ const (
 	r2ResponseChara = r2CommandsChara
 
 	// command safe interval
-	commandInterval = time.Duration(12) * time.Millisecond
+	commandInterval = 12 * time.Millisecond
 
 	// start of packet
 	sop = 0x8D
@@ -33,13 +33,13 @@ const (
 	escapeMask = 0x88
 
 	// flags
-	isResponse                = 0b1
-	requestsResponse          = 0b10
-	requestsOnlyErrorResponse = 0b100
-	isActivity                = 0b1000
-	hasTargetId               = 0b10000
-	hasSourceId               = 0b100000
-	unused                    = 0b1000000
+	isResponse                = 0b00000001
+	requestsResponse          = 0b00000010
+	requestsOnlyErrorResponse = 0b00000100
+	isActivity                = 0b00001000
+	hasTargetId               = 0b00010000
+	hasSourceId               = 0b00100000
+	unused                    = 0b01000000
 	extendedFlags             = 0b10000000
 
 	Immediate         Playback = 0x0
@@ -117,16 +117,12 @@ func (d *R2D2Driver) GetLocatorData(f func(p Point2D)) {
 }
 
 // GetPowerState calls the passed function with the Power State information from the sphero
+// Note the PowerState is defined as CHARGED = 0, CHARGING = 1, NOT_CHARGING = 2, OK = 3, LOW = 4,
+// CRITICAL = 5, UNKNOWN = 255
 func (d *R2D2Driver) GetPowerState(f func(p spherocommon.PowerStatePacket)) {
 	// did: 19, cid: 4
 	d.sendCraftPacket([]uint8{}, 0x13, 0x04)
-	//	CHARGED = 0
-	//	CHARGING = 1
-	//	NOT_CHARGING = 2
-	//	OK = 3
-	//	LOW = 4
-	//	CRITICAL = 5
-	//	UNKNOWN = 255
+
 	d.powerstateCallback = f
 }
 
@@ -138,7 +134,6 @@ func (d *R2D2Driver) SetRGB(r uint8, g uint8, b uint8) {
 
 // Roll tells the R2D2 to roll
 func (d *R2D2Driver) Roll(speed uint8, heading uint16) {
-	//nolint:gosec // TODO: fix later
 	// did: 22, cid: 7
 	// last data packet is DriveFlags, may not be supported on the R2
 	//	FORWARD = 0x0  # 0b0
@@ -250,8 +245,7 @@ func (d *R2D2Driver) initialize() error {
 	go func() {
 		for {
 			packet := <-d.packetChannel
-			err := d.writeCommand(packet)
-			if err != nil {
+			if err := d.writeCommand(packet); err != nil {
 				d.Publish(d.Event(spherocommon.ErrorEvent), err)
 			}
 		}
