@@ -284,6 +284,7 @@ platforms are currently supported:
 - [Sphero](http://www.sphero.com/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/sphero/sphero)
 - [Sphero BB-8](http://www.sphero.com/bb8) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/sphero/bb8)
 - [Sphero Ollie](http://www.sphero.com/ollie) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/sphero/ollie)
+- [Sphero R2-D2](https://sphero.com/pages/legacy-products) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/sphero/r2d2)
 - [Sphero SPRK+](http://www.sphero.com/sprk-plus) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/sphero/sprkplus)
 - [UP2](http://www.up-board.org/upsquared/) <=> [Package](https://github.com/hybridgroup/gobot/blob/release/platforms/upboard/up2)
 
