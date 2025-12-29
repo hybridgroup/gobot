@@ -101,5 +101,5 @@ periph.io/x/conn/v3 v3.7.2 h1:qt9dE6XGP5ljbFnCKRJ9OOCoiOyBGlw7JZgoi72zZ1s=
 periph.io/x/conn/v3 v3.7.2/go.mod h1:Ao0b4sFRo4QOx6c1tROJU1fLJN1hUIYggjOrkIVnpGg=
 periph.io/x/host/v3 v3.8.5 h1:g4g5xE1XZtDiGl1UAJaUur1aT7uNiFLMkyMEiZ7IHII=
 periph.io/x/host/v3 v3.8.5/go.mod h1:hPq8dISZIc+UNfWoRj+bPH3XEBQqJPdFdx218W92mdc=
-tinygo.org/x/bluetooth v0.13.0 h1:3pkTMcfqv71HoAxG4DBTm2n+1bm6Nqqz8eoHjSW9+5g=
-tinygo.org/x/bluetooth v0.13.0/go.mod h1:YnyJRVX09i+wkFeHpXut0b+qHq+T2WwKBRRiF/scANA=
+tinygo.org/x/bluetooth v0.14.0 h1:rrUaT+Fu6O0phGm4Y5UZULL8F7UahOq/JwGAPjJm+V4=
+tinygo.org/x/bluetooth v0.14.0/go.mod h1:YnyJRVX09i+wkFeHpXut0b+qHq+T2WwKBRRiF/scANA=

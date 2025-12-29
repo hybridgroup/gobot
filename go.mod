@@ -24,7 +24,7 @@ require (
 	golang.org/x/sys v0.37.0
 	periph.io/x/conn/v3 v3.7.2
 	periph.io/x/host/v3 v3.8.5
-	tinygo.org/x/bluetooth v0.13.0
+	tinygo.org/x/bluetooth v0.14.0
 )
 
 require (
