@@ -25,6 +25,7 @@ Gobot has a extensible system for connecting to hardware devices. The following 
 - Grove Touch Sensor (by using driver for Button)
 - HC-SR04 Ultrasonic Ranging Module
 - HD44780 LCD controller
+- HX711 24 bit ADC e.g. used for weight cells
 - LED
 - Makey Button (by using driver for Button)
 - MAX7219 LED Dot Matrix
