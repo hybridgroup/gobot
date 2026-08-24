@@ -26,6 +26,7 @@ type firmataBoard interface {
 	ReportDigital(pin int, state int) error
 	DigitalWrite(pin int, value int) error
 	I2cRead(address int, numBytes int) error
+	I2cReadRegister(address int, register int, numBytes int) error
 	I2cWrite(address int, data []byte) error
 	I2cConfig(delay int) error
 	ServoConfig(pin int, maximum int, minimum int) error

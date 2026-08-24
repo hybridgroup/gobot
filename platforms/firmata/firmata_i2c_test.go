@@ -25,6 +25,7 @@ type i2cMockFirmataBoard struct {
 
 	i2cDataForRead []byte
 	numBytesToRead int
+	registerToRead int
 	i2cWritten     []byte
 }
 
@@ -37,6 +38,11 @@ func (t *i2cMockFirmataBoard) I2cRead(address int, numBytes int) error {
 		t.Publish(t.Event("I2cReply"), i2cReply)
 	}()
 	return nil
+}
+
+func (t *i2cMockFirmataBoard) I2cReadRegister(address int, register int, numBytes int) error {
+	t.registerToRead = register
+	return t.I2cRead(address, numBytes)
 }
 
 func (t *i2cMockFirmataBoard) I2cWrite(address int, data []byte) error {
@@ -119,9 +125,9 @@ func TestReadByteData(t *testing.T) {
 	// assert
 	require.NoError(t, err)
 	assert.Equal(t, 1, brd.numBytesToRead)
+	assert.Equal(t, int(reg), brd.registerToRead)
 	assert.Equal(t, brd.i2cDataForRead[0], val)
-	assert.Len(t, brd.i2cWritten, 1)
-	assert.Equal(t, reg, brd.i2cWritten[0])
+	assert.Empty(t, brd.i2cWritten)
 }
 
 func TestReadWordData(t *testing.T) {
@@ -136,9 +142,9 @@ func TestReadWordData(t *testing.T) {
 	// assert
 	require.NoError(t, err)
 	assert.Equal(t, 2, brd.numBytesToRead)
+	assert.Equal(t, int(reg), brd.registerToRead)
 	assert.Equal(t, uint16(lsb)|uint16(msb)<<8, val)
-	assert.Len(t, brd.i2cWritten, 1)
-	assert.Equal(t, reg, brd.i2cWritten[0])
+	assert.Empty(t, brd.i2cWritten)
 }
 
 func TestReadBlockData(t *testing.T) {
@@ -152,9 +158,9 @@ func TestReadBlockData(t *testing.T) {
 	// assert
 	require.NoError(t, err)
 	assert.Equal(t, 5, brd.numBytesToRead)
+	assert.Equal(t, int(reg), brd.registerToRead)
 	assert.Equal(t, brd.i2cDataForRead, buf)
-	assert.Len(t, brd.i2cWritten, 1)
-	assert.Equal(t, reg, brd.i2cWritten[0])
+	assert.Empty(t, brd.i2cWritten)
 }
 
 func TestWrite(t *testing.T) {
