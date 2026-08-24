@@ -286,6 +286,19 @@ func TestI2cRead(t *testing.T) {
 	require.NoError(t, b.I2cRead(0x00, 10))
 }
 
+func TestI2cReadRegister(t *testing.T) {
+	b, _ := initTestFirmataWithReadWriteCloser(t.Name())
+	writeDataMutex.Lock()
+	testWriteData.Reset()
+	writeDataMutex.Unlock()
+
+	require.NoError(t, b.I2cReadRegister(0x11, 0x22, 10))
+
+	writeDataMutex.Lock()
+	assert.Equal(t, []byte{0xF0, 0x76, 0x11, 0x48, 0x22, 0x00, 0x0A, 0x00, 0xF7}, testWriteData.Bytes())
+	writeDataMutex.Unlock()
+}
+
 func TestWriteSysex(t *testing.T) {
 	b, _ := initTestFirmataWithReadWriteCloser(t.Name())
 	require.NoError(t, b.WriteSysex([]byte{0x01, 0x02}))

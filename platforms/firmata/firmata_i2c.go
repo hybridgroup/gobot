@@ -58,40 +58,24 @@ func (c *firmataI2cConnection) ReadByte() (byte, error) {
 }
 
 // ReadByteData reads one byte of the given register address from the i2c device.
-// TODO: implement the specification, because some devices will not work with this
-//
-//	current:  "S Addr Wr [A] Comm [A] P S Addr Rd [A] [Data] NA P"
-//	required: "S Addr Wr [A] Comm [A] S Addr Rd [A] [Data] NA P"
 func (c *firmataI2cConnection) ReadByteData(reg uint8) (uint8, error) {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
-	if err := c.writeAndCheckCount([]byte{reg}); err != nil {
-		return 0, err
-	}
-
 	buf := []byte{0}
-	if err := c.readAndCheckCount(buf); err != nil {
+	if err := c.readRegisterAndCheckCount(reg, buf); err != nil {
 		return 0, err
 	}
 	return buf[0], nil
 }
 
 // ReadWordData reads two bytes of the given register address from the i2c device.
-// TODO: implement the specification, because some devices will not work with this
-//
-//	current:  "S Addr Wr [A] Comm [A] P S Addr Rd [A] [DataLow] A [DataHigh] NA P"
-//	required: "S Addr Wr [A] Comm [A] S Addr Rd [A] [DataLow] A [DataHigh] NA P"
 func (c *firmataI2cConnection) ReadWordData(reg uint8) (uint16, error) {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
-	if err := c.writeAndCheckCount([]byte{reg}); err != nil {
-		return uint16(0), err
-	}
-
 	buf := []byte{0, 0}
-	if err := c.readAndCheckCount(buf); err != nil {
+	if err := c.readRegisterAndCheckCount(reg, buf); err != nil {
 		return uint16(0), err
 	}
 	low, high := buf[0], buf[1]
@@ -99,22 +83,14 @@ func (c *firmataI2cConnection) ReadWordData(reg uint8) (uint16, error) {
 }
 
 // ReadBlockData reads a block of maximum 32 bytes from the given register address of the i2c device.
-// TODO: implement the specification, because some devices will not work with this
-//
-//	current:  "S Addr Wr [A] Comm [A] P S Addr Rd [A] [Count] A [Data] A [Data] A ... A [Data] NA P"
-//	required: "S Addr Wr [A] Comm [A] S Addr Rd [A] [Count] A [Data] A [Data] A ... A [Data] NA P"
 func (c *firmataI2cConnection) ReadBlockData(reg uint8, data []byte) error {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
-	if err := c.writeAndCheckCount([]byte{reg}); err != nil {
-		return err
-	}
-
 	if len(data) > 32 {
 		data = data[:32]
 	}
-	return c.readAndCheckCount(data)
+	return c.readRegisterAndCheckCount(reg, data)
 }
 
 // WriteByte writes one byte to the i2c device.
@@ -185,6 +161,18 @@ func (c *firmataI2cConnection) readAndCheckCount(buf []byte) error {
 	return nil
 }
 
+func (c *firmataI2cConnection) readRegisterAndCheckCount(reg uint8, buf []byte) error {
+	countRead, err := c.readRegisterInternal(reg, buf)
+	if err != nil {
+		return err
+	}
+	expectedCount := len(buf)
+	if countRead != expectedCount {
+		return fmt.Errorf("firmata i2c read %d bytes, expected %d bytes", countRead, expectedCount)
+	}
+	return nil
+}
+
 func (c *firmataI2cConnection) writeAndCheckCount(buf []byte) error {
 	countWritten, err := c.writeInternal(buf)
 	if err != nil {
@@ -198,9 +186,21 @@ func (c *firmataI2cConnection) writeAndCheckCount(buf []byte) error {
 }
 
 func (c *firmataI2cConnection) readInternal(b []byte) (int, error) {
+	return c.readWithRequest(b, func() error {
+		return c.adaptor.Board.I2cRead(c.address, len(b))
+	})
+}
+
+func (c *firmataI2cConnection) readRegisterInternal(reg uint8, b []byte) (int, error) {
+	return c.readWithRequest(b, func() error {
+		return c.adaptor.Board.I2cReadRegister(c.address, int(reg), len(b))
+	})
+}
+
+func (c *firmataI2cConnection) readWithRequest(b []byte, request func() error) (int, error) {
 	ret := make(chan []byte)
 
-	if err := c.adaptor.Board.I2cRead(c.address, len(b)); err != nil {
+	if err := request(); err != nil {
 		return 0, err
 	}
 

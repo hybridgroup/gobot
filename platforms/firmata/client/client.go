@@ -52,6 +52,7 @@ const (
 	I2CModeRead              byte = 0x01
 	I2CModeContinuousRead    byte = 0x02
 	I2CModeStopReading       byte = 0x03
+	I2CAutoRestart           byte = 0x40
 	ServoConfig              byte = 0x70
 )
 
@@ -334,6 +335,15 @@ func (b *Client) ReportAnalog(pin int, state int) error {
 func (b *Client) I2cRead(address int, numBytes int) error {
 	return b.WriteSysex([]byte{
 		I2CRequest, byte(address), (I2CModeRead << 3),
+		byte(numBytes) & 0x7F, (byte(numBytes) >> 7) & 0x7F,
+	})
+}
+
+// I2cReadRegister reads numBytes from a register using a repeated start.
+func (b *Client) I2cReadRegister(address int, register int, numBytes int) error {
+	return b.WriteSysex([]byte{
+		I2CRequest, byte(address), (I2CModeRead << 3) | I2CAutoRestart,
+		byte(register) & 0x7F, (byte(register) >> 7) & 0x7F,
 		byte(numBytes) & 0x7F, (byte(numBytes) >> 7) & 0x7F,
 	})
 }

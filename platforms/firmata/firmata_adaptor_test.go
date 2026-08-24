@@ -95,9 +95,10 @@ func (mockFirmataBoard) ServoConfig(int, int, int) error { return nil }
 func (mockFirmataBoard) WriteSysex([]byte) error         { return nil }
 
 // i2c functions unused in this test scenarios
-func (mockFirmataBoard) I2cRead(int, int) error     { return nil }
-func (mockFirmataBoard) I2cWrite(int, []byte) error { return nil }
-func (mockFirmataBoard) I2cConfig(int) error        { return nil }
+func (mockFirmataBoard) I2cRead(int, int) error              { return nil }
+func (mockFirmataBoard) I2cReadRegister(int, int, int) error { return nil }
+func (mockFirmataBoard) I2cWrite(int, []byte) error          { return nil }
+func (mockFirmataBoard) I2cConfig(int) error                 { return nil }
 
 func initTestAdaptor() *Adaptor {
 	a := NewAdaptor("/dev/null")
