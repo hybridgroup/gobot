@@ -70,7 +70,7 @@ type Client struct {
 	connecting      atomic.Value
 	connected       atomic.Value
 	connection      io.ReadWriteCloser
-	analogPins      []int
+	analogPins      map[int]int
 	ConnectTimeout  time.Duration
 }
 
@@ -98,7 +98,7 @@ func New() *Client {
 		connection:      nil,
 		ConnectTimeout:  15 * time.Second,
 		pins:            []Pin{},
-		analogPins:      []int{},
+		analogPins:      make(map[int]int),
 		Eventer:         gobot.NewEventer(),
 	}
 
@@ -405,11 +405,11 @@ func (b *Client) process() error {
 		value := uint(buf[0]) | uint(buf[1])<<7
 		pin := int((messageType & 0x0F))
 
-		if len(b.analogPins) > pin {
-			if len(b.pins) > b.analogPins[pin] {
+		if physicalPin, ok := b.analogPins[pin]; ok {
+			if len(b.pins) > physicalPin {
 				//nolint:gosec // TODO: fix later
-				b.pins[b.analogPins[pin]].Value = int(value)
-				b.Publish(b.Event(fmt.Sprintf("AnalogRead%v", pin)), b.pins[b.analogPins[pin]].Value)
+				b.pins[physicalPin].Value = int(value)
+				b.Publish(b.Event(fmt.Sprintf("AnalogRead%v", pin)), b.pins[physicalPin].Value)
 			}
 		}
 	case DigitalMessageRangeStart <= messageType &&
@@ -480,15 +480,16 @@ func (b *Client) process() error {
 			b.Publish(b.Event("CapabilityQuery"), nil)
 		case AnalogMappingResponse:
 			pinIndex := 0
-			b.analogPins = []int{}
+			b.analogPins = make(map[int]int)
 
 			for _, val := range currentBuffer[2 : len(currentBuffer)-1] {
 				b.pins[pinIndex].AnalogChannel = int(val)
 
 				if val != 127 {
-					b.analogPins = append(b.analogPins, pinIndex)
+					// Analog channels need not follow physical pin order or be contiguous.
+					b.analogPins[int(val)] = pinIndex
+					b.AddEvent(fmt.Sprintf("AnalogRead%v", val))
 				}
-				b.AddEvent(fmt.Sprintf("AnalogRead%v", pinIndex))
 				pinIndex++
 			}
 			b.Publish(b.Event("AnalogMappingQuery"), nil)

@@ -2,6 +2,7 @@ package client
 
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"sync"
 	"testing"
@@ -117,6 +118,44 @@ func TestPins(t *testing.T) {
 	b, _ := initTestFirmataWithReadWriteCloser(t.Name(), testDataCapabilitiesResponse, testDataAnalogMappingResponse)
 	assert.Len(t, b.Pins(), 20)
 	assert.Len(t, b.analogPins, 6)
+}
+
+func TestProcessAnalogMapping(t *testing.T) {
+	tests := map[string]struct {
+		mapping []byte
+		channel byte
+		pin     int
+	}{
+		"noncontiguous pins": {[]byte{127, 0, 127, 1}, 1, 3},
+		"reordered channels": {[]byte{1, 127, 0}, 0, 2},
+		"sparse channels":    {[]byte{127, 5, 127, 0}, 5, 1},
+		"highest channel":    {[]byte{127, 15}, 15, 1},
+		"unmapped channel":   {[]byte{127, 3, 127, 0}, 1, -1},
+	}
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			b, rwc := initTestFirmataWithReadWriteCloser(t.Name())
+			b.pins = make([]Pin, len(tt.mapping))
+			response := append([]byte{StartSysex, AnalogMappingResponse}, tt.mapping...)
+			rwc.addTestReadData(append(response, EndSysex))
+			require.NoError(t, b.process())
+
+			if tt.pin >= 0 {
+				_, exists := b.Events()[fmt.Sprintf("AnalogRead%d", tt.channel)]
+				assert.True(t, exists)
+			}
+			rwc.addTestReadData([]byte{AnalogMessageRangeStart | tt.channel, 0x23, 0x05})
+			require.NoError(t, b.process())
+			for i, pin := range b.Pins() {
+				assert.Equal(t, int(tt.mapping[i]), pin.AnalogChannel)
+				if i == tt.pin {
+					assert.Equal(t, 675, pin.Value)
+				} else {
+					assert.Zero(t, pin.Value)
+				}
+			}
+		})
+	}
 }
 
 func TestProtocolVersionQuery(t *testing.T) {
