@@ -207,22 +207,25 @@ func (f *Adaptor) DigitalRead(pin string) (int, error) {
 	return f.Board.Pins()[p].Value, nil
 }
 
-// AnalogRead retrieves value from analog pin.
-// Returns -1 if the response from the board has timed out
+// AnalogRead retrieves the latest value from an analog channel using the board's pin mapping.
 func (f *Adaptor) AnalogRead(pin string) (int, error) {
-	p, err := strconv.Atoi(pin)
+	channel, err := strconv.Atoi(pin)
 	if err != nil {
 		return 0, err
 	}
 
-	p = f.digitalPin(p)
+	p, err := f.analogPinLookup(channel)
+	if err != nil {
+		return 0, err
+	}
 
 	if f.Board.Pins()[p].Mode != client.Analog {
 		if err := f.Board.SetPinMode(p, client.Analog); err != nil {
 			return 0, err
 		}
 
-		if err := f.Board.ReportAnalog(p, 1); err != nil {
+		// Reporting uses the analog channel; setting the mode uses the physical pin.
+		if err := f.Board.ReportAnalog(channel, 1); err != nil {
 			return 0, err
 		}
 		<-time.After(10 * time.Millisecond)
@@ -235,9 +238,17 @@ func (f *Adaptor) WriteSysex(data []byte) error {
 	return f.Board.WriteSysex(data)
 }
 
-// digitalPin converts pin number to digital mapping
-func (f *Adaptor) digitalPin(pin int) int {
-	return pin + 14
+// analogPinLookup finds the physical pin advertised for an analog input channel.
+func (f *Adaptor) analogPinLookup(channel int) (int, error) {
+	// Analog reports encode the channel in four bits. Mapping value 127 means no analog input.
+	if channel >= 0 && channel <= 15 {
+		for pin, state := range f.Board.Pins() {
+			if state.AnalogChannel == channel {
+				return pin, nil
+			}
+		}
+	}
+	return 0, fmt.Errorf("analog channel %d is not available", channel)
 }
 
 // GetI2cConnection returns an i2c connection to a device on a specified bus.

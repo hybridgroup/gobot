@@ -72,6 +72,11 @@ func newMockFirmataBoard() *mockFirmataBoard {
 
 	m.pins[1].Value = 1
 	m.pins[15].Value = 133
+	for i := range m.pins {
+		m.pins[i].AnalogChannel = 127
+	}
+	m.pins[14].AnalogChannel = 0
+	m.pins[15].AnalogChannel = 1
 
 	return m
 }
@@ -210,6 +215,111 @@ func TestAdaptorAnalogReadBadPin(t *testing.T) {
 	a := initTestAdaptor()
 	_, err := a.AnalogRead("xyz")
 	require.Error(t, err)
+}
+
+type analogMappingBoard struct {
+	mockFirmataBoard
+
+	modeCalls   [][2]int
+	reportCalls [][2]int
+	modeError   error
+	reportError error
+}
+
+func (b *analogMappingBoard) SetPinMode(pin int, mode int) error {
+	b.modeCalls = append(b.modeCalls, [2]int{pin, mode})
+	if b.modeError == nil {
+		b.pins[pin].Mode = mode
+	}
+	return b.modeError
+}
+
+func (b *analogMappingBoard) ReportAnalog(channel int, state int) error {
+	b.reportCalls = append(b.reportCalls, [2]int{channel, state})
+	return b.reportError
+}
+
+func TestAdaptorAnalogReadMapping(t *testing.T) {
+	tests := map[string]struct {
+		channel string
+		mapping []int
+		pin     int
+		mode    int
+	}{
+		"Uno": {
+			"1",
+			[]int{127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 0, 1},
+			15, client.Input,
+		},
+		"Yun": {
+			"1",
+			[]int{127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 0, 1},
+			19, client.Input,
+		},
+		"noncontiguous":  {"3", []int{127, 3, 127, 0}, 1, client.Input},
+		"already analog": {"0", []int{127, 0}, 1, client.Analog},
+	}
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			board := &analogMappingBoard{mockFirmataBoard: *newMockFirmataBoard()}
+			board.pins = make([]client.Pin, len(tt.mapping))
+			for i, channel := range tt.mapping {
+				board.pins[i].AnalogChannel = channel
+				board.pins[i].Value = 100 + i
+			}
+			board.pins[tt.pin].Mode = tt.mode
+			adaptor := NewAdaptor()
+			adaptor.Board = board
+
+			value, err := adaptor.AnalogRead(tt.channel)
+			require.NoError(t, err)
+			assert.Equal(t, 100+tt.pin, value)
+			if tt.mode == client.Analog {
+				assert.Empty(t, board.modeCalls)
+				assert.Empty(t, board.reportCalls)
+			} else {
+				assert.Equal(t, [][2]int{{tt.pin, client.Analog}}, board.modeCalls)
+				assert.Equal(t, [][2]int{{tt.mapping[tt.pin], 1}}, board.reportCalls)
+			}
+		})
+	}
+}
+
+func TestAdaptorAnalogReadUnmappedChannel(t *testing.T) {
+	for _, channel := range []string{"-1", "2", "127", "1000"} {
+		t.Run(channel, func(t *testing.T) {
+			board := &analogMappingBoard{mockFirmataBoard: *newMockFirmataBoard()}
+			adaptor := NewAdaptor()
+			adaptor.Board = board
+			value, err := adaptor.AnalogRead(channel)
+			require.ErrorContains(t, err, "analog channel")
+			assert.Zero(t, value)
+			assert.Empty(t, board.modeCalls)
+			assert.Empty(t, board.reportCalls)
+		})
+	}
+}
+
+func TestAdaptorAnalogReadBoardErrors(t *testing.T) {
+	boardError := errors.New("board error")
+	for _, setModeFails := range []bool{true, false} {
+		board := &analogMappingBoard{mockFirmataBoard: *newMockFirmataBoard()}
+		if setModeFails {
+			board.modeError = boardError
+		} else {
+			board.reportError = boardError
+		}
+		adaptor := NewAdaptor()
+		adaptor.Board = board
+		value, err := adaptor.AnalogRead("1")
+		require.ErrorIs(t, err, boardError)
+		assert.Zero(t, value)
+		if setModeFails {
+			assert.Empty(t, board.reportCalls)
+		} else {
+			assert.Equal(t, [][2]int{{1, 1}}, board.reportCalls)
+		}
+	}
 }
 
 func TestServoConfig(t *testing.T) {
